@@ -4,7 +4,7 @@ const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema(
   {
-    nickname: {
+    username: {
       type: String,
       unique: true,
       required: true,
