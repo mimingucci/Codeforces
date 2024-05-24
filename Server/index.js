@@ -1,8 +1,8 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const { createServer } = require("node:http");
-// const db = require("./config/db");
-// const initRoutes = require("./routes");
+const db = require("./config/db");
+const initRoutes = require("./routes");
 require("dotenv").config();
 
 const app = express();
@@ -11,8 +11,8 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 1905;
-// db();
-// initRoutes(app);
+db();
+initRoutes(app);
 
 app.get("/", (req, res) => {
   res.send("<h1>Hello I'm mimingucci</h1>");

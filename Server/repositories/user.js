@@ -1,11 +1,15 @@
 const User = require("../models/user");
 
 const save = async (user) => {
-  return await User.save(user).select("-password -refreshToken -role");
+  let u = convertToModel(user);
+  return await u
+    .save()
+    .then((savedUser) => savedUser)
+    .catch((err) => err);
 };
 
 const getAll = async () => {
-  const users = await User.find().select("-password -refreshToken -role");
+  const users = await User.find({}).select("-password -refreshToken -role");
   return users;
 };
 
@@ -21,8 +25,8 @@ const getByEmail = async (email) => {
   return await User.find({ email }).select("-password -refreshToken -role");
 };
 
-const update = async (_id, user) => {
-  return await User.findByIdAndUpdate(_id, user, { new: true }).select(
+const update = async (id, user) => {
+  return await User.findByIdAndUpdate(id, user, { new: true }).select(
     "-password -refreshToken -role"
   );
 };
@@ -35,6 +39,14 @@ const deleteById = async (_id) => {
 const deleteByEmail = async (email) => {
   const res = await User.findOneAndDelete({ email: email });
   return res ? true : false;
+};
+
+const convertToModel = (data) => {
+  let u = new User();
+  for (let [key, val] of Object.entries(data)) {
+    u.set(key, val);
+  }
+  return u;
 };
 
 module.exports = {
