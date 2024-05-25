@@ -33,8 +33,14 @@ const blogSchema = new mongoose.Schema(
     },
     author: {
       type: String,
-      default: "Admin",
+      required: true,
     },
+    comments: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
   },
   {
     timestamps: true,

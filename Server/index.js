@@ -14,9 +14,6 @@ const PORT = process.env.PORT || 1905;
 db();
 initRoutes(app);
 
-app.get("/", (req, res) => {
-  res.send("<h1>Hello I'm mimingucci</h1>");
-});
 server.listen(PORT, () => {
   console.log(`Hello NodeJS in port ${PORT}`);
 });

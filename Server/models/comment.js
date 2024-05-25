@@ -19,11 +19,12 @@ const commentSchema = new mongoose.Schema(
       },
     ],
     author: {
-      type: String,
-      default: "Admin",
+      type: mongoose.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     blogId: {
-      type: Number,
+      type: String,
       required: true,
     },
   },
