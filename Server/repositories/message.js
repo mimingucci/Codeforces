@@ -34,9 +34,13 @@ const deleteById = async (id) => {
 };
 
 const update = async (data) => {
-  const rs = await Message.findByIdAndUpdate(data._id, {
-    content: data.content,
-  });
+  const rs = await Message.findByIdAndUpdate(
+    data._id,
+    {
+      content: data.content,
+    },
+    { new: true }
+  );
   return rs;
 };
 

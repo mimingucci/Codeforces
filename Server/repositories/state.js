@@ -2,10 +2,7 @@ const State = require("../models/state");
 
 const save = async (data) => {
   const state = new State({ name: data.name });
-  const rs = await state.save((err, result) => {
-    if (err) throw err;
-    return result;
-  });
+  const rs = await state.save();
   return rs;
 };
 

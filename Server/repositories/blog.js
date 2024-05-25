@@ -26,7 +26,7 @@ const deleteById = async (id) => {
 };
 
 const updateById = async (id, blog) => {
-  const rs = await Blog.findByIdAndUpdate(id, blog);
+  const rs = await Blog.findByIdAndUpdate(id, blog, { new: true });
   return rs;
 };
 
@@ -121,16 +121,24 @@ const alreadyDislike = async (blogid, userid) => {
 };
 
 const addComment = async (blogid, commentid) => {
-  const rs = await Blog.findByIdAndUpdate(blogid, {
-    comments: { $push: commentid },
-  });
+  const rs = await Blog.findByIdAndUpdate(
+    blogid,
+    {
+      $push: { comments: commentid },
+    },
+    { new: true }
+  );
   return rs;
 };
 
 const deleteComment = async (blogid, commentid) => {
-  const rs = await Blog.findByIdAndUpdate(blogid, {
-    comments: { $pull: commentid },
-  });
+  const rs = await Blog.findByIdAndUpdate(
+    blogid,
+    {
+      $pull: { comments: commentid },
+    },
+    { new: true }
+  );
   return rs;
 };
 

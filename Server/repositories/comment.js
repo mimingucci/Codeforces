@@ -3,10 +3,7 @@ const { CommentNotFoundError } = require("../errors/comment");
 const save = async (data, author) => {
   const comment = convertDataToComment(data);
   comment.author = author;
-  const rs = await comment.save((err, result) => {
-    if (err) throw err;
-    return result;
-  });
+  const rs = await comment.save();
   return rs;
 };
 
@@ -20,12 +17,7 @@ const getByAuthor = async (author) => {
 };
 
 const update = async (id, data) => {
-  const comment = await Comment.findByIdAndUpdate(id, data, (err, result) => {
-    if (err) throw err;
-    if (!result)
-      throw new CommentNotFoundError(`Could not find comment with id ${id}`);
-    return result;
-  });
+  const comment = await Comment.findByIdAndUpdate(id, data);
   return comment;
 };
 
