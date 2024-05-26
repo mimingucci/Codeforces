@@ -1,3 +1,4 @@
+const country = require("../models/country");
 const User = require("../models/user");
 
 const save = async (user) => {
@@ -49,6 +50,44 @@ const convertToModel = (data) => {
   return u;
 };
 
+const getByState = async (state) => {
+  const rs = await User.find({ state });
+  return rs;
+};
+
+const getByCountry = async (country) => {
+  const rs = await User.find({ country });
+  return rs;
+};
+
+const setCountry = async (id, country) => {
+  const rs = await User.findByIdAndUpdate(id, { country }, { new: true });
+  return rs;
+};
+
+const setState = async (id, state) => {
+  const rs = await User.findByIdAndUpdate(id, { state }, { new: true });
+  return rs;
+};
+
+const unsetCountry = async (id) => {
+  const rs = await User.findByIdAndUpdate(
+    id,
+    { $unset: { country: "" } },
+    { new: true }
+  );
+  return rs ? true : false;
+};
+
+const unsetState = async (id) => {
+  const rs = await User.findByIdAndUpdate(
+    id,
+    { $unset: { state: "" } },
+    { new: true }
+  );
+  return rs ? true : false;
+};
+
 module.exports = {
   save,
   getById,
@@ -58,4 +97,10 @@ module.exports = {
   update,
   deleteById,
   deleteByEmail,
+  getByState,
+  getByCountry,
+  setCountry,
+  setState,
+  unsetState,
+  unsetCountry,
 };

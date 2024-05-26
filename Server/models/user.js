@@ -48,6 +48,14 @@ const userSchema = new mongoose.Schema(
       default: "DATABASE",
       enum: ["DATABASE", "GOOGLE", "FACEBOOK"],
     },
+    state: {
+      type: mongoose.Types.ObjectId,
+      ref: "State",
+    },
+    country: {
+      type: mongoose.Types.ObjectId,
+      ref: "Country",
+    },
   },
   {
     timestamps: true,

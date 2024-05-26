@@ -9,9 +9,16 @@ const {
   update,
   deleteById,
   deleteByEmail,
+  getByState,
+  getByCountry,
+  setCountry,
+  setState,
+  unsetCountry,
+  unsetState,
 } = require("../repositories/user");
 require("dotenv").config();
 const sendMail = require("../untils/sendMail");
+const { default: mongoose } = require("mongoose");
 
 const getUsers = asyncHandler(async (req, res) => {
   const response = await getAll();
@@ -226,6 +233,55 @@ const updateUserByAdmin = asyncHandler(async (req, res) => {
   });
 });
 
+const getUsersByState = asyncHandler(async (req, res) => {
+  const state = req.query.state;
+  const rs = await getByState(mongoose.Types.ObjectId(state));
+  return res.status(200).json({
+    status: rs ? "success" : "failure",
+    data: rs ? rs : "Something went wrong",
+  });
+});
+
+const getUsersByCountry = asyncHandler(async (req, res) => {
+  const country = req.query.country;
+  const rs = await getByCountry(mongoose.Types.ObjectId(country));
+  return res.status(200).json({
+    status: rs ? "success" : "failure",
+    data: rs ? rs : "Something went wrong",
+  });
+});
+
+const updateUserByAddress = asyncHandler(async (req, res) => {
+  const { country, state, id } = req.params;
+  if (!id) throw new Error("Missing user id");
+  ok = true;
+  if (country) {
+    ok = await setCountry(id, mongoose.Types.ObjectId(country));
+  }
+  if (state) {
+    ok = await setState(id, mongoose.Types.ObjectId(state));
+  }
+  return res.json({
+    status: ok ? "success" : "failure",
+  });
+});
+
+const unsetAddress = asyncHandler(async (req, res) => {
+  const country = req.query.country;
+  const state = req.query.state;
+  const { id } = req.params.id;
+  ok = true;
+  if (country && country === "true") {
+    ok = await unsetCountry(mongoose.Types.ObjectId(id));
+  }
+  if (state && state === "true") {
+    ok = await unsetState(mongoose.Types.ObjectId(id));
+  }
+  return res.json({
+    status: ok ? "success" : "failure",
+  });
+});
+
 module.exports = {
   register,
   login,
@@ -239,4 +295,8 @@ module.exports = {
   getUserById,
   getUserByUsername,
   getUserByEmail,
+  getUsersByCountry,
+  getUsersByState,
+  updateUserByAddress,
+  unsetAddress,
 };
