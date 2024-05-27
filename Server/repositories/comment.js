@@ -1,8 +1,7 @@
 const Comment = require("../models/comment");
 const { CommentNotFoundError } = require("../errors/comment");
-const save = async (data, author) => {
+const save = async (data) => {
   const comment = convertDataToComment(data);
-  comment.author = author;
   const rs = await comment.save();
   return rs;
 };
