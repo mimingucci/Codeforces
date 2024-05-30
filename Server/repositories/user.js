@@ -15,15 +15,21 @@ const getAll = async () => {
 };
 
 const getById = async (_id) => {
-  return await User.find({ _id }).select("-password -refreshToken -role");
+  return await User.findOne({ _id }).select("-password -refreshToken -role");
+};
+
+const getByIdAllFields = async (_id) => {
+  return await User.findOne({ _id });
 };
 
 const getByUsername = async (username) => {
-  return await User.find({ username }).select("-password -refreshToken -role");
+  return await User.findOne({ username }).select(
+    "-password -refreshToken -role"
+  );
 };
 
 const getByEmail = async (email) => {
-  return await User.find({ email }).select("-password -refreshToken -role");
+  return await User.findOne({ email }).select("-password -refreshToken -role");
 };
 
 const update = async (id, user) => {
@@ -103,4 +109,5 @@ module.exports = {
   setState,
   unsetState,
   unsetCountry,
+  getByIdAllFields,
 };

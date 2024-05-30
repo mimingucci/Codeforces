@@ -1,9 +1,9 @@
 const Blog = require("../models/blog");
 const {
+  getBlogById,
   save,
   getAll,
   getByAuthor,
-  getById,
   getByTag,
   deleteById,
   updateById,
@@ -20,7 +20,7 @@ const {
 } = require("../repositories/blog");
 
 const blogExists = async (id) => {
-  const blog = await getById(id);
+  const blog = await getBlogById(id);
   if (blog && blog?._id.toString() === id.toString()) {
     return true;
   } else {

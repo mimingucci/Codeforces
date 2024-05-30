@@ -2,12 +2,21 @@ const Blog = require("../models/blog");
 const { getById } = require("./user");
 
 const save = async (user) => {
-  const blog = await Blog.save(user);
-  return blog;
+  let blog = new Blog({
+    author: user.author,
+    title: user.title,
+    content: user.content,
+  });
+  const rs = await blog.save();
+  return rs;
 };
 
 const getAll = async () => {
   return await Blog.find();
+};
+
+const getBlogById = async (id) => {
+  return await Blog.findOne({ _id: id });
 };
 
 const getByAuthor = async (author) => {
@@ -48,9 +57,7 @@ const dislike = async (blogid, userid) => {
     blogid,
     {
       $push: {
-        dislikes: {
-          userid,
-        },
+        dislikes: userid,
       },
     },
     { new: true }
@@ -111,12 +118,12 @@ const deleteTag = async (blogid, tagid) => {
 };
 
 const alreadyLike = async (blogid, userid) => {
-  const rs = await Blog.find({ _id: blogid, likes: { $in: [userid] } });
+  const rs = await Blog.findOne({ _id: blogid, likes: { $in: [userid] } });
   return rs ? true : false;
 };
 
 const alreadyDislike = async (blogid, userid) => {
-  const rs = await Blog.find({ _id: blogid, dislikes: { $in: [userid] } });
+  const rs = await Blog.findOne({ _id: blogid, dislikes: { $in: [userid] } });
   return rs ? true : false;
 };
 
@@ -146,7 +153,7 @@ module.exports = {
   save,
   getAll,
   getByAuthor,
-  getById,
+  getBlogById,
   getByTag,
   deleteById,
   updateById,

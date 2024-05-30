@@ -16,10 +16,10 @@ const createMessage = asyncHandler(async (req, res) => {
   if (!req.body.content || !req.body.from || !req.body.to) {
     throw new MissingFieldsError("Missing inputs");
   }
-  const [a, b] = await Promise.all(
+  const [a, b] = await Promise.all([
     userExists(mongoose.Types.ObjectId(req.body.from)),
-    userExists(mongoose.Types.ObjectId(req.body.to))
-  );
+    userExists(mongoose.Types.ObjectId(req.body.to)),
+  ]);
   if (!a || !b) throw new Error("Invalid user id");
   const rs = await save(req.body);
   return res.json({
@@ -60,7 +60,7 @@ const getMessageByReceiver = asyncHandler(async (req, res) => {
 
 const getMessageByAuthorAndReceiver = asyncHandler(async (req, res) => {
   const receiver = req.query.to;
-  const author = req.body.from;
+  const author = req.query.from;
   if (!receiver || !author) throw new MissingFieldsError("Missing id fields");
   const rs = await getByAuthorAndReceiver(
     mongoose.Types.ObjectId(author),
