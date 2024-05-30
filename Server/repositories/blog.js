@@ -29,6 +29,11 @@ const getByTag = async (tag) => {
   return rs;
 };
 
+const getByTags = async (t) => {
+  const rs = await Blog.find({ tags: { $all: t } });
+  return rs;
+};
+
 const deleteById = async (id) => {
   const rs = await Blog.findByIdAndDelete(id);
   return rs ? true : false;
@@ -167,4 +172,5 @@ module.exports = {
   deleteTag,
   deleteLike,
   deleteDislike,
+  getByTags,
 };

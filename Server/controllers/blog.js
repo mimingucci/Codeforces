@@ -25,6 +25,7 @@ const { MissingFieldsError } = require("../errors/input");
 const { default: mongoose } = require("mongoose");
 const { userExists } = require("../services/user");
 const { UserNotFoundError } = require("../errors/user");
+const { tagExists } = require("../services/tag");
 
 const createBlog = asyncHandler(async (req, res) => {
   if (!req.body?.author || !req.body.title || !req.body.content)
@@ -244,7 +245,9 @@ const addTagToBlog = asyncHandler(async (req, res) => {
     throw new MissingFieldsError("Missing blog id");
   }
   let rs;
-  for (let tag in req.body?.tags) {
+  for (let tag of req.body?.tags) {
+    const has = await tagExists(mongoose.Types.ObjectId(tag));
+    if (!has) throw new Error(`Cannot find tag with id ${tag}`);
     rs = await addTag(
       mongoose.Types.ObjectId(req.body.blog),
       mongoose.Types.ObjectId(tag)
@@ -256,12 +259,12 @@ const addTagToBlog = asyncHandler(async (req, res) => {
   });
 });
 
-const removeTagFromBlog = asyncHandler(async (req, res) => {
+const deleteTagFromBlog = asyncHandler(async (req, res) => {
   if (!req.body?.blog) {
     throw new MissingFieldsError("Missing blog id");
   }
   let rs;
-  for (let tag in req.body?.tags) {
+  for (let tag of req.body?.tags) {
     rs = await deleteTag(
       mongoose.Types.ObjectId(req.body.blog),
       mongoose.Types.ObjectId(tag)
@@ -295,7 +298,7 @@ module.exports = {
   likeBlog,
   dislikeBlog,
   addTagToBlog,
-  removeTagFromBlog,
+  deleteTagFromBlog,
   updateBlogById,
   deleteLikeBlog,
   deleteDislikeBlog,

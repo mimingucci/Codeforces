@@ -1,14 +1,4 @@
-const {
-  save,
-  getById,
-  getByAuthor,
-  update,
-  deleteById,
-  like,
-  dislike,
-  alreadyLike,
-  alreadyDislike,
-} = require("../repositories/comment");
+const { getById } = require("../repositories/comment");
 
 const commentExists = async (id) => {
   const rs = await getById(id);

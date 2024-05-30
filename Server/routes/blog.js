@@ -12,6 +12,8 @@ router.put("/update/like", controller.likeBlog);
 router.put("/update/dislike", controller.dislikeBlog);
 router.put("/update/deletelike", controller.deleteLikeBlog);
 router.put("/update/deletedislike", controller.deleteDislikeBlog);
+router.put("/update/addtag", controller.addTagToBlog);
+router.put("/update/deletetag", controller.deleteTagFromBlog);
 router.put("/update/:id", controller.updateBlogById);
 router.delete("/delete/:id", controller.deleteBlogById);
 module.exports = router;

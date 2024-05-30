@@ -17,7 +17,11 @@ const getByAuthor = async (author) => {
 };
 
 const update = async (id, content) => {
-  const comment = await Comment.findByIdAndUpdate(id, { content: content });
+  const comment = await Comment.findByIdAndUpdate(
+    id,
+    { content: content },
+    { new: true }
+  );
   return comment;
 };
 
@@ -35,40 +39,59 @@ const convertDataToComment = (data) => {
 };
 
 const like = async (commentid, userid) => {
-  const rs = await Comment.findByIdAndUpdate(commentid, {
-    likes: { $push: userid },
-  });
+  const rs = await Comment.findByIdAndUpdate(
+    commentid,
+    {
+      $push: { likes: userid },
+    },
+    { new: true }
+  );
   return rs;
 };
 
 const dislike = async (commentid, userid) => {
-  const rs = await Comment.findByIdAndUpdate(commentid, {
-    dislikes: { $push: userid },
-  });
+  const rs = await Comment.findByIdAndUpdate(
+    commentid,
+    {
+      $push: { dislikes: userid },
+    },
+    { new: true }
+  );
   return rs;
 };
 
 const deleteLike = async (commentid, userid) => {
-  const rs = await Comment.findByIdAndUpdate(commentid, {
-    likes: { $pull: userid },
-  });
+  const rs = await Comment.findByIdAndUpdate(
+    commentid,
+    {
+      $pull: { likes: userid },
+    },
+    { new: true }
+  );
   return rs;
 };
 
 const deleteDislike = async (commentid, userid) => {
-  const rs = await Comment.findByIdAndUpdate(commentid, {
-    dislikes: { $pull: userid },
-  });
+  const rs = await Comment.findByIdAndUpdate(
+    commentid,
+    {
+      $pull: { dislikes: userid },
+    },
+    { new: true }
+  );
   return rs;
 };
 
 const alreadyLike = async (commentid, userid) => {
-  const rs = await Comment.find({ _id: commentid, likes: { $in: [userid] } });
+  const rs = await Comment.findOne({
+    _id: commentid,
+    likes: { $in: [userid] },
+  });
   return rs ? true : false;
 };
 
 const alreadyDislike = async (commentid, userid) => {
-  const rs = await Comment.find({
+  const rs = await Comment.findOne({
     _id: commentid,
     dislikes: { $in: [userid] },
   });

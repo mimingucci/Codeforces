@@ -39,17 +39,16 @@ const createComment = asyncHandler(async (req, res) => {
     rs._id
   );
   return res.json({
-    status:
-      rs.toString() === addToBlog.author.toString() ? "success" : "failure",
-    data:
-      rs.toString() === addToBlog.author.toString()
-        ? rs
-        : "Cannot create new comment",
+    status: rs ? "success" : "failure",
+    data: rs ? rs : "Cannot create new comment",
   });
 });
 
 const getCommentsByAuthor = asyncHandler(async (req, res) => {
-  const { author } = req.params;
+  const author = req.query.author;
+  if (!author) throw new MissingFieldsError("Missing author field");
+  const valid = await userExists(mongoose.Types.ObjectId(author));
+  if (!valid) throw new UserNotFoundError(`Cannot find user with id ${author}`);
   const rs = await getByAuthor(mongoose.Types.ObjectId(author));
   return res.json({
     status: rs ? "success" : "failure",
@@ -70,16 +69,33 @@ const likeComment = asyncHandler(async (req, res) => {
   if (!req.body.comment || !req.body.user)
     throw new MissingFieldsError("Missing inputs");
   const [x, y, z, t] = await Promise.all([
-    commentExists(req.body.comment),
-    userExists(req.body.user),
-    alreadyLike(req.body.comment, req.body.user),
-    alreadyDislike(req.body.comment, req.body.user),
+    commentExists(mongoose.Types.ObjectId(req.body.comment)),
+    userExists(mongoose.Types.ObjectId(req.body.user)),
+    alreadyLike(
+      mongoose.Types.ObjectId(req.body.comment),
+      mongoose.Types.ObjectId(req.body.user)
+    ),
+    alreadyDislike(
+      mongoose.Types.ObjectId(req.body.comment),
+      mongoose.Types.ObjectId(req.body.user)
+    ),
   ]);
-  if (!x || !y || z) throw new Error("Invalid inputs");
-  if (t) {
-    await deleteDislike(req.body.comment, req.body.user);
+  if (!x || !y) throw new Error("Invalid inputs");
+  if (z) {
+    return res.status(200).json({
+      status: "success",
+    });
   }
-  const rs = await like(req.body.comment, req.body.user);
+  if (t) {
+    await deleteDislike(
+      mongoose.Types.ObjectId(req.body.comment),
+      mongoose.Types.ObjectId(req.body.user)
+    );
+  }
+  const rs = await like(
+    mongoose.Types.ObjectId(req.body.comment),
+    mongoose.Types.ObjectId(req.body.user)
+  );
   return res.json({
     status: rs ? "success" : "failure",
     data: rs,
@@ -90,19 +106,62 @@ const dislikeComment = asyncHandler(async (req, res) => {
   if (!req.body.comment || !req.body.user)
     throw new MissingFieldsError("Missing inputs");
   const [x, y, z, t] = await Promise.all([
-    commentExists(req.body.comment),
-    userExists(req.body.user),
-    alreadyLike(req.body.comment, req.body.user),
-    alreadyDislike(req.body.comment, req.body.user),
+    commentExists(mongoose.Types.ObjectId(req.body.comment)),
+    userExists(mongoose.Types.ObjectId(req.body.user)),
+    alreadyLike(
+      mongoose.Types.ObjectId(req.body.comment),
+      mongoose.Types.ObjectId(req.body.user)
+    ),
+    alreadyDislike(
+      mongoose.Types.ObjectId(req.body.comment),
+      mongoose.Types.ObjectId(req.body.user)
+    ),
   ]);
-  if (!x || !y || t) throw new Error("Invalid inputs");
-  if (z) {
-    await deleteLike(req.body.comment, req.body.user);
+  if (!x || !y) throw new Error("Invalid inputs");
+  if (t) {
+    return res.status(200).json({
+      status: "success",
+    });
   }
-  const rs = await dislike(req.body.comment, req.body.user);
+  if (z) {
+    await deleteLike(
+      mongoose.Types.ObjectId(req.body.comment),
+      mongoose.Types.ObjectId(req.body.user)
+    );
+  }
+  const rs = await dislike(
+    mongoose.Types.ObjectId(req.body.comment),
+    mongoose.Types.ObjectId(req.body.user)
+  );
   return res.json({
     status: rs ? "success" : "failure",
     data: rs,
+  });
+});
+
+const deleteLikeFromComment = asyncHandler(async (req, res) => {
+  if (!req.body.comment || !req.body.user)
+    throw new MissingFieldsError("Missing input fields");
+  const rs = await deleteLike(
+    mongoose.Types.ObjectId(req.body.comment),
+    mongoose.Types.ObjectId(req.body.user)
+  );
+  return res.json({
+    status: rs ? "success" : "failure",
+    data: rs ? rs : "Cannot delete like from comment",
+  });
+});
+
+const deleteDislikeFromComment = asyncHandler(async (req, res) => {
+  if (!req.body.comment || !req.body.user)
+    throw new MissingFieldsError("Missing input fields");
+  const rs = await deleteDislike(
+    mongoose.Types.ObjectId(req.body.comment),
+    mongoose.Types.ObjectId(req.body.user)
+  );
+  return res.json({
+    status: rs ? "success" : "failure",
+    data: rs ? rs : "Cannot delete dislike from comment",
   });
 });
 
@@ -120,8 +179,7 @@ const deleteCommentController = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!id) throw new MissingFieldsError("Missing id filed");
   const comment = await getById(mongoose.Types.ObjectId(id));
-  if (!comment || comment.blogId.toString() != id)
-    throw new Error("Cannot get comment with provided id");
+  if (!comment) throw new Error("Cannot get comment with provided id");
   const rs1 = await deleteComment(
     mongoose.Types.ObjectId(comment.blogId),
     mongoose.Types.ObjectId(id)
@@ -140,4 +198,6 @@ module.exports = {
   dislikeComment,
   updateComment,
   deleteCommentController,
+  deleteLikeFromComment,
+  deleteDislikeFromComment,
 };
