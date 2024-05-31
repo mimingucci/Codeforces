@@ -3,8 +3,8 @@ const Message = require("../models/message");
 const save = async (data) => {
   const message = new Message({
     content: data.content,
-    from: data.from,
-    to: data.to,
+    author: data.author,
+    chatId: data.chatId,
   });
   const rs = await message.save();
   return rs;
@@ -15,17 +15,17 @@ const getById = async (id) => {
   return rs;
 };
 
-const getByAuthor = async (from) => {
-  const rs = await Message.find({ from });
+const getByAuthor = async (author) => {
+  const rs = await Message.find({ author });
   return rs;
 };
 
-const getByReceiver = async (to) => {
-  return await Message.find({ to });
+const getByChatId = async (chatId) => {
+  return await Message.find({ chatId });
 };
 
-const getByAuthorAndReceiver = async (from, to) => {
-  return await Message.find({ from, to });
+const getByAuthorAndChatId = async (author, chatId) => {
+  return await Message.find({ author, chatId });
 };
 
 const deleteById = async (id) => {
@@ -48,8 +48,8 @@ module.exports = {
   save,
   getById,
   getByAuthor,
-  getByReceiver,
-  getByAuthorAndReceiver,
+  getByChatId,
+  getByAuthorAndChatId,
   deleteById,
   update,
 };

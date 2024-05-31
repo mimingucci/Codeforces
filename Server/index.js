@@ -22,28 +22,22 @@ io.on("connection", (socket) => {
     return io.sockets.sockets[id];
   }
   socket.on("sendMessage", async (message) => {
-    const { content, from, to } = message;
+    const { content, author, chatId } = message;
 
     try {
       const ms = await createMessage(message);
 
-      // Emit the message to the receiver
-      const receiverSocket = getReceiverSocketById(to);
-      const senderSocket = getReceiverSocketById(from);
-      if (receiverSocket) {
-        receiverSocket.emit("receiveMessage", ms);
-      } else {
-        socket.emit("error", "User is not connected");
-      }
-      if (senderSocket) {
-        senderSocket.emit("receiveMessage", ms);
-      } else {
-        socket.emit("error", "User is not connected");
-      }
+      socket.to(chatId).emit("receiveMessage", ms);
     } catch (error) {
-      console.error("Error saving message to DB:", error);
-      socket.emit("error", "Failed to save message to database");
+      // console.error("Error saving message to DB:", error);
+      socket.to(chatId).emit("error", "Failed to save message to database");
     }
+  });
+  socket.on("joinChatRoom", (chatId) => {
+    socket.join(chatId);
+  });
+  socket.on("leaveChatRoom", (chatId) => {
+    socket.leave(chatId);
   });
 });
 

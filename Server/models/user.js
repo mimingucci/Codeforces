@@ -56,6 +56,11 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "Country",
     },
+    chats: {
+      type: [mongoose.Types.ObjectId],
+      ref: "Chat",
+      default: [],
+    },
   },
   {
     timestamps: true,
