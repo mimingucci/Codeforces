@@ -778,6 +778,129 @@ var compilerOptions = {
 const CodeEditorWindow = ({ onChange, language, code, theme }) => {
   const [value, setValue] = useState(code || "");
 
+  useEffect(() => {
+    switch (language) {
+      case "cpp":
+        setValue(cppSource);
+        break;
+      case "c":
+        setValue(cSource);
+        break;
+      case "javascript":
+        setValue(javaScriptSource);
+        break;
+      case "assembly":
+        setValue(assemblySource);
+        break;
+      case "bash":
+        setValue(bashSource);
+        break;
+      case "basic":
+        setValue(basicSource);
+        break;
+      case "clojure":
+        setValue(clojureSource);
+        break;
+      case "csharp":
+        setValue(csharpSource);
+        break;
+      case "cobol":
+        setValue(cobolSource);
+        break;
+      case "lisp":
+        setValue(lispSource);
+        break;
+      case "d":
+        setValue(dSource);
+        break;
+      case "elixir":
+        setValue(elixirSource);
+        break;
+      case "erlang":
+        setValue(erlangSource);
+        break;
+      case "exe":
+        setValue(executableSource);
+        break;
+      case "fsharp":
+        setValue(fsharpSource);
+        break;
+      case "fortran":
+        setValue(fortranSource);
+        break;
+      case "go":
+        setValue(goSource);
+        break;
+      case "groovy":
+        setValue(groovySource);
+        break;
+      case "haskell":
+        setValue(haskellSource);
+        break;
+      case "java":
+        setValue(javaSource);
+        break;
+      case "kotlin":
+        setValue(kotlinSource);
+        break;
+      case "lua":
+        setValue(luaSource);
+        break;
+      case "ocaml":
+        setValue(ocamlSource);
+        break;
+      case "objectivec":
+        setValue(objectiveCSource);
+        break;
+      case "octave":
+        setValue(octaveSource);
+        break;
+      case "pascal":
+        setValue(pascalSource);
+        break;
+      case "perl":
+        setValue(perlSource);
+        break;
+      case "php":
+        setValue(phpSource);
+        break;
+      case "python":
+        setValue(pythonSource);
+        break;
+      case "text":
+        setValue(plainTextSource);
+        break;
+      case "prolog":
+        setValue(prologSource);
+        break;
+      case "r":
+        setValue(rSource);
+        break;
+      case "ruby":
+        setValue(rubySource);
+        break;
+      case "rust":
+        setValue(rustSource);
+        break;
+      case "scala":
+        setValue(scalaSource);
+        break;
+      case "sql":
+        setValue(sqliteSource);
+        break;
+      case "swift":
+        setValue(swiftSource);
+        break;
+      case "typescript":
+        setValue(typescriptSource);
+        break;
+      case "vbnet":
+        setValue(vbSource);
+        break;
+      default:
+        setValue("");
+    }
+  }, [language]);
   const handleEditorChange = (value) => {
     setValue(value);
     onChange("code", value);
