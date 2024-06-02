@@ -1,14 +1,15 @@
-export {default as Navbar} from './Navbar'
-export {default as Main} from './Main'
-export {default as Post} from './Post'
-export {default as Profile} from './Profile'
-export {default as Review} from './Review'
-export {default as Reviews} from './Reviews'
-export {default as Footer} from './Footer'
-export {default as Rating} from './Rating'
-export {default as Calendar} from './Calendar'
-export {default as Login} from './Login'
-export {default as Posts} from './Posts'
-export {default as Search} from './Search'
-export {default as SearchList} from './SearchList'
-export {default as SignUp} from './SignUp'
+export { default as Navbar } from "./Navbar";
+export { default as Main } from "./Main";
+export { default as Post } from "./Post";
+export { default as Profile } from "./Profile";
+export { default as Review } from "./Review";
+export { default as Reviews } from "./Reviews";
+export { default as Footer } from "./Footer";
+export { default as Rating } from "./Rating";
+export { default as Calendar } from "./Calendar";
+export { default as Login } from "./Login";
+export { default as Posts } from "./Posts";
+export { default as Search } from "./Search";
+export { default as SearchList } from "./SearchList";
+export { default as SignUp } from "./SignUp";
+export { default as Ide } from "./Ide";
