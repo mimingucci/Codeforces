@@ -1,5 +1,5 @@
-import Post from "./Post";
-import Posts from "./Posts";
+import Blog from "./Blog";
+import Blogs from "./Blogs";
 import { Route, Routes } from "react-router-dom";
 import Profile from "./Profile";
 import Rating from "./Rating";
@@ -11,7 +11,7 @@ import { useLocation } from "react-router-dom";
 import Editor from "../Editor";
 import SignUp from "./SignUp";
 import Setting from "./Setting";
-import PostDetail from "./PostDetail";
+import BlogDetail from "./BlogDetail";
 import Message from "./Message";
 import Landing from "../CodeEditor/Components/Landing";
 import Ide from "../CodeEditor/Components/Ide";
@@ -31,18 +31,18 @@ const Main = () => {
   return (
     <div className={inLoginPage ? "w-full" : "w-[75%]"}>
       <Routes>
-        <Route path={path.PUBLIC} element={<Posts />}>
-          <Route path={path.HOME} element={<Posts />} />
+        <Route path={path.PUBLIC} element={<Blogs />}>
+          <Route path={path.HOME} element={<Blogs />} />
         </Route>
         <Route path={path.SEARCH} element={<SearchList />} />
         <Route path={path.RATING} element={<Rating />} />
         <Route path={path.USER} element={<Profile />} />
         <Route path={path.CALENDAR} element={<Calendar />} />
         <Route path={path.LOGIN} element={<Login />} />
-        <Route path={path.WRITEPOST} element={<Editor />} />
+        <Route path={path.WRITEBLOG} element={<Editor />} />
         <Route path={path.SIGNUP} element={<SignUp />} />
         <Route path={path.SETTING} element={<Setting />} />
-        <Route path={path.POST} element={<PostDetail />} />
+        <Route path={path.BLOG} element={<BlogDetail />} />
         <Route path={path.MESSAGE} element={<Message />} />
         <Route path={path.IDE} element={<Ide />} />
         <Route path={path.PROBLEM} element={<Problem />} />

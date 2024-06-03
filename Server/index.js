@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { createServer } = require("node:http");
 const db = require("./config/db");
@@ -10,6 +11,7 @@ const { createMessage } = require("./services/message");
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
+app.use(cors({ origin: process.env.URL_REACT_APP }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

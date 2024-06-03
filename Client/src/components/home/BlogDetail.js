@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import PostApi from "../../getApi/PostApi";
+import BlogApi from "../../getApi/BlogApi";
 import icons from "../../utils/icons";
 import Comment from "./Comment";
 import { useLocation } from "react-router-dom";
@@ -19,23 +19,23 @@ const {
   BsCalendar2DateFill,
   IoIosChatboxes,
 } = icons;
-let headline = null;
+let title = null;
 let content = null;
-const PostDetail = () => {
+const BlogDetail = () => {
   const [p, setP] = useState();
-  const [like, setLike]=useState(0);
+  const [like, setLike] = useState(0);
   const [comment, setComment] = useState("Content");
   const [home, setHome] = useState(false);
   const location = useLocation();
-  let { post } = useParams();
+  let { blog } = useParams();
   useEffect(() => {
-    PostApi.getPostById(post)
+    BlogApi.getBlogById(blog)
       .then((res) => {
         console.log(res);
-        headline = { __html: res?.data?.headline };
+        title = { __html: res?.data?.title };
         content = { __html: res?.data?.content };
         setP(res?.data);
-        setLike(p?.agree?.length-p?.disagree?.length);
+        setLike(p?.likes?.length - p?.dislikes?.length);
       })
       .catch((err) => console.log("error"));
     const author = HandleCookies.getCookie("nickname");
@@ -48,20 +48,20 @@ const PostDetail = () => {
     }
   }, [p?.id]);
   const handleLike = async () => {
-    const nickname = HandleCookies.getCookie("nickname");
+    const username = HandleCookies.getCookie("username");
     const id = p?.id;
     try {
-      const res = await PostApi.updateLike(id, nickname);
+      const res = await BlogApi.updateLike(id, username);
       setLike(like + 1);
     } catch (error) {
       alert(error?.response?.data);
     }
   };
   const handleDislike = async () => {
-    const nickname = HandleCookies.getCookie("nickname");
+    const username = HandleCookies.getCookie("username");
     const id = p?.id;
     try {
-      const res = await PostApi.updateDislike(id, nickname);
+      const res = await BlogApi.updateDislike(id, username);
       setLike(like - 1);
     } catch (error) {
       alert(error?.response?.data);
@@ -69,14 +69,14 @@ const PostDetail = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const author = HandleCookies.getCookie("nickname");
+    const author = HandleCookies.getCookie("username");
     if (author == null || author.length == 0) {
       alert("Please login to write review");
       return;
     }
     console.log(author, comment);
     try {
-      const res = await PostApi.createComment(p?.id, author, comment);
+      const res = await BlogApi.createComment(p?.id, author, comment);
       alert("Your comment created success");
       window.location.replace(location?.pathname);
     } catch (err) {
@@ -90,7 +90,7 @@ const PostDetail = () => {
     <div>
       <div className="text-left mt-5">
         <h1 className="text-blue-800 text-[30px] font-bold">
-          {<div dangerouslySetInnerHTML={headline} /> || "Educational top user"}
+          {<div dangerouslySetInnerHTML={title} /> || "Educational top user"}
         </h1>
         <p>
           By{" "}
@@ -114,9 +114,25 @@ const PostDetail = () => {
         </div>
         <div className="border-[2px] rounded-md border-solid h-[50px] mt-3 mr-5 border-gray-300 text-center">
           <div className="inline-flex items-center h-full">
-            <BiSolidUpArrow size={20} className='text-green-300 mx-[5px] hover:cursor-pointer' onClick={handleLike}/>
-              <span className={like>=0 ? 'text-green-700 text-[16px] font-bold' : 'text-red-500 text-[16px] font-bold'}>{like || 0}</span>
-            <BiSolidDownArrow size={20} className='text-red-300 mx-[5px] hover:cursor-pointer' onClick={handleDislike}/>
+            <BiSolidUpArrow
+              size={20}
+              className="text-green-300 mx-[5px] hover:cursor-pointer"
+              onClick={handleLike}
+            />
+            <span
+              className={
+                like >= 0
+                  ? "text-green-700 text-[16px] font-bold"
+                  : "text-red-500 text-[16px] font-bold"
+              }
+            >
+              {like || 0}
+            </span>
+            <BiSolidDownArrow
+              size={20}
+              className="text-red-300 mx-[5px] hover:cursor-pointer"
+              onClick={handleDislike}
+            />
           </div>
           <div className="h-full inline-flex">
             <div className="flex h-full items-center pl-[470px] mx-[10px]">
@@ -188,4 +204,4 @@ const PostDetail = () => {
     </div>
   );
 };
-export default PostDetail;
+export default BlogDetail;
