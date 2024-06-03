@@ -9,7 +9,7 @@ const { createMessage } = require("./services/message");
 
 const app = express();
 const server = createServer(app);
-const io = Server(server);
+const io = new Server(server);
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

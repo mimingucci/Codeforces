@@ -14,5 +14,6 @@ const path = {
   WRITEPOST: "/writepost",
   POST: "/post/:post",
   MESSAGE: "/message/:user",
+  PROBLEM: "/problem",
 };
 export default path;

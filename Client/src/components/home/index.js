@@ -12,4 +12,3 @@ export { default as Posts } from "./Posts";
 export { default as Search } from "./Search";
 export { default as SearchList } from "./SearchList";
 export { default as SignUp } from "./SignUp";
-export { default as Ide } from "./Ide";

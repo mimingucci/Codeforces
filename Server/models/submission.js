@@ -5,6 +5,7 @@ const submissionSchema = new mongoose.Schema(
     author: {
       type: mongoose.Types.ObjectId,
       ref: "User",
+      required: true,
     },
     status: {
       type: String,
@@ -33,6 +34,14 @@ const submissionSchema = new mongoose.Schema(
     problem: {
       type: mongoose.Types.ObjectId,
       ref: "Problem",
+    },
+    token: {
+      type: String,
+      required: true,
+    },
+    score: {
+      type: Number,
+      default: 0,
     },
   },
   {

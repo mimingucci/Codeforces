@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 
+function noDuplicateElements(value) {
+  return value.length === new Set(value).size; // Check if the array contains unique elements
+}
+
 const problemSchema = new mongoose.Schema(
   {
     title: {
@@ -10,24 +14,36 @@ const problemSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    tags: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "Tag",
-      },
-    ],
-    likes: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-    dislikes: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "User",
-      },
-    ],
+    tags: {
+      type: [
+        {
+          type: mongoose.Types.ObjectId,
+          ref: "Tag",
+          unique: true,
+        },
+      ],
+      validate: [noDuplicateElements, "Tag must contain unique elements"],
+    },
+    likes: {
+      type: [
+        {
+          type: mongoose.Types.ObjectId,
+          ref: "User",
+          unique: true,
+        },
+      ],
+      validate: [noDuplicateElements, "Likes must contain unique elements"],
+    },
+    dislikes: {
+      type: [
+        {
+          type: mongoose.Types.ObjectId,
+          ref: "User",
+          unique: true,
+        },
+      ],
+      validate: [noDuplicateElements, "Dislikes must contain unique elements"],
+    },
     image: {
       type: String,
     },
@@ -47,7 +63,16 @@ const problemSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    testcases: [{ type: mongoose.Types.ObjectId, ref: "TestCase" }],
+    testcases: {
+      type: [
+        {
+          type: mongoose.Types.ObjectId,
+          ref: "TestCase",
+          unique: true,
+        },
+      ],
+      validate: [noDuplicateElements, "Test case must contain unique elements"],
+    },
     rating: {
       type: Number,
       min: 500,

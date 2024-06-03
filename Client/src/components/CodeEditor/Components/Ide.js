@@ -3,7 +3,7 @@ import CodeEditorWindow from "./CodeEditorWindow";
 import axios from "axios";
 import { classnames } from "../general";
 import { languageOptions } from "../languageOptions";
-
+import "@vaadin/split-layout";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -14,6 +14,8 @@ import Input from "./Input";
 import OutputDetails from "./OutputDetails";
 import ThemeDropdown from "./ThemeDropdown";
 import LanguagesDropdown from "./LanguagesDropdown";
+import InputIde from "./InputIde";
+import OutputIde from "./OutputIde";
 
 var cppSource =
   '\
@@ -25,7 +27,7 @@ int main() {\n\
 }\n\
 ';
 
-const Landing = () => {
+const Ide = () => {
   const [code, setCode] = useState(cppSource);
   const [customInput, setCustomInput] = useState("");
   const [outputDetails, setOutputDetails] = useState(null);
@@ -211,34 +213,33 @@ const Landing = () => {
             {processing ? "Processing..." : "Compile and Execute"}
           </button>
         </div>
-        <div className="px-4 py-2">
-          <button
-            onClick={handleCompile}
-            // disabled={!code}
-            className={classnames(
-              "border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 bg-white flex-shrink-0"
-            )}
-          >
-            Submit
-          </button>
-        </div>
       </div>
-      <div className="flex flex-row space-x-4 items-start px-4 py-4">
-        <div className="flex flex-col w-full h-full justify-start items-end">
-          <CodeEditorWindow
-            code={code}
-            onChange={onChange}
-            language={language?.value}
-            theme={theme.value}
-          />
-        </div>
+      <div className="px-4 py-4">
+        <vaadin-split-layout>
+          <div className="flex flex-col w-[65%] h-full justify-start items-end">
+            <CodeEditorWindow
+              code={code}
+              onChange={onChange}
+              language={language?.value}
+              theme={theme.value}
+            />
+          </div>
 
-        <div className="right-container flex flex-shrink-0 w-[30%] flex-col h-[500px]">
-          <Input customInput={customInput} setCustomInput={setCustomInput} />
-          <OutputWindow outputDetails={outputDetails} />
-        </div>
+          <vaadin-split-layout orientation="vertical">
+            <div>
+              <InputIde
+                customInput={customInput}
+                setCustomInput={setCustomInput}
+                theme={theme.value}
+              />
+            </div>
+            <div>
+              <OutputIde outputDetails={outputDetails} theme={theme.value} />
+            </div>
+          </vaadin-split-layout>
+        </vaadin-split-layout>
       </div>
     </>
   );
 };
-export default Landing;
+export default Ide;

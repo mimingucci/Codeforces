@@ -13,9 +13,9 @@ import SignUp from "./SignUp";
 import Setting from "./Setting";
 import PostDetail from "./PostDetail";
 import Message from "./Message";
-import Ide from "./Ide";
 import Landing from "../CodeEditor/Components/Landing";
-
+import Ide from "../CodeEditor/Components/Ide";
+import Problem from "./Problem";
 const Main = () => {
   const location = useLocation();
   let inLoginPage = false;
@@ -44,7 +44,8 @@ const Main = () => {
         <Route path={path.SETTING} element={<Setting />} />
         <Route path={path.POST} element={<PostDetail />} />
         <Route path={path.MESSAGE} element={<Message />} />
-        <Route path={path.IDE} element={<Landing />} />
+        <Route path={path.IDE} element={<Ide />} />
+        <Route path={path.PROBLEM} element={<Problem />} />
       </Routes>
     </div>
   );

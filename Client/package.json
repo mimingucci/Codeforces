@@ -17,6 +17,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@tinymce/tinymce-react": "^4.3.2",
     "@uiw/react-monacoeditor": "^3.6.0",
+    "@vaadin/split-layout": "^24.3.13",
     "axios": "^1.6.2",
     "clsx": "^2.0.0",
     "cors": "^2.8.5",
