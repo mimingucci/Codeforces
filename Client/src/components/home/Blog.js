@@ -103,7 +103,7 @@ const Blog = ({ blog }) => {
             <FaUser className="mx-[5px]" />
             <span className="underline">
               <a href={"/profile/" + user?.username || "/profile/..."}>
-                {"mimingucci"}
+                {user?.username || "..."}
               </a>
             </span>
           </div>

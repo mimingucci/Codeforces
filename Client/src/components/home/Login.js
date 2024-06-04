@@ -20,7 +20,7 @@ const Login = () => {
   return (
     <div className="mt-5">
       <div className="text-left">
-        <p className="font-bold">Fill in the form to login into Topcoder.</p>
+        <p className="font-bold">Fill in the form to login into Codeforces.</p>
         <p>You can use Gmail as an alternative way to enter.</p>
       </div>
       <div>

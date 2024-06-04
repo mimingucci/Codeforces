@@ -6,7 +6,7 @@
     font-family: sans-serif;
   }
   
-  input,
+  input, 
   textarea,
   [contenteditable] {
     font: inherit;
@@ -24,6 +24,6 @@
   [contenteditable] {
     height: 10rem;
     border: 1px solid;
-    resize: both;
+    resize: vertical;
   }
   

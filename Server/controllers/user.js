@@ -17,8 +17,10 @@ const {
   unsetState,
 } = require("../repositories/user");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 const sendMail = require("../untils/sendMail");
 const { default: mongoose } = require("mongoose");
+const { signToken } = require("../middlewares/jwt");
 
 const getUsers = asyncHandler(async (req, res) => {
   const response = await getAll();
@@ -90,11 +92,53 @@ const register = asyncHandler(async (req, res) => {
   if (user) throw new Error("User has existed");
   else {
     const newUser = await save(req.body);
+    const token = signToken({
+      _id: newUser._id,
+      email: newUser.email,
+      password: newUser.password,
+    });
+    const resEmail = await sendMail({
+      email,
+      subject: "Verify email",
+      html: `<h1>Hello, ${username}</h1>, we <a href="${process.env.URL_REACT_APP}">Codeforces</a> received request to sign up from you, please click on below link to continue sign up process!!! <br/><a href="${process.env.URL_REACT_APP}/verify-email?token=${token}">Verify Email</a>`,
+    });
     return res.status(200).json({
       status: newUser ? "success" : "failure",
       data: newUser
-        ? "Register is successfully. Please login"
+        ? "Please check email to verify account!!!"
         : "Something went wrong",
+    });
+  }
+});
+
+const verifyEmail = asyncHandler(async (req, res) => {
+  const { token } = req.body;
+  if (!token)
+    return res.status(403).json({
+      status: "failure",
+      data: "Missing token",
+    });
+  try {
+    let decodedData = jwt.verify(
+      token,
+      process.env.JWT_SECRET,
+      (err, decode) => {
+        if (err)
+          return res.status(401).json({
+            success: false,
+            message: "Invalid access token",
+          });
+        return decode;
+      }
+    );
+    console.log(decodedData);
+    return res.status(200).json({
+      status: "success",
+    });
+  } catch (error) {
+    return res.status(403).json({
+      status: "failure",
+      data: error,
     });
   }
 });
@@ -108,6 +152,12 @@ const login = asyncHandler(async (req, res) => {
     });
   // plain object
   const response = await User.findOne({ email });
+  if (!response.enabled) {
+    return res.json({
+      status: "failure",
+      data: "Email is invalid",
+    });
+  }
   if (response && (await response.isCorrectPassword(password))) {
     // split password and role from response
     const { password, role, refreshToken, ...userData } = response.toObject();

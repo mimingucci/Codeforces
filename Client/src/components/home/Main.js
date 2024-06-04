@@ -16,6 +16,7 @@ import Message from "./Message";
 import Landing from "../CodeEditor/Components/Landing";
 import Ide from "../CodeEditor/Components/Ide";
 import Problem from "./Problem";
+import RichTextInput from "../RichTextInput";
 const Main = () => {
   const location = useLocation();
   let inLoginPage = false;
@@ -39,7 +40,7 @@ const Main = () => {
         <Route path={path.USER} element={<Profile />} />
         <Route path={path.CALENDAR} element={<Calendar />} />
         <Route path={path.LOGIN} element={<Login />} />
-        <Route path={path.WRITEBLOG} element={<Editor />} />
+        <Route path={path.WRITEBLOG} element={<RichTextInput />} />
         <Route path={path.SIGNUP} element={<SignUp />} />
         <Route path={path.SETTING} element={<Setting />} />
         <Route path={path.BLOG} element={<BlogDetail />} />
