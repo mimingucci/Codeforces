@@ -10,12 +10,12 @@ const save = async (user) => {
 };
 
 const getAll = async () => {
-  const users = await User.find({}).select("-password -refreshToken -role");
+  const users = await User.find({}).select("-password -refreshToken");
   return users;
 };
 
 const getById = async (_id) => {
-  return await User.findOne({ _id }).select("-password -refreshToken -role");
+  return await User.findOne({ _id }).select("-password -refreshToken");
 };
 
 const getByIdAllFields = async (_id) => {
@@ -23,18 +23,23 @@ const getByIdAllFields = async (_id) => {
 };
 
 const getByUsername = async (username) => {
-  return await User.findOne({ username }).select(
-    "-password -refreshToken -role"
-  );
+  return await User.findOne({ username }).select("-password -refreshToken");
 };
 
 const getByEmail = async (email) => {
-  return await User.findOne({ email }).select("-password -refreshToken -role");
+  return await User.findOne({ email }).select("-password -refreshToken");
 };
 
 const update = async (id, user) => {
+  if (user.password) delete user.password;
   return await User.findByIdAndUpdate(id, user, { new: true }).select(
-    "-password -refreshToken -role"
+    "-password -refreshToken"
+  );
+};
+
+const updatePassword = async (id, password) => {
+  return await User.findByIdAndUpdate(id, { password }, { new: true }).select(
+    "-password -refreshToken"
   );
 };
 
@@ -110,4 +115,5 @@ module.exports = {
   unsetState,
   unsetCountry,
   getByIdAllFields,
+  updatePassword,
 };

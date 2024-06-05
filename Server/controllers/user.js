@@ -15,6 +15,7 @@ const {
   setState,
   unsetCountry,
   unsetState,
+  updatePassword,
 } = require("../repositories/user");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
@@ -95,11 +96,10 @@ const register = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email });
   if (user) throw new Error("User has existed");
   else {
-    const newUser = await save(req.body);
+    const newUser = await save({ username, email, password });
     const token = signToken({
       _id: newUser._id,
       email: newUser.email,
-      password: newUser.password,
     });
     const resEmail = await sendMail({
       email,
@@ -135,7 +135,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
         return decode;
       }
     );
-    if (!decodedData._id || !decodedData.email || !decodedData.password)
+    if (!decodedData._id || !decodedData.email)
       return res.status(403).json({
         status: "failure",
         data: "Token invalid",
@@ -273,7 +273,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   const rs = await sendMail(data);
   return res.status(200).json({
     success: true,
-    rs,
+    data: rs,
   });
 });
 
@@ -296,20 +296,40 @@ const resetPassword = asyncHandler(async (req, res) => {
   await user.save();
   return res.status(200).json({
     success: user ? true : false,
-    message: user ? "Updated password" : "Something went wrong",
+    data: user ? "Updated password" : "Something went wrong",
   });
 });
 
 const updateUserByAdmin = asyncHandler(async (req, res) => {
-  const { uid } = req.params;
+  const { id } = req.params;
   if (!req.body || Object.keys(req.body).length === 0)
     throw new Error("Missing inputs");
-  const response = await User.findByIdAndUpdate(uid, req.body, {
-    new: true,
-  }).select("-password -role -refreshToken");
+  const response = await User.findByIdAndUpdate(
+    mongoose.Types.ObjectId(id),
+    req.body,
+    {
+      new: true,
+    }
+  ).select("-password -refreshToken");
   return res.status(200).json({
     success: response ? true : false,
-    updatedUser: response ? response : "Some thing went wrong",
+    data: response ? response : "Some thing went wrong",
+  });
+});
+
+const updateUserPassword = asyncHandler(async (req, res) => {
+  if (!req.body.password || req.body.password.length == 0)
+    return res.status(401).json({
+      status: "failure",
+      data: "Invalid password",
+    });
+  const rs = await updatePassword(
+    mongoose.Types.ObjectId(req.user._id),
+    req.body.password
+  );
+  return res.json({
+    status: rs ? "success" : "failure",
+    data: rs ? rs : "Something went wrong",
   });
 });
 
@@ -380,4 +400,6 @@ module.exports = {
   updateUserByAddress,
   unsetAddress,
   verifyEmail,
+  updateUserPassword,
+  updateUserByAdmin,
 };
