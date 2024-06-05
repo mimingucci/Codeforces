@@ -20,7 +20,11 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const sendMail = require("../untils/sendMail");
 const { default: mongoose } = require("mongoose");
-const { signToken } = require("../middlewares/jwt");
+const {
+  signToken,
+  generateAccessToken,
+  generateRefreshToken,
+} = require("../middlewares/jwt");
 
 const getUsers = asyncHandler(async (req, res) => {
   const response = await getAll();
@@ -131,9 +135,21 @@ const verifyEmail = asyncHandler(async (req, res) => {
         return decode;
       }
     );
-    console.log(decodedData);
-    return res.status(200).json({
-      status: "success",
+    if (!decodedData._id || !decodedData.email || !decodedData.password)
+      return res.status(403).json({
+        status: "failure",
+        data: "Token invalid",
+      });
+    const user = await getById(mongoose.Types.ObjectId(decodedData._id));
+    if (user.email === decodedData.email) {
+      await update(mongoose.Types.ObjectId(decodedData._id), { enabled: true });
+      return res.status(200).json({
+        status: "success",
+      });
+    }
+    return res.status(403).json({
+      status: "failure",
+      data: "Something went wrong",
     });
   } catch (error) {
     return res.status(403).json({
@@ -175,6 +191,12 @@ const login = asyncHandler(async (req, res) => {
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: true,
+    });
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: true,
     });
     return res.status(200).json({
       success: true,
@@ -192,16 +214,20 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   // Check token
   if (!cookie && !cookie.refreshToken)
     throw new Error("No refresh token in cookies");
-  const rs = await jwt.verify(cookie.refreshToken, process.env.JWT_SECRET);
+  const rs = jwt.verify(cookie.refreshToken, process.env.JWT_SECRET);
   const response = await User.findOne({
     _id: rs._id,
     refreshToken: cookie.refreshToken,
   });
+  const accessToken = generateAccessToken(response._id, response.role);
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    secure: true,
+  });
   return res.status(200).json({
     success: response ? true : false,
-    newAccessToken: response
-      ? generateAccessToken(response._id, response.role)
-      : "Refresh token not matched",
+    data: response ? accessToken : "Refresh token not matched",
   });
 });
 
@@ -217,6 +243,10 @@ const logout = asyncHandler(async (req, res) => {
   );
   // remove refresh token in cookie browser
   res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: true,
+  });
+  res.clearCookie("accessToken", {
     httpOnly: true,
     secure: true,
   });
@@ -349,4 +379,5 @@ module.exports = {
   getUsersByState,
   updateUserByAddress,
   unsetAddress,
+  verifyEmail,
 };

@@ -3,7 +3,7 @@ const router = express.Router();
 const controller = require("../controllers/blog");
 const { verifyAccessToken, isAdmin } = require("../middlewares/verifyToken");
 
-router.post("/create", controller.createBlog);
+router.post("/create", [verifyAccessToken], controller.createBlog);
 router.get("/getall", controller.getAllBlogs);
 router.get("/get/author", controller.getBlogsByAuthor);
 router.get("/get/tag", controller.getBlogsByTag);

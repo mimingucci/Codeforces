@@ -1,9 +1,8 @@
 const nodemailer = require("nodemailer");
-const asyncHandler = require("express-async-handler");
 require("dotenv").config();
-const sendMail = asyncHandler(async ({ email, subject, html }) => {
+const sendMail = async ({ email, subject, html }) => {
   const transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
+    host: "smtp.gmail.com",
     port: 587,
     secure: false, // Use `true` for port 465, `false` for all other ports
     auth: {
@@ -19,6 +18,6 @@ const sendMail = asyncHandler(async ({ email, subject, html }) => {
     html: html, // html body
   });
   return info;
-});
+};
 
 module.exports = sendMail;

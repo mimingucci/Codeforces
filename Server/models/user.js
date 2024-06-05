@@ -89,6 +89,29 @@ userSchema.methods = {
     this.passwordResetExpires = Date.now() + 15 * 60 * 1000;
     return resetToken;
   },
+  generateAccessToken: function () {
+    return jwt.sign(
+      {
+        _id: this._id,
+        role: this.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "15m",
+      }
+    );
+  },
+  generateRefreshToken: function () {
+    return jwt.sign(
+      {
+        _id: this._id,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "30d",
+      }
+    );
+  },
 };
 
 module.exports = mongoose.model("User", userSchema);

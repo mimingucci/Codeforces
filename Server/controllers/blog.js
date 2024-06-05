@@ -28,17 +28,21 @@ const { UserNotFoundError } = require("../errors/user");
 const { tagExists } = require("../services/tag");
 
 const createBlog = asyncHandler(async (req, res) => {
-  if (!req.body?.author || !req.body.title || !req.body.content)
+  if (!req.user?._id || !req.body.title || !req.body.content)
     throw new MissingFieldsError(
       "Missing input, body must have title, content, author field"
     );
-  const user = await userExists(mongoose.Types.ObjectId(req.body.author));
+  const user = await userExists(mongoose.Types.ObjectId(req.user._id));
   if (!user) {
     throw new UserNotFoundError(
       `User with id ${req.body.author} does not exist`
     );
   }
-  const rs = await save(req.body);
+  const rs = await save({
+    author: req.user._id,
+    content: req.body.content,
+    title: req.body.title,
+  });
   return res.status(200).json({
     status: rs ? "success" : "failure",
     data: rs ? rs : "Cannot create new blog",
