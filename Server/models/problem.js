@@ -14,36 +14,26 @@ const problemSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    tags: {
-      type: [
-        {
-          type: mongoose.Types.ObjectId,
-          ref: "Tag",
-          unique: true,
-        },
-      ],
-      validate: [noDuplicateElements, "Tag must contain unique elements"],
-    },
-    likes: {
-      type: [
-        {
-          type: mongoose.Types.ObjectId,
-          ref: "User",
-          unique: true,
-        },
-      ],
-      validate: [noDuplicateElements, "Likes must contain unique elements"],
-    },
-    dislikes: {
-      type: [
-        {
-          type: mongoose.Types.ObjectId,
-          ref: "User",
-          unique: true,
-        },
-      ],
-      validate: [noDuplicateElements, "Dislikes must contain unique elements"],
-    },
+    tags: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Tag",
+      },
+    ],
+    likes: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+        unique: true,
+      },
+    ],
+    dislikes: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+        unique: true,
+      },
+    ],
     image: {
       type: String,
     },

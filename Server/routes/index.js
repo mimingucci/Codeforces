@@ -7,6 +7,7 @@ const BlogRouter = require("./blog");
 const TagRouter = require("./tag");
 const CommentRouter = require("./comment");
 const ProblemRouter = require("./problem");
+const TestCaseRouter = require("./testcase");
 const initRoutes = (app) => {
   app.use("/api/user", UserRouter);
   app.use("/api/state", StateRouter);
@@ -16,6 +17,7 @@ const initRoutes = (app) => {
   app.use("/api/tag", TagRouter);
   app.use("/api/comment", CommentRouter);
   app.use("/api/problem", ProblemRouter);
+  app.use("/api/testcase", TestCaseRouter);
   app.use(errorHandler);
 };
 

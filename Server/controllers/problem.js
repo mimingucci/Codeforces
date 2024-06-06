@@ -13,6 +13,7 @@ const {
   deleteById,
   update,
   getAll,
+  getTestCases,
 } = require("../repositories/problem");
 const tc = require("../repositories/testcase");
 const { MissingFieldsError } = require("../errors/input");
@@ -25,15 +26,18 @@ const createProblem = asyncHandler(async (req, res) => {
   if (
     !req.body.title ||
     !req.body.statement ||
-    !req.body.author ||
+    !req.user._id ||
     !req.body.timelimit ||
     !req.body.memorylimit
   )
     throw new MissingFieldsError("Missing Fields");
-  const valid = await userExists(mongoose.Types.ObjectId(req.body.author));
-  if (!valid)
-    throw new UserNotFoundError(`Cannot find user with id ${req.body.author}`);
-  const problem = await save(req.body);
+  const problem = await save({
+    author: req.user._id,
+    title: req.body.title,
+    statement: req.body.statement,
+    timelimit: req.body.timelimit,
+    memorylimit: req.body.memorylimit,
+  });
   return res.json({
     status: problem ? "success" : "failure",
     data: problem ? problem : "Cannot create new problem",
@@ -52,6 +56,16 @@ const getProblemById = asyncHandler(async (req, res) => {
 
 const getAllProblems = asyncHandler(async (req, res) => {
   const rs = await getAll();
+  return res.json({
+    status: rs ? "success" : "failure",
+    data: rs ? rs : "Something went wrong",
+  });
+});
+
+const getAllTestCases = asyncHandler(async (req, res) => {
+  const id = req.query.id;
+  if (!id) throw new MissingFieldsError("Missing id field");
+  const rs = await getTestCases(mongoose.Types.ObjectId(id));
   return res.json({
     status: rs ? "success" : "failure",
     data: rs ? rs : "Something went wrong",
@@ -78,4 +92,5 @@ module.exports = {
   getProblemById,
   getAllProblems,
   createTestCase,
+  getAllTestCases,
 };

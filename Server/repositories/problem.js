@@ -18,6 +18,11 @@ const getById = async (id) => {
   return problem;
 };
 
+const getTestCases = async (id) => {
+  const problem = await Problem.findOne({ _id: id }).populate("testcases");
+  return problem;
+};
+
 const getByAuthor = async (author) => {
   const problems = await Problem.find({ author });
   return problems;
@@ -131,4 +136,5 @@ module.exports = {
   deleteById,
   update,
   getAll,
+  getTestCases,
 };
