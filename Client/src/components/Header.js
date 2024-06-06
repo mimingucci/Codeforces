@@ -4,9 +4,10 @@ import icons from "../utils/icons";
 import UserApi from "../getApi/UserApi";
 import { redirect } from "react-router-dom";
 import HandleCookies from "../utils/HandleCookies";
+import handleTokenAutomatically from "../utils/autoHandlerToken";
 const { IoIosNotifications, IoMdSearch } = icons;
-let user = "";
 const Header = () => {
+  let user = "";
   const [value, setValue] = useState();
   const handleClick = () => {
     const keyword = value;
@@ -14,18 +15,20 @@ const Header = () => {
     window.location.replace("/search?query=" + keyword);
   };
   const checkLogin = () => {
-    // console.log(HandleCookies.getCookie('nickname'))
-    if (HandleCookies.getCookie("nickname")?.length > 0) {
-      user = HandleCookies.getCookie("nickname");
+    if (HandleCookies.getCookie("username")?.length > 0) {
+      user = HandleCookies.getCookie("username");
       return true;
     } else {
       return false;
     }
   };
-  const handleLogout = () => {
+  const handleLogout = async () => {
     user = "";
-    HandleCookies.setCookie("nickname", "", 0);
-    HandleCookies.setCookie("password", "", 0);
+    const rs = await UserApi.logout(HandleCookies.getCookie("refreshToken"));
+    console.log(rs);
+    HandleCookies.setCookie("accessToken", "", 0);
+    HandleCookies.setCookie("refreshToken", "", 0);
+    HandleCookies.setCookie("username", "", 0);
     window.location.replace("/");
   };
   useEffect(() => {
@@ -48,7 +51,9 @@ const Header = () => {
           </div>
           <div className="underline mt-[15px]">
             {checkLogin() && (
-              <a href={"http://localhost:3000/profile/" + user}>{user}</a>
+              <a href={"http://localhost:3000/profile/" + user} className="">
+                {user}
+              </a>
             )}
             {checkLogin() && (
               <span onClick={handleLogout} className="hover:cursor-pointer">
@@ -65,13 +70,19 @@ const Header = () => {
             <a href="http://localhost:3000/home">HOME</a>
           </div>
           <div className="hover:cursor-pointer">
+            <a href="http://localhost:3000/ide">IDE</a>
+          </div>
+          <div className="hover:cursor-pointer">
+            <a href="http://localhost:3000/problems">PROBLEMSET</a>
+          </div>
+          <div className="hover:cursor-pointer">
             <a href="http://localhost:3000/rating">TOP USER</a>
           </div>
           <div className="hover:cursor-pointer">
             <a href="http://localhost:3000/calendar">CALENDAR</a>
           </div>
           <div className="hover:cursor-pointer">
-            <a href="http://localhost:3000/ide">IDE</a>
+            <a href="http://localhost:3000/createproblem">CREATEPROBLEM</a>
           </div>
           <div className="hover:cursor-pointer">HELP</div>
           <div className="hover:cursor-pointer">CATALOG</div>
@@ -86,7 +97,7 @@ const Header = () => {
             // onKeyPress={handleKeyUp}
             type={"text"}
             placeholder="Search"
-            className="flex-1 bg-gray-200 outline-none"
+            className="flex-1 bg-gray-200 outline-none w-auto"
             onChange={(e) => setValue(e.target.value)}
             value={value}
           />

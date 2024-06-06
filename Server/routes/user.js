@@ -1,7 +1,11 @@
 const express = require("express");
 const UserRouter = express.Router();
 const controller = require("../controllers/user");
-const { verifyAccessToken, isAdmin } = require("../middlewares/verifyToken");
+const {
+  verifyAccessToken,
+  isAdmin,
+  getUserInfoByAccessToken,
+} = require("../middlewares/verifyToken");
 
 UserRouter.post("/create", controller.register);
 UserRouter.post("/verify", controller.verifyEmail);
@@ -14,6 +18,7 @@ UserRouter.get("/logout", verifyAccessToken, controller.logout);
 UserRouter.get("/id/:id", controller.getUserById);
 UserRouter.get("/username/:username", controller.getUserByUsername);
 UserRouter.get("/email", controller.getUserByEmail);
+UserRouter.get("/info", getUserInfoByAccessToken);
 UserRouter.delete(
   "/delete",
   [verifyAccessToken, isAdmin],

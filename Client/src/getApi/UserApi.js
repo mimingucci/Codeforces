@@ -30,10 +30,25 @@ class UserApi {
       password: newpassword,
     });
   }
-  login(username, password) {
-    return axios.post(BASE_URL + "/login", null, {
-      headers: { "Content-Type": "application/json; charset=UTF-8" },
-      params: { username: username, password: password },
+  login({ email, password }) {
+    return axios.post(BASE_URL + "/login", {
+      email,
+      password,
+    });
+  }
+  logout(accessToken) {
+    return axios.get(BASE_URL + "/logout", {
+      headers: { Authorization: "Bearer " + accessToken },
+    });
+  }
+  getUserInfo(accessToken) {
+    return axios.get(BASE_URL + "/info", {
+      headers: { Authorization: "Bearer " + accessToken },
+    });
+  }
+  refreshAccessToken(refreshToken) {
+    return axios.get(BASE_URL + "/reset-access-token", {
+      headers: { Authorization: "Bearer " + refreshToken },
     });
   }
   signup(email, username, password) {

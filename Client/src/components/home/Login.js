@@ -2,20 +2,28 @@ import { useState } from "react";
 import UserApi from "../../getApi/UserApi";
 import HandleCookies from "../../utils/HandleCookies";
 const Login = () => {
-  const [username, setUsername] = useState();
+  const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const handleSubmit = async () => {
     try {
-      const res = await UserApi.login(username, password);
-      HandleCookies.setCookie("username", res.data["username"], 30);
-      HandleCookies.setCookie("password", res.data["password"], 30);
+      const res = await UserApi.login({ email, password });
+      console.log("login->", res);
+      HandleCookies.setCookie("accessToken", res.data["accessToken"], 7);
+      HandleCookies.setCookie("username", res.data.data.username, 7);
+      HandleCookies.setCookie("refreshToken", res.data["refreshToken"], 30);
       window.location.replace("/");
     } catch (err) {
+      console.log(err);
       alert("Login Info Not Exists");
     }
   };
-  const handleChange = (ps) => {
+  const handleChangePassword = (ps) => {
+    // console.log(ps);
     setPassword(ps);
+  };
+  const handleChangeEmail = (ps) => {
+    // console.log(ps);
+    setEmail(ps);
   };
   return (
     <div className="mt-5">
@@ -38,7 +46,7 @@ const Login = () => {
                   Handle / Email
                 </label>
                 <input
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => handleChangeEmail(e.target.value)}
                   type="text"
                   className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                 />
@@ -52,7 +60,7 @@ const Login = () => {
                 </label>
                 <input
                   onChange={(e) => {
-                    handleChange(e.target.value);
+                    handleChangePassword(e.target.value);
                   }}
                   type="password"
                   className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"

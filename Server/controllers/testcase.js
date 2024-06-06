@@ -18,6 +18,20 @@ const getTestCaseById = asyncHandler(async (req, res) => {
   });
 });
 
+const updateTestCaseById = asyncHandler(async (req, res) => {
+  const id = req.query.id;
+  if (!id || !req.body.input || !req.body.output)
+    throw new MissingFieldsError("Missing test case id field");
+  const rs = await update(mongoose.Types.ObjectId(id), {
+    input: req.body.input,
+    output: req.body.output,
+  });
+  return res.json({
+    status: rs ? "success" : "failure",
+    data: rs ? rs : "Something went wrong",
+  });
+});
 module.exports = {
   getTestCaseById,
+  updateTestCaseById,
 };

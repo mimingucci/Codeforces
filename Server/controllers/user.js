@@ -201,7 +201,8 @@ const login = asyncHandler(async (req, res) => {
     return res.status(200).json({
       success: true,
       accessToken,
-      userData,
+      refreshToken: newRefreshToken,
+      data: userData,
     });
   } else {
     throw new Error("Invalid credentials!");
@@ -209,15 +210,13 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-  // get token from cookies
-  const cookie = req.cookies;
-  // Check token
-  if (!cookie && !cookie.refreshToken)
-    throw new Error("No refresh token in cookies");
-  const rs = jwt.verify(cookie.refreshToken, process.env.JWT_SECRET);
+  if (!req?.headers?.authorization?.startsWith("Bearer"))
+    throw new Error("No refresh token");
+  const token = req.headers.authorization.split(" ")[1];
+  const rs = jwt.verify(token, process.env.JWT_SECRET);
   const response = await User.findOne({
     _id: rs._id,
-    refreshToken: cookie.refreshToken,
+    refreshToken: token,
   });
   const accessToken = generateAccessToken(response._id, response.role);
   res.cookie("accessToken", accessToken, {
@@ -232,12 +231,12 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 const logout = asyncHandler(async (req, res) => {
-  const cookie = req.cookies;
-  if (!cookie || !cookie.refreshToken)
-    throw new Error("No refresh token in cookies");
+  if (!req?.headers?.authorization?.startsWith("Bearer"))
+    throw new Error("No refresh token");
+  const token = req.headers.authorization.split(" ")[1];
   // remove refresh token in db
   await User.findOneAndUpdate(
-    { refreshToken: cookie.refreshToken },
+    { refreshToken: token },
     { refreshToken: "" },
     { new: true }
   );

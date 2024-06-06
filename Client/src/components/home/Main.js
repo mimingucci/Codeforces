@@ -6,7 +6,7 @@ import Rating from "./Rating";
 import Calendar from "./Calendar";
 import path from "../../utils/path";
 import Login from "./Login";
-import { SearchList } from ".";
+import { CreateProblem, SearchList } from ".";
 import { useLocation } from "react-router-dom";
 import Editor from "../Editor";
 import SignUp from "./SignUp";
@@ -47,6 +47,7 @@ const Main = () => {
         <Route path={path.MESSAGE} element={<Message />} />
         <Route path={path.IDE} element={<Ide />} />
         <Route path={path.PROBLEM} element={<Problem />} />
+        <Route path={path.CREATEPROBLEM} element={<CreateProblem />} />
       </Routes>
     </div>
   );

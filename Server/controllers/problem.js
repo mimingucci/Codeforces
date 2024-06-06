@@ -87,10 +87,29 @@ const createTestCase = asyncHandler(async (req, res) => {
   });
 });
 
+const updateProblemById = asyncHandler(async (req, res) => {
+  const id = req.query.id;
+  if (!id) throw new MissingFieldsError("Missing fields");
+  let valid = true;
+  valid = await problemExists(mongoose.Types.ObjectId(id));
+  if (!valid) throw new Error(`Cannot find problem with id ${id}`);
+  let data = {};
+  if (req.body.statement) data.statement = req.body.statement;
+  if (req.body.title) data.title = req.body.title;
+  if (req.body.timelimit) data.timelimit = req.body.timelimit;
+  if (req.body.memorylimit) data.memorylimit = req.body.memorylimit;
+  const rs = await update(mongoose.Types.ObjectId(id), data);
+  return res.json({
+    status: rs ? "success" : "failure",
+    data: rs,
+  });
+});
+
 module.exports = {
   createProblem,
   getProblemById,
   getAllProblems,
   createTestCase,
   getAllTestCases,
+  updateProblemById,
 };
