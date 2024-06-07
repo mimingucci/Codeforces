@@ -24,7 +24,8 @@ int main() {\n\
     return 0;\n\
 }\n\
 ';
-
+let tcip = "";
+let tcop = "";
 const Landing = ({ sampleinput = "", sampleoutput = "" }) => {
   const [code, setCode] = useState(cppSource);
   const [customInput, setCustomInput] = useState(sampleinput.trim());
@@ -32,7 +33,8 @@ const Landing = ({ sampleinput = "", sampleoutput = "" }) => {
   const [processing, setProcessing] = useState(null);
   const [theme, setTheme] = useState("cobalt");
   const [language, setLanguage] = useState(languageOptions[0]);
-
+  tcip = sampleinput.trim();
+  tcop = sampleoutput.trim();
   const enterPress = useKeyPress("Enter");
   const ctrlPress = useKeyPress("Control");
 
@@ -234,11 +236,8 @@ const Landing = ({ sampleinput = "", sampleoutput = "" }) => {
         </div>
 
         <div className="right-container flex flex-shrink-0 w-[30%] flex-col h-[500px]">
-          <Input customInput={customInput} setCustomInput={setCustomInput} />
-          <OutputWindow
-            outputDetails={outputDetails}
-            sampleoutput={sampleoutput.trim()}
-          />
+          <Input customInput={tcip} setCustomInput={setCustomInput} />
+          <OutputWindow outputDetails={outputDetails} sampleoutput={tcop} />
         </div>
       </div>
     </>

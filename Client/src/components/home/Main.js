@@ -17,6 +17,7 @@ import Landing from "../CodeEditor/Components/Landing";
 import Ide from "../CodeEditor/Components/Ide";
 import Problem from "./Problem";
 import RichTextInput from "../RichTextInput";
+import Problems from "./Problems";
 const Main = () => {
   const location = useLocation();
   let inLoginPage = false;
@@ -49,6 +50,7 @@ const Main = () => {
         <Route path={path.IDE} element={<Ide />} />
         <Route path={path.PROBLEM} element={<Problem />} />
         <Route path={path.CREATEPROBLEM} element={<CreateProblem />} />
+        <Route path={path.PROBLEMS} element={<Problems />} />
       </Routes>
     </div>
   );

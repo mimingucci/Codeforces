@@ -29,10 +29,14 @@ const OutputWindow = ({ outputDetails, sampleoutput = null }) => {
               : null}
           </pre>
         );
-      const answer = sampleoutput.split(" ").filter((syntax) => syntax !== " ");
-      const participant = atob(outputDetails.stdout)
+      const answer = sampleoutput
+        .trim()
         .split(" ")
-        .filter((syntax) => syntax !== " ");
+        .filter((syntax) => syntax !== "");
+      const participant = atob(outputDetails.stdout)
+        .trim()
+        .split(" ")
+        .filter((syntax) => syntax !== "");
       if (answer.length !== participant.length) {
         return (
           <pre className="px-2 py-1 font-normal text-xs text-red-500 text-left">
@@ -41,6 +45,35 @@ const OutputWindow = ({ outputDetails, sampleoutput = null }) => {
             } ms \nMemory: ${outputDetails?.memory} KB \nUser's Output: ${atob(
               outputDetails.stdout
             )}Expected Answer: ${sampleoutput}`}
+          </pre>
+        );
+      }
+      let isCorrect = true;
+      for (let i = 0; i < answer.length && isCorrect; i++) {
+        if (answer[i] !== participant[i]) {
+          isCorrect = false;
+        }
+      }
+      if (!isCorrect) {
+        return (
+          <pre className="px-2 py-1 font-normal text-xs text-red-500 text-left">
+            {`Verdict: Wrong Answer \nTime ${
+              outputDetails?.time * 1000
+            } ms \nMemory: ${outputDetails?.memory} KB \nUser's Output: ${atob(
+              outputDetails.stdout
+            )}Expected Answer: ${sampleoutput}`}
+          </pre>
+        );
+      } else {
+        return (
+          <pre className="px-2 py-1 font-normal text-xs text-green-500 text-left">
+            {atob(outputDetails.stdout) !== null
+              ? `Verdict: ${outputDetails?.status?.description} \nTime: ${
+                  outputDetails?.time * 1000
+                } ms \nMemory: ${outputDetails?.memory} KB\n${atob(
+                  outputDetails.stdout
+                )}`
+              : null}
           </pre>
         );
       }

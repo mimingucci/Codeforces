@@ -19,6 +19,9 @@ class ProblemApi {
   getProblem(id) {
     return axios.get(BASE_URL + "/get/testcase?id=" + id);
   }
+  getProblems({ page }) {
+    return axios.get(BASE_URL + "/fetch?page=" + page);
+  }
   update({ statement, id, title, timelimit, memorylimit, accessToken }) {
     return axios.put(
       BASE_URL + "/update?id=" + id,

@@ -3,18 +3,21 @@ import Landing from "../CodeEditor/Components/Landing";
 import { useEffect, useState } from "react";
 import ProblemApi from "../../getApi/ProblemApi";
 import ProblemNavbar from "./ProblemNavbar";
+import { useParams } from "react-router-dom";
 
 const Problem = () => {
   const [problem, setProblem] = useState(null);
+  const { id } = useParams();
   useEffect(() => {
-    async function init() {
-      const rs = await ProblemApi.getProblem("66613d66e910e617cab3b91e");
+    const fetchData = async () => {
+      const rs = await ProblemApi.getProblem(id);
       if (rs?.data?.status === "success") {
         setProblem(rs.data.data);
-        console.log(problem.testcases[0].input);
+      } else {
+        setProblem(null);
       }
-    }
-    init();
+    };
+    fetchData();
   }, []);
   return (
     <vaadin-split-layout orientation="vertical">
@@ -51,8 +54,8 @@ const Problem = () => {
       )}
       <div>
         <Landing
-          sampleinput={problem?.testcases[0].input}
-          sampleoutput={problem?.testcases[0].output}
+          sampleinput={problem?.testcases[0]?.input}
+          sampleoutput={problem?.testcases[0]?.output}
         />
       </div>
     </vaadin-split-layout>

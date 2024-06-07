@@ -14,7 +14,8 @@ const path = {
   WRITEBLOG: "/writeblog",
   BLOG: "/blog/:blog",
   MESSAGE: "/message/:user",
-  PROBLEM: "/problem",
+  PROBLEM: "/problem/:id",
+  PROBLEMS: "/problems",
   CREATEPROBLEM: "/createproblem",
 };
 export default path;

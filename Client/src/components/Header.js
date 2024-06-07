@@ -73,7 +73,7 @@ const Header = () => {
             <a href="http://localhost:3000/ide">IDE</a>
           </div>
           <div className="hover:cursor-pointer">
-            <a href="http://localhost:3000/problems">PROBLEMSET</a>
+            <a href="http://localhost:3000/problems?page=1">PROBLEMSET</a>
           </div>
           <div className="hover:cursor-pointer">
             <a href="http://localhost:3000/rating">TOP USER</a>

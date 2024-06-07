@@ -21,6 +21,7 @@ const { default: mongoose } = require("mongoose");
 const { userExists } = require("../services/user");
 const { UserNotFoundError } = require("../errors/user");
 const { problemExists } = require("../services/problem");
+const Problem = require("../models/problem");
 
 const createProblem = asyncHandler(async (req, res) => {
   if (
@@ -59,6 +60,47 @@ const getAllProblems = asyncHandler(async (req, res) => {
   return res.json({
     status: rs ? "success" : "failure",
     data: rs ? rs : "Something went wrong",
+  });
+});
+
+const fetchProblem = asyncHandler(async (req, res) => {
+  let queryObj = { ...req.query };
+  let excludedFields = ["page", "sort", "fields"];
+  excludedFields.forEach((el) => delete queryObj[el]);
+
+  let queryString = JSON.stringify(queryObj);
+  queryString = queryString.replace(
+    /\b(gte|gt|lte|lt)\b/g,
+    (match) => `$${match}`
+  );
+  let query = JSON.parse(queryString);
+  // Filtering
+  if (queryObj?.title) query.title = { $regex: queryObj.title, $options: "i" };
+  let queryCommand = Problem.find(query);
+  // sorting
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    queryCommand = queryCommand.sort(sortBy);
+  }
+  // fields limiting
+  if (req.query.fields) {
+    const fields = req.query.fields.split(",").join(" ");
+    queryCommand = queryCommand.select(fields);
+  }
+  // paging
+  const page = +req.query.page || 1;
+  const limit = 5; //100;
+  const skip = (page - 1) * limit;
+  queryCommand.skip(skip).limit(limit);
+  //execute query command
+  queryCommand.exec(async (err, results) => {
+    if (err) throw new Error(err.message);
+    const cnt = await Problem.find({}).countDocuments();
+    return res.status(200).json({
+      success: results ? "success" : "failure",
+      numberOfPage: Math.ceil(cnt / 5),
+      data: results ? results : "Cannot get products",
+    });
   });
 });
 
@@ -112,4 +154,5 @@ module.exports = {
   createTestCase,
   getAllTestCases,
   updateProblemById,
+  fetchProblem,
 };
