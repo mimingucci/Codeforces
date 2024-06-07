@@ -10,7 +10,8 @@ const Navbar = () => {
   if (
     location?.pathname == "/login" ||
     location?.pathname == "/signup" ||
-    location?.pathname == "/ide"
+    location?.pathname == "/ide" ||
+    location?.pathname.startsWith("/problem")
   ) {
     inLoginPage = true;
   } else {

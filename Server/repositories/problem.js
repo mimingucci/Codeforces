@@ -19,7 +19,18 @@ const getById = async (id) => {
 };
 
 const getTestCases = async (id) => {
-  const problem = await Problem.findOne({ _id: id }).populate("testcases");
+  const problem = await Problem.findOne({ _id: id })
+    .populate({
+      path: "testcases",
+      model: "TestCase",
+      select: "input output",
+      options: { limit: 1 },
+    })
+    .populate({ path: "author", model: "User", select: "username" })
+    // .populate({ path: "submissions", model: "Submission" })
+    .populate({ path: "likes", model: "User", select: "_id" })
+    .populate({ path: "dislikes", model: "User", select: "_id" })
+    .populate({ path: "tags", model: "Tag", select: "name" });
   return problem;
 };
 

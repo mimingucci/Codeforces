@@ -25,9 +25,9 @@ int main() {\n\
 }\n\
 ';
 
-const Landing = () => {
+const Landing = ({ sampleinput = "", sampleoutput = "" }) => {
   const [code, setCode] = useState(cppSource);
-  const [customInput, setCustomInput] = useState("");
+  const [customInput, setCustomInput] = useState(sampleinput.trim());
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(null);
   const [theme, setTheme] = useState("cobalt");
@@ -235,7 +235,10 @@ const Landing = () => {
 
         <div className="right-container flex flex-shrink-0 w-[30%] flex-col h-[500px]">
           <Input customInput={customInput} setCustomInput={setCustomInput} />
-          <OutputWindow outputDetails={outputDetails} />
+          <OutputWindow
+            outputDetails={outputDetails}
+            sampleoutput={sampleoutput.trim()}
+          />
         </div>
       </div>
     </>

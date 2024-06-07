@@ -16,10 +16,8 @@ class ProblemApi {
       { headers: { Authorization: "Bearer " + accessToken } }
     );
   }
-  getProblem({ id, accessToken }) {
-    return axios.get(BASE_URL + "/get/testcase?id=" + id, {
-      headers: { Authorization: "Bearer " + accessToken },
-    });
+  getProblem(id) {
+    return axios.get(BASE_URL + "/get/testcase?id=" + id);
   }
   update({ statement, id, title, timelimit, memorylimit, accessToken }) {
     return axios.put(

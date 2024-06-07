@@ -64,7 +64,7 @@ const Header = () => {
           </div>
         </div>
       </div>
-      <div className="downer_header border-r-[50%] rounded-md border-2 w-full h-[50px] border-black border-solid justify-between flex">
+      <div className="downer_header border-r-[50%] rounded-md border-2 w-full h-[50px] border-gray-400 border-solid justify-between flex">
         <div className="w-full h-full flex space-x-4 content-center py-[10px] pl-[10px]">
           <div className="hover:cursor-pointer">
             <a href="http://localhost:3000/home">HOME</a>

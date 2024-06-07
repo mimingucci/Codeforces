@@ -1,7 +1,7 @@
 import React from "react";
 import { classnames } from "../general";
 
-const OutputWindow = ({ outputDetails }) => {
+const OutputWindow = ({ outputDetails, sampleoutput = null }) => {
   const getOutput = () => {
     let statusId = outputDetails?.status?.id;
 
@@ -13,17 +13,37 @@ const OutputWindow = ({ outputDetails }) => {
         </pre>
       );
     } else if (statusId === 3) {
-      return (
-        <pre className="px-2 py-1 font-normal text-xs text-green-500 text-left">
-          {atob(outputDetails.stdout) !== null
-            ? `Verdict: ${outputDetails?.status?.description} \nTime: ${
-                outputDetails?.time * 1000
-              } ms \nMemory: ${outputDetails?.memory} KB\n${atob(
-                outputDetails.stdout
-              )}`
-            : null}
-        </pre>
-      );
+      if (
+        !sampleoutput ||
+        !sampleoutput?.length ||
+        atob(outputDetails.stdout) === null
+      )
+        return (
+          <pre className="px-2 py-1 font-normal text-xs text-green-500 text-left">
+            {atob(outputDetails.stdout) !== null
+              ? `Verdict: ${outputDetails?.status?.description} \nTime: ${
+                  outputDetails?.time * 1000
+                } ms \nMemory: ${outputDetails?.memory} KB\n${atob(
+                  outputDetails.stdout
+                )}`
+              : null}
+          </pre>
+        );
+      const answer = sampleoutput.split(" ").filter((syntax) => syntax !== " ");
+      const participant = atob(outputDetails.stdout)
+        .split(" ")
+        .filter((syntax) => syntax !== " ");
+      if (answer.length !== participant.length) {
+        return (
+          <pre className="px-2 py-1 font-normal text-xs text-red-500 text-left">
+            {`Verdict: Wrong Answer \nTime ${
+              outputDetails?.time * 1000
+            } ms \nMemory: ${outputDetails?.memory} KB \nUser's Output: ${atob(
+              outputDetails.stdout
+            )}Expected Answer: ${sampleoutput}`}
+          </pre>
+        );
+      }
     } else if (statusId === 5) {
       return (
         <pre className="px-2 py-1 font-normal text-xs text-red-500 text-left">
