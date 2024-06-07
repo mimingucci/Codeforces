@@ -1,6 +1,7 @@
 const express = require("express");
 const UserRouter = express.Router();
 const controller = require("../controllers/user");
+const { uploadCloud } = require("../config/cloudinary.config");
 const {
   verifyAccessToken,
   isAdmin,
@@ -35,4 +36,12 @@ UserRouter.put(
   verifyAccessToken,
   controller.updateUserPassword
 );
+UserRouter.put(
+  "/avatar",
+  [verifyAccessToken],
+  uploadCloud.single("avatar"),
+  controller.uploadAvatar
+);
+
+UserRouter.put("/unset-avatar", [verifyAccessToken], controller.deleteAvatar);
 module.exports = UserRouter;

@@ -19,6 +19,10 @@ const {
 } = require("../repositories/user");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const {
+  publicId,
+  cloudinaryDeleteImg,
+} = require("../config/cloudinary.config");
 const sendMail = require("../untils/sendMail");
 const { default: mongoose } = require("mongoose");
 const {
@@ -255,6 +259,38 @@ const logout = asyncHandler(async (req, res) => {
   });
 });
 
+const uploadAvatar = asyncHandler(async (req, res) => {
+  if (!req.file) throw new Error("Missing image file");
+  console.log(req.file.path);
+  const rs = await update(req.user._id, { avatar: req.file.path });
+  return res.status(200).json({
+    status: rs ? "success" : "failure",
+    data: rs ? rs : "Cannot upload avatar",
+  });
+});
+
+const deleteAvatar = asyncHandler(async (req, res) => {
+  const user = await getById(mongoose.Types.ObjectId(req.user._id));
+  if (
+    user.avatar ===
+    "https://res.cloudinary.com/dtov6mocw/image/upload/v1717788682/Codeforces/o5kutr4fekswjrvg7i1r.jpg"
+  ) {
+    return res.status(200).json({
+      status: "success",
+      data: "You don't set avatar",
+    });
+  }
+  const rs = await cloudinaryDeleteImg(publicId(user.avatar));
+  const updatedUser = await update(mongoose.Types.ObjectId(req.user._id), {
+    avatar:
+      "https://res.cloudinary.com/dtov6mocw/image/upload/v1717788682/Codeforces/o5kutr4fekswjrvg7i1r.jpg",
+  });
+  return res.status(200).json({
+    status: rs ? "success" : "failure",
+    data: rs ? "Unset avatar successfully" : "Cannot delete avatar",
+  });
+});
+
 const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.query;
   if (!email) throw new Error("Missing email");
@@ -401,4 +437,6 @@ module.exports = {
   verifyEmail,
   updateUserPassword,
   updateUserByAdmin,
+  uploadAvatar,
+  deleteAvatar,
 };

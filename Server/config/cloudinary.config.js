@@ -1,5 +1,6 @@
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const { extractPublicId } = require("cloudinary-build-url");
 const multer = require("multer");
 require("dotenv").config();
 
@@ -13,10 +14,30 @@ const storage = new CloudinaryStorage({
   cloudinary,
   allowedFormats: ["jpg", "png"],
   params: {
-    folder: "kikigoofy",
+    folder: "Codeforces",
   },
 });
 
+const cloudinaryDeleteImg = async (fileToDelete) => {
+  return new Promise((resolve) => {
+    cloudinary.uploader.destroy(fileToDelete, (error, result) => {
+      console.log("result :: ", result);
+      resolve(
+        {
+          url: result.secure_url,
+          asset_id: result.asset_id,
+          public_id: result.public_id,
+        },
+        {
+          resource_type: "auto",
+        }
+      );
+    });
+  });
+};
+
+const publicId = (url) => extractPublicId(url);
+
 const uploadCloud = multer({ storage });
 
-module.exports = uploadCloud;
+module.exports = { uploadCloud, publicId, cloudinaryDeleteImg };

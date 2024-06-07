@@ -62,6 +62,11 @@ const userSchema = new mongoose.Schema(
       ref: "Chat",
       default: [],
     },
+    avatar: {
+      type: String,
+      default:
+        "https://res.cloudinary.com/dtov6mocw/image/upload/v1717788682/Codeforces/o5kutr4fekswjrvg7i1r.jpg",
+    },
   },
   {
     timestamps: true,
