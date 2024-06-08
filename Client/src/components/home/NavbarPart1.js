@@ -31,22 +31,27 @@ const NavbarPart1 = () => {
             {detain?.username || "Username"}
           </div>
           <hr />
-          <div>
-            <div className="flex items-center">
-              <FaStar size={14} className="mx-[5px] text-blue-800" />
-              Rating: {detain?.rating || "0"}
+          <div className="flex">
+            <div className="w-[60%]">
+              <div className="flex items-center">
+                <FaStar size={14} className="mx-[5px] text-blue-800" />
+                Rating: {detain?.rating || "0"}
+              </div>
+              <div className="flex items-center">
+                <GoDotFill size={14} className="mx-[5px] text-blue-800" />
+                Settings
+              </div>
+              <div className="flex items-center">
+                <GoDotFill size={14} className="mx-[5px] text-blue-800" />
+                Blogs
+              </div>
+              <div className="flex items-center">
+                <GoDotFill size={14} className="mx-[5px] text-blue-800" />
+                Talks
+              </div>
             </div>
-            <div className="flex items-center">
-              <GoDotFill size={14} className="mx-[5px] text-blue-800" />
-              Settings
-            </div>
-            <div className="flex items-center">
-              <GoDotFill size={14} className="mx-[5px] text-blue-800" />
-              Blogs
-            </div>
-            <div className="flex items-center">
-              <GoDotFill size={14} className="mx-[5px] text-blue-800" />
-              Talks
+            <div className="w-[40%] items-center flex justify-center">
+              <img src={detain?.avatar} className="w-[65%]" />
             </div>
           </div>
         </div>

@@ -43,5 +43,9 @@ UserRouter.put(
   controller.uploadAvatar
 );
 
-UserRouter.put("/unset-avatar", [verifyAccessToken], controller.deleteAvatar);
+UserRouter.delete(
+  "/unset-avatar",
+  [verifyAccessToken],
+  controller.deleteAvatar
+);
 module.exports = UserRouter;

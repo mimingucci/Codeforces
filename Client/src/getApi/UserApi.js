@@ -41,6 +41,22 @@ class UserApi {
       headers: { Authorization: "Bearer " + accessToken },
     });
   }
+  uploadImage({ file, accessToken }) {
+    const formData = new FormData();
+    formData.append("avatar", file);
+    return axios.put(BASE_URL + "/avatar", formData, {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    });
+  }
+  unsetImage(accessToken) {
+    return axios.delete(BASE_URL + "/unset-avatar", {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    });
+  }
   getUserInfo(accessToken) {
     return axios.get(BASE_URL + "/info", {
       headers: { Authorization: "Bearer " + accessToken },
