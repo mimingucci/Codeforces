@@ -28,9 +28,6 @@ const blogSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    image: {
-      type: String,
-    },
     author: {
       type: mongoose.Types.ObjectId,
       ref: "User",

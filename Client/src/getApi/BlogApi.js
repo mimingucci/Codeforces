@@ -8,11 +8,11 @@ class BlogApi {
   getBlogById(id) {
     return axios.get(BASE_URL + "/get/" + id);
   }
-  createBlog({ title, content, author }) {
+  createBlog({ title, content, accessToken }) {
     return axios.post(
       BASE_URL + "/create",
-      { title, content, author }
-      //   { params: { nickname: author } }
+      { title, content },
+      { headers: { Authorization: "Bearer " + accessToken } }
     );
   }
   createComment(content, author, blogId) {

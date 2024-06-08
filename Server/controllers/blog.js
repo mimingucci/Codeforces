@@ -19,13 +19,15 @@ const {
   deleteLike,
   deleteDislike,
 } = require("../repositories/blog");
+const TagRepo = require("../repositories/tag");
 const { blogExists } = require("../services/blog");
 const { commentExists } = require("../services/comment");
 const { MissingFieldsError } = require("../errors/input");
 const { default: mongoose } = require("mongoose");
 const { userExists } = require("../services/user");
 const { UserNotFoundError } = require("../errors/user");
-const { tagExists } = require("../services/tag");
+const { tagExists, tagExistsByName } = require("../services/tag");
+const { BlogNotFoundError } = require("../errors/blog");
 
 const createBlog = asyncHandler(async (req, res) => {
   if (!req.user?._id || !req.body.title || !req.body.content)
@@ -38,16 +40,35 @@ const createBlog = asyncHandler(async (req, res) => {
       `User with id ${req.body.author} does not exist`
     );
   }
-  const rs = await save({
+  let rs = await save({
     author: req.user._id,
     content: req.body.content,
     title: req.body.title,
   });
+  if (req.body.tags) {
+    rs = await updateTags(rs._id, req.body.tags);
+  }
   return res.status(200).json({
     status: rs ? "success" : "failure",
     data: rs ? rs : "Cannot create new blog",
   });
 });
+
+const updateTags = async (id, tags) => {
+  let t = [];
+  for (let i of tags) {
+    let valid = await tagExistsByName(i);
+    if (!valid) {
+      const tag = await TagRepo.save(i);
+      t.push(tag._id);
+    } else {
+      const tag = await TagRepo.getByName(i);
+      t.push(tag._id);
+    }
+  }
+  const rs = await updateById(id, { tags: t });
+  return rs;
+};
 
 const getAllBlogs = asyncHandler(async (req, res) => {
   const rs = await getAll();
@@ -101,15 +122,13 @@ const deleteBlogById = asyncHandler(async (req, res) => {
 });
 
 const likeBlog = asyncHandler(async (req, res) => {
-  const { blog, user } = req.body;
-  if (!blog || !user) throw new Error("Missing inputs");
+  const { blog } = req.body;
+  if (!blog || !req.user._id) throw new Error("Missing inputs");
   let valid = await blogExists(mongoose.Types.ObjectId(blog));
   if (!valid) throw new BlogNotFoundError(`Cannot find blog with id ${blog}`);
-  valid = await userExists(mongoose.Types.ObjectId(user));
-  if (!valid) throw new UserNotFoundError(`Cannot find user with id ${user}`);
   valid = await alreadyLike(
     mongoose.Types.ObjectId(blog),
-    mongoose.Types.ObjectId(user)
+    mongoose.Types.ObjectId(req.user._id)
   );
   if (valid) {
     return res.json({
@@ -118,16 +137,16 @@ const likeBlog = asyncHandler(async (req, res) => {
   }
   valid = await alreadyDislike(
     mongoose.Types.ObjectId(blog),
-    mongoose.Types.ObjectId(user)
+    mongoose.Types.ObjectId(req.user._id)
   );
   if (valid) {
     const updated = await deleteDislike(
       mongoose.Types.ObjectId(blog),
-      mongoose.Types.ObjectId(user)
+      mongoose.Types.ObjectId(req.user._id)
     );
     const rs = await like(
       mongoose.Types.ObjectId(blog),
-      mongoose.Types.ObjectId(user)
+      mongoose.Types.ObjectId(req.user._id)
     );
     return res.json({
       status: rs.likes.length > updated.likes.length ? "success" : "failure",
@@ -137,7 +156,7 @@ const likeBlog = asyncHandler(async (req, res) => {
   }
   const rs = await like(
     mongoose.Types.ObjectId(blog),
-    mongoose.Types.ObjectId(user)
+    mongoose.Types.ObjectId(req.user._id)
   );
   return res.json({
     status: rs ? "success" : "failure",
@@ -146,15 +165,13 @@ const likeBlog = asyncHandler(async (req, res) => {
 });
 
 const dislikeBlog = asyncHandler(async (req, res) => {
-  const { blog, user } = req.body;
-  if (!blog || !user) throw new Error("Missing inputs");
+  const { blog } = req.body;
+  if (!blog || !req.user._id) throw new Error("Missing inputs");
   let valid = await blogExists(mongoose.Types.ObjectId(blog));
   if (!valid) throw new BlogNotFoundError(`Cannot find blog with id ${blog}`);
-  valid = await userExists(mongoose.Types.ObjectId(user));
-  if (!valid) throw new UserNotFoundError(`Cannot find user with id ${user}`);
   valid = await alreadyDislike(
     mongoose.Types.ObjectId(blog),
-    mongoose.Types.ObjectId(user)
+    mongoose.Types.ObjectId(req.user._id)
   );
   if (valid) {
     return res.json({
@@ -163,16 +180,16 @@ const dislikeBlog = asyncHandler(async (req, res) => {
   }
   valid = await alreadyLike(
     mongoose.Types.ObjectId(blog),
-    mongoose.Types.ObjectId(user)
+    mongoose.Types.ObjectId(req.user._id)
   );
   if (valid) {
     const updated = await deleteLike(
       mongoose.Types.ObjectId(blog),
-      mongoose.Types.ObjectId(user)
+      mongoose.Types.ObjectId(req.user._id)
     );
     const rs = await dislike(
       mongoose.Types.ObjectId(blog),
-      mongoose.Types.ObjectId(user)
+      mongoose.Types.ObjectId(req.user._id)
     );
     return res.json({
       status: rs.likes.length > updated.likes.length ? "success" : "failure",
@@ -182,7 +199,7 @@ const dislikeBlog = asyncHandler(async (req, res) => {
   }
   const rs = await dislike(
     mongoose.Types.ObjectId(blog),
-    mongoose.Types.ObjectId(user)
+    mongoose.Types.ObjectId(req.user._id)
   );
   return res.json({
     status: rs ? "success" : "failure",
@@ -191,25 +208,23 @@ const dislikeBlog = asyncHandler(async (req, res) => {
 });
 
 const deleteLikeBlog = asyncHandler(async (req, res) => {
-  const { blog, user } = req.body;
-  if (!blog || !user) throw new Error("Missing inputs");
+  const { blog } = req.body;
+  if (!blog || !req.user._id) throw new Error("Missing inputs");
   let valid = await blogExists(mongoose.Types.ObjectId(blog));
   if (!valid) throw new BlogNotFoundError(`Cannot find blog with id ${blog}`);
-  valid = await userExists(mongoose.Types.ObjectId(user));
-  if (!valid) throw new UserNotFoundError(`Cannot find user with id ${user}`);
   valid = await alreadyLike(
     mongoose.Types.ObjectId(blog),
-    mongoose.Types.ObjectId(user)
+    mongoose.Types.ObjectId(req.user._id)
   );
   if (!valid) {
     return res.status(403).json({
       status: "failure",
-      message: `User with id ${user} doesn't like blog with id ${blog}`,
+      message: `User with id ${req.user._id} doesn't like blog with id ${blog}`,
     });
   }
   const rs = await deleteLike(
     mongoose.Types.ObjectId(blog),
-    mongoose.Types.ObjectId(user)
+    mongoose.Types.ObjectId(req.user._id)
   );
   return res.status(200).json({
     status: rs ? "success" : "failure",
@@ -218,25 +233,23 @@ const deleteLikeBlog = asyncHandler(async (req, res) => {
 });
 
 const deleteDislikeBlog = asyncHandler(async (req, res) => {
-  const { blog, user } = req.body;
-  if (!blog || !user) throw new Error("Missing inputs");
+  const { blog } = req.body;
+  if (!blog || !req.user._id) throw new Error("Missing inputs");
   let valid = await blogExists(mongoose.Types.ObjectId(blog));
   if (!valid) throw new BlogNotFoundError(`Cannot find blog with id ${blog}`);
-  valid = await userExists(mongoose.Types.ObjectId(user));
-  if (!valid) throw new UserNotFoundError(`Cannot find user with id ${user}`);
   valid = await alreadyDislike(
     mongoose.Types.ObjectId(blog),
-    mongoose.Types.ObjectId(user)
+    mongoose.Types.ObjectId(req.user._id)
   );
   if (!valid) {
     return res.status(403).json({
       status: "failure",
-      message: `User with id ${user} doesn't dislike blog with id ${blog}`,
+      message: `User with id ${req.user._id} doesn't dislike blog with id ${blog}`,
     });
   }
   const rs = await deleteDislike(
     mongoose.Types.ObjectId(blog),
-    mongoose.Types.ObjectId(user)
+    mongoose.Types.ObjectId(req.user._id)
   );
   return res.status(200).json({
     status: rs ? "success" : "failure",
@@ -285,7 +298,17 @@ const updateBlogById = asyncHandler(async (req, res) => {
   if (!id) {
     throw new MissingFieldsError("Missing blog id");
   }
-  const rs = await updateById(mongoose.Types.ObjectId(id), req.body);
+  let valid = await blogExists(mongoose.Types.ObjectId(id));
+  if (!valid) throw new BlogNotFoundError(`Cannot find blog with id ${id}`);
+  let tags = undefined;
+  if (req.body.tags) {
+    tags = req.body.tags;
+    delete req.body.tags;
+  }
+  let rs = await updateById(mongoose.Types.ObjectId(id), req.body);
+  if (tags) {
+    rs = await updateTags(mongoose.Types.ObjectId(id), tags);
+  }
   return res.json({
     status: rs ? "success" : "failure",
     data: rs ? rs : "Cannot update blog by id",

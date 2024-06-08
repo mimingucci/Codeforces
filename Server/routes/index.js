@@ -8,6 +8,7 @@ const TagRouter = require("./tag");
 const CommentRouter = require("./comment");
 const ProblemRouter = require("./problem");
 const TestCaseRouter = require("./testcase");
+const ImageRouter = require("./image");
 const initRoutes = (app) => {
   app.use("/api/user", UserRouter);
   app.use("/api/state", StateRouter);
@@ -18,6 +19,7 @@ const initRoutes = (app) => {
   app.use("/api/comment", CommentRouter);
   app.use("/api/problem", ProblemRouter);
   app.use("/api/testcase", TestCaseRouter);
+  app.use("/api/image", ImageRouter);
   app.use(errorHandler);
 };
 

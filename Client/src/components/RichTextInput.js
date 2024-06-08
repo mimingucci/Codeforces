@@ -1,12 +1,47 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import BlogApi from "../getApi/BlogApi";
+import axios from "axios";
+import HandleCookies from "../utils/HandleCookies";
 
 const RichTextInput = () => {
+  const BASE_URL = "http://localhost:1234/api/image";
   const [text, setText] = useState("");
   const [title, setTitle] = useState("");
   const ref = useRef();
+  const quillRef = useRef(null);
+
+  const imageHandler = useCallback(() => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.click();
+    input.onchange = async () => {
+      if (input !== null && input.files !== null) {
+        const file = input.files[0];
+        const url = await uploadToCloudinary(file);
+        const quill = quillRef.current;
+        if (quill) {
+          const range = quill.getEditorSelection();
+          range && quill.getEditor().insertEmbed(range.index, "image", url);
+        }
+      }
+    };
+  }, []);
+
+  const uploadToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    const rs = await axios.post(BASE_URL, formData, {
+      headers: {
+        Authorization: "Bearer " + HandleCookies.getCookie("accessToken"),
+      },
+    });
+    console.log(rs?.data?.data);
+    return rs?.data?.data;
+  };
+
   const handleChange = (value) => {
     setText(value);
     console.log(title);
@@ -20,7 +55,7 @@ const RichTextInput = () => {
       const res = await BlogApi.createBlog({
         title,
         content: text,
-        author: "66504756a3a46397d657163b",
+        accessToken: HandleCookies.getCookie("accessToken"),
       });
       console.log(res);
       alert("Your blog created success");
@@ -46,11 +81,53 @@ const RichTextInput = () => {
       </div>
       <div className="items-center my-10">
         <ReactQuill
+          ref={quillRef}
           theme="snow"
           value={text}
           onChange={handleChange}
           placeholder="Enter context"
-          className="w-[600px] mx-auto"
+          modules={{
+            toolbar: {
+              container: [
+                [{ header: "1" }, { header: "2" }, { font: [] }],
+                [{ size: [] }],
+                ["bold", "italic", "underline", "strike", "blockquote"],
+                [
+                  { list: "ordered" },
+                  { list: "bullet" },
+                  { indent: "-1" },
+                  { indent: "+1" },
+                ],
+                ["link", "image", "video"],
+                ["code-block"],
+                ["clean"],
+              ],
+              handlers: {
+                image: imageHandler,
+              },
+            },
+            clipboard: {
+              matchVisual: false,
+            },
+          }}
+          formats={[
+            "header",
+            "font",
+            "size",
+            "bold",
+            "italic",
+            "underline",
+            "strike",
+            "blockquote",
+            "list",
+            "bullet",
+            "indent",
+            "link",
+            "image",
+            "video",
+            "code-block",
+          ]}
+          className="w-full mx-auto px-5"
         />
       </div>
 

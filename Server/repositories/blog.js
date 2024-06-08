@@ -12,25 +12,40 @@ const save = async (user) => {
 };
 
 const getAll = async () => {
-  return await Blog.find();
+  return await Blog.find().populate({
+    path: "tags",
+    model: "Tag",
+  });
 };
 
 const getBlogById = async (id) => {
-  return await Blog.findOne({ _id: id });
+  return await Blog.findOne({ _id: id }).populate({
+    path: "tags",
+    model: "Tag",
+  });
 };
 
 const getByAuthor = async (author) => {
-  const blogs = await Blog.find({ author });
+  const blogs = await Blog.find({ author }).populate({
+    path: "tags",
+    model: "Tag",
+  });
   return blogs;
 };
 
 const getByTag = async (tag) => {
-  const rs = await Blog.find({ tags: { $elemMatch: { name: tag } } });
+  const rs = await Blog.find({ tags: { $elemMatch: { name: tag } } }).populate({
+    path: "tags",
+    model: "Tag",
+  });
   return rs;
 };
 
 const getByTags = async (t) => {
-  const rs = await Blog.find({ tags: { $all: t } });
+  const rs = await Blog.find({ tags: { $all: t } }).populate({
+    path: "tags",
+    model: "Tag",
+  });
   return rs;
 };
 
@@ -40,7 +55,10 @@ const deleteById = async (id) => {
 };
 
 const updateById = async (id, blog) => {
-  const rs = await Blog.findByIdAndUpdate(id, blog, { new: true });
+  const rs = await Blog.findByIdAndUpdate(id, blog, { new: true }).populate({
+    path: "tags",
+    model: "Tag",
+  });
   return rs;
 };
 
@@ -53,7 +71,10 @@ const like = async (blogid, userid) => {
       },
     },
     { new: true }
-  );
+  ).populate({
+    path: "tags",
+    model: "Tag",
+  });
   return rs;
 };
 
@@ -66,7 +87,10 @@ const dislike = async (blogid, userid) => {
       },
     },
     { new: true }
-  );
+  ).populate({
+    path: "tags",
+    model: "Tag",
+  });
   return rs;
 };
 
@@ -79,7 +103,10 @@ const deleteLike = async (blogid, userid) => {
       },
     },
     { new: true }
-  );
+  ).populate({
+    path: "tags",
+    model: "Tag",
+  });
   return rs;
 };
 
@@ -92,7 +119,10 @@ const deleteDislike = async (blogid, userid) => {
       },
     },
     { new: true }
-  );
+  ).populate({
+    path: "tags",
+    model: "Tag",
+  });
   return rs;
 };
 
@@ -139,7 +169,10 @@ const addComment = async (blogid, commentid) => {
       $push: { comments: commentid },
     },
     { new: true }
-  );
+  ).populate({
+    path: "tags",
+    model: "Tag",
+  });
   return rs;
 };
 
@@ -150,7 +183,10 @@ const deleteComment = async (blogid, commentid) => {
       $pull: { comments: commentid },
     },
     { new: true }
-  );
+  ).populate({
+    path: "tags",
+    model: "Tag",
+  });
   return rs;
 };
 

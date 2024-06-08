@@ -8,12 +8,24 @@ router.get("/getall", controller.getAllBlogs);
 router.get("/get/author", controller.getBlogsByAuthor);
 router.get("/get/tag", controller.getBlogsByTag);
 router.get("/get/:id", controller.getBlogByIdController);
-router.put("/update/like", controller.likeBlog);
-router.put("/update/dislike", controller.dislikeBlog);
-router.put("/update/deletelike", controller.deleteLikeBlog);
-router.put("/update/deletedislike", controller.deleteDislikeBlog);
-router.put("/update/addtag", controller.addTagToBlog);
-router.put("/update/deletetag", controller.deleteTagFromBlog);
-router.put("/update/:id", controller.updateBlogById);
-router.delete("/delete/:id", controller.deleteBlogById);
+router.put("/update/like", [verifyAccessToken], controller.likeBlog);
+router.put("/update/dislike", [verifyAccessToken], controller.dislikeBlog);
+router.put(
+  "/update/deletelike",
+  [verifyAccessToken],
+  controller.deleteLikeBlog
+);
+router.put(
+  "/update/deletedislike",
+  [verifyAccessToken],
+  controller.deleteDislikeBlog
+);
+router.put("/update/addtag", [verifyAccessToken], controller.addTagToBlog);
+router.put(
+  "/update/deletetag",
+  [verifyAccessToken],
+  controller.deleteTagFromBlog
+);
+router.put("/update/:id", [verifyAccessToken], controller.updateBlogById);
+router.delete("/delete/:id", [verifyAccessToken], controller.deleteBlogById);
 module.exports = router;

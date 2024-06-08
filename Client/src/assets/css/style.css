@@ -11,11 +11,19 @@
   [contenteditable] {
     font: inherit;
     line-height: 1.5;
-    width: 600px;
+    /* width: 600px; */
     padding: 8px 12px;
     overflow: auto;
   }
-  
+
+  input {
+    width: 600px;
+  }
+
+  textarea {
+    width: 100%;
+  }
+
   label {
     display: block;
     margin-bottom: 4px;

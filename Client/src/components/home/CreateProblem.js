@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "@vaadin/split-layout";
@@ -8,10 +8,15 @@ import handleTokenAutomatically from "../../utils/autoHandlerToken";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TestCaseApi from "../../getApi/TestCaseApi";
+import axios from "axios";
 
 const CreateProblem = ({ problemid = "-1" }) => {
+  const BASE_URL = "http://localhost:1234/api/image";
+
   const [id, setId] = useState(problemid);
   const [problem, setProblem] = useState({});
+  const quillRef = useRef(null);
+
   useEffect(() => {
     console.log("run here");
     if (id === "-1") {
@@ -157,6 +162,36 @@ const CreateProblem = ({ problemid = "-1" }) => {
     }
   };
 
+  const imageHandler = useCallback(() => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.click();
+    input.onchange = async () => {
+      if (input !== null && input.files !== null) {
+        const file = input.files[0];
+        const url = await uploadToCloudinary(file);
+        const quill = quillRef.current;
+        if (quill) {
+          const range = quill.getEditorSelection();
+          range && quill.getEditor().insertEmbed(range.index, "image", url);
+        }
+      }
+    };
+  }, []);
+
+  const uploadToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    const rs = await axios.post(BASE_URL, formData, {
+      headers: {
+        Authorization: "Bearer " + HandleCookies.getCookie("accessToken"),
+      },
+    });
+    console.log(rs?.data?.data);
+    return rs?.data?.data;
+  };
+
   return (
     <div className="w-full mt-3">
       <ToastContainer
@@ -199,12 +234,61 @@ const CreateProblem = ({ problemid = "-1" }) => {
       </div>
       <div className="items-center my-10">
         <h3 className="text-left">Statement:</h3>
-        <ReactQuill
+        {/* <ReactQuill
           theme="snow"
           value={statement}
           onChange={handleChangeStatement}
           placeholder="Enter context"
           className="w-[600px] mx-auto"
+        /> */}
+        <ReactQuill
+          ref={quillRef}
+          theme="snow"
+          value={statement}
+          onChange={handleChangeStatement}
+          placeholder="Enter context"
+          modules={{
+            toolbar: {
+              container: [
+                [{ header: "1" }, { header: "2" }, { font: [] }],
+                [{ size: [] }],
+                ["bold", "italic", "underline", "strike", "blockquote"],
+                [
+                  { list: "ordered" },
+                  { list: "bullet" },
+                  { indent: "-1" },
+                  { indent: "+1" },
+                ],
+                ["link", "image", "video"],
+                ["code-block"],
+                ["clean"],
+              ],
+              handlers: {
+                image: imageHandler,
+              },
+            },
+            clipboard: {
+              matchVisual: false,
+            },
+          }}
+          formats={[
+            "header",
+            "font",
+            "size",
+            "bold",
+            "italic",
+            "underline",
+            "strike",
+            "blockquote",
+            "list",
+            "bullet",
+            "indent",
+            "link",
+            "image",
+            "video",
+            "code-block",
+          ]}
+          className="w-full mx-auto px-5"
         />
       </div>
       <div className="items-center my-10">

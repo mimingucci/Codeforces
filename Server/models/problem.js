@@ -34,9 +34,6 @@ const problemSchema = new mongoose.Schema(
         unique: true,
       },
     ],
-    image: {
-      type: String,
-    },
     author: {
       type: mongoose.Types.ObjectId,
       ref: "User",
