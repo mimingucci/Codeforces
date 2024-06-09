@@ -5,7 +5,9 @@ const { FaArrowRightLong, FaStar, GoDotFill } = icons;
 const NavbarPart2 = () => {
   const [users, setUsers] = useState();
   useEffect(() => {
-    UserApi.getTopRatings().then((res) => setUsers(res.data.data));
+    UserApi.getTopUsers({ field: "-rating" }).then((res) =>
+      setUsers(res.data.data)
+    );
   }, []);
   return (
     <div className="w-full border-[2px] rounded-t-md border-solid border-gray-400 mt-4">
@@ -15,7 +17,7 @@ const NavbarPart2 = () => {
       </div>
       <hr />
       <div>
-        <table class="table-fixed w-full">
+        <table className="table-fixed w-full">
           <thead>
             <tr>
               <th>#</th>
@@ -28,7 +30,7 @@ const NavbarPart2 = () => {
               users.map((user, index) => {
                 if (index < 10) {
                   return (
-                    <tr className="odd:bg-gray-100">
+                    <tr className="odd:bg-gray-100" key={user._id}>
                       <td>{index + 1}</td>
                       <td>
                         <a href={"/profile/" + user.nickname}>

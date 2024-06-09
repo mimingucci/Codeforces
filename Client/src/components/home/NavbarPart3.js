@@ -5,7 +5,9 @@ const { FaArrowRightLong, FaStar, GoDotFill } = icons;
 const NavbarPart3 = () => {
   const [users, setUsers] = useState();
   useEffect(() => {
-    UserApi.getTopContributors().then((res) => setUsers(res.data));
+    UserApi.getTopUsers({ field: "-contribution" }).then((res) =>
+      setUsers(res.data.data)
+    );
   }, []);
   return (
     <div className="w-full border-[2px] rounded-t-md border-solid border-gray-400 mt-4">
@@ -15,7 +17,7 @@ const NavbarPart3 = () => {
       </div>
       <hr />
       <div>
-        <table class="table-fixed w-full">
+        <table className="table-fixed w-full">
           <thead>
             <tr>
               <th>#</th>
@@ -27,21 +29,18 @@ const NavbarPart3 = () => {
             {users &&
               users.map((user, index) => {
                 return (
-                  <tr className="odd:bg-gray-100">
+                  <tr className="odd:bg-gray-100" key={user._id}>
                     <td>{index + 1}</td>
                     <td>
-                      <a href={"/profile/" + user.nickname}>{user.nickname}</a>
+                      <a href={"/profile/" + user.usename}>{user.username}</a>
                     </td>
-                    <td>{user.posts.length}</td>
+                    <td>{user.contribution}</td>
                   </tr>
                 );
               })}
           </tbody>
         </table>
-        <div className="flex items-center bg-gray-100 text-blue-800 flex-row-reverse">
-          <FaArrowRightLong size={15} className="mx-[5px]" />
-          View all
-        </div>
+        <div className="flex items-center bg-gray-100 text-blue-800 flex-row-reverse"></div>
       </div>
     </div>
   );

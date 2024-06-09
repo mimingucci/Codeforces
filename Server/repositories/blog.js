@@ -12,40 +12,50 @@ const save = async (user) => {
 };
 
 const getAll = async () => {
-  return await Blog.find().populate({
-    path: "tags",
-    model: "Tag",
-  });
+  return await Blog.find()
+    .populate({
+      path: "tags",
+      model: "Tag",
+    })
+    .populate({ path: "author", model: "User", select: "username" });
 };
 
 const getBlogById = async (id) => {
-  return await Blog.findOne({ _id: id }).populate({
-    path: "tags",
-    model: "Tag",
-  });
+  return await Blog.findOne({ _id: id })
+    .populate({
+      path: "tags",
+      model: "Tag",
+    })
+    .populate({ path: "author", model: "User", select: "username" });
 };
 
 const getByAuthor = async (author) => {
-  const blogs = await Blog.find({ author }).populate({
-    path: "tags",
-    model: "Tag",
-  });
+  const blogs = await Blog.find({ author })
+    .populate({
+      path: "tags",
+      model: "Tag",
+    })
+    .populate({ path: "author", model: "User", select: "username" });
   return blogs;
 };
 
 const getByTag = async (tag) => {
-  const rs = await Blog.find({ tags: { $elemMatch: { name: tag } } }).populate({
-    path: "tags",
-    model: "Tag",
-  });
+  const rs = await Blog.find({ tags: { $elemMatch: { name: tag } } })
+    .populate({
+      path: "tags",
+      model: "Tag",
+    })
+    .populate({ path: "author", model: "User", select: "username" });
   return rs;
 };
 
 const getByTags = async (t) => {
-  const rs = await Blog.find({ tags: { $all: t } }).populate({
-    path: "tags",
-    model: "Tag",
-  });
+  const rs = await Blog.find({ tags: { $all: t } })
+    .populate({
+      path: "tags",
+      model: "Tag",
+    })
+    .populate({ path: "author", model: "User", select: "username" });
   return rs;
 };
 
@@ -55,10 +65,12 @@ const deleteById = async (id) => {
 };
 
 const updateById = async (id, blog) => {
-  const rs = await Blog.findByIdAndUpdate(id, blog, { new: true }).populate({
-    path: "tags",
-    model: "Tag",
-  });
+  const rs = await Blog.findByIdAndUpdate(id, blog, { new: true })
+    .populate({
+      path: "tags",
+      model: "Tag",
+    })
+    .populate({ path: "author", model: "User", select: "username" });
   return rs;
 };
 
@@ -71,10 +83,12 @@ const like = async (blogid, userid) => {
       },
     },
     { new: true }
-  ).populate({
-    path: "tags",
-    model: "Tag",
-  });
+  )
+    .populate({
+      path: "tags",
+      model: "Tag",
+    })
+    .populate({ path: "author", model: "User", select: "username" });
   return rs;
 };
 
@@ -87,10 +101,12 @@ const dislike = async (blogid, userid) => {
       },
     },
     { new: true }
-  ).populate({
-    path: "tags",
-    model: "Tag",
-  });
+  )
+    .populate({
+      path: "tags",
+      model: "Tag",
+    })
+    .populate({ path: "author", model: "User", select: "username" });
   return rs;
 };
 
@@ -103,10 +119,12 @@ const deleteLike = async (blogid, userid) => {
       },
     },
     { new: true }
-  ).populate({
-    path: "tags",
-    model: "Tag",
-  });
+  )
+    .populate({
+      path: "tags",
+      model: "Tag",
+    })
+    .populate({ path: "author", model: "User", select: "username" });
   return rs;
 };
 
@@ -119,10 +137,12 @@ const deleteDislike = async (blogid, userid) => {
       },
     },
     { new: true }
-  ).populate({
-    path: "tags",
-    model: "Tag",
-  });
+  )
+    .populate({
+      path: "tags",
+      model: "Tag",
+    })
+    .populate({ path: "author", model: "User", select: "username" });
   return rs;
 };
 
@@ -169,10 +189,12 @@ const addComment = async (blogid, commentid) => {
       $push: { comments: commentid },
     },
     { new: true }
-  ).populate({
-    path: "tags",
-    model: "Tag",
-  });
+  )
+    .populate({
+      path: "tags",
+      model: "Tag",
+    })
+    .populate({ path: "author", model: "User", select: "username" });
   return rs;
 };
 
@@ -183,10 +205,12 @@ const deleteComment = async (blogid, commentid) => {
       $pull: { comments: commentid },
     },
     { new: true }
-  ).populate({
-    path: "tags",
-    model: "Tag",
-  });
+  )
+    .populate({
+      path: "tags",
+      model: "Tag",
+    })
+    .populate({ path: "author", model: "User", select: "username" });
   return rs;
 };
 

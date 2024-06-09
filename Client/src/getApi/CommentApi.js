@@ -1,15 +1,35 @@
 import axios from "axios";
 const BASE_URL = "http://localhost:1234/api/comment";
 class CommentApi {
-  updateLike(id, nickname) {
-    return axios.put(BASE_URL + "/update/like", null, {
-      params: { nickname, id },
-    });
+  updateLike({ comment, accessToken }) {
+    return axios.put(
+      BASE_URL + "/update/like",
+      {
+        comment,
+      },
+      {
+        headers: { Authorization: "Bearer " + accessToken },
+      }
+    );
   }
-  updateDislike(id, nickname) {
-    return axios.put(BASE_URL + "/update/dislike", null, {
-      params: { nickname, id },
-    });
+  updateDislike({ comment, accessToken }) {
+    return axios.put(
+      BASE_URL + "/update/dislike",
+      { comment },
+      {
+        headers: { Authorization: "Bearer " + accessToken },
+      }
+    );
+  }
+  getCommentById(id) {
+    return axios.get(BASE_URL + "/get/" + id);
+  }
+  createComment({ content, accessToken, blogId }) {
+    return axios.post(
+      BASE_URL + "/create",
+      { content, blogId },
+      { headers: { Authorization: "Bearer " + accessToken } }
+    );
   }
 }
 export default new CommentApi();

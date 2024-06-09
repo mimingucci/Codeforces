@@ -29,6 +29,50 @@ const { UserNotFoundError } = require("../errors/user");
 const { tagExists, tagExistsByName } = require("../services/tag");
 const { BlogNotFoundError } = require("../errors/blog");
 
+const fetchBlog = asyncHandler(async (req, res) => {
+  let queryObj = { ...req.query };
+  let excludedFields = ["page", "sort", "fields"];
+  excludedFields.forEach((el) => delete queryObj[el]);
+
+  let queryString = JSON.stringify(queryObj);
+  queryString = queryString.replace(
+    /\b(gte|gt|lte|lt)\b/g,
+    (match) => `$${match}`
+  );
+  let query = JSON.parse(queryString);
+  // Filtering
+  if (queryObj?.title) query.title = { $regex: queryObj.title, $options: "i" };
+  let queryCommand = Blog.find(query).populate({
+    path: "author",
+    model: "User",
+  });
+  // sorting
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    queryCommand = queryCommand.sort(sortBy);
+  }
+  // fields limiting
+  if (req.query.fields) {
+    const fields = req.query.fields.split(",").join(" ");
+    queryCommand = queryCommand.select(fields);
+  }
+  // paging
+  const page = +req.query.page || 1;
+  const limit = 50;
+  const skip = (page - 1) * limit;
+  queryCommand.skip(skip).limit(limit);
+  //execute query command
+  queryCommand.exec(async (err, results) => {
+    if (err) throw new Error(err.message);
+    const cnt = await Blog.find({}).countDocuments();
+    return res.status(200).json({
+      success: results ? "success" : "failure",
+      numberOfPage: Math.ceil(cnt / 50),
+      data: results ? results : "Cannot get blogs",
+    });
+  });
+});
+
 const createBlog = asyncHandler(async (req, res) => {
   if (!req.user?._id || !req.body.title || !req.body.content)
     throw new MissingFieldsError(
@@ -134,8 +178,13 @@ const likeBlog = asyncHandler(async (req, res) => {
     mongoose.Types.ObjectId(req.user._id)
   );
   if (valid) {
-    return res.json({
-      status: "success",
+    const rs = await deleteLike(
+      mongoose.Types.ObjectId(blog),
+      mongoose.Types.ObjectId(req.user._id)
+    );
+    return res.status(200).json({
+      status: rs ? "success" : "failure",
+      data: rs ? rs : "Cannot update like",
     });
   }
   valid = await alreadyDislike(
@@ -177,8 +226,13 @@ const dislikeBlog = asyncHandler(async (req, res) => {
     mongoose.Types.ObjectId(req.user._id)
   );
   if (valid) {
-    return res.json({
-      status: "success",
+    const rs = await deleteDislike(
+      mongoose.Types.ObjectId(blog),
+      mongoose.Types.ObjectId(req.user._id)
+    );
+    return res.status(200).json({
+      status: rs ? "success" : "failure",
+      data: rs ? rs : "Cannot update dislike",
     });
   }
   valid = await alreadyLike(
@@ -195,9 +249,12 @@ const dislikeBlog = asyncHandler(async (req, res) => {
       mongoose.Types.ObjectId(req.user._id)
     );
     return res.json({
-      status: rs.likes.length > updated.likes.length ? "success" : "failure",
+      status:
+        rs.dislikes.length > updated.dislikes.length ? "success" : "failure",
       data:
-        rs.likes.length > updated.likes.length ? rs : "Something went wrong",
+        rs.dislikes.length > updated.dislikes.length
+          ? rs
+          : "Something went wrong",
     });
   }
   const rs = await dislike(
@@ -332,4 +389,5 @@ module.exports = {
   updateBlogById,
   deleteLikeBlog,
   deleteDislikeBlog,
+  fetchBlog,
 };

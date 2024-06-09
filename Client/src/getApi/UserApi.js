@@ -4,8 +4,8 @@ class UserApi {
   getAllUsers() {
     return axios.get(BASE_URL + "/all");
   }
-  getTopRatings() {
-    return axios.get(BASE_URL + "/fetch?sort=-rating&page=1&enabled=true");
+  getTopUsers({ field = "-rating" }) {
+    return axios.get(BASE_URL + `/fetch?sort=${field}&page=1&enabled=true`);
   }
   getUserById(id) {
     return axios.get(BASE_URL + "/id/" + id);

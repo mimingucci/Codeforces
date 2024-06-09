@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import icons from "../../utils/icons";
-import UserApi from "../../getApi/UserApi";
+import BlogApi from "../../getApi/BlogApi";
 import HandleCookies from "../../utils/HandleCookies";
+import { ToastContainer, toast } from "react-toastify";
+import { relativeTime } from "../../utils/timeManufacture";
+import "react-toastify/dist/ReactToastify.css";
 const {
   FaAnglesRight,
   RiAttachment2,
@@ -12,68 +15,91 @@ const {
   IoIosChatboxes,
 } = icons;
 const Blog = ({ blog }) => {
-  const [user, setUser] = useState(null);
-  useEffect(() => {
-    async function getUsername() {
-      try {
-        const rs = await UserApi.getUserById(blog?.author);
-        setUser(rs?.data?.data);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    getUsername();
-  }, []);
   const [like, setLike] = useState(blog?.likes.length - blog?.dislikes.length);
-  const title = { __html: blog?.title };
-  const content = { __html: blog?.content };
   const handleLike = async () => {
-    // const nickname = HandleCookies.getCookie("nickname");
-    // const id = blog?.id;
-    // try {
-    //   const res = await BlogApi.updateLike(id, nickname);
-    //   setLike(like + 1);
-    // } catch (error) {
-    //   alert(error?.response?.data);
-    // }
+    const accessToken = HandleCookies.getCookie("accessToken");
+    if (!accessToken) {
+      showErrorToast("Please login to continue...");
+      return;
+    }
+    const id = blog?._id;
+    try {
+      const res = await BlogApi.updateLike({ blog: id, accessToken });
+      showSuccessToast("Update like successfully");
+      setLike(res?.data?.data?.likes.length - res?.data?.data?.dislikes.length);
+    } catch (error) {
+      showErrorToast("Update like failed");
+    }
   };
   const handleDislike = async () => {
-    // const nickname = HandleCookies.getCookie("nickname");
-    // const id = blog?.id;
-    // try {
-    //   const res = await BlogApi.updateDislike(id, nickname);
-    //   setLike(like - 1);
-    // } catch (error) {
-    //   alert(error?.response?.data);
-    // }
+    const accessToken = HandleCookies.getCookie("accessToken");
+    if (!accessToken) {
+      showErrorToast("Please login to continue...");
+      return;
+    }
+    const id = blog?._id;
+    try {
+      const res = await BlogApi.updateDislike({ blog: id, accessToken });
+      showSuccessToast("Update dislike successfully");
+      setLike(res?.data?.data?.likes.length - res?.data?.data?.dislikes.length);
+    } catch (error) {
+      showErrorToast("Update dislike failed");
+    }
+  };
+
+  const showSuccessToast = (msg) => {
+    toast.success(msg || `Compiled Successfully!`, {
+      position: "top-right",
+      autoClose: 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+
+  const showErrorToast = (msg, timer) => {
+    toast.error(msg || `Something went wrong! Please try again.`, {
+      position: "top-right",
+      autoClose: timer ? timer : 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   };
   return (
     <div className="text-left mt-5">
       <h1 className="text-blue-800 text-[30px] font-bold">
-        {<div dangerouslySetInnerHTML={title} /> || "Educational top user"}
+        {
+          <a href={`/blog/${blog?._id}`}>
+            <div dangerouslySetInnerHTML={{ __html: blog?.title }} />
+          </a>
+        }
       </h1>
       <p>
         By{" "}
         <span className="underline">
-          <a href={"/profile/" + blog?.author || "/profile/mimingucci"}>
-            {user?.username || "..."}
+          <a href={"/profile/" + blog?.author?.username}>
+            {blog?.author?.username}
           </a>
         </span>
-        , {((new Date() - new Date(blog?.createdAt)) / (1000 * 60 * 60)) | 0}{" "}
-        hours ago
+        , {relativeTime(blog?.createdAt)}
       </p>
       <div className="border-l-[4px] border-solid border-gray-400 px-3">
-        {<div dangerouslySetInnerHTML={content} /> || "Lionel Messi"}
+        {<div dangerouslySetInnerHTML={{ __html: blog?.content }} />}
       </div>
       <div className="flex text-blue-800 items-center text-[12px]">
-        <a href={"/post/" + blog?.id}>Full text and comments</a>
+        <a href={"/blog/" + blog?._id}>Full text and comments</a>
         <FaAnglesRight size={10} />
       </div>
       <div className="flex items-center text-[12px]">
         <RiAttachment2 size={15} />
         Announcement of{" "}
         <span className="text-gray-500 mx-[5px]">
-          {blog?.content || "Educational top user"}
+          {blog?.tags.map((tag) => tag.name).join(", ")}
         </span>
       </div>
       <div className="border-[2px] rounded-md border-solid h-[50px] mt-3 mr-5 border-gray-300 text-center">
@@ -90,7 +116,7 @@ const Blog = ({ blog }) => {
                 : "text-red-500 text-[16px] font-bold"
             }
           >
-            {like || 0}
+            {like}
           </span>
           <BiSolidDownArrow
             size={20}
@@ -102,8 +128,8 @@ const Blog = ({ blog }) => {
           <div className="flex h-full items-center pl-[470px] mx-[10px]">
             <FaUser className="mx-[5px]" />
             <span className="underline">
-              <a href={"/profile/" + user?.username || "/profile/..."}>
-                {user?.username || "..."}
+              <a href={"/profile/" + blog?.author?.username}>
+                {blog?.author?.username}
               </a>
             </span>
           </div>
@@ -113,7 +139,7 @@ const Blog = ({ blog }) => {
           </div>
           <div className="flex h-full items-center mx-[10px]">
             <IoIosChatboxes className="mx-[5px]" />
-            <span className="underline">{blog?.comments.length || 0}</span>
+            <span className="underline">{blog?.comments.length}</span>
           </div>
         </div>
       </div>

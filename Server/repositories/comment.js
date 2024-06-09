@@ -8,7 +8,11 @@ const save = async (data) => {
 };
 
 const getById = async (id) => {
-  return await Comment.findById(id);
+  return await Comment.findById(id).populate({
+    path: "author",
+    model: "User",
+    select: "username avatar",
+  });
 };
 
 const getByAuthor = async (author) => {
@@ -21,7 +25,11 @@ const update = async (id, content) => {
     id,
     { content: content },
     { new: true }
-  );
+  ).populate({
+    path: "author",
+    model: "User",
+    select: "username avatar",
+  });
   return comment;
 };
 
@@ -45,7 +53,11 @@ const like = async (commentid, userid) => {
       $push: { likes: userid },
     },
     { new: true }
-  );
+  ).populate({
+    path: "author",
+    model: "User",
+    select: "username avatar",
+  });
   return rs;
 };
 
@@ -56,7 +68,11 @@ const dislike = async (commentid, userid) => {
       $push: { dislikes: userid },
     },
     { new: true }
-  );
+  ).populate({
+    path: "author",
+    model: "User",
+    select: "username avatar",
+  });
   return rs;
 };
 
@@ -67,7 +83,11 @@ const deleteLike = async (commentid, userid) => {
       $pull: { likes: userid },
     },
     { new: true }
-  );
+  ).populate({
+    path: "author",
+    model: "User",
+    select: "username avatar",
+  });
   return rs;
 };
 
@@ -78,7 +98,11 @@ const deleteDislike = async (commentid, userid) => {
       $pull: { dislikes: userid },
     },
     { new: true }
-  );
+  ).populate({
+    path: "author",
+    model: "User",
+    select: "username avatar",
+  });
   return rs;
 };
 

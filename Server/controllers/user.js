@@ -68,7 +68,7 @@ const fetchUser = asyncHandler(async (req, res) => {
     const cnt = await User.find({}).countDocuments();
     return res.status(200).json({
       success: results ? "success" : "failure",
-      numberOfPage: Math.ceil(cnt / 5),
+      numberOfPage: Math.ceil(cnt / 100),
       data: results ? results : "Cannot get users",
     });
   });

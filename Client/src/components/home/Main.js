@@ -38,7 +38,7 @@ const Main = () => {
           <Route path={path.HOME} element={<Blogs />} />
         </Route>
         <Route path={path.SEARCH} element={<SearchList />} />
-        <Route path={path.RATING} element={<Rating />} />
+        <Route path={path.RATING} element={<Problems userPage={true} />} />
         <Route path={path.USER} element={<Profile />} />
         <Route path={path.CALENDAR} element={<Calendar />} />
         <Route path={path.LOGIN} element={<Login />} />
@@ -50,7 +50,7 @@ const Main = () => {
         <Route path={path.IDE} element={<Ide />} />
         <Route path={path.PROBLEM} element={<Problem />} />
         <Route path={path.CREATEPROBLEM} element={<CreateProblem />} />
-        <Route path={path.PROBLEMS} element={<Problems />} />
+        <Route path={path.PROBLEMS} element={<Problems userPage={false} />} />
       </Routes>
     </div>
   );

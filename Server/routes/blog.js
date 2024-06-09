@@ -7,6 +7,7 @@ router.post("/create", [verifyAccessToken], controller.createBlog);
 router.get("/getall", controller.getAllBlogs);
 router.get("/get/author", controller.getBlogsByAuthor);
 router.get("/get/tag", controller.getBlogsByTag);
+router.get("/fetch", controller.fetchBlog);
 router.get("/get/:id", controller.getBlogByIdController);
 router.put("/update/like", [verifyAccessToken], controller.likeBlog);
 router.put("/update/dislike", [verifyAccessToken], controller.dislikeBlog);

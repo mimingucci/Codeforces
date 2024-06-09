@@ -1,44 +1,59 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CommentApi from "../../getApi/CommentApi";
 import icons from "../../utils/icons";
-import HandleCookies from '../../utils/HandleCookies'
+import HandleCookies from "../../utils/HandleCookies";
 const { BiSolidUpArrow, BiSolidDownArrow, FaAnglesRight } = icons;
 
-const Comment = ({ comment }) => {
-  const content = { __html: comment?.content };
-  const [like, setLike] = useState(
-    comment?.agree.length - comment?.disagree.length
-  );
+const Comment = ({ id }) => {
+  const [comment, setComment] = useState(null);
+  useEffect(() => {
+    CommentApi.getCommentById(id).then((rs) => {
+      setComment(rs.data.data);
+    });
+  }, [id]);
   const handleLike = async () => {
-    const nickname = HandleCookies.getCookie("nickname");
-    const id = comment?.id;
+    const accessToken = HandleCookies.getCookie("accessToken");
     try {
-      const res = await CommentApi.updateLike(id, nickname);
-      setLike(like + 1);
+      const res = await CommentApi.updateLike({
+        comment: comment._id,
+        accessToken,
+      });
+      setComment(res.data.data);
     } catch (error) {
-      alert(error?.response?.data);
+      alert("Somthing went wrong, try again later");
     }
   };
   const handleDislike = async () => {
-    const nickname = HandleCookies.getCookie("nickname");
-    const id = comment?.id;
+    const accessToken = HandleCookies.getCookie("accessToken");
     try {
-      const res = await CommentApi.updateDislike(id, nickname);
-      setLike(like - 1);
+      const res = await CommentApi.updateDislike({
+        comment: comment._id,
+        accessToken,
+      });
+      setComment(res.data.data);
     } catch (error) {
-      alert(error?.response?.data);
+      alert("Somthing went wrong, try again later");
     }
   };
   return (
     <div className="py-3">
       <div className="flex justify-between">
-        <div>
-          <a className="inline-block pr-3" href={"/profile/" + comment?.author}>
-            {comment?.author}
-          </a>
-          <FaAnglesRight size={10} className="inline-block" />
+        <div className="flex">
+          <div>
+            <a
+              className="inline-block pr-3"
+              href={"/profile/" + comment?.author.username}
+            >
+              <div className="flex justify-center">
+                <img src={comment?.author.avatar} className="w-[50px] h-auto" />
+              </div>
+              {comment?.author.username}
+            </a>
+          </div>
+
           <div className="inline-block px-3">
-            <div dangerouslySetInnerHTML={content} />
+            {/* <FaAnglesRight size={10} className="inline-block" /> */}
+            <div dangerouslySetInnerHTML={{ __html: comment?.content }} />
           </div>
         </div>
         <div>
@@ -50,12 +65,12 @@ const Comment = ({ comment }) => {
             />
             <span
               className={
-                like >= 0
+                comment?.likes.length - comment?.dislikes.length >= 0
                   ? "text-green-700 text-[16px] font-bold"
                   : "text-red-500 text-[16px] font-bold"
               }
             >
-              {like || 0}
+              {comment?.likes.length - comment?.dislikes.length || 0}
             </span>
             <BiSolidDownArrow
               size={20}
@@ -66,8 +81,8 @@ const Comment = ({ comment }) => {
         </div>
       </div>
       <div>
-        <p className="text-sm text-gray-600">
-          {comment?.commenttime?.slice(0, 10)}
+        <p className="text-sm text-gray-600 text-right">
+          {comment?.updatedAt?.slice(0, 10)}
         </p>
       </div>
     </div>

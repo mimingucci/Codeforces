@@ -8,6 +8,9 @@ class BlogApi {
   getBlogById(id) {
     return axios.get(BASE_URL + "/get/" + id);
   }
+  recentlyActive({ page = 1 }) {
+    return axios.get(BASE_URL + `/fetch?page=${page}&sort=-updatedAt`);
+  }
   updateById({ id, blog, accessToken }) {
     return axios.put(BASE_URL + "/update/" + id, blog, {
       headers: { Authorization: "Bearer " + accessToken },
@@ -18,22 +21,22 @@ class BlogApi {
       headers: { Authorization: "Bearer " + accessToken },
     });
   }
-  createComment(content, author, blogId) {
-    return axios.post(
-      COMMENT_URL + "/create",
-      { content, author, blogId }
-      //   { params: { postid, nickname } }
+  updateLike({ blog, accessToken }) {
+    return axios.put(
+      BASE_URL + "/update/like",
+      { blog },
+      { headers: { Authorization: "Bearer " + accessToken } }
     );
   }
-  updateLike(id, username) {
-    return axios.put(BASE_URL + "/update/agree/" + id, null, {
-      params: { username },
-    });
+  updateDislike({ blog, accessToken }) {
+    return axios.put(
+      BASE_URL + "/update/dislike",
+      { blog },
+      { headers: { Authorization: "Bearer " + accessToken } }
+    );
   }
-  updateDislike(id, username) {
-    return axios.put(BASE_URL + "/update/disagree/" + id, null, {
-      params: { username },
-    });
+  createComment(content, author, blogId) {
+    return axios.post(COMMENT_URL + "/create", { content, author, blogId });
   }
 }
 export default new BlogApi();
