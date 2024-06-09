@@ -25,7 +25,7 @@ const comment = require("../models/comment");
 const createComment = asyncHandler(async (req, res) => {
   if (!req.body?.author) throw new MissingFieldsError("Missing author field");
   if (!req.body?.blogId) throw new MissingFieldsError("Missing blog id field");
-  let ok = await userExists(mongoose.Types.ObjectId(req.body.author));
+  let ok = await userExists({ id: mongoose.Types.ObjectId(req.body.author) });
   if (!ok)
     throw new UserNotFoundError(
       "Can not find author with id " + req.body.author
@@ -47,7 +47,7 @@ const createComment = asyncHandler(async (req, res) => {
 const getCommentsByAuthor = asyncHandler(async (req, res) => {
   const author = req.query.author;
   if (!author) throw new MissingFieldsError("Missing author field");
-  const valid = await userExists(mongoose.Types.ObjectId(author));
+  const valid = await userExists({ id: mongoose.Types.ObjectId(author) });
   if (!valid) throw new UserNotFoundError(`Cannot find user with id ${author}`);
   const rs = await getByAuthor(mongoose.Types.ObjectId(author));
   return res.json({
@@ -70,7 +70,7 @@ const likeComment = asyncHandler(async (req, res) => {
     throw new MissingFieldsError("Missing inputs");
   const [x, y, z, t] = await Promise.all([
     commentExists(mongoose.Types.ObjectId(req.body.comment)),
-    userExists(mongoose.Types.ObjectId(req.body.user)),
+    userExists({ id: mongoose.Types.ObjectId(req.body.user) }),
     alreadyLike(
       mongoose.Types.ObjectId(req.body.comment),
       mongoose.Types.ObjectId(req.body.user)
@@ -107,7 +107,7 @@ const dislikeComment = asyncHandler(async (req, res) => {
     throw new MissingFieldsError("Missing inputs");
   const [x, y, z, t] = await Promise.all([
     commentExists(mongoose.Types.ObjectId(req.body.comment)),
-    userExists(mongoose.Types.ObjectId(req.body.user)),
+    userExists({ id: mongoose.Types.ObjectId(req.body.user) }),
     alreadyLike(
       mongoose.Types.ObjectId(req.body.comment),
       mongoose.Types.ObjectId(req.body.user)

@@ -12,6 +12,7 @@ UserRouter.post("/create", controller.register);
 UserRouter.post("/verify", controller.verifyEmail);
 UserRouter.post("/signup", controller.register);
 UserRouter.post("/login", controller.login);
+UserRouter.get("/fetch", controller.fetchUser);
 UserRouter.get("/reset-access-token", controller.refreshAccessToken);
 UserRouter.get("/all", [verifyAccessToken, isAdmin], controller.getUsers);
 UserRouter.get("/refresh-access-token", controller.refreshAccessToken);

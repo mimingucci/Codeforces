@@ -5,7 +5,7 @@ const { FaArrowRightLong, FaStar, GoDotFill } = icons;
 const NavbarPart2 = () => {
   const [users, setUsers] = useState();
   useEffect(() => {
-    UserApi.getListUserByRating(1).then((res) => setUsers(res.data.content));
+    UserApi.getTopRatings().then((res) => setUsers(res.data.data));
   }, []);
   return (
     <div className="w-full border-[2px] rounded-t-md border-solid border-gray-400 mt-4">
@@ -32,7 +32,7 @@ const NavbarPart2 = () => {
                       <td>{index + 1}</td>
                       <td>
                         <a href={"/profile/" + user.nickname}>
-                          {user.nickname}
+                          {user.username}
                         </a>
                       </td>
                       <td>{user.rating}</td>

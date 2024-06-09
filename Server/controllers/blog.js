@@ -34,7 +34,10 @@ const createBlog = asyncHandler(async (req, res) => {
     throw new MissingFieldsError(
       "Missing input, body must have title, content, author field"
     );
-  const user = await userExists(mongoose.Types.ObjectId(req.user._id));
+  const user = await userExists({
+    id: mongoose.Types.ObjectId(req.user._id),
+    add: true,
+  });
   if (!user) {
     throw new UserNotFoundError(
       `User with id ${req.body.author} does not exist`
@@ -91,7 +94,7 @@ const getBlogByIdController = asyncHandler(async (req, res) => {
 const getBlogsByAuthor = asyncHandler(async (req, res) => {
   const author = req.query.author;
   if (!author) throw new MissingFieldsError("Missing author id");
-  const user = await userExists(mongoose.Types.ObjectId(author));
+  const user = await userExists({ id: mongoose.Types.ObjectId(author) });
   if (!user) {
     throw new UserNotFoundError(`User with id ${author} does not exist`);
   }

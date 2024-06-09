@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    contribution: {
+      type: Number,
+      default: 0,
+    },
     enabled: {
       type: Boolean,
       default: false,

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import TagsInput from "../TagsInput";
 import "@vaadin/split-layout";
 import ProblemApi from "../../getApi/ProblemApi";
 import HandleCookies from "../../utils/HandleCookies";
@@ -12,13 +13,12 @@ import axios from "axios";
 
 const CreateProblem = ({ problemid = "-1" }) => {
   const BASE_URL = "http://localhost:1234/api/image";
-
+  const [tags, setTags] = useState([]);
   const [id, setId] = useState(problemid);
   const [problem, setProblem] = useState({});
   const quillRef = useRef(null);
 
   useEffect(() => {
-    console.log("run here");
     if (id === "-1") {
       setProblem({});
     } else {
@@ -309,6 +309,10 @@ const CreateProblem = ({ problemid = "-1" }) => {
             </div>
           </vaadin-split-layout>
         </div>
+      </div>
+      <div className="flex items-center gap-3 my-10">
+        <h3 className="text-left">Add Tag:</h3>
+        <TagsInput active={true} initTags={tags} setTags={setTags} />
       </div>
       <div className="col-md-3">
         <button

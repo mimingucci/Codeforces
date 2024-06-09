@@ -19,7 +19,7 @@ const createChat = asyncHandler(async (req, res) => {
     throw new MissingFieldsError("Push user in chat room");
   let valid = true;
   req.body.users.forEach(async (user) => {
-    valid = await userExists(mongoose.Types.ObjectId(user));
+    valid = await userExists({ id: mongoose.Types.ObjectId(user) });
     if (!valid) throw new Error(`Cannot find user with id ${user}`);
   });
   const rs = await save(req.body.users);

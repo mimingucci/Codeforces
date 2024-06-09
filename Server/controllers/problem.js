@@ -89,7 +89,7 @@ const fetchProblem = asyncHandler(async (req, res) => {
   }
   // paging
   const page = +req.query.page || 1;
-  const limit = 5; //100;
+  const limit = 100;
   const skip = (page - 1) * limit;
   queryCommand.skip(skip).limit(limit);
   //execute query command

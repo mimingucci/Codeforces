@@ -31,6 +31,49 @@ const {
   generateRefreshToken,
 } = require("../middlewares/jwt");
 
+const fetchUser = asyncHandler(async (req, res) => {
+  let queryObj = { ...req.query };
+  let excludedFields = ["page", "sort", "fields"];
+  excludedFields.forEach((el) => delete queryObj[el]);
+
+  let queryString = JSON.stringify(queryObj);
+  queryString = queryString.replace(
+    /\b(gte|gt|lte|lt)\b/g,
+    (match) => `$${match}`
+  );
+  let query = JSON.parse(queryString);
+  // Filtering
+  // if (queryObj?.title) query.title = { $regex: queryObj.title, $options: "i" };
+  let queryCommand = User.find(query).select(
+    "-password -accessToken -refreshToken"
+  );
+  // sorting
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    queryCommand = queryCommand.sort(sortBy);
+  }
+  // fields limiting
+  if (req.query.fields) {
+    const fields = req.query.fields.split(",").join(" ");
+    queryCommand = queryCommand.select(fields);
+  }
+  // paging
+  const page = +req.query.page || 1;
+  const limit = 100;
+  const skip = (page - 1) * limit;
+  queryCommand.skip(skip).limit(limit);
+  //execute query command
+  queryCommand.exec(async (err, results) => {
+    if (err) throw new Error(err.message);
+    const cnt = await User.find({}).countDocuments();
+    return res.status(200).json({
+      success: results ? "success" : "failure",
+      numberOfPage: Math.ceil(cnt / 5),
+      data: results ? results : "Cannot get users",
+    });
+  });
+});
+
 const getUsers = asyncHandler(async (req, res) => {
   const response = await getAll();
   return res.status(200).json({
@@ -439,4 +482,5 @@ module.exports = {
   updateUserByAdmin,
   uploadAvatar,
   deleteAvatar,
+  fetchUser,
 };

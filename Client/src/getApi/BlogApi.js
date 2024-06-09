@@ -8,12 +8,15 @@ class BlogApi {
   getBlogById(id) {
     return axios.get(BASE_URL + "/get/" + id);
   }
-  createBlog({ title, content, accessToken }) {
-    return axios.post(
-      BASE_URL + "/create",
-      { title, content },
-      { headers: { Authorization: "Bearer " + accessToken } }
-    );
+  updateById({ id, blog, accessToken }) {
+    return axios.put(BASE_URL + "/update/" + id, blog, {
+      headers: { Authorization: "Bearer " + accessToken },
+    });
+  }
+  createBlog({ blog, accessToken }) {
+    return axios.post(BASE_URL + "/create", blog, {
+      headers: { Authorization: "Bearer " + accessToken },
+    });
   }
   createComment(content, author, blogId) {
     return axios.post(

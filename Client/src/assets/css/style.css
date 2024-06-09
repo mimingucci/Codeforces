@@ -2,36 +2,36 @@
     box-sizing: border-box;
   }
   
-  body {
-    font-family: sans-serif;
-  }
+body {
+  font-family: sans-serif;
+}
+
+input, 
+textarea,
+[contenteditable] {
+  font: inherit;
+  line-height: 1.5;
+  /* width: 600px; */
+  padding: 8px 12px;
+  overflow: auto;
+}
+
+input {
+  width: 600px;
+}
   
-  input, 
-  textarea,
-  [contenteditable] {
-    font: inherit;
-    line-height: 1.5;
-    /* width: 600px; */
-    padding: 8px 12px;
-    overflow: auto;
-  }
+textarea {
+  width: 100%;
+}
 
-  input {
-    width: 600px;
-  }
-
-  textarea {
-    width: 100%;
-  }
-
-  label {
-    display: block;
-    margin-bottom: 4px;
-  }
+label {
+display: block;
+margin-bottom: 4px;
+}
   
-  [contenteditable] {
-    height: 10rem;
-    border: 1px solid;
-    resize: vertical;
-  }
+[contenteditable] {
+height: 10rem;
+border: 1px solid;
+resize: vertical;
+}
   

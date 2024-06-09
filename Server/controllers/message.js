@@ -19,7 +19,7 @@ const createMessage = asyncHandler(async (req, res) => {
     throw new MissingFieldsError("Missing inputs");
   }
   const [a, b] = await Promise.all([
-    userExists(mongoose.Types.ObjectId(req.body.author)),
+    userExists({ id: mongoose.Types.ObjectId(req.body.author) }),
     chatExists(mongoose.Types.ObjectId(req.body.chatId)),
   ]);
   if (!a || !b) throw new Error("Invalid user id or chat id");
