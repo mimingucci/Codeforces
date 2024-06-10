@@ -1,24 +1,16 @@
+import HandleCookies from "../../utils/HandleCookies";
 import icons from "../../utils/icons";
-const {
-  FaArrowRightLong,
-  FaStar,
-  GoDotFill,
-  FaAnglesRight,
-  RiAttachment2,
-  BiSolidUpArrow,
-  BiSolidDownArrow,
-  FaUser,
-  BsCalendar2DateFill,
-  IoIosChatboxes,
-} = icons;
+const { FaArrowRightLong } = icons;
 
 const ProblemNavbar = ({
+  problem,
   author,
   tags = [],
   likes = [],
   dislikes = [],
   submissions = [],
   rating = null,
+  solution = null,
 }) => {
   return (
     <div className="w-[25%] border-[2px] rounded-t-md border-solid border-gray-400 mt-4 h-fit">
@@ -46,33 +38,28 @@ const ProblemNavbar = ({
             }, 0)}
           </div>
           <div className="flex mx-[5px] items-center">
-            Tags:{" "}
-            {tags?.map((tag) => {
-              return tag.name;
-            })}
+            Tags: {tags?.map((tag) => tag.name).join(", ")}
+          </div>
+          <div className="flex mx-[5px] items-center">Rating: {rating}</div>
+          <div className="mx-[5px]">
+            <button
+              className={`border-collapse border-2 border-black bg-gray-300 px-3 my-3 ${
+                solution ? "" : "hidden"
+              }`}
+            >
+              <a href={solution}>Solution</a>
+            </button>
           </div>
           <div className="mx-[5px]">
-            <div className="text-left">Vote:</div>
-            <div className="flex">
-              <BiSolidUpArrow
-                size={20}
-                className="text-green-300 mx-[5px] hover:cursor-pointer"
-                //   onClick={handleLike}
-              />
-              <span className="text-green-700 text-[16px] font-bold">
-                {likes?.length}
-              </span>
-            </div>
-            <div className="flex">
-              <BiSolidDownArrow
-                size={20}
-                className="text-red-300 mx-[5px] hover:cursor-pointer"
-                //   onClick={handleDislike}
-              />
-              <span className="text-red-500 text-[16px] font-bold">
-                {dislikes?.length}
-              </span>
-            </div>
+            <button
+              className={`border-collapse border-2 border-black bg-gray-300 px-3 my-3 ${
+                author == HandleCookies.getCookie("username") ? "" : "hidden"
+              }`}
+            >
+              <a href={"/editproblem/" + problem} target="_blank">
+                Edit Problem
+              </a>
+            </button>
           </div>
         </div>
       </div>

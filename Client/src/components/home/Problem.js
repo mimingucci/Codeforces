@@ -47,6 +47,8 @@ const Problem = () => {
             tags={problem?.tags}
             rating={problem?.rating}
             submissions={problem?.submissions}
+            solution={problem?.solution}
+            problem={problem._id}
           />
         </div>
       ) : (

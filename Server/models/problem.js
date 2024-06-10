@@ -39,8 +39,8 @@ const problemSchema = new mongoose.Schema(
       ref: "User",
     },
     solution: {
-      type: mongoose.Types.ObjectId,
-      ref: "Blog",
+      type: String,
+      default: "",
     },
     timelimit: {
       type: Number,

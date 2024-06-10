@@ -8,36 +8,41 @@ import HandleCookies from "../../utils/HandleCookies";
 import handleTokenAutomatically from "../../utils/autoHandlerToken";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import TestCaseApi from "../../getApi/TestCaseApi";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-const CreateProblem = ({ problemid = "-1" }) => {
+import { useParams } from "react-router-dom";
+
+const EditProblem = () => {
   const BASE_URL = "http://localhost:1234/api/image";
   const [tags, setTags] = useState([]);
-  const [id, setId] = useState(problemid);
   const [problem, setProblem] = useState({});
   const quillRef = useRef(null);
-  const [solution, setSolution] = useState("");
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (id === "-1") {
-      setProblem({});
-    } else {
-      const fetchData = async () => {
-        const rs = await ProblemApi.getProblem({
-          id,
-          accessToken: HandleCookies.getCookie("accessToken"),
-        });
-        return rs.data.data;
-      };
-      fetchData().then((rs) => setProblem(rs));
-    }
-  }, [id]);
+  const { id } = useParams();
   const [statement, setStatement] = useState("");
   const [title, setTitle] = useState("");
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [timelimit, setTimelimit] = useState("");
   const [memorylimit, setMemorylimit] = useState("");
+  const [solution, setSolution] = useState("");
+  useEffect(() => {
+    const fetchData = async () => {
+      const rs = await ProblemApi.getProblem(id);
+      return rs.data.data;
+    };
+    fetchData().then((rs) => {
+      setProblem(rs);
+      setTags(rs?.tags.map((t) => t.name));
+      setTimelimit(rs?.timelimit);
+      setTitle(rs?.title);
+      setStatement(rs?.statement);
+      setMemorylimit(rs?.memorylimit);
+      setInput(rs?.testcases[0].input);
+      setOutput(rs?.testcases[0].output);
+      setSolution(rs?.solution);
+    });
+  }, [id]);
+
   const handleChangeStatement = (value) => {
     setStatement(value);
   };
@@ -85,7 +90,7 @@ const CreateProblem = ({ problemid = "-1" }) => {
     });
   };
 
-  const handleSubmit = async () => {
+  const handleUpdate = async () => {
     try {
       const valid = await handleTokenAutomatically();
       if (!valid) {
@@ -103,30 +108,26 @@ const CreateProblem = ({ problemid = "-1" }) => {
         showErrorToast("Please fill out all the required info");
         return;
       }
-      const rs = await ProblemApi.create({
+      const rs = await ProblemApi.update({
+        id: problem._id,
         title,
         statement,
         timelimit,
         memorylimit,
-        tags,
         solution,
+        tags,
         accessToken: HandleCookies.getCookie("accessToken"),
       });
-      const result = await ProblemApi.addTestCase({
-        problem: rs.data.data._id,
+      const result = await TestCaseApi.update({
+        id: problem.testcases[0]._id,
         input,
         output,
         accessToken: HandleCookies.getCookie("accessToken"),
       });
-      showSuccessToast("Problem created successfully");
-      setId(result.data.data._id);
+      showSuccessToast("Problem updated successfully");
     } catch (err) {
-      alert("Oww! Something wrong");
+      showErrorToast("Oww! Something wrong");
     }
-  };
-
-  const handleUpdate = () => {
-    navigate("/editproblem/" + id);
   };
 
   const imageHandler = useCallback(() => {
@@ -172,14 +173,13 @@ const CreateProblem = ({ problemid = "-1" }) => {
         draggable
         pauseOnHover
       />
-      <h1 className="text-lg">
-        {id !== "-1" ? "View Problem" : "Create New Problem"}
-      </h1>
+      <h1 className="text-lg">View Problem</h1>
       <div className="flex items-center gap-3 my-10">
         <h3 className="text-left w-[167px]">Name Problem:</h3>
         <input
           type="text"
           className="border-[2px] border-solid border-black rounded-md"
+          value={title}
           onChange={handleChangeTitle}
         ></input>
       </div>
@@ -187,6 +187,7 @@ const CreateProblem = ({ problemid = "-1" }) => {
         <h3 className="text-left w-[167px]">Time Limit:</h3>
         <input
           type="number"
+          value={timelimit}
           className="border-[2px] border-solid border-black rounded-md"
           onChange={handleChangeTimelimit}
         ></input>
@@ -195,6 +196,7 @@ const CreateProblem = ({ problemid = "-1" }) => {
         <h3 className="text-left w-[167px]">Memory Limit:</h3>
         <input
           type="number"
+          value={memorylimit}
           className="border-[2px] border-solid border-black rounded-md"
           onChange={handleChangeMemorylimit}
         ></input>
@@ -259,12 +261,14 @@ const CreateProblem = ({ problemid = "-1" }) => {
               <textarea
                 placeholder="Input"
                 onChange={handleChangeInput}
+                value={input}
               ></textarea>
             </div>
             <div>
               <textarea
                 placeholder="Output"
                 onChange={handleChangeOutput}
+                value={output}
               ></textarea>
             </div>
           </vaadin-split-layout>
@@ -287,14 +291,13 @@ const CreateProblem = ({ problemid = "-1" }) => {
         <button
           className="btn btn-block btn-primary btn-lg bg-blue-500 rounded-sm px-5 py-3 text-white mt-[10px]"
           type="submit"
-          onClick={id !== "-1" ? handleUpdate : handleSubmit}
+          onClick={handleUpdate}
         >
-          {id !== "-1" ? "Update" : "Create"}
+          Update
         </button>
         <button
-          className={`btn btn-block btn-primary btn-lg bg-blue-500 rounded-sm px-5 py-3 text-white mt-[10px] ml-5 ${
-            id !== "-1" ? "" : "hidden"
-          }`}
+          className={`btn btn-block btn-primary btn-lg bg-blue-500 rounded-sm px-5 py-3 text-white mt-[10px] ml-5 `}
+          // type="submit"
           onClick={() => window.location.replace("/createproblem")}
         >
           New
@@ -304,4 +307,4 @@ const CreateProblem = ({ problemid = "-1" }) => {
   );
 };
 
-export default CreateProblem;
+export default EditProblem;

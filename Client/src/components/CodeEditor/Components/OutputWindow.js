@@ -1,7 +1,11 @@
 import React from "react";
 import { classnames } from "../general";
 
-const OutputWindow = ({ outputDetails, sampleoutput = null }) => {
+const OutputWindow = ({
+  outputDetails,
+  sampleoutput = null,
+  setEnableSubmit,
+}) => {
   const getOutput = () => {
     let statusId = outputDetails?.status?.id;
 
@@ -55,6 +59,7 @@ const OutputWindow = ({ outputDetails, sampleoutput = null }) => {
         }
       }
       if (!isCorrect) {
+        setEnableSubmit(false);
         return (
           <pre className="px-2 py-1 font-normal text-xs text-red-500 text-left">
             {`Verdict: Wrong Answer \nTime ${
@@ -65,6 +70,7 @@ const OutputWindow = ({ outputDetails, sampleoutput = null }) => {
           </pre>
         );
       } else {
+        setEnableSubmit(true);
         return (
           <pre className="px-2 py-1 font-normal text-xs text-green-500 text-left">
             {atob(outputDetails.stdout) !== null
@@ -78,12 +84,16 @@ const OutputWindow = ({ outputDetails, sampleoutput = null }) => {
         );
       }
     } else if (statusId === 5) {
+      setEnableSubmit(false);
+
       return (
         <pre className="px-2 py-1 font-normal text-xs text-red-500 text-left">
           {`Time Limit Exceeded`}
         </pre>
       );
     } else {
+      setEnableSubmit(false);
+
       return (
         <pre className="px-2 py-1 font-normal text-xs text-red-500 text-left">
           {atob(outputDetails?.stderr)}

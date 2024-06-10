@@ -15,6 +15,8 @@ const {
   getAll,
   getTestCases,
 } = require("../repositories/problem");
+const { tagExists, tagExistsByName } = require("../services/tag");
+const TagRepo = require("../repositories/tag");
 const tc = require("../repositories/testcase");
 const { MissingFieldsError } = require("../errors/input");
 const { default: mongoose } = require("mongoose");
@@ -32,18 +34,38 @@ const createProblem = asyncHandler(async (req, res) => {
     !req.body.memorylimit
   )
     throw new MissingFieldsError("Missing Fields");
-  const problem = await save({
+  let problem = await save({
     author: req.user._id,
     title: req.body.title,
     statement: req.body.statement,
     timelimit: req.body.timelimit,
     memorylimit: req.body.memorylimit,
+    solution: req.body?.solution || "",
   });
+  if (req.body.tags) {
+    problem = await updateTags(problem._id, req.body.tags);
+  }
   return res.json({
     status: problem ? "success" : "failure",
     data: problem ? problem : "Cannot create new problem",
   });
 });
+
+const updateTags = async (id, tags) => {
+  let t = [];
+  for (let i of tags) {
+    let valid = await tagExistsByName(i);
+    if (!valid) {
+      const tag = await TagRepo.save(i);
+      t.push(tag._id);
+    } else {
+      const tag = await TagRepo.getByName(i);
+      t.push(tag._id);
+    }
+  }
+  const rs = await update(id, { tags: t });
+  return rs;
+};
 
 const getProblemById = asyncHandler(async (req, res) => {
   const id = req.query.id;
@@ -140,7 +162,16 @@ const updateProblemById = asyncHandler(async (req, res) => {
   if (req.body.title) data.title = req.body.title;
   if (req.body.timelimit) data.timelimit = req.body.timelimit;
   if (req.body.memorylimit) data.memorylimit = req.body.memorylimit;
-  const rs = await update(mongoose.Types.ObjectId(id), data);
+  if (req.body.solution) data.solution = req.body.solution;
+  let rs = await update(mongoose.Types.ObjectId(id), data);
+  let tags = undefined;
+  if (req.body.tags) {
+    tags = req.body.tags;
+    delete req.body.tags;
+  }
+  if (tags) {
+    rs = await updateTags(mongoose.Types.ObjectId(id), tags);
+  }
   return res.json({
     status: rs ? "success" : "failure",
     data: rs,

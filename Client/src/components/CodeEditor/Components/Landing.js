@@ -35,6 +35,7 @@ const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
   const [processing, setProcessing] = useState(null);
   const [theme, setTheme] = useState("cobalt");
   const [language, setLanguage] = useState(languageOptions[0]);
+  const [enableSubmit, setEnableSubmit] = useState(false);
   tcip = sampleinput.trim();
   tcop = sampleoutput.trim();
   const enterPress = useKeyPress("Enter");
@@ -282,9 +283,11 @@ const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
         <div className="px-4 py-2">
           <button
             onClick={handleSubmit}
-            // disabled={!code}
+            disabled={!enableSubmit}
             className={classnames(
-              "border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 bg-white flex-shrink-0"
+              `border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 flex-shrink-0 ${
+                enableSubmit ? "bg-green-500" : "bg-red-600"
+              }`
             )}
           >
             Submit
@@ -303,7 +306,11 @@ const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
 
         <div className="right-container flex flex-shrink-0 w-[30%] flex-col h-[500px]">
           <Input customInput={tcip} setCustomInput={setCustomInput} />
-          <OutputWindow outputDetails={outputDetails} sampleoutput={tcop} />
+          <OutputWindow
+            outputDetails={outputDetails}
+            sampleoutput={tcop}
+            setEnableSubmit={setEnableSubmit}
+          />
         </div>
       </div>
     </>

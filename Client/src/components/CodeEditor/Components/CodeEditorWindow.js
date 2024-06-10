@@ -782,120 +782,159 @@ const CodeEditorWindow = ({ onChange, language, code, theme }) => {
     switch (language) {
       case "cpp":
         setValue(cppSource);
+        onChange("code", cppSource);
         break;
       case "c":
         setValue(cSource);
+        onChange("code", cSource);
         break;
       case "javascript":
         setValue(javaScriptSource);
+        onChange("code", javaScriptSource);
         break;
       case "assembly":
         setValue(assemblySource);
+        onChange("code", assemblySource);
         break;
       case "bash":
         setValue(bashSource);
+        onChange("code", bashSource);
         break;
       case "basic":
         setValue(basicSource);
+        onChange("code", basicSource);
         break;
       case "clojure":
         setValue(clojureSource);
+        onChange("code", clojureSource);
         break;
       case "csharp":
         setValue(csharpSource);
+        onChange("code", csharpSource);
         break;
       case "cobol":
         setValue(cobolSource);
+        onChange("code", cobolSource);
         break;
       case "lisp":
         setValue(lispSource);
+        onChange("code", lispSource);
         break;
       case "d":
         setValue(dSource);
+        onChange("code", dSource);
         break;
       case "elixir":
         setValue(elixirSource);
+        onChange("code", elixirSource);
         break;
       case "erlang":
         setValue(erlangSource);
+        onChange("code", erlangSource);
         break;
       case "exe":
         setValue(executableSource);
+        onChange("code", executableSource);
         break;
       case "fsharp":
         setValue(fsharpSource);
+        onChange("code", fsharpSource);
         break;
       case "fortran":
         setValue(fortranSource);
+        onChange("code", fortranSource);
         break;
       case "go":
         setValue(goSource);
+        onChange("code", goSource);
         break;
       case "groovy":
         setValue(groovySource);
+        onChange("code", groovySource);
         break;
       case "haskell":
         setValue(haskellSource);
+        onChange("code", haskellSource);
         break;
       case "java":
         setValue(javaSource);
+        onChange("code", javaSource);
         break;
       case "kotlin":
         setValue(kotlinSource);
+        onChange("code", kotlinSource);
         break;
       case "lua":
         setValue(luaSource);
+        onChange("code", luaSource);
         break;
       case "ocaml":
         setValue(ocamlSource);
+        onChange("code", ocamlSource);
         break;
       case "objectivec":
         setValue(objectiveCSource);
+        onChange("code", objectiveCSource);
         break;
       case "octave":
         setValue(octaveSource);
+        onChange("code", octaveSource);
         break;
       case "pascal":
         setValue(pascalSource);
+        onChange("code", pascalSource);
         break;
       case "perl":
         setValue(perlSource);
+        onChange("code", perlSource);
         break;
       case "php":
         setValue(phpSource);
+        onChange("code", phpSource);
         break;
       case "python":
         setValue(pythonSource);
+        onChange("code", pythonSource);
         break;
       case "text":
         setValue(plainTextSource);
+        onChange("code", plainTextSource);
         break;
       case "prolog":
         setValue(prologSource);
+        onChange("code", prologSource);
         break;
       case "r":
         setValue(rSource);
+        onChange("code", rSource);
         break;
       case "ruby":
         setValue(rubySource);
+        onChange("code", rubySource);
         break;
       case "rust":
         setValue(rustSource);
+        onChange("code", rustSource);
         break;
       case "scala":
         setValue(scalaSource);
+        onChange("code", scalaSource);
         break;
       case "sql":
         setValue(sqliteSource);
+        onChange("code", sqliteSource);
         break;
       case "swift":
         setValue(swiftSource);
+        onChange("code", swiftSource);
         break;
       case "typescript":
         setValue(typescriptSource);
+        onChange("code", typescriptSource);
         break;
       case "vbnet":
         setValue(vbSource);
+        onChange("code", vbSource);
         break;
       default:
         setValue("");

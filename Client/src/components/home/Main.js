@@ -18,6 +18,8 @@ import Ide from "../CodeEditor/Components/Ide";
 import Problem from "./Problem";
 import RichTextInput from "../RichTextInput";
 import Problems from "./Problems";
+import EditProblem from "./EditProblem";
+import EditBlog from "./EditBlog";
 const Main = () => {
   const location = useLocation();
   let inLoginPage = false;
@@ -51,6 +53,8 @@ const Main = () => {
         <Route path={path.PROBLEM} element={<Problem />} />
         <Route path={path.CREATEPROBLEM} element={<CreateProblem />} />
         <Route path={path.PROBLEMS} element={<Problems userPage={false} />} />
+        <Route path={path.EDITPROBLEM} element={<EditProblem />} />
+        <Route path={path.EDITBLOG} element={<EditBlog />} />
       </Routes>
     </div>
   );

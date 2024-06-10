@@ -33,7 +33,7 @@ const NavbarPart2 = () => {
                     <tr className="odd:bg-gray-100" key={user._id}>
                       <td>{index + 1}</td>
                       <td>
-                        <a href={"/profile/" + user.nickname}>
+                        <a href={"/profile/" + user.username}>
                           {user.username}
                         </a>
                       </td>
