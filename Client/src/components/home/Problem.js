@@ -56,6 +56,7 @@ const Problem = () => {
         <Landing
           sampleinput={problem?.testcases[0]?.input}
           sampleoutput={problem?.testcases[0]?.output}
+          problem={problem?._id}
         />
       </div>
     </vaadin-split-layout>

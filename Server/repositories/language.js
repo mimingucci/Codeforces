@@ -11,6 +11,11 @@ const update = async (id, data) => {
   return rs;
 };
 
+const getAll = async () => {
+  const rs = await Language.find();
+  return rs;
+};
+
 const getByCode = async (code) => {
   const rs = await Language.findOne({ code });
   return rs;
@@ -38,4 +43,5 @@ module.exports = {
   getById,
   deleteByCode,
   deleteById,
+  getAll,
 };

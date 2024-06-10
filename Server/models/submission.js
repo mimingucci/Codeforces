@@ -27,9 +27,17 @@ const submissionSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    stdin: {
+      type: String,
+      default: "",
+    },
+    stdout: {
+      type: String,
+      default: "",
+    },
     language: {
-      type: mongoose.Types.ObjectId,
-      ref: "Language",
+      type: String,
+      required: true,
     },
     problem: {
       type: mongoose.Types.ObjectId,

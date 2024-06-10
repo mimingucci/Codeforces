@@ -9,6 +9,8 @@ const CommentRouter = require("./comment");
 const ProblemRouter = require("./problem");
 const TestCaseRouter = require("./testcase");
 const ImageRouter = require("./image");
+const SubmissionRouter = require("./submission");
+const LanguageRouter = require("./language");
 const initRoutes = (app) => {
   app.use("/api/user", UserRouter);
   app.use("/api/state", StateRouter);
@@ -20,6 +22,8 @@ const initRoutes = (app) => {
   app.use("/api/problem", ProblemRouter);
   app.use("/api/testcase", TestCaseRouter);
   app.use("/api/image", ImageRouter);
+  app.use("/api/submission", SubmissionRouter);
+  app.use("/api/language", LanguageRouter);
   app.use(errorHandler);
 };
 

@@ -11,8 +11,8 @@ const verifyAccessToken = asyncHandler(async (req, res, next) => {
     const id = jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
       if (err)
         return res.status(401).json({
-          success: false,
-          message: "Invalid access token",
+          status: "failure",
+          data: "Invalid access token",
         });
       return decode._id;
     });
@@ -26,8 +26,8 @@ const verifyAccessToken = asyncHandler(async (req, res, next) => {
     next();
   } else {
     return res.status(401).json({
-      success: false,
-      message: "Require authentication!!!",
+      status: "failure",
+      data: "Require authentication!!!",
     });
   }
 });
@@ -40,8 +40,8 @@ const getUserInfoByAccessToken = asyncHandler(async (req, res) => {
     const id = jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
       if (err)
         return res.status(401).json({
-          success: false,
-          message: "Invalid access token",
+          status: "failure",
+          data: "Invalid access token",
         });
       return decode._id;
     });
@@ -57,8 +57,8 @@ const getUserInfoByAccessToken = asyncHandler(async (req, res) => {
     });
   } else {
     return res.status(401).json({
-      success: false,
-      message: "Require authentication!!!",
+      status: "failure",
+      data: "Require authentication!!!",
     });
   }
 });
@@ -67,8 +67,8 @@ const isAdmin = asyncHandler((req, res, next) => {
   const { role } = req.user;
   if (role !== "admin")
     return res.status(401).json({
-      success: false,
-      message: "REQUIRE ADMIN ROLE",
+      status: "failure",
+      data: "REQUIRE ADMIN ROLE",
     });
   next();
 });

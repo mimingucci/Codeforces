@@ -8,6 +8,10 @@ const Login = () => {
     try {
       const res = await UserApi.login({ email, password });
       console.log("login->", res);
+      if (!res?.data || res?.data?.status !== "success") {
+        alert("Something went wrong");
+        return;
+      }
       HandleCookies.setCookie("accessToken", res.data["accessToken"], 7);
       HandleCookies.setCookie("username", res.data.data.username, 7);
       HandleCookies.setCookie("refreshToken", res.data["refreshToken"], 30);

@@ -10,24 +10,37 @@ const save = async (user) => {
 };
 
 const getAll = async () => {
+  const users = await User.find({ enabled: true }).select(
+    "-password -refreshToken"
+  );
+  return users;
+};
+
+const getAllByAdmin = async () => {
   const users = await User.find({}).select("-password -refreshToken");
   return users;
 };
 
 const getById = async (_id) => {
-  return await User.findOne({ _id }).select("-password -refreshToken");
+  return await User.findOne({ _id, enabled: true }).select(
+    "-password -refreshToken"
+  );
 };
 
 const getByIdAllFields = async (_id) => {
-  return await User.findOne({ _id });
+  return await User.findOne({ _id, enabled: true });
 };
 
 const getByUsername = async (username) => {
-  return await User.findOne({ username }).select("-password -refreshToken");
+  return await User.findOne({ username, enabled: true }).select(
+    "-password -refreshToken"
+  );
 };
 
 const getByEmail = async (email) => {
-  return await User.findOne({ email }).select("-password -refreshToken");
+  return await User.findOne({ email, enabled: true }).select(
+    "-password -refreshToken"
+  );
 };
 
 const update = async (id, user) => {
@@ -38,9 +51,11 @@ const update = async (id, user) => {
 };
 
 const updatePassword = async (id, password) => {
-  return await User.findByIdAndUpdate(id, { password }, { new: true }).select(
-    "-password -refreshToken"
-  );
+  return await User.findOneAndUpdate(
+    { _id: id, enabled: true },
+    { password },
+    { new: true }
+  ).select("-password -refreshToken");
 };
 
 const deleteById = async (_id) => {
@@ -62,12 +77,12 @@ const convertToModel = (data) => {
 };
 
 const getByState = async (state) => {
-  const rs = await User.find({ state });
+  const rs = await User.find({ state, enabled: true });
   return rs;
 };
 
 const getByCountry = async (country) => {
-  const rs = await User.find({ country });
+  const rs = await User.find({ country, enabled: true });
   return rs;
 };
 
@@ -116,4 +131,5 @@ module.exports = {
   unsetCountry,
   getByIdAllFields,
   updatePassword,
+  getAllByAdmin,
 };

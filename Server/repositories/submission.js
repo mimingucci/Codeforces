@@ -6,13 +6,14 @@ const save = async (data) => {
     code: data.code,
     language: data.language,
     problem: data.problem,
+    token: data.token,
   });
   const rs = await submit.save();
   return rs;
 };
 
-const update = async (id, data) => {
-  const rs = await Submission.findByIdAndUpdate(id, data);
+const update = async (token, data) => {
+  const rs = await Submission.findOneAndUpdate({ token }, data, { new: true });
   return rs;
 };
 

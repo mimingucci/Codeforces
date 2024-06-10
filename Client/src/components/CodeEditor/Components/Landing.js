@@ -14,6 +14,8 @@ import Input from "./Input";
 import OutputDetails from "./OutputDetails";
 import ThemeDropdown from "./ThemeDropdown";
 import LanguagesDropdown from "./LanguagesDropdown";
+import HandleCookies from "../../../utils/HandleCookies";
+import SubmissionApi from "../../../getApi/SubmissionApi";
 
 var cppSource =
   '\
@@ -26,7 +28,7 @@ int main() {\n\
 ';
 let tcip = "";
 let tcop = "";
-const Landing = ({ sampleinput = "", sampleoutput = "" }) => {
+const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
   const [code, setCode] = useState(cppSource);
   const [customInput, setCustomInput] = useState(sampleinput.trim());
   const [outputDetails, setOutputDetails] = useState(null);
@@ -84,15 +86,15 @@ const Landing = ({ sampleinput = "", sampleoutput = "" }) => {
     axios
       .request(options)
       .then(function (response) {
-        console.log("res.data", response.data);
+        // console.log("res.data", response.data);
         const token = response.data.token;
-        checkStatus(token);
+        checkStatus(token, false);
       })
       .catch((err) => {
         let error = err.response ? err.response.data : err;
         // get error status
         let status = err.response.status;
-        console.log("status", status);
+        // console.log("status", status);
         if (status === 429) {
           console.log("too many requests", status);
 
@@ -102,11 +104,74 @@ const Landing = ({ sampleinput = "", sampleoutput = "" }) => {
           );
         }
         setProcessing(false);
-        console.log("catch block...", error);
+        // console.log("catch block...", error);
       });
   };
 
-  const checkStatus = async (token) => {
+  const handleSubmit = async () => {
+    const accessToken = HandleCookies.getCookie("accessToken");
+    if (!accessToken) showErrorToast("Please login to submit your code");
+    const formData = {
+      language_id: language.id,
+      // encode source code in base64
+      source_code: btoa(code),
+      stdin: btoa(tcip),
+    };
+    const options = {
+      method: "POST",
+      url: "https://judge0-ce.p.rapidapi.com/submissions",
+      params: { base64_encoded: "true", fields: "*" },
+      headers: {
+        "Content-Type": "application/json",
+        // "X-RapidAPI-Host": process.env.REACT_APP_RAPID_API_HOST,
+        "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
+      },
+      data: formData,
+    };
+
+    axios
+      .request(options)
+      .then(async function (response) {
+        // console.log("res.data", response.data);
+        const token = response.data.token;
+        await SubmissionApi.submit({
+          language: language.name,
+          code,
+          token,
+          problem,
+          accessToken,
+        });
+        const rs = await checkStatus(token, true);
+        const result = await SubmissionApi.update({
+          status: rs?.status?.description,
+          time: rs?.time,
+          accessToken,
+          stdin: rs?.stdin,
+          stdout: rs?.stdout,
+          stderr: rs?.stderr,
+          token,
+          memory: rs?.memory,
+        });
+        showSuccessToast("Submit success");
+      })
+      .catch((err) => {
+        let error = err.response ? err.response.data : err;
+        // get error status
+        let status = err.response.status;
+        // console.log("status", status);
+        if (status === 429) {
+          // console.log("too many requests", status);
+
+          showErrorToast(
+            `Quota of 100 requests exceeded for the Day! Please read the blog on freeCodeCamp to learn how to setup your own RAPID API Judge0!`,
+            10000
+          );
+        }
+        // console.log("catch block...", error);
+      });
+  };
+
+  const checkStatus = async (token, submit = false) => {
     const options = {
       method: "GET",
       url: "https://judge0-ce.p.rapidapi.com/submissions/" + token,
@@ -126,18 +191,19 @@ const Landing = ({ sampleinput = "", sampleoutput = "" }) => {
         setTimeout(() => {
           checkStatus(token);
         }, 2000);
-        return;
+        return null;
       } else {
-        setProcessing(false);
+        if (!submit) setProcessing(false);
         setOutputDetails(response.data);
-        showSuccessToast(`Compiled Successfully!`);
-        console.log("response.data", response.data);
-        return;
+        if (!submit) showSuccessToast(`Compiled Successfully!`);
+        return response.data;
       }
     } catch (err) {
-      console.log("err", err);
-      setProcessing(false);
-      showErrorToast();
+      if (!submit) {
+        setProcessing(false);
+        showErrorToast();
+      }
+      return null;
     }
   };
 
@@ -215,7 +281,7 @@ const Landing = ({ sampleinput = "", sampleoutput = "" }) => {
         </div>
         <div className="px-4 py-2">
           <button
-            onClick={handleCompile}
+            onClick={handleSubmit}
             // disabled={!code}
             className={classnames(
               "border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 bg-white flex-shrink-0"

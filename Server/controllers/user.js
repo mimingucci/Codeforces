@@ -16,6 +16,7 @@ const {
   unsetCountry,
   unsetState,
   updatePassword,
+  getAllByAdmin,
 } = require("../repositories/user");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
@@ -75,7 +76,7 @@ const fetchUser = asyncHandler(async (req, res) => {
 });
 
 const getUsers = asyncHandler(async (req, res) => {
-  const response = await getAll();
+  const response = await getAllByAdmin();
   return res.status(200).json({
     status: response ? "success" : "failure",
     data: response,
@@ -176,8 +177,8 @@ const verifyEmail = asyncHandler(async (req, res) => {
       (err, decode) => {
         if (err)
           return res.status(401).json({
-            success: false,
-            message: "Invalid access token",
+            status: "failure",
+            data: "Invalid access token",
           });
         return decode;
       }
@@ -210,8 +211,8 @@ const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password)
     return res.status(400).json({
-      sucess: false,
-      message: "Missing inputs",
+      status: "failure",
+      data: "Missing inputs",
     });
   // plain object
   const response = await User.findOne({ email });
@@ -246,7 +247,7 @@ const login = asyncHandler(async (req, res) => {
       secure: true,
     });
     return res.status(200).json({
-      success: true,
+      status: "success",
       accessToken,
       refreshToken: newRefreshToken,
       data: userData,
@@ -272,7 +273,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     secure: true,
   });
   return res.status(200).json({
-    success: response ? true : false,
+    status: response ? "success" : "failure",
     data: response ? accessToken : "Refresh token not matched",
   });
 });
@@ -297,8 +298,8 @@ const logout = asyncHandler(async (req, res) => {
     secure: true,
   });
   return res.status(200).json({
-    success: true,
-    message: "Logout is done",
+    status: "success",
+    data: "Logout is done",
   });
 });
 
@@ -373,7 +374,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   user.passwordResetExpires = undefined;
   await user.save();
   return res.status(200).json({
-    success: user ? true : false,
+    status: user ? "success" : "failure",
     data: user ? "Updated password" : "Something went wrong",
   });
 });
@@ -390,7 +391,7 @@ const updateUserByAdmin = asyncHandler(async (req, res) => {
     }
   ).select("-password -refreshToken");
   return res.status(200).json({
-    success: response ? true : false,
+    status: response ? "success" : "failure",
     data: response ? response : "Some thing went wrong",
   });
 });
