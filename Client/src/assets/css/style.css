@@ -35,3 +35,25 @@ border: 1px solid;
 resize: vertical;
 }
   
+.react-calendar-heatmap .color-scale-1 { fill: #37d147; }
+.react-calendar-heatmap .color-scale-2 { fill: #3fad59; }
+.react-calendar-heatmap .color-scale-3 { fill: #2f6d2d; }
+
+.navbar {
+  display: flex;
+  background-color: #333;
+}
+
+.navbar a {
+  color: white;
+  padding: 14px 20px;
+  text-decoration: none;
+}
+
+.navbar a:hover {
+  background-color: #555;
+}
+
+.navbar a.active {
+  background-color: #4CAF50;
+}

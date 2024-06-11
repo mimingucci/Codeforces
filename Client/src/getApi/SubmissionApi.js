@@ -25,6 +25,12 @@ class SubmissionApi {
       { headers: { Authorization: "Bearer " + accessToken } }
     );
   }
+  getByAuthor(author) {
+    return axios.get(BASE_URL + "/get/author/" + author);
+  }
+  paging({ author, page }) {
+    return axios.get(BASE_URL + "/paging?author=" + author + "&page=" + page);
+  }
 }
 
 export default new SubmissionApi();

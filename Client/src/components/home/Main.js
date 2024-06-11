@@ -20,6 +20,8 @@ import RichTextInput from "../RichTextInput";
 import Problems from "./Problems";
 import EditProblem from "./EditProblem";
 import EditBlog from "./EditBlog";
+import ErrorPage from "../ErrorPage";
+import Submission from "./Submission";
 const Main = () => {
   const location = useLocation();
   let inLoginPage = false;
@@ -55,6 +57,8 @@ const Main = () => {
         <Route path={path.PROBLEMS} element={<Problems userPage={false} />} />
         <Route path={path.EDITPROBLEM} element={<EditProblem />} />
         <Route path={path.EDITBLOG} element={<EditBlog />} />
+        <Route path={path.SUBMIT} element={<Submission />} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
     </div>
   );

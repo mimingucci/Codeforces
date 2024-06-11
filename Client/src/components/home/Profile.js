@@ -1,9 +1,11 @@
 import icons from "../../utils/icons";
 import { useEffect, useState } from "react";
 import UserApi from "../../getApi/UserApi";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import HandleCookies from "../../utils/HandleCookies";
 import ImageUploader from "./ImageUploader";
+import CommitGrid from "./CommitGrid";
+import NavProfile from "./NavProfile";
 const {
   IoIosChatboxes,
   IoIosSettings,
@@ -18,11 +20,14 @@ const {
 const Profile = () => {
   const [user, setUser] = useState();
   const [isHome, setIsHome] = useState(false);
+  const [id, setId] = useState();
   const params = useParams();
+  const navigate = useNavigate();
   useEffect(() => {
     UserApi.getUserByUsername(params.username)
       .then((res) => {
         setUser(res?.data?.data);
+        setId(res?.data?.data?._id);
         if (params.username === HandleCookies.getCookie("username")) {
           setIsHome(true);
         }
@@ -31,7 +36,8 @@ const Profile = () => {
   }, [params.username]);
   return (
     <div className="w-full">
-      <div className="border-[2px] rounded-md border-solid mt-[15px] mr-5 border-gray-300 text-left p-3 flex">
+      <NavProfile username={params.username} />
+      <div className="border-[2px] rounded-md border-solid mr-5 border-gray-300 text-left p-3 flex">
         <div className="w-[65%]">
           <h1 className="text-[20px] text-blue-800 font-bold">Expert</h1>
           <h1 className="text-[20px] text-blue-800 font-bold">
@@ -61,13 +67,13 @@ const Profile = () => {
               Vietnam
             </span>
           </div>
-          {/* <div className="flex items-center">
-          <FaStar className="mr-[5px]" />
-          Contribution:{" "}
-          <span className="ml-[5px] text-green-600 font-bold">
-            {user?.reviews.length || 0}
-          </span>
-        </div> */}
+          <div className="flex items-center">
+            <FaStar className="mr-[5px]" />
+            Contribution:{" "}
+            <span className="ml-[5px] text-green-600 font-bold">
+              {user?.contribution || 0}
+            </span>
+          </div>
           <div className={isHome == false ? "hidden" : "flex items-center"}>
             <IoIosSettings className="mr-[5px]" />
             <span className=" underline hover:cursor-pointer">
@@ -85,7 +91,7 @@ const Profile = () => {
           <div className={isHome == false ? "hidden" : "flex items-center"}>
             <IoDocumentText className="mr-[5px]" />
             <span className="underline hover:cursor-pointer">
-              <a href="/writepost">Write post</a>
+              <a href="/writeblog">Write Blog</a>
             </span>
           </div>
           <div className={isHome == true ? "hidden" : "flex items-center"}>
@@ -98,6 +104,9 @@ const Profile = () => {
         <div className="w-[35%]">
           <ImageUploader user={user} isHome={isHome} />
         </div>
+      </div>
+      <div className="border-[2px] rounded-md border-solid mt-[15px] mr-5 border-gray-300 text-left p-3 flex">
+        <CommitGrid author={user?._id} day_of_register={user?.createdAt} />
       </div>
     </div>
   );
