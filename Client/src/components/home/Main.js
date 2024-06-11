@@ -1,19 +1,15 @@
-import Blog from "./Blog";
 import Blogs from "./Blogs";
 import { Route, Routes } from "react-router-dom";
 import Profile from "./Profile";
-import Rating from "./Rating";
 import Calendar from "./Calendar";
 import path from "../../utils/path";
 import Login from "./Login";
 import { CreateProblem, SearchList } from ".";
 import { useLocation } from "react-router-dom";
-import Editor from "../Editor";
 import SignUp from "./SignUp";
 import Setting from "./Setting";
 import BlogDetail from "./BlogDetail";
 import Message from "./Message";
-import Landing from "../CodeEditor/Components/Landing";
 import Ide from "../CodeEditor/Components/Ide";
 import Problem from "./Problem";
 import RichTextInput from "../RichTextInput";
@@ -22,6 +18,8 @@ import EditProblem from "./EditProblem";
 import EditBlog from "./EditBlog";
 import ErrorPage from "../ErrorPage";
 import Submission from "./Submission";
+import SubmitDetail from "./SubmitDetail";
+import UserBlog from "./UserBlog";
 const Main = () => {
   const location = useLocation();
   let inLoginPage = false;
@@ -58,6 +56,8 @@ const Main = () => {
         <Route path={path.EDITPROBLEM} element={<EditProblem />} />
         <Route path={path.EDITBLOG} element={<EditBlog />} />
         <Route path={path.SUBMIT} element={<Submission />} />
+        <Route path={path.SUBMITDETAIL} element={<SubmitDetail />} />
+        <Route path={path.USERBLOG} element={<UserBlog />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </div>

@@ -6,6 +6,7 @@ const { verifyAccessToken, isAdmin } = require("../middlewares/verifyToken");
 router.post("/create", [verifyAccessToken], controller.createBlog);
 router.get("/getall", controller.getAllBlogs);
 router.get("/get/author", controller.getBlogsByAuthor);
+router.get("/get/username", controller.getBlogsByUsername);
 router.get("/get/tag", controller.getBlogsByTag);
 router.get("/fetch", controller.fetchBlog);
 router.get("/get/:id", controller.getBlogByIdController);

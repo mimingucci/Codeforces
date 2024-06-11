@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import HandleCookies from "../../utils/HandleCookies";
 import UserApi from "../../getApi/UserApi";
 export default function ImageUploader({ user, isHome = false }) {

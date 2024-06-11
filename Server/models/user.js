@@ -21,7 +21,6 @@ const userSchema = new mongoose.Schema(
     },
     firstname: String,
     lastname: String,
-    photo: String,
     description: String,
     role: {
       type: String,
@@ -83,6 +82,7 @@ userSchema.pre("save", async function (next) {
   }
   const salt = bcrypt.genSaltSync(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 userSchema.methods = {

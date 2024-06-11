@@ -25,13 +25,16 @@ class UserApi {
   getResultBySearch(keyword) {
     return axios.get(BASE_URL + "/search", { params: { query: keyword } });
   }
-  updateUser(username, firstname, lastname, description, newpassword) {
-    return axios.put(BASE_URL + "/update?id=" + username, {
-      firstname,
-      lastname,
-      description,
-      password: newpassword,
-    });
+  updateUser({ accessToken, firstname, lastname, description }) {
+    return axios.put(
+      BASE_URL + "/update",
+      {
+        firstname,
+        lastname,
+        description,
+      },
+      { headers: { Authorization: "Bearer " + accessToken } }
+    );
   }
   login({ email, password }) {
     return axios.post(BASE_URL + "/login", {
@@ -64,6 +67,15 @@ class UserApi {
     return axios.get(BASE_URL + "/info", {
       headers: { Authorization: "Bearer " + accessToken },
     });
+  }
+  allow({ accessToken, username, id }) {
+    return axios.post(
+      BASE_URL + "/allow",
+      { username, id },
+      {
+        headers: { Authorization: "Bearer " + accessToken },
+      }
+    );
   }
   refreshAccessToken(refreshToken) {
     return axios.get(BASE_URL + "/reset-access-token", {

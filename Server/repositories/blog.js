@@ -13,6 +13,7 @@ const save = async (user) => {
 
 const getAll = async () => {
   return await Blog.find()
+    .sort("-createdAt")
     .populate({
       path: "tags",
       model: "Tag",
@@ -31,6 +32,7 @@ const getBlogById = async (id) => {
 
 const getByAuthor = async (author) => {
   const blogs = await Blog.find({ author })
+    .sort("-createdAt")
     .populate({
       path: "tags",
       model: "Tag",
@@ -51,6 +53,7 @@ const getByTag = async (tag) => {
 
 const getByTags = async (t) => {
   const rs = await Blog.find({ tags: { $all: t } })
+    .sort("-createdAt")
     .populate({
       path: "tags",
       model: "Tag",

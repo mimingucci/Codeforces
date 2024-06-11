@@ -28,6 +28,7 @@ const { userExists } = require("../services/user");
 const { UserNotFoundError } = require("../errors/user");
 const { tagExists, tagExistsByName } = require("../services/tag");
 const { BlogNotFoundError } = require("../errors/blog");
+const User = require("../models/user");
 
 const fetchBlog = asyncHandler(async (req, res) => {
   let queryObj = { ...req.query };
@@ -143,6 +144,20 @@ const getBlogsByAuthor = asyncHandler(async (req, res) => {
     throw new UserNotFoundError(`User with id ${author} does not exist`);
   }
   const rs = await getByAuthor(mongoose.Types.ObjectId(author));
+  return res.json({
+    status: rs ? "success" : "failure",
+    data: rs ? rs : "Cannot find blogs by author",
+  });
+});
+
+const getBlogsByUsername = asyncHandler(async (req, res) => {
+  const author = req.query.author;
+  if (!author) throw new MissingFieldsError("Missing author id");
+  const user = await User.findOne({ username: author });
+  if (!user || !user?.username === author) {
+    throw new UserNotFoundError(`User with username ${author} does not exist`);
+  }
+  const rs = await getByAuthor(mongoose.Types.ObjectId(user._id));
   return res.json({
     status: rs ? "success" : "failure",
     data: rs ? rs : "Cannot find blogs by author",
@@ -390,4 +405,5 @@ module.exports = {
   deleteLikeBlog,
   deleteDislikeBlog,
   fetchBlog,
+  getBlogsByUsername,
 };

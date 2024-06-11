@@ -31,9 +31,7 @@ const getTestCases = async (id) => {
       options: { limit: 1 },
     })
     .populate({ path: "author", model: "User", select: "username" })
-    // .populate({ path: "submissions", model: "Submission" })
-    .populate({ path: "likes", model: "User", select: "_id" })
-    .populate({ path: "dislikes", model: "User", select: "_id" })
+    .populate({ path: "submissions", model: "Submission" })
     .populate({ path: "tags", model: "Tag", select: "name" });
   return problem;
 };
@@ -72,54 +70,6 @@ const update = async (id, data) => {
   return problem;
 };
 
-const like = async (id, user) => {
-  const problem = await Problem.findByIdAndUpdate(
-    id,
-    { $push: { likes: user } },
-    { new: true }
-  ).populate({ path: "tags", model: "Tag", select: "name" });
-  return problem;
-};
-
-const dislike = async (id, user) => {
-  const rs = await Problem.findByIdAndUpdate(
-    id,
-    {
-      $push: {
-        dislikes: user,
-      },
-    },
-    { new: true }
-  ).populate({ path: "tags", model: "Tag", select: "name" });
-  return rs;
-};
-
-const deleteLike = async (id, user) => {
-  const rs = await Problem.findByIdAndUpdate(
-    id,
-    {
-      $pull: {
-        likes: user,
-      },
-    },
-    { new: true }
-  ).populate({ path: "tags", model: "Tag", select: "name" });
-  return rs;
-};
-
-const deleteDislike = async (id, user) => {
-  const rs = await Problem.findByIdAndUpdate(
-    id,
-    {
-      $pull: {
-        dislikes: user,
-      },
-    },
-    { new: true }
-  ).populate({ path: "tags", model: "Tag", select: "name" });
-  return rs;
-};
-
 const addTestCase = async (id, tc) => {
   const rs = await Problem.findByIdAndUpdate(
     id,
@@ -156,10 +106,6 @@ module.exports = {
   getById,
   getByAuthor,
   getByTag,
-  like,
-  dislike,
-  deleteLike,
-  deleteDislike,
   addTestCase,
   deleteTestCase,
   deleteById,

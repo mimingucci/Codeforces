@@ -31,6 +31,9 @@ class SubmissionApi {
   paging({ author, page }) {
     return axios.get(BASE_URL + "/paging?author=" + author + "&page=" + page);
   }
+  getById(id) {
+    return axios.get(BASE_URL + "/get/id?id=" + id);
+  }
 }
 
 export default new SubmissionApi();

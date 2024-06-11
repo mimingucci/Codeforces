@@ -1,15 +1,9 @@
 import SubmissionApi from "../../getApi/SubmissionApi";
 import Pagination from "@mui/material/Pagination";
-import PaginationItem from "@mui/material/PaginationItem";
 import Stack from "@mui/material/Stack";
 import { useEffect, useState } from "react";
 import "../../assets/css/default.css";
-import {
-  redirect,
-  useParams,
-  useSearchParams,
-  useNavigate,
-} from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import NavProfile from "./NavProfile";
 const Submission = () => {
   const navigate = useNavigate();
@@ -36,6 +30,9 @@ const Submission = () => {
   return (
     <div>
       <NavProfile username={author} />
+      <div>
+        <h1 className="text-lg">{author} submissions</h1>
+      </div>
       <div
         className={`mr-5 border-[2px] rounded-t-md border-solid border-gray-400 mt-4`}
       >
@@ -60,12 +57,10 @@ const Submission = () => {
                 submissions.map((submission, index) => {
                   return (
                     <tr className="odd:bg-gray-100">
-                      <td
-                        className="border border-slate-300"
-                        class="under"
-                        // onClick={openNav}
-                      >
-                        {index + 1}
+                      <td className="border border-slate-300" class="under">
+                        <a href={`/submission/${submission?._id}`}>
+                          {submission?._id}
+                        </a>
                       </td>
                       <td className="border border-slate-300">
                         {new Date(submission?.createdAt).toUTCString()}
@@ -74,7 +69,12 @@ const Submission = () => {
                         {submission?.author.username}
                       </td>
                       <td className="border border-slate-300">
-                        <a class="under">{submission?.problem.title}</a>
+                        <a
+                          class="under"
+                          href={"/problem/" + submission?.problem?._id}
+                        >
+                          {submission?.problem.title}
+                        </a>
                       </td>
                       <td className="border border-slate-300">
                         {submission?.language}

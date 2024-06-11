@@ -2,9 +2,10 @@ import { useState } from "react";
 import icons from "../../utils/icons";
 import BlogApi from "../../getApi/BlogApi";
 import HandleCookies from "../../utils/HandleCookies";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { relativeTime } from "../../utils/timeManufacture";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 const {
   FaAnglesRight,
   RiAttachment2,
@@ -16,6 +17,7 @@ const {
 } = icons;
 const Blog = ({ blog }) => {
   const [like, setLike] = useState(blog?.likes.length - blog?.dislikes.length);
+  const navigate = useNavigate();
   const handleLike = async () => {
     const accessToken = HandleCookies.getCookie("accessToken");
     if (!accessToken) {
@@ -72,13 +74,25 @@ const Blog = ({ blog }) => {
   };
   return (
     <div className="text-left mt-5">
-      <h1 className="text-blue-800 text-[30px] font-bold">
-        {
-          <a href={`/blog/${blog?._id}`}>
-            <div dangerouslySetInnerHTML={{ __html: blog?.title }} />
-          </a>
-        }
-      </h1>
+      <div className="flex gap-5">
+        <h1 className="text-blue-800 text-[30px] font-bold">
+          {
+            <a href={`/blog/${blog?._id}`}>
+              <div dangerouslySetInnerHTML={{ __html: blog?.title }} />
+            </a>
+          }
+        </h1>
+        <button
+          onClick={() => navigate(`/editblog/${blog?._id}`)}
+          className={
+            blog?.author?.username === HandleCookies.getCookie("username")
+              ? "bg-gray-300 px-3 h-fit"
+              : "hidden"
+          }
+        >
+          Edit
+        </button>
+      </div>
       <p>
         By{" "}
         <span className="underline">

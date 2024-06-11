@@ -18,7 +18,9 @@ const update = async (token, data) => {
 };
 
 const getById = async (id) => {
-  const rs = await Submission.findById(id);
+  const rs = await Submission.findById(id)
+    .populate({ path: "author", model: "User", select: "username" })
+    .populate({ path: "problem", model: "Problem", select: "title" });
   return rs;
 };
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import icons from "../../utils/icons";
 import BlogApi from "../../getApi/BlogApi";
-const { FaArrowRightLong, FaStar, GoDotFill } = icons;
+const { FaArrowRightLong } = icons;
 const NavbarPart4 = () => {
   const [blogs, setBlogs] = useState();
   useEffect(() => {

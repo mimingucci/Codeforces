@@ -6,7 +6,7 @@ const path = {
   API_SEARCH_ALL: "/search",
   USER: "/profile/:username",
   IDE: "/ide",
-  SETTING: "/profile/:user/setting",
+  SETTING: "/setting/:username",
   SIGNUP: "/signup",
   RATING: "/rating",
   CALENDAR: "/calendar",
@@ -20,5 +20,7 @@ const path = {
   EDITPROBLEM: "/editproblem/:id",
   EDITBLOG: "/editblog/:id",
   SUBMIT: "/profile/submissions/:author/:page",
+  SUBMITDETAIL: "/submission/:id",
+  USERBLOG: "/userblog/:author",
 };
 export default path;

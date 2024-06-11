@@ -1,7 +1,7 @@
 import icons from "../../utils/icons";
 import { useEffect, useState } from "react";
 import UserApi from "../../getApi/UserApi";
-const { FaArrowRightLong, FaStar, GoDotFill } = icons;
+const { FaArrowRightLong } = icons;
 const NavbarPart2 = () => {
   const [users, setUsers] = useState();
   useEffect(() => {

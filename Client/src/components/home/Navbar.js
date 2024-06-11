@@ -3,7 +3,6 @@ import NavbarPart1 from "./NavbarPart1";
 import NavbarPart2 from "./NavbarPart2";
 import NavbarPart3 from "./NavbarPart3";
 import NavbarPart4 from "./NavbarPart4";
-import { useEffect } from "react";
 const Navbar = () => {
   const location = useLocation();
   let inLoginPage = false;

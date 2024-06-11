@@ -1,18 +1,10 @@
 import Pagination from "@mui/material/Pagination";
-import PaginationItem from "@mui/material/PaginationItem";
 import Stack from "@mui/material/Stack";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useEffect, useState } from "react";
 import icons from "../../utils/icons";
 import ProblemApi from "../../getApi/ProblemApi";
 import UserApi from "../../getApi/UserApi";
-import {
-  redirect,
-  useParams,
-  useSearchParams,
-  useNavigate,
-} from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 const { FaArrowRightLong, FaStar, GoDotFill } = icons;
 

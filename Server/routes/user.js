@@ -6,12 +6,14 @@ const {
   verifyAccessToken,
   isAdmin,
   getUserInfoByAccessToken,
+  enabledAccess,
 } = require("../middlewares/verifyToken");
 
 UserRouter.post("/create", controller.register);
 UserRouter.post("/verify", controller.verifyEmail);
 UserRouter.post("/signup", controller.register);
 UserRouter.post("/login", controller.login);
+UserRouter.post("/allow", enabledAccess);
 UserRouter.get("/fetch", controller.fetchUser);
 UserRouter.get("/reset-access-token", controller.refreshAccessToken);
 UserRouter.get("/all", [verifyAccessToken, isAdmin], controller.getUsers);
@@ -26,7 +28,7 @@ UserRouter.delete(
   [verifyAccessToken, isAdmin],
   controller.deleteUserById
 );
-UserRouter.put("/update", controller.updateUser);
+UserRouter.put("/update", [verifyAccessToken], controller.updateUser);
 UserRouter.put(
   "/update-by-admin/:id",
   [verifyAccessToken, isAdmin],

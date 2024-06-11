@@ -123,10 +123,13 @@ const deleteUserById = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-  const { id } = req.query;
-  if (!id || Object.keys(req.body).length === 0)
+  if (!req.user._id || Object.keys(req.body).length === 0)
     throw new Error("Missing inputs");
-  const response = await update(id, req.body);
+  if (req.body.oldpassword) {
+    delete req.body.oldpassword;
+  }
+  console.log(req.body);
+  const response = await update(req.user._id, req.body);
   return res.status(200).json({
     status: response ? "success" : "failure",
     data: response ? response : "Some thing went wrong",

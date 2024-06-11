@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import logo from "../assets/image/Codeforces_logo.svg.png";
 import icons from "../utils/icons";
 import UserApi from "../getApi/UserApi";
-import { redirect } from "react-router-dom";
 import HandleCookies from "../utils/HandleCookies";
-import handleTokenAutomatically from "../utils/autoHandlerToken";
 const { IoIosNotifications, IoMdSearch } = icons;
 const Header = () => {
   let user = "";

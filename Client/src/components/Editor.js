@@ -5,7 +5,6 @@ import "../assets/css/style.css";
 import { Editor } from "@tinymce/tinymce-react";
 import { demoClientId, demoContent, demoTitle } from "./demo";
 import BlogApi from "../getApi/BlogApi";
-import HandleCookies from "../utils/HandleCookies";
 
 const Editors = () => {
   const [content, setContent] = useState("Content");

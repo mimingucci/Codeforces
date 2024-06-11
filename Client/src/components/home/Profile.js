@@ -1,7 +1,7 @@
 import icons from "../../utils/icons";
 import { useEffect, useState } from "react";
 import UserApi from "../../getApi/UserApi";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import HandleCookies from "../../utils/HandleCookies";
 import ImageUploader from "./ImageUploader";
 import CommitGrid from "./CommitGrid";
@@ -45,12 +45,10 @@ const Profile = () => {
           </h1>
           <p
             className={
-              user?.fullname == null || user?.fullname.length == 0
-                ? "hidden"
-                : "text-gray-600"
+              user?.firstname || user?.lastname ? "text-gray-600" : "hidden"
             }
           >
-            {user?.fullname || "Fullname"}
+            {`${user?.firstname} ${user?.lastname}`}
           </p>
           <div className="flex items-center">
             <FaChartLine className="mr-[5px]" />
@@ -77,7 +75,7 @@ const Profile = () => {
           <div className={isHome == false ? "hidden" : "flex items-center"}>
             <IoIosSettings className="mr-[5px]" />
             <span className=" underline hover:cursor-pointer">
-              <a href={"/setting"}>Change settings</a>
+              <a href={`/setting/${user?.username}`}>Change settings</a>
             </span>
           </div>
           <div className="flex items-center">

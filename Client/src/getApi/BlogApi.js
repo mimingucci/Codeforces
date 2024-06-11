@@ -8,6 +8,9 @@ class BlogApi {
   getBlogById(id) {
     return axios.get(BASE_URL + "/get/" + id);
   }
+  getBlogByUsername(author) {
+    return axios.get(BASE_URL + "/get/username?author=" + author);
+  }
   recentlyActive({ page = 1 }) {
     return axios.get(BASE_URL + `/fetch?page=${page}&sort=-updatedAt`);
   }

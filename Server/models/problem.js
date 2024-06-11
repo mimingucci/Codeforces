@@ -20,20 +20,6 @@ const problemSchema = new mongoose.Schema(
         ref: "Tag",
       },
     ],
-    likes: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "User",
-        unique: true,
-      },
-    ],
-    dislikes: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "User",
-        unique: true,
-      },
-    ],
     author: {
       type: mongoose.Types.ObjectId,
       ref: "User",

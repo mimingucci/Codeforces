@@ -51,7 +51,9 @@ const NavbarPart1 = () => {
               </div>
             </div>
             <div className="w-[40%] items-center flex justify-center">
-              <img src={detain?.avatar} className="w-[65%]" />
+              <a href={`/profile/${detain?.username}`}>
+                <img src={detain?.avatar} className="w-[65%]" />
+              </a>
             </div>
           </div>
         </div>

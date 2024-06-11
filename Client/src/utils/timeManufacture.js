@@ -6,7 +6,7 @@ export const relativeTime = (pivot) => {
   let output = ``;
   if (difference < 60) {
     // Less than a minute has passed:
-    output = `${difference} seconds ago`;
+    output = `${Math.round(difference)} seconds ago`;
   } else if (difference < 3600) {
     // Less than an hour has passed:
     output = `${Math.floor(difference / 60)} minutes ago`;

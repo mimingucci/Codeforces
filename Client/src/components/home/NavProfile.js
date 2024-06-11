@@ -1,17 +1,29 @@
+import { useNavigate } from "react-router-dom";
+
 const NavProfile = ({ username }) => {
+  const navigate = useNavigate();
+  const handleNavigate = (url) => {
+    navigate(url);
+  };
   return (
     <div class="navbar" className="text-left gap-3 flex items-center h-10">
       <div>
-        <a href={`/profile/${username}`} class="active">
+        <button onClick={() => handleNavigate(`/profile/${username}`)}>
           Home
-        </a>
+        </button>
       </div>
       <div>
         {" "}
-        <a href={`/profile/blog/${username}`}>Blog</a>
+        <button onClick={() => handleNavigate(`/userblog/${username}`)}>
+          Blog
+        </button>
       </div>
       <div>
-        <a href={`/profile/submissions/${username}/1`}>Submissions</a>
+        <button
+          onClick={() => handleNavigate(`/profile/submissions/${username}/1`)}
+        >
+          Submissions
+        </button>
       </div>
     </div>
   );
