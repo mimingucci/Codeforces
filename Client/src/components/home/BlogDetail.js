@@ -10,6 +10,7 @@ import CommentApi from "../../getApi/CommentApi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { relativeTime } from "../../utils/timeManufacture";
+import Ranking from "./Ranking";
 const {
   RiAttachment2,
   BiSolidUpArrow,
@@ -122,11 +123,15 @@ const BlogDetail = () => {
         <h1 className="text-blue-800 text-[30px] font-bold">
           {<div dangerouslySetInnerHTML={{ __html: p?.title }} />}
         </h1>
-        <p>
+        <p className="flex gap-1">
           By{" "}
-          <span className="underline">
+          <span className="">
             <a href={"/profile/" + p?.author?.username}>
-              {p?.author?.username}
+              <Ranking
+                username={p?.author?.username}
+                rating={p?.author?.rating}
+                title={false}
+              />
             </a>
           </span>
           , {relativeTime(p?.createdAt)}

@@ -1,6 +1,7 @@
 import icons from "../../utils/icons";
 import { useEffect, useState } from "react";
 import UserApi from "../../getApi/UserApi";
+import Ranking from "./Ranking";
 const { FaArrowRightLong } = icons;
 const NavbarPart2 = () => {
   const [users, setUsers] = useState();
@@ -34,7 +35,11 @@ const NavbarPart2 = () => {
                       <td>{index + 1}</td>
                       <td>
                         <a href={"/profile/" + user.username}>
-                          {user.username}
+                          <Ranking
+                            username={user.username}
+                            rating={user.rating}
+                            title={false}
+                          />
                         </a>
                       </td>
                       <td>{user.rating}</td>

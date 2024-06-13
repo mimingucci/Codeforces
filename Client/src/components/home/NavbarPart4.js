@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import icons from "../../utils/icons";
 import BlogApi from "../../getApi/BlogApi";
+import Ranking from "./Ranking";
 const { FaArrowRightLong } = icons;
 const NavbarPart4 = () => {
   const [blogs, setBlogs] = useState();
@@ -20,7 +21,12 @@ const NavbarPart4 = () => {
             blogs.map((blog) => (
               <div className="flex mx-[5px] items-center" key={blog?._id}>
                 <a href={`/profile/${blog?.author?.username}`}>
-                  {blog?.author?.username}
+                  {/* {blog?.author?.username} */}
+                  <Ranking
+                    username={blog?.author?.username}
+                    rating={blog?.author?.rating}
+                    title={false}
+                  />
                 </a>
                 <FaArrowRightLong size={15} className="mx-[5px]" />{" "}
                 <a href={`/blog/${blog?._id}`}>{blog?.title}</a>

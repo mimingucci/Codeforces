@@ -6,6 +6,7 @@ import HandleCookies from "../../utils/HandleCookies";
 import ImageUploader from "./ImageUploader";
 import CommitGrid from "./CommitGrid";
 import NavProfile from "./NavProfile";
+import Ranking from "./Ranking";
 const {
   IoIosChatboxes,
   IoIosSettings,
@@ -24,25 +25,26 @@ const Profile = () => {
   const params = useParams();
   const navigate = useNavigate();
   useEffect(() => {
-    UserApi.getUserByUsername(params.username)
+    UserApi.getUserByUsername(params?.username)
       .then((res) => {
         setUser(res?.data?.data);
         setId(res?.data?.data?._id);
-        if (params.username === HandleCookies.getCookie("username")) {
+        if (params?.username === HandleCookies.getCookie("username")) {
           setIsHome(true);
         }
       })
       .catch((err) => console.log(err));
-  }, [params.username]);
+  }, [params?.username]);
   return (
     <div className="w-full">
-      <NavProfile username={params.username} />
+      <NavProfile username={user?.username} />
       <div className="border-[2px] rounded-md border-solid mr-5 border-gray-300 text-left p-3 flex">
         <div className="w-[65%]">
-          <h1 className="text-[20px] text-blue-800 font-bold">Expert</h1>
-          <h1 className="text-[20px] text-blue-800 font-bold">
-            {user?.username || "Username"}
-          </h1>
+          <Ranking
+            username={user?.username}
+            rating={user?.rating}
+            title={true}
+          />
           <p
             className={
               user?.firstname || user?.lastname ? "text-gray-600" : "hidden"
@@ -92,10 +94,12 @@ const Profile = () => {
               <a href="/writeblog">Write Blog</a>
             </span>
           </div>
-          <div className={isHome == true ? "hidden" : "flex items-center"}>
+          <div className={"flex items-center"}>
             <IoIosChatboxes className="mr-[5px]" />
             <span className="underline hover:cursor-pointer">
-              <a href={"/message/" + user?.username}>Message</a>
+              <a href={`/usertalk${isHome ? "" : "/" + user?.username}`}>
+                Message
+              </a>
             </span>
           </div>
         </div>

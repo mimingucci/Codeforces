@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import Editor from "@monaco-editor/react";
 // Template Sources
-var assemblySource =
+const assemblySource =
   "\
 section	.text\n\
     global _start\n\
@@ -26,11 +26,11 @@ msg	db 'hello, world', 0xa\n\
 len	equ	$ - msg\n\
 ";
 
-var bashSource = 'echo "hello, world"';
+const bashSource = 'echo "hello, world"';
 
-var basicSource = 'PRINT "hello, world"';
+const basicSource = 'PRINT "hello, world"';
 
-var cSource =
+const cSource =
   '\
 // Powered by Judge0\n\
 #include <stdio.h>\n\
@@ -41,7 +41,7 @@ int main(void) {\n\
 }\n\
 ';
 
-var csharpSource =
+const csharpSource =
   '\
 public class Hello {\n\
     public static void Main() {\n\
@@ -50,7 +50,7 @@ public class Hello {\n\
 }\n\
 ';
 
-var cppSource =
+const cppSource =
   '\
 #include <iostream>\n\
 \n\
@@ -60,7 +60,7 @@ int main() {\n\
 }\n\
 ';
 
-var competitiveProgrammingSource =
+const competitiveProgrammingSource =
   "\
 #include <algorithm>\n\
 #include <cstdint>\n\
@@ -168,9 +168,9 @@ int main()\n\
 }\n\
 ";
 
-var clojureSource = '(println "hello, world")\n';
+const clojureSource = '(println "hello, world")\n';
 
-var cobolSource =
+const cobolSource =
   '\
 IDENTIFICATION DIVISION.\n\
 PROGRAM-ID. MAIN.\n\
@@ -179,9 +179,9 @@ DISPLAY "hello, world".\n\
 STOP RUN.\n\
 ';
 
-var lispSource = '(write-line "hello, world")';
+const lispSource = '(write-line "hello, world")';
 
-var dSource =
+const dSource =
   '\
 import std.stdio;\n\
 \n\
@@ -191,15 +191,15 @@ void main()\n\
 }\n\
 ';
 
-var elixirSource = 'IO.puts "hello, world"';
+const elixirSource = 'IO.puts "hello, world"';
 
-var erlangSource =
+const erlangSource =
   '\
 main(_) ->\n\
     io:fwrite("hello, world\\n").\n\
 ';
 
-var executableSource =
+const executableSource =
   '\
 Judge0 IDE assumes that content of executable is Base64 encoded.\n\
 \n\
@@ -212,16 +212,16 @@ Content of compiled binary is Base64 encoded and used as source code.\n\
 https://ide.judge0.com/?kS_f\n\
 ';
 
-var fsharpSource = 'printfn "hello, world"\n';
+const fsharpSource = 'printfn "hello, world"\n';
 
-var fortranSource =
+const fortranSource =
   '\
 program main\n\
     print *, "hello, world"\n\
 end\n\
 ';
 
-var goSource =
+const goSource =
   '\
 package main\n\
 \n\
@@ -232,11 +232,11 @@ func main() {\n\
 }\n\
 ';
 
-var groovySource = 'println "hello, world"\n';
+const groovySource = 'println "hello, world"\n';
 
-var haskellSource = 'main = putStrLn "hello, world"';
+const haskellSource = 'main = putStrLn "hello, world"';
 
-var javaSource =
+const javaSource =
   '\
 public class Main {\n\
     public static void main(String[] args) {\n\
@@ -245,18 +245,18 @@ public class Main {\n\
 }\n\
 ';
 
-var javaScriptSource = 'console.log("hello, world");';
+const javaScriptSource = 'console.log("hello, world");';
 
-var kotlinSource =
+const kotlinSource =
   '\
 fun main() {\n\
     println("hello, world")\n\
 }\n\
 ';
 
-var luaSource = 'print("hello, world")';
+const luaSource = 'print("hello, world")';
 
-var objectiveCSource =
+const objectiveCSource =
   '\
 #import <Foundation/Foundation.h>\n\
 \n\
@@ -271,9 +271,9 @@ int main() {\n\
 }\n\
 ';
 
-var ocamlSource = 'print_endline "hello, world"';
+const ocamlSource = 'print_endline "hello, world"';
 
-var octaveSource = 'printf("hello, world\\n");';
+const octaveSource = 'printf("hello, world\\n");';
 
 var pascalSource =
   "\
@@ -283,41 +283,41 @@ begin\n\
 end.\n\
 ";
 
-var perlSource =
+const perlSource =
   '\
 my $name = <STDIN>;\n\
 print "hello, $name";\n\
 ';
 
-var phpSource =
+const phpSource =
   '\
 <?php\n\
 print("hello, world\\n");\n\
 ?>\n\
 ';
 
-var plainTextSource = "hello, world\n";
+const plainTextSource = "hello, world\n";
 
-var prologSource =
+const prologSource =
   "\
 :- initialization(main).\n\
 main :- write('hello, world\\n').\n\
 ";
 
-var pythonSource = 'print("hello, world")';
+const pythonSource = 'print("hello, world")';
 
-var rSource = 'cat("hello, world\\n")';
+const rSource = 'cat("hello, world\\n")';
 
-var rubySource = 'puts "hello, world"';
+const rubySource = 'puts "hello, world"';
 
-var rustSource =
+const rustSource =
   '\
 fn main() {\n\
     println!("hello, world");\n\
 }\n\
 ';
 
-var scalaSource =
+const scalaSource =
   '\
 object Main {\n\
     def main(args: Array[String]) = {\n\
@@ -327,7 +327,7 @@ object Main {\n\
 }\n\
 ';
 
-var sqliteSource =
+const sqliteSource =
   "\
 -- On Judge0 IDE your SQL script is run on chinook database (https://www.sqlitetutorial.net/sqlite-sample-database).\n\
 -- For more information about how to use SQL with Judge0 please\n\
@@ -340,18 +340,18 @@ GROUP BY Name\n\
 ORDER BY num_albums DESC\n\
 LIMIT 4;\n\
 ";
-var sqliteAdditionalFiles = "";
+const sqliteAdditionalFiles = "";
 
-var swiftSource =
+const swiftSource =
   '\
 import Foundation\n\
 let name = readLine()\n\
 print("hello, \\(name!)")\n\
 ';
 
-var typescriptSource = 'console.log("hello, world");';
+const typescriptSource = 'console.log("hello, world");';
 
-var vbSource =
+const vbSource =
   '\
 Public Module Program\n\
    Public Sub Main()\n\
@@ -360,7 +360,7 @@ Public Module Program\n\
 End Module\n\
 ';
 
-var c3Source =
+const c3Source =
   '\
 // On the Judge0 IDE, C3 is automatically\n\
 // updated every hour to the latest commit on master branch.\n\
@@ -375,7 +375,7 @@ func int main()\n\
 }\n\
 ';
 
-var javaTestSource =
+const javaTestSource =
   "\
 import static org.junit.jupiter.api.Assertions.assertEquals;\n\
 \n\
@@ -397,7 +397,7 @@ class MainTest {\n\
 }\n\
 ";
 
-var mpiccSource =
+const mpiccSource =
   '\
 // Try adding "-n 5" (without quotes) into command line arguments. \n\
 #include <mpi.h>\n\
@@ -422,7 +422,7 @@ int main()\n\
 }\n\
 ';
 
-var mpicxxSource =
+const mpicxxSource =
   '\
 // Try adding "-n 5" (without quotes) into command line arguments. \n\
 #include <mpi.h>\n\
@@ -448,7 +448,7 @@ int main()\n\
 }\n\
 ';
 
-var mpipySource =
+const mpipySource =
   '\
 # Try adding "-n 5" (without quotes) into command line arguments. \n\
 from mpi4py import MPI\n\
@@ -460,14 +460,14 @@ world_rank = comm.Get_rank()\n\
 print(f"Hello from processor with rank {world_rank} out of {world_size} processors")\n\
 ';
 
-var nimSource =
+const nimSource =
   '\
 # On the Judge0 IDE, Nim is automatically\n\
 # updated every day to the latest stable version.\n\
 echo "hello, world"\n\
 ';
 
-var pythonForMlSource =
+const pythonForMlSource =
   '\
 import mlxtend\n\
 import numpy\n\
@@ -478,7 +478,7 @@ import sklearn\n\
 print("hello, world")\n\
 ';
 
-var bosqueSource =
+const bosqueSource =
   '\
 // On the Judge0 IDE, Bosque (https://github.com/microsoft/BosqueLanguage)\n\
 // is automatically updated every hour to the latest commit on master branch.\n\
@@ -527,7 +527,7 @@ entrypoint function main(arg?: String): String {\n\
 }\n\
 ';
 
-var cppTestSource =
+const cppTestSource =
   "\
 #include <gtest/gtest.h>\n\
 \n\
@@ -551,7 +551,7 @@ int main(int argc, char **argv) {\n\
 }\n\
 ";
 
-var csharpTestSource =
+const csharpTestSource =
   "\
 using NUnit.Framework;\n\
 \n\
@@ -590,7 +590,7 @@ public class Tests\n\
 }\n\
 ";
 
-var sources = {
+const sources = {
   45: assemblySource,
   46: bashSource,
   47: basicSource,
@@ -658,7 +658,7 @@ var sources = {
   1024: fsharpSource,
 };
 
-var fileNames = {
+const fileNames = {
   45: "main.asm",
   46: "script.sh",
   47: "main.bas",
@@ -726,7 +726,7 @@ var fileNames = {
   1024: "script.fsx",
 };
 
-var languageIdTable = {
+const languageIdTable = {
   1001: 1,
   1002: 2,
   1003: 3,
@@ -748,7 +748,7 @@ var languageIdTable = {
   1024: 24,
 };
 
-var competitiveProgrammingInput =
+const competitiveProgrammingInput =
   "\
 3\n\
 3 2\n\
@@ -765,14 +765,14 @@ var competitiveProgrammingInput =
 1 3\n\
 ";
 
-var inputs = {
+const inputs = {
   54: competitiveProgrammingInput,
 };
 
-var competitiveProgrammingCompilerOptions =
+const competitiveProgrammingCompilerOptions =
   "-O3 --std=c++17 -Wall -Wextra -Wold-style-cast -Wuseless-cast -Wnull-dereference -Werror -Wfatal-errors -pedantic -pedantic-errors";
 
-var compilerOptions = {
+const compilerOptions = {
   54: competitiveProgrammingCompilerOptions,
 };
 const CodeEditorWindow = ({ onChange, language, code, theme }) => {

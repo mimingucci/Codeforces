@@ -4,7 +4,7 @@ const save = async (data) => {
   const message = new Message({
     content: data.content,
     author: data.author,
-    chatId: data.chatId,
+    chat: data.chat,
   });
   const rs = await message.save();
   return rs;
@@ -16,16 +16,24 @@ const getById = async (id) => {
 };
 
 const getByAuthor = async (author) => {
-  const rs = await Message.find({ author });
+  const rs = await Message.find({ author }).populate({
+    path: "author",
+    model: "User",
+    select: "username",
+  });
   return rs;
 };
 
-const getByChatId = async (chatId) => {
-  return await Message.find({ chatId });
+const getByChat = async (chat) => {
+  return await Message.find({ chat }).sort("-createdAt").limit(100).populate({
+    path: "author",
+    model: "User",
+    select: "username",
+  });
 };
 
-const getByAuthorAndChatId = async (author, chatId) => {
-  return await Message.find({ author, chatId });
+const getByAuthorAndChat = async ({ author, chat }) => {
+  return await Message.findOne({ author, chat });
 };
 
 const deleteById = async (id) => {
@@ -48,8 +56,8 @@ module.exports = {
   save,
   getById,
   getByAuthor,
-  getByChatId,
-  getByAuthorAndChatId,
+  getByChat,
+  getByAuthorAndChat,
   deleteById,
   update,
 };

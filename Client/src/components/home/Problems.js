@@ -5,6 +5,7 @@ import icons from "../../utils/icons";
 import ProblemApi from "../../getApi/ProblemApi";
 import UserApi from "../../getApi/UserApi";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import Ranking from "./Ranking";
 
 const { FaArrowRightLong, FaStar, GoDotFill } = icons;
 
@@ -68,7 +69,12 @@ const Problems = ({ userPage = false }) => {
                       )}
                       {userPage && (
                         <a href={"/profile/" + problem.username}>
-                          {problem.username}
+                          {/* {problem.username} */}
+                          <Ranking
+                            username={problem.username}
+                            rating={problem.rating}
+                            title={false}
+                          />
                         </a>
                       )}
                     </td>

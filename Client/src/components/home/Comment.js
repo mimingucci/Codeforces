@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import CommentApi from "../../getApi/CommentApi";
 import icons from "../../utils/icons";
 import HandleCookies from "../../utils/HandleCookies";
+import Ranking from "./Ranking";
 const { BiSolidUpArrow, BiSolidDownArrow, FaAnglesRight } = icons;
 
 const Comment = ({ id }) => {
@@ -45,9 +46,16 @@ const Comment = ({ id }) => {
               href={"/profile/" + comment?.author.username}
             >
               <div className="flex justify-center">
-                <img src={comment?.author.avatar} className="w-[50px] h-auto" />
+                <img
+                  src={comment?.author?.avatar}
+                  className="w-[50px] h-auto"
+                />
               </div>
-              {comment?.author.username}
+              <Ranking
+                username={comment?.author?.username}
+                rating={comment?.author?.rating}
+                title={false}
+              />
             </a>
           </div>
 

@@ -15,18 +15,20 @@ const User = require("../models/user");
 const Chat = require("../models/chat");
 
 const createChat = asyncHandler(async (req, res) => {
-  if (!req.body.users || req.body.users.length == 0)
+  if (!req.body.users || req.body.users.length == 0 || !req.body.name)
     throw new MissingFieldsError("Push user in chat room");
   let valid = true;
   req.body.users.forEach(async (user) => {
     valid = await userExists({ id: mongoose.Types.ObjectId(user) });
     if (!valid) throw new Error(`Cannot find user with id ${user}`);
   });
-  const rs = await save(req.body.users);
+  const rs = await save({ users: req.body.users, name: req.body.name });
   req.body.users.forEach(async (user) => {
-    let u = await User.findById(mongoose.Types.ObjectId(user));
-    u.chats.push(rs._id);
-    await u.save();
+    let u = await User.findByIdAndUpdate(mongoose.Types.ObjectId(user), {
+      $push: { chats: rs?._id },
+    });
+    // u.chats.push(rs._id);
+    // await u.save();
   });
   return res.status(200).json({
     status: rs ? "success" : "failure",

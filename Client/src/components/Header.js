@@ -1,16 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useDeferredValue, Suspense } from "react";
 import logo from "../assets/image/Codeforces_logo.svg.png";
 import icons from "../utils/icons";
 import UserApi from "../getApi/UserApi";
 import HandleCookies from "../utils/HandleCookies";
+import SearchResults from "./home/SearchResults";
+import { useNavigate } from "react-router-dom";
 const { IoIosNotifications, IoMdSearch } = icons;
 const Header = () => {
   let user = "";
-  const [value, setValue] = useState();
+  const [value, setValue] = useState("");
+  const deferredQuery = useDeferredValue(value);
+  const navigate = useNavigate();
   const handleClick = () => {
-    const keyword = value;
+    const query = value;
     setValue("");
-    window.location.replace("/search?query=" + keyword);
+    navigate(`/search?query=${query}`);
+  };
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      let query = value;
+      setValue("");
+      navigate(`/search?query=${query}`);
+    }
   };
   const checkLogin = () => {
     if (HandleCookies.getCookie("username")?.length > 0) {
@@ -85,20 +96,31 @@ const Header = () => {
           <div className="hover:cursor-pointer">HELP</div>
           <div className="hover:cursor-pointer">CATALOG</div>
         </div>
-        <div className="py-[10px] pr-[10px] flex">
-          <IoMdSearch
-            size={20}
-            className="my-auto hover:cursor-pointer"
-            onClick={handleClick}
-          />
-          <input
-            // onKeyPress={handleKeyUp}
-            type={"text"}
-            placeholder="Search"
-            className="flex-1 bg-gray-200 outline-none w-auto"
-            onChange={(e) => setValue(e.target.value)}
-            value={value}
-          />
+        <div className="relative">
+          <div className="py-1 flex px-3">
+            <IoMdSearch
+              size={20}
+              className="my-auto hover:cursor-pointer"
+              onClick={handleClick}
+            />
+            <input
+              onKeyDown={handleKeyDown}
+              type={"text"}
+              placeholder="Search"
+              className="flex-1 bg-gray-200 outline-none w-auto h-fit"
+              onChange={(e) => setValue(e.target.value)}
+              value={value}
+            />
+          </div>
+          <div
+            className={`absolute bg-white w-full border-solid border-gray-500 border-[1px] rounded-md ${
+              !deferredQuery ? "hidden" : ""
+            }`}
+          >
+            <Suspense fallback={<h2>Loading...</h2>}>
+              <SearchResults query={deferredQuery} />
+            </Suspense>
+          </div>
         </div>
       </div>
     </div>

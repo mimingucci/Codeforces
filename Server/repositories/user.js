@@ -22,9 +22,9 @@ const getAllByAdmin = async () => {
 };
 
 const getById = async (_id) => {
-  return await User.findOne({ _id, enabled: true }).select(
-    "-password -refreshToken"
-  );
+  return await User.findOne({ _id, enabled: true })
+    .select("-password -refreshToken")
+    .populate({ path: "chats", model: "Chat" });
 };
 
 const getByIdAllFields = async (_id) => {
@@ -41,6 +41,29 @@ const getByEmail = async (email) => {
   return await User.findOne({ email, enabled: true }).select(
     "-password -refreshToken"
   );
+};
+
+const addToChat = async ({ id, chat }) => {
+  return await User.findOneAndUpdate(
+    { _id: id },
+    { $push: { chats: chat } },
+    { new: true }
+  );
+};
+
+const deleteFromChat = async ({ id, chat }) => {
+  return await User.findOneAndUpdate(
+    { _id: id },
+    { $pull: { chats: chat } },
+    { new: true }
+  );
+};
+
+const getAllChat = async (id) => {
+  return await User.findOne({ _id: id }).populate({
+    path: "chats",
+    model: "Chat",
+  });
 };
 
 const update = async (id, user) => {
@@ -132,4 +155,7 @@ module.exports = {
   getByIdAllFields,
   updatePassword,
   getAllByAdmin,
+  addToChat,
+  deleteFromChat,
+  getAllChat,
 };

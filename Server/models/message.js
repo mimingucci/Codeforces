@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 
 const emojiSchema = new mongoose.Schema({
-  username: {
-    type: String,
+  user: {
+    type: mongoose.Types.ObjectId,
+    ref: "User",
     required: true,
   },
   emoji: {
@@ -32,7 +33,7 @@ const messageSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "User",
     },
-    chatId: {
+    chat: {
       type: mongoose.Types.ObjectId,
       ref: "Chat",
       required: [true, "Please provide chat room id"],

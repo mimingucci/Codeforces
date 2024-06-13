@@ -15,6 +15,8 @@ UserRouter.post("/signup", controller.register);
 UserRouter.post("/login", controller.login);
 UserRouter.post("/allow", enabledAccess);
 UserRouter.get("/fetch", controller.fetchUser);
+UserRouter.get("/search", controller.search);
+UserRouter.get("/chats", [verifyAccessToken], controller.getAllChats);
 UserRouter.get("/reset-access-token", controller.refreshAccessToken);
 UserRouter.get("/all", [verifyAccessToken, isAdmin], controller.getUsers);
 UserRouter.get("/refresh-access-token", controller.refreshAccessToken);

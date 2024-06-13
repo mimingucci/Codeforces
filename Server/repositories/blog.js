@@ -18,7 +18,7 @@ const getAll = async () => {
       path: "tags",
       model: "Tag",
     })
-    .populate({ path: "author", model: "User", select: "username" });
+    .populate({ path: "author", model: "User", select: "username rating" });
 };
 
 const getBlogById = async (id) => {
@@ -27,7 +27,7 @@ const getBlogById = async (id) => {
       path: "tags",
       model: "Tag",
     })
-    .populate({ path: "author", model: "User", select: "username" });
+    .populate({ path: "author", model: "User", select: "username rating" });
 };
 
 const getByAuthor = async (author) => {
@@ -37,7 +37,7 @@ const getByAuthor = async (author) => {
       path: "tags",
       model: "Tag",
     })
-    .populate({ path: "author", model: "User", select: "username" });
+    .populate({ path: "author", model: "User", select: "username rating" });
   return blogs;
 };
 
@@ -47,7 +47,7 @@ const getByTag = async (tag) => {
       path: "tags",
       model: "Tag",
     })
-    .populate({ path: "author", model: "User", select: "username" });
+    .populate({ path: "author", model: "User", select: "username rating" });
   return rs;
 };
 
@@ -58,7 +58,7 @@ const getByTags = async (t) => {
       path: "tags",
       model: "Tag",
     })
-    .populate({ path: "author", model: "User", select: "username" });
+    .populate({ path: "author", model: "User", select: "username rating" });
   return rs;
 };
 
@@ -73,7 +73,7 @@ const updateById = async (id, blog) => {
       path: "tags",
       model: "Tag",
     })
-    .populate({ path: "author", model: "User", select: "username" });
+    .populate({ path: "author", model: "User", select: "username rating" });
   return rs;
 };
 
@@ -91,7 +91,7 @@ const like = async (blogid, userid) => {
       path: "tags",
       model: "Tag",
     })
-    .populate({ path: "author", model: "User", select: "username" });
+    .populate({ path: "author", model: "User", select: "username rating" });
   return rs;
 };
 
@@ -109,7 +109,7 @@ const dislike = async (blogid, userid) => {
       path: "tags",
       model: "Tag",
     })
-    .populate({ path: "author", model: "User", select: "username" });
+    .populate({ path: "author", model: "User", select: "username rating" });
   return rs;
 };
 
@@ -127,7 +127,7 @@ const deleteLike = async (blogid, userid) => {
       path: "tags",
       model: "Tag",
     })
-    .populate({ path: "author", model: "User", select: "username" });
+    .populate({ path: "author", model: "User", select: "username rating" });
   return rs;
 };
 
@@ -145,7 +145,7 @@ const deleteDislike = async (blogid, userid) => {
       path: "tags",
       model: "Tag",
     })
-    .populate({ path: "author", model: "User", select: "username" });
+    .populate({ path: "author", model: "User", select: "username rating" });
   return rs;
 };
 
@@ -197,7 +197,7 @@ const addComment = async (blogid, commentid) => {
       path: "tags",
       model: "Tag",
     })
-    .populate({ path: "author", model: "User", select: "username" });
+    .populate({ path: "author", model: "User", select: "username rating" });
   return rs;
 };
 
@@ -213,7 +213,7 @@ const deleteComment = async (blogid, commentid) => {
       path: "tags",
       model: "Tag",
     })
-    .populate({ path: "author", model: "User", select: "username" });
+    .populate({ path: "author", model: "User", select: "username rating" });
   return rs;
 };
 

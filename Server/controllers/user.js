@@ -17,6 +17,9 @@ const {
   unsetState,
   updatePassword,
   getAllByAdmin,
+  getAllChat,
+  addToChat,
+  deleteFromChat,
 } = require("../repositories/user");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
@@ -60,7 +63,7 @@ const fetchUser = asyncHandler(async (req, res) => {
   }
   // paging
   const page = +req.query.page || 1;
-  const limit = 100;
+  let limit = 100;
   const skip = (page - 1) * limit;
   queryCommand.skip(skip).limit(limit);
   //execute query command
@@ -68,7 +71,33 @@ const fetchUser = asyncHandler(async (req, res) => {
     if (err) throw new Error(err.message);
     const cnt = await User.find({}).countDocuments();
     return res.status(200).json({
-      success: results ? "success" : "failure",
+      status: results ? "success" : "failure",
+      numberOfPage: Math.ceil(cnt / 100),
+      data: results ? results : "Cannot get users",
+    });
+  });
+});
+
+const search = asyncHandler(async (req, res) => {
+  let queryObj = { ...req.query };
+
+  let queryCommand = User.find({
+    $text: { $search: req.query.username },
+  }).select("-password -accessToken -refreshToken");
+  // paging
+  const page = +req.query.page || 1;
+  let limit = 100;
+  if (req.query.limit && Number.isInteger(+req.query.limit)) {
+    limit = +req.query.limit;
+  }
+  const skip = (page - 1) * limit;
+  queryCommand.skip(skip).limit(limit);
+  //execute query command
+  queryCommand.exec(async (err, results) => {
+    if (err) throw new Error(err.message);
+    const cnt = await User.find({}).countDocuments();
+    return res.status(200).json({
+      status: results ? "success" : "failure",
       numberOfPage: Math.ceil(cnt / 100),
       data: results ? results : "Cannot get users",
     });
@@ -464,6 +493,14 @@ const unsetAddress = asyncHandler(async (req, res) => {
   });
 });
 
+const getAllChats = asyncHandler(async (req, res) => {
+  const rs = await getAllChat(req.user._id);
+  return res.json({
+    status: "success",
+    data: rs.chats,
+  });
+});
+
 module.exports = {
   register,
   login,
@@ -487,4 +524,6 @@ module.exports = {
   uploadAvatar,
   deleteAvatar,
   fetchUser,
+  search,
+  getAllChats,
 };

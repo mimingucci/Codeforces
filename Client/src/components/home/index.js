@@ -7,7 +7,7 @@ export { default as Rating } from "./Rating";
 export { default as Calendar } from "./Calendar";
 export { default as Login } from "./Login";
 export { default as Posts } from "./Blogs";
-export { default as Search } from "./Search";
+export { default as Search } from "./SearchResults";
 export { default as SearchList } from "./SearchList";
 export { default as SignUp } from "./SignUp";
 export { default as CreateProblem } from "./CreateProblem";

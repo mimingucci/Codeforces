@@ -20,7 +20,16 @@ import ErrorPage from "../ErrorPage";
 import Submission from "./Submission";
 import SubmitDetail from "./SubmitDetail";
 import UserBlog from "./UserBlog";
+import io from "socket.io-client";
+import Home from "../Chat/Home/home";
+import Chat from "../Chat/Chat/Room";
+import { useState } from "react";
+
+const socket = io.connect("http://localhost:1234");
+
 const Main = () => {
+  const [username, setUsername] = useState("");
+  const [room, setRoom] = useState("");
   const location = useLocation();
   let inLoginPage = false;
   if (
@@ -58,6 +67,22 @@ const Main = () => {
         <Route path={path.SUBMIT} element={<Submission />} />
         <Route path={path.SUBMITDETAIL} element={<SubmitDetail />} />
         <Route path={path.USERBLOG} element={<UserBlog />} />
+        <Route
+          path="/usertalk"
+          element={
+            <Home
+              username={username}
+              setUsername={setUsername}
+              room={room}
+              setRoom={setRoom}
+              socket={socket}
+            />
+          }
+        />
+        <Route
+          path="/chat"
+          element={<Chat username={username} room={room} socket={socket} />}
+        />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </div>

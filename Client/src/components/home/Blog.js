@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { relativeTime } from "../../utils/timeManufacture";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import Ranking from "./Ranking";
 const {
   FaAnglesRight,
   RiAttachment2,
@@ -93,11 +94,16 @@ const Blog = ({ blog }) => {
           Edit
         </button>
       </div>
-      <p>
+      <p className="flex gap-1">
         By{" "}
-        <span className="underline">
+        <span className="">
           <a href={"/profile/" + blog?.author?.username}>
-            {blog?.author?.username}
+            {/* {blog?.author?.username} */}
+            <Ranking
+              username={blog?.author?.username}
+              rating={blog?.author?.rating}
+              title={false}
+            />
           </a>
         </span>
         , {relativeTime(blog?.createdAt)}

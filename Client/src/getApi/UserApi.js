@@ -7,6 +7,12 @@ class UserApi {
   getTopUsers({ field = "-rating" }) {
     return axios.get(BASE_URL + `/fetch?sort=${field}&page=1&enabled=true`);
   }
+  search({ page = 1, username, limit = 100 }) {
+    return axios.get(
+      BASE_URL +
+        `/search?page=${page}&enabled=true&username=${username}&limit=${limit}`
+    );
+  }
   getUserById(id) {
     return axios.get(BASE_URL + "/id/" + id);
   }

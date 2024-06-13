@@ -7,10 +7,15 @@ const initRoutes = require("./routes");
 require("dotenv").config();
 const { Server } = require("socket.io");
 const { createMessage } = require("./services/message");
-
+const { getByChat, save } = require("./repositories/message");
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.URL_REACT_APP,
+    methods: ["GET", "POST"],
+  },
+});
 app.use(cors({ origin: process.env.URL_REACT_APP }));
 app.use(cookieParser());
 app.use(express.json());
@@ -19,27 +24,87 @@ const PORT = process.env.PORT || 1905;
 db();
 initRoutes(app);
 
+const CHAT_BOT = "ChatBot";
+let chatRoom = "";
+let allUsers = [];
+
+function leaveRoom(userID, chatRoomUsers) {
+  return chatRoomUsers.filter((user) => user.id !== userID);
+}
+
 io.on("connection", (socket) => {
-  function getReceiverSocketById(id) {
-    return io.sockets.sockets[id];
-  }
-  socket.on("sendMessage", async (message) => {
-    const { content, author, chatId } = message;
+  console.log(`User connected ${socket.id}`);
+  // Add a user to a room
+  socket.on("join_room", (data) => {
+    const { username, userId, room } = data; // Data sent from client when join_room event emitted
+    socket.join(room); // Join the user to a socket room
 
-    try {
-      const ms = await createMessage(message);
+    let __createdtime__ = Date.now(); // Current timestamp
+    // Send message to all users currently in the room, apart from the user that just joined
+    socket.to(room).emit("receive_message", {
+      content: `${username} has joined the chat room`,
+      author: { username: CHAT_BOT },
+      createdAt: __createdtime__,
+    });
+    // Send welcome msg to user that just joined chat only
+    socket.emit("receive_message", {
+      content: `Welcome ${username}`,
+      author: { username: CHAT_BOT },
+      createdAt: __createdtime__,
+    });
+    // Save the new user to the room
+    chatRoom = room;
+    allUsers.push({ id: socket.id, username, room, userId });
+    let chatRoomUsers = allUsers.filter((user) => user.room === room);
+    socket.to(room).emit("chatroom_users", chatRoomUsers);
+    socket.emit("chatroom_users", chatRoomUsers);
 
-      socket.to(chatId).emit("receiveMessage", ms);
-    } catch (error) {
-      // console.error("Error saving message to DB:", error);
-      socket.to(chatId).emit("error", "Failed to save message to database");
+    // Get last 100 messages sent in the chat room
+    getByChat(room)
+      .then((last100Messages) => {
+        // console.log('latest messages', last100Messages);
+        socket.emit("last_100_messages", last100Messages);
+      })
+      .catch((err) => console.log(err));
+  });
+
+  socket.on("send_message", (data) => {
+    const { message, username, room, userId, __createdtime__ } = data;
+    io.in(room).emit("receive_message", {
+      content: message,
+      author: { username: username },
+      createdAt: new Date(),
+    }); // Send to all users in room, including sender
+    save({ content: message, author: userId, chat: room }) // Save message in db
+      .then((response) => console.log(response))
+      .catch((err) => console.log(err));
+  });
+
+  socket.on("leave_room", (data) => {
+    const { username, room } = data;
+    socket.leave(room);
+    const __createdtime__ = Date.now();
+    // Remove user from memory
+    allUsers = leaveRoom(socket.id, allUsers);
+    socket.to(room).emit("chatroom_users", allUsers);
+    socket.to(room).emit("receive_message", {
+      username: CHAT_BOT,
+      message: `${username} has left the chat`,
+      __createdtime__,
+    });
+    console.log(`${username} has left the chat`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected from the chat");
+    const user = allUsers.find((user) => user.id == socket.id);
+    if (user?.username) {
+      allUsers = leaveRoom(socket.id, allUsers);
+      socket.to(chatRoom).emit("chatroom_users", allUsers);
+      socket.to(chatRoom).emit("receive_message", {
+        message: `${user.username} has disconnected from the chat.`,
+      });
     }
-  });
-  socket.on("joinChatRoom", (chatId) => {
-    socket.join(chatId);
-  });
-  socket.on("leaveChatRoom", (chatId) => {
-    socket.leave(chatId);
   });
 });
 

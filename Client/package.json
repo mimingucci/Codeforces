@@ -32,6 +32,7 @@
     "react-scripts": "5.0.1",
     "react-select": "^5.8.0",
     "react-toastify": "^10.0.5",
+    "socket.io-client": "^4.7.5",
     "tippy.js": "^6.3.7",
     "tw-elements-react": "^1.0.0-alpha2",
     "web-vitals": "^2.1.4"

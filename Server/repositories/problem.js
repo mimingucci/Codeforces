@@ -30,7 +30,7 @@ const getTestCases = async (id) => {
       select: "input output",
       options: { limit: 1 },
     })
-    .populate({ path: "author", model: "User", select: "username" })
+    .populate({ path: "author", model: "User", select: "username rating" })
     .populate({ path: "submissions", model: "Submission" })
     .populate({ path: "tags", model: "Tag", select: "name" });
   return problem;
