@@ -4,7 +4,9 @@ const {
   deleteUserFromChat,
   addUserToChat,
   deleteById,
+  individualChat,
 } = require("../repositories/chat");
+const { addToChat, deleteFromChat } = require("../repositories/user");
 const asyncHandler = require("express-async-handler");
 const { MissingFieldsError } = require("../errors/input");
 const { UserNotFoundError } = require("../errors/user");
@@ -92,9 +94,53 @@ const getMessagesForSpecificChat = asyncHandler(async (req, res) => {
   }
 });
 
+const addChat = asyncHandler(async (req, res) => {
+  const { user, chat } = req.body;
+  if (!user || !chat) throw new MissingFieldsError("Required user and chat id");
+  const rs = await addUserToChat({ chat, user });
+  const result = await addToChat({ id: user, chat });
+  return res.json({
+    status: rs ? "success" : "failure",
+    data: rs,
+  });
+});
+
+const removeChat = asyncHandler(async (req, res) => {
+  const { user, chat } = req.body;
+  if (!user || !chat) throw new MissingFieldsError("Required user and chat id");
+  const rs = await deleteUserFromChat({ chat, user });
+  const result = await deleteFromChat({ id: user, chat });
+  return res.json({
+    status: "success",
+  });
+});
+
+const openIndividualChat = asyncHandler(async (req, res) => {
+  if (
+    !req.user._id ||
+    !req.user.username ||
+    !req.body._id ||
+    !req.body.username
+  )
+    throw new MissingFieldsError("Required username and id");
+  const rs = await individualChat({
+    id1: req.user._id,
+    id2: mongoose.Types.ObjectId(req.body._id),
+    name1: req.user.username,
+    name2: req.body.username,
+  });
+  return res.json({
+    status: rs ? "success" : "failure",
+    data: rs ? rs : "Cannot open chat room",
+  });
+});
+
 module.exports = {
   createChat,
   deleteChat,
   getChatsForUser,
   getMessagesForSpecificChat,
+  addChat,
+  removeChat,
+  openIndividualChat,
 };

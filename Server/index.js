@@ -8,6 +8,8 @@ require("dotenv").config();
 const { Server } = require("socket.io");
 const { createMessage } = require("./services/message");
 const { getByChat, save } = require("./repositories/message");
+const { getAllUsers, individualChat } = require("./repositories/chat");
+const { getByUsername, addToChat } = require("./repositories/user");
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
@@ -56,8 +58,12 @@ io.on("connection", (socket) => {
     chatRoom = room;
     allUsers.push({ id: socket.id, username, room, userId });
     let chatRoomUsers = allUsers.filter((user) => user.room === room);
-    socket.to(room).emit("chatroom_users", chatRoomUsers);
-    socket.emit("chatroom_users", chatRoomUsers);
+    getAllUsers(room).then((rs) => {
+      socket.to(room).emit("chatroom_users", rs);
+      socket.emit("chatroom_users", rs);
+    });
+    // socket.to(room).emit("chatroom_users", chatRoomUsers);
+    // socket.emit("chatroom_users", chatRoomUsers);
 
     // Get last 100 messages sent in the chat room
     getByChat(room)

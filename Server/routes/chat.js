@@ -10,5 +10,7 @@ const {
 } = require("../middlewares/verifyToken");
 
 ChatRouter.post("/create", [verifyAccessToken], controller.createChat);
-
+ChatRouter.post("/add", [verifyAccessToken], controller.addChat);
+ChatRouter.post("/delete", [verifyAccessToken], controller.removeChat);
+ChatRouter.post("/open", [verifyAccessToken], controller.openIndividualChat);
 module.exports = ChatRouter;

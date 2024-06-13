@@ -35,6 +35,7 @@ const Profile = () => {
       })
       .catch((err) => console.log(err));
   }, [params?.username]);
+
   return (
     <div className="w-full">
       <NavProfile username={user?.username} />
@@ -97,7 +98,13 @@ const Profile = () => {
           <div className={"flex items-center"}>
             <IoIosChatboxes className="mr-[5px]" />
             <span className="underline hover:cursor-pointer">
-              <a href={`/usertalk${isHome ? "" : "/" + user?.username}`}>
+              <a
+                href={
+                  isHome
+                    ? "/usertalk"
+                    : `/message?username=${params.username}&id=${id}`
+                }
+              >
                 Message
               </a>
             </span>

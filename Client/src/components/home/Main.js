@@ -24,6 +24,7 @@ import io from "socket.io-client";
 import Home from "../Chat/Home/home";
 import Chat from "../Chat/Chat/Room";
 import { useState } from "react";
+import IndividualChat from "../Chat/Home/IndividualChat";
 
 const socket = io.connect("http://localhost:1234");
 
@@ -82,6 +83,18 @@ const Main = () => {
         <Route
           path="/chat"
           element={<Chat username={username} room={room} socket={socket} />}
+        />
+        <Route
+          path="/message"
+          element={
+            <IndividualChat
+              username={username}
+              setUsername={setUsername}
+              room={room}
+              setRoom={setRoom}
+              socket={socket}
+            />
+          }
         />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
