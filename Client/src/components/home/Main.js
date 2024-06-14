@@ -25,6 +25,7 @@ import Home from "../Chat/Home/home";
 import Chat from "../Chat/Chat/Room";
 import { useState } from "react";
 import IndividualChat from "../Chat/Home/IndividualChat";
+import LoginGoogle from "./LoginGoogle";
 
 const socket = io.connect("http://localhost:1234");
 
@@ -95,6 +96,10 @@ const Main = () => {
               socket={socket}
             />
           }
+        />
+        <Route
+          path="/login-google/:email/:password"
+          element={<LoginGoogle />}
         />
         <Route path="*" element={<ErrorPage />} />
       </Routes>

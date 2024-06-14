@@ -10,6 +10,8 @@ const { createMessage } = require("./services/message");
 const { getByChat, save } = require("./repositories/message");
 const { getAllUsers, individualChat } = require("./repositories/chat");
 const { getByUsername, addToChat } = require("./repositories/user");
+const passport = require("passport");
+require("./config/passport")(passport);
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
@@ -22,6 +24,7 @@ app.use(cors({ origin: process.env.URL_REACT_APP }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 const PORT = process.env.PORT || 1905;
 db();
 initRoutes(app);
