@@ -46,7 +46,7 @@ const Login = () => {
                   for="email"
                   className="block text-sm font-semibold text-gray-800 text-left"
                 >
-                  Handle / Email
+                  Email
                 </label>
                 <input
                   onChange={(e) => handleChangeEmail(e.target.value)}

@@ -176,7 +176,11 @@ const getBlogsByTag = asyncHandler(async (req, res) => {
 
 const deleteBlogById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  if (!id) throw new MissingFieldsError("You must provide a blog id");
+  if (!id) {
+    return res.json({
+      status: "failure",
+    });
+  }
   const rs = await deleteById(mongoose.Types.ObjectId(id));
   return res.json({
     status: rs ? "success" : "failure",

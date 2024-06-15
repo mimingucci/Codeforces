@@ -39,15 +39,15 @@ const NavbarPart1 = () => {
               </div>
               <div className="flex items-center">
                 <GoDotFill size={14} className="mx-[5px] text-blue-800" />
-                Settings
+                <a href={`/setting/${detain?.username}`}>Settings</a>
               </div>
               <div className="flex items-center">
                 <GoDotFill size={14} className="mx-[5px] text-blue-800" />
-                Blogs
+                <a href={`/userblog/${detain?.username}`}>Blogs</a>
               </div>
               <div className="flex items-center">
                 <GoDotFill size={14} className="mx-[5px] text-blue-800" />
-                Talks
+                <a href="/usertalk">Talks</a>
               </div>
             </div>
             <div className="w-[40%] items-center flex justify-center">

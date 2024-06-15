@@ -38,6 +38,11 @@ class BlogApi {
       { headers: { Authorization: "Bearer " + accessToken } }
     );
   }
+  delete({ accessToken, id }) {
+    return axios.delete(BASE_URL + "/delete/" + id, {
+      headers: { Authorization: "Bearer " + accessToken },
+    });
+  }
   createComment(content, author, blogId) {
     return axios.post(COMMENT_URL + "/create", { content, author, blogId });
   }

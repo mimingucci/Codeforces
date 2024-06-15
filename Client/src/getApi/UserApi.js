@@ -31,16 +31,21 @@ class UserApi {
   getResultBySearch(keyword) {
     return axios.get(BASE_URL + "/search", { params: { query: keyword } });
   }
-  updateUser({ accessToken, firstname, lastname, description }) {
-    return axios.put(
-      BASE_URL + "/update",
-      {
-        firstname,
-        lastname,
-        description,
-      },
-      { headers: { Authorization: "Bearer " + accessToken } }
-    );
+  updateUser({
+    accessToken,
+    firstname = null,
+    lastname = null,
+    description = null,
+    password = null,
+  }) {
+    let body = {};
+    if (firstname) body.firstname = firstname;
+    if (lastname) body.lastname = lastname;
+    if (description) body.description = description;
+    if (password) body.password = password;
+    return axios.put(BASE_URL + "/update", body, {
+      headers: { Authorization: "Bearer " + accessToken },
+    });
   }
   login({ email, password }) {
     return axios.post(BASE_URL + "/login", {

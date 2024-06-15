@@ -7,6 +7,7 @@ import { relativeTime } from "../../utils/timeManufacture";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import Ranking from "./Ranking";
+import Overlay from "./Overlay";
 const {
   FaAnglesRight,
   RiAttachment2,
@@ -18,6 +19,8 @@ const {
 } = icons;
 const Blog = ({ blog }) => {
   const [like, setLike] = useState(blog?.likes.length - blog?.dislikes.length);
+  const [show, setShow] = useState(false);
+  const [deleted, setDeleted] = useState(false);
   const navigate = useNavigate();
   const handleLike = async () => {
     const accessToken = HandleCookies.getCookie("accessToken");
@@ -50,6 +53,19 @@ const Blog = ({ blog }) => {
     }
   };
 
+  const onDelete = () => {
+    BlogApi.delete({
+      accessToken: HandleCookies.getCookie("accessToken"),
+      id: blog._id,
+    }).then((rs) => {
+      if (rs?.data?.status === "success") {
+        showSuccessToast("Delete blog successfully");
+        setDeleted(true);
+      }
+    });
+    setShow(false);
+  };
+
   const showSuccessToast = (msg) => {
     toast.success(msg || `Compiled Successfully!`, {
       position: "top-right",
@@ -74,7 +90,7 @@ const Blog = ({ blog }) => {
     });
   };
   return (
-    <div className="text-left mt-5">
+    <div className={`text-left mt-5 ${deleted ? "hidden" : ""}`}>
       <div className="flex gap-5">
         <h1 className="text-blue-800 text-[30px] font-bold">
           {
@@ -92,6 +108,16 @@ const Blog = ({ blog }) => {
           }
         >
           Edit
+        </button>
+        <button
+          onClick={() => setShow(true)}
+          className={
+            blog?.author?.username === HandleCookies.getCookie("username")
+              ? "bg-red-500 px-3 h-fit"
+              : "hidden"
+          }
+        >
+          Delete
         </button>
       </div>
       <p className="flex gap-1">
@@ -163,6 +189,7 @@ const Blog = ({ blog }) => {
           </div>
         </div>
       </div>
+      {show && <Overlay setShow={setShow} onDelete={onDelete} />}
     </div>
   );
 };

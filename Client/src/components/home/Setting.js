@@ -11,6 +11,7 @@ const Setting = () => {
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [description, setDescription] = useState("");
+  const [password, setPassword] = useState("");
   const { username } = useParams();
   useEffect(() => {
     if (!username) {
@@ -40,6 +41,7 @@ const Setting = () => {
       firstname,
       lastname,
       description,
+      password,
     });
     if (!rs || rs?.data?.status !== "success") {
       showErrorToast("Something went wrong:((");
@@ -123,22 +125,13 @@ const Setting = () => {
             <small></small>
           </div>
           <div class="field">
-            <label for="name">Old Password:</label>
-            <input
-              type="password"
-              id="oldpassword"
-              name="oldpassword"
-              placeholder="Enter your old password"
-            />
-            <small></small>
-          </div>
-          <div class="field">
             <label for="name">New Password:</label>
             <input
               type="password"
               id="newpassword"
               name="newpassword"
               placeholder="Enter your new password"
+              onChange={(e) => setPassword(e.target.value)}
             />
             <small></small>
           </div>

@@ -23,15 +23,6 @@ const verifyAccessToken = asyncHandler(async (req, res, next) => {
         status: "failure",
         data: "User not found with token",
       });
-    if (req.body.oldpassword) {
-      let valid = await user.isCorrectPassword(req.body.oldpassword);
-      if (!valid) {
-        return res.status(401).json({
-          status: "failure",
-          data: "Password is not correct",
-        });
-      }
-    }
     req.user = user;
     next();
   } else {

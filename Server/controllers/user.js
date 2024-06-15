@@ -155,10 +155,6 @@ const deleteUserById = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
   if (!req.user._id || Object.keys(req.body).length === 0)
     throw new Error("Missing inputs");
-  if (req.body.oldpassword) {
-    delete req.body.oldpassword;
-  }
-  console.log(req.body);
   const response = await update(req.user._id, req.body);
   return res.status(200).json({
     status: response ? "success" : "failure",
@@ -372,6 +368,12 @@ const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.query;
   if (!email) throw new Error("Missing email");
   const user = await User.findOne({ email });
+  if (user.authenticationType !== "DATABASE") {
+    return res.json({
+      status: "failure",
+      data: "This email has logged in with an other type",
+    });
+  }
   if (!user) throw new Error("User not found");
   const resetToken = user.createPasswordChangedToken();
   await user.save();
