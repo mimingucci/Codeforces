@@ -22,6 +22,8 @@ UserRouter.get("/all", [verifyAccessToken, isAdmin], controller.getUsers);
 UserRouter.get("/refresh-access-token", controller.refreshAccessToken);
 UserRouter.get("/logout", verifyAccessToken, controller.logout);
 UserRouter.get("/id/:id", controller.getUserById);
+UserRouter.get("/forgot-password", controller.forgotPassword);
+UserRouter.put("/reset-password", controller.resetPassword);
 UserRouter.get("/username/:username", controller.getUserByUsername);
 UserRouter.get("/email", controller.getUserByEmail);
 UserRouter.get("/info", getUserInfoByAccessToken);

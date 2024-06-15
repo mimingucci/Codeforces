@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const asyncHandler = require("express-async-handler");
+const crypto = require("crypto");
 const {
   save,
   getAll,
@@ -375,7 +376,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   const resetToken = user.createPasswordChangedToken();
   await user.save();
 
-  const html = `Please click bollow link to change password. Link will expire in 15 minutes from now. <a href=${process.env.URL_SERVER}/api/user/reset-password/${resetToken}>Click here</a>`;
+  const html = `Please click bollow link to change password. Link will expire in 15 minutes from now. <a href=${process.env.URL_REACT_APP}/api/auth/reset-password/${resetToken}/${email}>Click here</a>`;
 
   const data = {
     email,
@@ -383,26 +384,27 @@ const forgotPassword = asyncHandler(async (req, res) => {
   };
   const rs = await sendMail(data);
   return res.status(200).json({
-    success: true,
+    status: "success",
     data: rs,
   });
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
-  const { password, token } = req.body;
-  if (!password || !token) throw new Error("Missing inputs");
+  const { password, token, email } = req.body;
+  if (!password || !token || !email) throw new Error("Missing inputs");
   const passwordResetToken = crypto
     .createHash("sha256")
     .update(token)
     .digest("hex");
+  console.log(passwordResetToken);
   const user = await User.findOne({
+    email,
     passwordResetToken,
     passwordResetExpires: { $gt: Date.now() },
   });
   if (!user) throw new Error("Invalid reset token");
   user.password = password;
   user.passwordResetToken = undefined;
-  user.passwordChangedAt = Date.now();
   user.passwordResetExpires = undefined;
   await user.save();
   return res.status(200).json({

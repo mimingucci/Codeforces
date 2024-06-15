@@ -22,5 +22,7 @@ const path = {
   SUBMIT: "/profile/submissions/:author/:page",
   SUBMITDETAIL: "/submission/:id",
   USERBLOG: "/userblog/:author",
+  FORGOTPASSWORD: "/forgot-password",
+  RESETPASSWORD: "/api/auth/reset-password/:token/:email",
 };
 export default path;

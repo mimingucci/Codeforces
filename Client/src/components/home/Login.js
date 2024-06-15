@@ -69,7 +69,10 @@ const Login = () => {
                   className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                 />
               </div>
-              <a href="#" className="text-xs text-blue-600 hover:underline">
+              <a
+                href="/forgot-password"
+                className="text-xs text-blue-600 hover:underline"
+              >
                 Forget Password?
               </a>
               <div className="mt-6">

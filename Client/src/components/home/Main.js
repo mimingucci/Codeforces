@@ -26,6 +26,8 @@ import Chat from "../Chat/Chat/Room";
 import { useState } from "react";
 import IndividualChat from "../Chat/Home/IndividualChat";
 import LoginGoogle from "./LoginGoogle";
+import ForgotPassword from "./ForgotPassword";
+import ResetPassword from "./ResetPassword";
 
 const socket = io.connect("http://localhost:1234");
 
@@ -69,6 +71,8 @@ const Main = () => {
         <Route path={path.SUBMIT} element={<Submission />} />
         <Route path={path.SUBMITDETAIL} element={<SubmitDetail />} />
         <Route path={path.USERBLOG} element={<UserBlog />} />
+        <Route path={path.FORGOTPASSWORD} element={<ForgotPassword />} />
+        <Route path={path.RESETPASSWORD} element={<ResetPassword />} />
         <Route
           path="/usertalk"
           element={

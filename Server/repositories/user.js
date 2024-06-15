@@ -67,10 +67,12 @@ const getAllChat = async (id) => {
 };
 
 const update = async (id, user) => {
-  if (user.password) delete user.password;
-  return await User.findByIdAndUpdate(id, user, { new: true }).select(
-    "-password -refreshToken"
-  );
+  const data = await User.findOne({ _id: id });
+  for (let [key, value] of Object.entries(user)) {
+    data[key] = value;
+  }
+  const rs = await data.save();
+  return rs;
 };
 
 const updatePassword = async (id, password) => {

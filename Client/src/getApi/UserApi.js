@@ -91,5 +91,11 @@ class UserApi {
   signup(email, username, password) {
     return axios.post(BASE_URL + "/create", { username, password, email });
   }
+  forgotPassword(email) {
+    return axios.get(BASE_URL + "/forgot-password?email=" + email);
+  }
+  resetPassword({ email, token, password }) {
+    return axios.put(BASE_URL + "/reset-password", { email, token, password });
+  }
 }
 export default new UserApi();
