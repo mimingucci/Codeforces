@@ -10,6 +10,7 @@ Because this project is still under development, so i also run it in local, i al
 - **Backend**: Built on NodeJS with Express, offering a robust server-side framework.
 - **Database**: MongoDB is used for data storage, providing flexibility and scalability.
 - **Authentication**: PassportJS manages user authentication, ensuring secure logins.
+- **Containerization**: Docker is used for containerizing the application, ensuring a consistent environment across different machines.
 
 ### Future goals:
 

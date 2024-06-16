@@ -4,7 +4,10 @@ mongoose.set("strictQuery", false);
 
 const db = async () => {
   try {
-    const connect = await mongoose.connect(process.env.MONGODB_URI);
+    const connect = await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     if (connect.connection.readyState === 1)
       console.log("DB connection is successfully!");
     else console.log("DB connecting");
