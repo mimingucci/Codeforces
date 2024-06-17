@@ -34,7 +34,10 @@ const readFile = async (key) => {
 };
 
 const writeFile = async (format, content) => {
-  const filepath = path.join(dirPath, `main.${format}`); // Adjust filepath to include the new folder
+  let filepath = path.join(dirPath, `main.${format}`); // Adjust filepath to include the new folder
+  if (format === "java") {
+    filepath = path.join(dirPath, `Main.${format}`);
+  }
   try {
     await fs.promises.writeFile(filepath, content); // Use fs.promises.writeFile to save the file asynchronously
     return true;

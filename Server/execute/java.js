@@ -1,20 +1,18 @@
-const { spawn, exec, execFile } = require("child_process");
-
+const { spawn, exec, execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
 const outputPath = path.join(__dirname, "sources");
 
-const executeCpp = (userInput) => {
+const executeJava = (userInput) => {
+  const filepath = path.join(outputPath, "Main.java");
   return new Promise((resolve, reject) => {
-    const filepath = path.join(outputPath, "main.cpp");
-    const outPath = path.join(outputPath, "cpp.out");
-
-    const compileProcess = spawn("g++", [filepath, "-o", outPath]);
+    const compileProcess = spawn("javac", [filepath]);
 
     let compileError = ""; // Variable to store the compilation error message
 
     compileProcess.on("error", (error) => {
+      console.log(error);
       reject({ type: "c_error", message: error.message });
     });
 
@@ -30,7 +28,11 @@ const executeCpp = (userInput) => {
         }); // Reject with the compilation error
         return;
       }
-      const executeProcess = spawn(outPath);
+
+      const executeDirectory = path.dirname(filepath); // Directory where the file is
+      const executeProcess = spawn("java", ["-cp", executeDirectory, "Main"], {
+        cwd: executeDirectory,
+      });
 
       executeProcess.stdin.write(userInput);
       executeProcess.stdin.end();
@@ -67,5 +69,5 @@ const executeCpp = (userInput) => {
 };
 
 module.exports = {
-  executeCpp,
+  executeJava,
 };
