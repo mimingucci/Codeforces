@@ -36,16 +36,12 @@ const problemSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    testcases: {
-      type: [
-        {
-          type: mongoose.Types.ObjectId,
-          ref: "TestCase",
-          unique: true,
-        },
-      ],
-      validate: [noDuplicateElements, "Test case must contain unique elements"],
-    },
+    testcases: [
+      {
+        input: { type: String },
+        output: { type: String },
+      },
+    ],
     rating: {
       type: Number,
       min: 500,

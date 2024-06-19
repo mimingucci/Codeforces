@@ -6,12 +6,11 @@ const db = require("./config/db");
 const initRoutes = require("./routes");
 require("dotenv").config();
 const { Server } = require("socket.io");
-const { createMessage } = require("./services/message");
 const { getByChat, save } = require("./repositories/message");
 const { getAllUsers } = require("./repositories/chat");
 const fileparser = require("./config/fileparser");
-const { cpp } = require("./controllers/writeCode");
 const passport = require("passport");
+const { verifyAccessToken } = require("./middlewares/verifyToken");
 require("./config/passport")(passport);
 const app = express();
 const server = createServer(app);
@@ -30,23 +29,21 @@ const PORT = process.env.PORT || 1905;
 db();
 initRoutes(app);
 
-app.post("/api/file/upload", async (req, res) => {
+app.post("/api/file/upload", [verifyAccessToken], async (req, res) => {
   await fileparser(req)
     .then((data) => {
       res.status(200).json({
-        message: "Success",
+        status: "success",
         data,
       });
     })
     .catch((error) => {
       res.status(400).json({
-        message: "An error occurred.",
-        error,
+        status: "failure",
+        data: error,
       });
     });
 });
-
-app.post("/api/cpp", cpp);
 
 const CHAT_BOT = "ChatBot";
 let chatRoom = "";

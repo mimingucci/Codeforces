@@ -8,6 +8,7 @@ const save = async (data) => {
     author: mongoose.Types.ObjectId(data.author),
     timelimit: data.timelimit,
     memorylimit: data.memorylimit,
+    testcases: [...data.testcases],
   });
   const rs = await problem.save();
   return rs;
@@ -24,12 +25,6 @@ const getById = async (id) => {
 
 const getTestCases = async (id) => {
   const problem = await Problem.findOne({ _id: id })
-    .populate({
-      path: "testcases",
-      model: "TestCase",
-      select: "input output",
-      options: { limit: 1 },
-    })
     .populate({ path: "author", model: "User", select: "username rating" })
     .populate({ path: "submissions", model: "Submission" })
     .populate({ path: "tags", model: "Tag", select: "name" });
@@ -70,32 +65,6 @@ const update = async (id, data) => {
   return problem;
 };
 
-const addTestCase = async (id, tc) => {
-  const rs = await Problem.findByIdAndUpdate(
-    id,
-    {
-      $push: {
-        testcases: tc,
-      },
-    },
-    { new: true }
-  );
-  return rs;
-};
-
-const deleteTestCase = async (id, tc) => {
-  const rs = await Problem.findByIdAndUpdate(
-    id,
-    {
-      $pull: {
-        testcases: tc,
-      },
-    },
-    { new: true }
-  );
-  return rs;
-};
-
 const deleteById = async (id) => {
   const rs = await Problem.findByIdAndDelete(id);
   return rs ? true : false;
@@ -106,8 +75,6 @@ module.exports = {
   getById,
   getByAuthor,
   getByTag,
-  addTestCase,
-  deleteTestCase,
   deleteById,
   update,
   getAll,

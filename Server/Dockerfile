@@ -16,8 +16,7 @@ COPY . .
 
 EXPOSE 1234
 
-# CMD [ "nodemon", "run", "dev" ]
-CMD ["npx", "nodemon", "index"]
+CMD ["npm", "run", "dev"]
 
 
 

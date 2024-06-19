@@ -51,6 +51,10 @@ const submissionSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    format: {
+      type: String,
+      default: "cpp",
+    },
   },
   {
     timestamps: true,

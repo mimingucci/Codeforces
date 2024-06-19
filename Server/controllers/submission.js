@@ -1,5 +1,6 @@
 const asyncHanlder = require("express-async-handler");
 const { getByCode } = require("../repositories/language");
+const fileparser = require("../config/fileparser");
 const User = require("../models/user");
 const {
   save,
@@ -13,13 +14,14 @@ const { userExists } = require("../services/user");
 const { UserNotFoundError } = require("../errors/user");
 const { problemExists } = require("../services/problem");
 const Submission = require("../models/submission");
+const { addSubmitToQueue } = require("../submitQueue");
 const createSubmission = asyncHanlder(async (req, res) => {
   if (
     !req.user._id ||
     !req.body.language ||
-    !req.body.code ||
     !req.body.problem ||
-    !req.body.token
+    !req.body.format ||
+    !req.body.code
   )
     throw new MissingFieldsError("Please login to submit your solution");
   const valid = await problemExists(mongoose.Types.ObjectId(req.body.problem));
@@ -29,11 +31,12 @@ const createSubmission = asyncHanlder(async (req, res) => {
     language: req.body.language,
     code: req.body.code,
     problem: req.body.problem,
-    token: req.body.token,
+    format: req.body.format,
   });
+  await addSubmitToQueue(rs._id);
   return res.status(200).json({
     status: rs ? "success" : "failure",
-    data: rs ? rs : "Submission failed",
+    data: rs ? "Submission successfully" : "Submission failed",
   });
 });
 

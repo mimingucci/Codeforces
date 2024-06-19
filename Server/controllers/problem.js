@@ -4,8 +4,6 @@ const {
   getById,
   getByAuthor,
   getByTag,
-  addTestCase,
-  deleteTestCase,
   deleteById,
   update,
   getAll,
@@ -14,10 +12,9 @@ const {
 const { tagExists, tagExistsByName } = require("../services/tag");
 const TagRepo = require("../repositories/tag");
 const tc = require("../repositories/testcase");
+const problemRepo = require("../repositories/problem");
 const { MissingFieldsError } = require("../errors/input");
 const { default: mongoose } = require("mongoose");
-const { userExists } = require("../services/user");
-const { UserNotFoundError } = require("../errors/user");
 const { problemExists } = require("../services/problem");
 const Problem = require("../models/problem");
 
@@ -37,6 +34,7 @@ const createProblem = asyncHandler(async (req, res) => {
     timelimit: req.body.timelimit,
     memorylimit: req.body.memorylimit,
     solution: req.body?.solution || "",
+    testcases: req.body?.testcases || [],
   });
   if (req.body.tags) {
     problem = await updateTags(problem._id, req.body.tags);
@@ -136,11 +134,10 @@ const createTestCase = asyncHandler(async (req, res) => {
   const id = req.query.id;
   if (!id || !req.body.input || !req.body.output)
     throw new MissingFieldsError("Missing fields");
-  let valid = true;
-  valid = await problemExists(mongoose.Types.ObjectId(id));
-  if (!valid) throw new Error(`Cannot find problem with id ${id}`);
-  const testcase = await tc.save(req.body);
-  const rs = await addTestCase(mongoose.Types.ObjectId(id), testcase._id);
+  const prob = await problemRepo.getById(mongoose.Types.ObjectId(id));
+  if (!prob) throw new Error(`Cannot find problem with id ${id}`);
+  prob.testcases.push({ input: req.body.input, output: req.body.output });
+  const rs = await prob.save();
   return res.json({
     status: rs ? "success" : "failure",
     data: rs ? rs : "Something went wrong",
@@ -159,6 +156,7 @@ const updateProblemById = asyncHandler(async (req, res) => {
   if (req.body.timelimit) data.timelimit = req.body.timelimit;
   if (req.body.memorylimit) data.memorylimit = req.body.memorylimit;
   if (req.body.solution) data.solution = req.body.solution;
+  if (req.body.testcases) data.testcases = [...req.body.testcases];
   let rs = await update(mongoose.Types.ObjectId(id), data);
   let tags = undefined;
   if (req.body.tags) {

@@ -10,6 +10,7 @@ services:
       - /app/node_modules
     links:
       - db
+      - redis
     depends_on:
       - db
 
@@ -31,6 +32,9 @@ services:
     volumes:
       - ./client:/app
       - /app/node_modules
+
+  redis:
+    image: redis:7.2.3-alpine    
 
 volumes:
   codeforces:                  
