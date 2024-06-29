@@ -2,12 +2,21 @@ version: '3.8'
 
 services:
   server:
-    build: ./server
+    build: ./Server
     ports:
       - 1234:1234
-    volumes:
-      - ./server:/app
-      - /app/node_modules
+    # volumes:
+    #   - ./server:/app
+    #   - /app/node_modules
+    develop:
+      watch: 
+        - action: sync
+          path: ./Server
+          target: /app
+          ignore:
+            - ./Server/node_modules/
+        - action: rebuild
+          path: ./Server/package.json
     links:
       - db
       - redis
@@ -26,7 +35,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=password   
 
   client:
-    build: ./client
+    build: ./Client
     ports:
       - 3000:3000
     volumes:
