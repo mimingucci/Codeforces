@@ -5,9 +5,9 @@ services:
     build: ./Server
     ports:
       - 1234:1234
-    # volumes:
-    #   - ./server:/app
-    #   - /app/node_modules
+    volumes:
+      - webdata:/volumes
+      - /app/node_modules
     develop:
       watch: 
         - action: sync
@@ -39,12 +39,13 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./client:/app
+      - webdata:/volumes
       - /app/node_modules
 
   redis:
     image: redis:7.2.3-alpine    
 
 volumes:
+  webdata:
   codeforces:                  
 
