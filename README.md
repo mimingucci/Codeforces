@@ -15,3 +15,7 @@ Because this project is still under development, so i also run it in local, i al
 ### Future goals:
 
 I want to implement contest features for contest organizations, Redux, or something useful ...
+
+# Update:
+
+- I will reconduct this project to microservices architecture, integrate with AI to help users solve problems, add more features ... this also means the project will be refactored and some features will be rewritten.
