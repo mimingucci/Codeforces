@@ -1,5 +1,6 @@
 package com.mimingucci.auth.common.util;
 
+import com.mimingucci.auth.common.enums.Role;
 import com.mimingucci.auth.domain.model.User;
 import com.mimingucci.auth.infrastructure.repository.UserRepositoryImpl;
 import io.jsonwebtoken.*;
@@ -20,14 +21,15 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
 public class JwtUtil {
-    @Value("${jwt.private-key-path}")
+    @Value("${jwt.private-key}")
     private String privateKeyPath;
 
-    @Value("${jwt.public-key-path}")
+    @Value("${jwt.public-key}")
     private String publicKeyPath;
 
     private final UserRepositoryImpl userRepository; // Inject UserRepository
@@ -59,9 +61,10 @@ public class JwtUtil {
     /**
      * Generates a JWT access token for the given email.
      */
-    public String generateAccessToken(String email) {
+    public String generateAccessToken(String email, Set<Role> roles) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
                 .signWith(privateKey, SignatureAlgorithm.RS256)

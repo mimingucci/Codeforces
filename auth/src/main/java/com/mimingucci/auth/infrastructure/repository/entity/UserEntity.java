@@ -22,6 +22,8 @@ public class UserEntity {
 
     private String email;
 
+    private String username;
+
     private String password;
 
     private Boolean enabled;
@@ -31,12 +33,9 @@ public class UserEntity {
     @Column(nullable = false, updatable = false, name = "created_at")
     private Instant createdAt; // UTC timestamp
 
-    @Column(nullable = false, length = 50, name = "time_zone")
-    private String timeZone;
-
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now(); // Set to current UTC time
-        this.enabled = false;
+        this.enabled = true;
     }
 }

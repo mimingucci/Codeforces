@@ -3,6 +3,7 @@ package com.mimingucci.auth.domain.model;
 import com.mimingucci.auth.common.enums.Role;
 import lombok.Data;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -13,7 +14,7 @@ public class User {
 
     private String password;
 
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     private Boolean enabled;
 
