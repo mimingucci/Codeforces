@@ -1,22 +1,38 @@
+server:
+    port: 8080
+
 spring:
-  cloud:
-    gateway:
-      routes:
-        - id: user-service
-          uri: http://user-service
-          predicates:
-            - Path=/users/**
-          filters:
-            - AuthFilter
+    main:
+        web-application-type: reactive
+    application:
+        name: api-gateway
+    cloud:
+        gateway:
+            routes:
+                -   id: user-service
+                    uri: http://user-service
+                    predicates:
+                        - Path=/users/**
+                    filters:
+                        - AuthFilter
 
-        - id: auth-service
-          uri: http://auth-service
-          predicates:
-            - Path=/auth/**
+                -   id: auth-service
+                    uri: http://auth-service
+                    predicates:
+                        - Path=/auth/**
 
-        - id: product-service
-          uri: http://product-service
-          predicates:
-            - Path=/products/**
-          filters:
-            - AuthFilter
+                -   id: product-service
+                    uri: http://product-service
+                    predicates:
+                        - Path=/products/**
+                    filters:
+                        - AuthFilter
+
+eureka:
+    client:
+        register-with-eureka: true
+        service-url:
+            defaultZone: http://localhost:8761/eureka/
+
+jwt:
+    public-key-path: /home/mimingucci/Work/Java/Codeforces/public-key.pem
