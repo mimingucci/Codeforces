@@ -7,12 +7,14 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.function.Predicate;
 
+@Component
 public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> {
     private final JwtUtil jwtUtil;
 
