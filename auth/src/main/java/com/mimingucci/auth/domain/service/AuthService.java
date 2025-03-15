@@ -1,5 +1,6 @@
 package com.mimingucci.auth.domain.service;
 
+import com.mimingucci.auth.presentation.dto.request.UserChangePasswordRequest;
 import com.mimingucci.auth.presentation.dto.request.UserForgotPasswordRequest;
 import com.mimingucci.auth.presentation.dto.request.UserLoginRequest;
 import com.mimingucci.auth.presentation.dto.request.UserRegisterRequest;
@@ -13,4 +14,6 @@ public interface AuthService {
     UserRegisterResponse register(UserRegisterRequest request);
 
     UserForgotPasswordResponse forgotPassword(UserForgotPasswordRequest request);
+
+    void changePassword(UserChangePasswordRequest request);
 }

@@ -4,6 +4,7 @@ import com.mimingucci.auth.common.enums.Role;
 import com.mimingucci.auth.domain.model.User;
 import com.mimingucci.auth.infrastructure.repository.entity.UserEntity;
 import com.mimingucci.auth.infrastructure.util.IdGenerator;
+import com.mimingucci.auth.presentation.dto.request.UserChangePasswordRequest;
 import com.mimingucci.auth.presentation.dto.request.UserForgotPasswordRequest;
 import com.mimingucci.auth.presentation.dto.request.UserLoginRequest;
 import com.mimingucci.auth.presentation.dto.request.UserRegisterRequest;
@@ -28,4 +29,6 @@ public abstract class UserAssembler {
     public abstract UserEntity toEntity(User domain);
 
     public abstract User forgotToDomain(UserForgotPasswordRequest request);
+
+    public abstract User changePasswordRequestToDomain(UserChangePasswordRequest request);
 }

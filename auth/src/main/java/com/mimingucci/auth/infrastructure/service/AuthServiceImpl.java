@@ -1,4 +1,4 @@
-package com.mimingucci.auth.domain.service.impl;
+package com.mimingucci.auth.infrastructure.service;
 
 import com.mimingucci.auth.common.constant.ErrorMessageConstants;
 import com.mimingucci.auth.common.constant.SuccessMessageConstants;
@@ -8,6 +8,8 @@ import com.mimingucci.auth.domain.assembler.UserAssembler;
 import com.mimingucci.auth.domain.model.User;
 import com.mimingucci.auth.domain.repository.UserRepository;
 import com.mimingucci.auth.domain.service.AuthService;
+import com.mimingucci.auth.domain.service.KafkaProducerService;
+import com.mimingucci.auth.presentation.dto.request.UserChangePasswordRequest;
 import com.mimingucci.auth.presentation.dto.request.UserForgotPasswordRequest;
 import com.mimingucci.auth.presentation.dto.request.UserLoginRequest;
 import com.mimingucci.auth.presentation.dto.request.UserRegisterRequest;
@@ -29,6 +31,8 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final KafkaProducerService producer;
 
     @Override
     public UserLoginResponse login(UserLoginRequest request) {
@@ -55,6 +59,7 @@ public class AuthServiceImpl implements AuthService {
         if (isExist) throw new ApiRequestException(ErrorMessageConstants.EMAIL_HAS_ALREADY_BEEN_TAKEN, HttpStatus.BAD_REQUEST);
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         User savedUser = this.userRepository.save(user);
+        this.producer.sendVerificationRegistrationEmail(savedUser.getEmail());
         return UserRegisterResponse.builder().done(Boolean.TRUE).message(SuccessMessageConstants.REGISTER_SUCCESS).build();
     }
 
@@ -63,9 +68,25 @@ public class AuthServiceImpl implements AuthService {
         User user = this.userAssembler.forgotToDomain(request);
         Boolean isExist = this.userRepository.existsByEmail(user.getEmail());
         if (isExist) throw new ApiRequestException(ErrorMessageConstants.EMAIL_HAS_ALREADY_BEEN_TAKEN, HttpStatus.BAD_REQUEST);
-        // put to kafka/rabbitmq
+        // put event to kafka
+        this.producer.sendChangingPasswordEmail(request.getEmail());
 
         return UserForgotPasswordResponse.builder().sentEmail(Boolean.TRUE).message(SuccessMessageConstants.SEND_EMAIL_SUCCESS).build();
+    }
+
+    @Override
+    public void changePassword(UserChangePasswordRequest request) {
+        User user = this.userAssembler.changePasswordRequestToDomain(request);
+        User queriedUser = this.userRepository.findByEmail(user.getEmail());
+
+        if (queriedUser == null) throw new ApiRequestException(ErrorMessageConstants.USER_NOT_FOUND, HttpStatus.BAD_REQUEST);
+
+        if (!queriedUser.getEnabled()) {
+            throw new ApiRequestException(ErrorMessageConstants.ACCOUNT_DISABLED, HttpStatus.LOCKED);
+        }
+
+        queriedUser.setPassword(this.passwordEncoder.encode(user.getPassword()));
+        this.userRepository.save(queriedUser);
     }
 
 }
