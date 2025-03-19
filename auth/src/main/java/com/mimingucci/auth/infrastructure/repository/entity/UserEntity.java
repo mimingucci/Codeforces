@@ -28,6 +28,8 @@ public class UserEntity {
 
     private Boolean enabled;
 
+    private Integer rating;
+
     private Set<Role> roles;
 
     @Column(nullable = false, updatable = false, name = "created_at")
@@ -37,5 +39,6 @@ public class UserEntity {
     protected void onCreate() {
         this.createdAt = Instant.now(); // Set to current UTC time
         this.enabled = true;
+        this.rating = 0;
     }
 }

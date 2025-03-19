@@ -1,6 +1,5 @@
 package com.mimingucci.auth.presentation.api;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.mimingucci.auth.presentation.dto.request.UserChangePasswordRequest;
 import com.mimingucci.auth.presentation.dto.request.UserForgotPasswordRequest;
 import com.mimingucci.auth.presentation.dto.request.UserLoginRequest;

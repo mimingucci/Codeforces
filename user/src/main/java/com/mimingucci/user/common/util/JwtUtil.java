@@ -1,7 +1,8 @@
 package com.mimingucci.user.common.util;
 
-import com.mimingucci.user.infrastructure.repository.entity.User;
-import com.mimingucci.user.infrastructure.repository.UserRepository;
+import com.mimingucci.user.common.exception.ApiRequestException;
+import com.mimingucci.user.domain.model.User;
+import com.mimingucci.user.domain.repository.UserRepository;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Optional;
 
 @Component
 public class JwtUtil {
@@ -155,14 +155,13 @@ public class JwtUtil {
             }
 
             // Query the database to check if the user exists
-            Optional<User> userOptional = this.userRepository.findByEmail(email);
-            if (userOptional.isEmpty()) {
-                return false; // User not found
+            try {
+                User user = this.userRepository.findByEmail(email);
+                return user.getEnabled();
+            } catch (ApiRequestException ex) {
+                return false;
             }
 
-            // Additional validation (e.g., check if user is active)
-            User user = userOptional.get();
-            return user.getEnabled(); // Example: Check if the user is active
         } catch (Exception e) {
             return false; // If any error occurs, consider the token invalid
         }
@@ -179,15 +178,7 @@ public class JwtUtil {
             String username = claims.getSubject();
 
             // Check if the refresh token matches the one stored in the database
-            Optional<User> userOptional = userRepository.findByUsername(username);
-            if (userOptional.isEmpty()) {
-                return null; // User not found
-            }
-
-            User user = userOptional.get();
-            if (!refreshToken.equals(user.getRefreshToken())) {
-                return null; // Refresh token does not match
-            }
+            User user = userRepository.findByUsername(username);
 
             // Check if the refresh token is expired
             if (isTokenExpired(refreshToken)) {
