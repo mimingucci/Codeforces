@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BlogAddAuthorEvent {
-    String email;
+    Long userId;
     Long blogId;
 }

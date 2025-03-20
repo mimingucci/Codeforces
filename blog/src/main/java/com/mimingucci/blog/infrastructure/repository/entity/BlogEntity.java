@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "blog")
@@ -24,24 +22,7 @@ public class BlogEntity {
     @Column(nullable = false)
     private String content;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "blog_id")
-    private List<TagEntity> tags = new ArrayList<>();
-
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "blog_id")
-    private List<UserEntity> likes = new ArrayList<>();
-
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "blog_id")
-    private List<UserEntity> dislikes = new ArrayList<>();
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "blog_id")
-    private List<UserEntity> comments = new ArrayList<>();
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    private UserEntity author;
+    private Long author;
 
     @Column(nullable = false, updatable = false, name = "created_at")
     private Instant createdAt; // UTC timestamp

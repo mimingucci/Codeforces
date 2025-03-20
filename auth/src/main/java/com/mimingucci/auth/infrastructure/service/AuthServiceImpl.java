@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
             throw new ApiRequestException(ErrorMessageConstants.INCORRECT_PASSWORD, HttpStatus.BAD_REQUEST);
         }
 
-        return UserLoginResponse.builder().token(this.jwtUtil.generateAccessToken(queriedUser.getEmail(), queriedUser.getRoles())).build();
+        return UserLoginResponse.builder().token(this.jwtUtil.generateAccessToken(queriedUser.getId(), queriedUser.getEmail(), queriedUser.getRoles())).build();
     }
 
     @Override

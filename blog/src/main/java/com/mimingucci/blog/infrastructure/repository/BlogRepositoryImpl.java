@@ -31,8 +31,7 @@ public class BlogRepositoryImpl implements BlogRepository {
     @Override
     public Blog createBlog(Blog blog) {
         BlogEntity entity = this.converter.toEntity(blog);
-
-        return null;
+        return this.converter.toDomain(this.blogJpaRepository.save(entity));
     }
 
     @Override

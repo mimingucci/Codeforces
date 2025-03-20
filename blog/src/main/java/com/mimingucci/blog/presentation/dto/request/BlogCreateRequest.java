@@ -12,5 +12,4 @@ public class BlogCreateRequest {
     private String content;
 
     private List<Integer> tags;
-
 }

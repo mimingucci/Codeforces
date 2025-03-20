@@ -61,9 +61,10 @@ public class JwtUtil {
     /**
      * Generates a JWT access token for the given email.
      */
-    public String generateAccessToken(String email, Set<Role> roles) {
+    public String generateAccessToken(Long id, String email, Set<Role> roles) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("id", id)
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours

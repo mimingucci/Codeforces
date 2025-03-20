@@ -1,4 +1,4 @@
-package com.mimingucci.blog.infrastructure.repository.entity;
+package com.mimingucci.comment.infrastructure.repository.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "comment")
@@ -23,16 +21,9 @@ public class CommentEntity {
     @Column(nullable = false)
     private String content;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "blog_id")
-    private List<UserEntity> likes = new ArrayList<>();
+    private Long author;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "blog_id")
-    private List<UserEntity> dislikes = new ArrayList<>();
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    private UserEntity author;
+    private Long blog;
 
     @Column(nullable = false, updatable = false, name = "created_at")
     private Instant createdAt; // UTC timestamp

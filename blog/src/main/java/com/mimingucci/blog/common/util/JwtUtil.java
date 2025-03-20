@@ -2,6 +2,7 @@ package com.mimingucci.blog.common.util;
 
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -76,6 +77,20 @@ public class JwtUtil {
     }
 
     /**
+     *
+     * @param token String
+     * @return Long
+     */
+    public Long extractId(String token) {
+        try {
+            Claims claims = validateToken(token);
+            return claims.get("id", Long.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * Extracts the expiration date from the token.
      */
     public Date extractExpiration(String token) {
@@ -96,5 +111,19 @@ public class JwtUtil {
         } catch (Exception e) {
             return null; // If token is invalid, return null
         }
+    }
+
+    public Claims extractClaimsFromHttpRequest(HttpServletRequest request) {
+        // Extract the JWT token from the Authorization header
+        final String authorizationHeader = request.getHeader("Authorization");
+
+        Claims claims = null;
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7); // Remove "Bearer " prefix
+            claims = this.extractAllClaims(token); // Extract email from the token
+        }
+
+        return claims;
     }
 }
