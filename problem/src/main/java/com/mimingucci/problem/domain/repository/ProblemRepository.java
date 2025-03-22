@@ -12,4 +12,6 @@ public interface ProblemRepository {
     Page<Problem> findProblems(Pageable pageable);
 
     Page<Problem> findProblemsByRating(Integer rating, Pageable pageable);
+
+    Problem updateProblem(Long id, Problem domain);
 }

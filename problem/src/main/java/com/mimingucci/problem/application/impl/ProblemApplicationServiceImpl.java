@@ -58,11 +58,11 @@ public class ProblemApplicationServiceImpl implements ProblemApplicationService 
 
     @Override
     public PageableResponse<ProblemResponse> getAllProblems(Pageable pageable) {
-        return null;
+        return this.assembler.pageToResponse(this.service.findAll(pageable));
     }
 
     @Override
     public PageableResponse<ProblemResponse> getAllProblemsByRating(Integer rating, Pageable pageable) {
-        return null;
+        return this.assembler.pageToResponse(this.service.findAllByRating(rating, pageable));
     }
 }

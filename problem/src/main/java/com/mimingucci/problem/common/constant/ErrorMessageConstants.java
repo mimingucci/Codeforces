@@ -13,4 +13,6 @@ public class ErrorMessageConstants {
 
     public static final String PROBLEM_NOT_FOUND = "Problem not found";
 
+    public static final String NOT_HAVE_PERMISSION = "You don't have permission to change problem";
+
 }
