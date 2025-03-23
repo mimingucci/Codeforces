@@ -30,6 +30,7 @@ hs_err_pid*
 # Python - FastAPI
 # ========================
 __pycache__/
+run/
 *.py[cod]
 *.so
 *.pyd
