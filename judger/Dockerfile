@@ -1,8 +1,13 @@
+# Use Ubuntu 24.04 as the base image
 FROM ubuntu:24.04 AS builder
+
 ARG TARGETARCH
 ARG TARGETVARIANT
-ENV DEBIAN_FRONTEND=noninteractive
+
 WORKDIR /app
+
+# Set environment variables to prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN --mount=type=cache,target=/var/cache/apt,id=apt-cahce-1-$TARGETARCH$TARGETVARIANT-builder,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,id=apt-cahce-2-$TARGETARCH$TARGETVARIANT-builder,sharing=locked \
@@ -16,7 +21,9 @@ apt-get update
 apt-get install -y libtool make cmake libseccomp-dev gcc python3 python3-venv
 EOS
 
-COPY Judger/ /app/
+# Copy the FastApi app files into the container
+COPY . /app/
+
 RUN <<EOS
 set -ex
 mkdir /app/build
@@ -37,7 +44,6 @@ ARG TARGETARCH
 ARG TARGETVARIANT
 
 ENV DEBIAN_FRONTEND=noninteractive
-# ENV JUDGER_WORKSPACE_BASE=/judger_run
 WORKDIR /app
 
 RUN --mount=type=cache,target=/var/cache/apt,id=apt-cahce-1-$TARGETARCH$TARGETVARIANT-final,sharing=locked \
@@ -96,24 +102,9 @@ RUN --mount=type=cache,target=/root/.cache/pip,id=pip-cahce-$TARGETARCH$TARGETVA
     <<EOS
 set -ex
 python3 -m venv .venv
-CC=gcc .venv/bin/pip3 install --compile --no-cache-dir flask gunicorn idna psutil requests
+CC=gcc .venv/bin/pip3 install --compile --no-cache-dir fastapi uvicorn pydantic idna psutil requests
 .venv/bin/pip3 install *.whl
 EOS
-
-COPY server/ /app/
-RUN <<EOS
-set -ex
-chmod -R u=rwX,go=rX /app/
-chmod +x /app/entrypoint.sh
-gcc -shared -fPIC -o unbuffer.so unbuffer.c
-useradd -u 901 -r -s /sbin/nologin -M compiler
-useradd -u 902 -r -s /sbin/nologin -M code
-useradd -u 903 -r -s /sbin/nologin -M -G code spj
-mkdir -p /usr/lib/judger
-EOS
-
-# RUN mkdir -p ${JUDGER_WORKSPACE_BASE} && \
-#     chmod 711 ${JUDGER_WORKSPACE_BASE}
 
 RUN <<EOS
 set -ex
@@ -124,6 +115,8 @@ java -version
 node --version
 EOS
 
-HEALTHCHECK --interval=5s CMD [ "/app/.venv/bin/python3", "/app/service.py" ]
-EXPOSE 9999
-ENTRYPOINT [ "/app/entrypoint.sh" ]
+# Expose port 8000 (or change if needed)
+EXPOSE 8000
+
+# Command to run FastAPI app
+CMD ["fastapi", "run", "/bindings/Python/api/main.py", "--port", "8000"]
