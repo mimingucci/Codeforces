@@ -1,29 +1,31 @@
-import os
 import sys
+import os
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+import _judger 
 import subprocess
 import logging
-import tempfile
-import hashlib
-import socket
-import psutil
+import uuid
 import shlex
+import shutil
 # import uvicorn
 # coding=utf-8
 from enum import Enum
 from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
-from pathlib import Path
+from languages import *
+from exception import JudgeServerException
+from util import server_info, get_hash_token
+from config import JUDGER_WORKSPACE_BASE, COMPILER_USER_UID, COMPILER_GROUP_GID, RUN_USER_UID, RUN_GROUP_GID, JUDGER_LOG_PATH
+from compiler import Compiler
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-import _judger 
 
 app = FastAPI()
-DEBUG = True
+DEBUG = os.environ.get("DEBUG_MODE") == "1"
 app.debug = DEBUG
 # Configure logging (this is required)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
 
 class Language(Enum):
     C = "C"
@@ -45,47 +47,105 @@ class CodeExecutionRequest(BaseModel):
     language: Language
 
 
-@app.get("/ping")
-async def ping():
-    return server_info()
+class InitSubmissionEnv(object):
+    def __init__(self, judger_workspace, submission_id):
+        self.work_dir = os.path.join(judger_workspace, submission_id)
+
+    def __enter__(self):
+        try:
+            os.mkdir(self.work_dir)
+            os.chown(self.work_dir, COMPILER_USER_UID, RUN_GROUP_GID)
+            os.chmod(self.work_dir, 0o711)
+        except Exception as e:
+            logging.exception(e)
+            raise JudgeServerException("failed to create runtime dir")
+        return self.work_dir
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if not DEBUG:
+            try:
+                shutil.rmtree(self.work_dir)
+            except Exception as e:
+                logging.exception(e)
+                raise logging("failed to clean runtime dir")
 
 
-@app.post("/judge")
-async def run_code(request: CodeExecutionRequest):
-    # logging.info("src", request.code)
-    compile_config = None
-    run_config = None
-    match request.language:
-        case Language.C:
-            compile_config = c_lang_config["compile"]
-            run_config = c_lang_config["run"]
-        case Language.CPP:
-            compile_config = cpp_lang_config["compile"]
-            run_config = cpp_lang_config["run"]
-        case Language.PY3:
-            compile_config = py3_lang_config["compile"]
-            run_config = py3_lang_config["run"]
-        case Language.JAVA:
-            compile_config = java_lang_config["compile"]
-            run_config = java_lang_config["run"]
-        case Language.PHP:
-            run_config = php_lang_config["run"]
-        case Language.GO:
-            compile_config = go_lang_config["compile"]
-            run_config = go_lang_config["run"]
-        case Language.JS:
-            run_config = js_lang_config["run"]
-        case _:
-            raise JudgeServerException("Unsupport language!")
-       
-    seccomp_rule = run_config["seccomp_rule"]    
-   
-    try:
-        # Create a temporary directory for execution
-        with tempfile.TemporaryDirectory() as tmpdir:
-            # Make sure tmpdir has proper permissions
-            os.chmod(tmpdir, 0o777)
-           
+class JudgeServer:
+    @classmethod
+    def ping(cls):
+        return server_info()
+
+
+    @classmethod
+    def judge(cls, request: CodeExecutionRequest):
+        compile_config = None
+        run_config = None
+        match request.language:
+            case Language.C:
+                compile_config = c_lang_config["compile"]
+                run_config = c_lang_config["run"]
+            case Language.CPP:
+                compile_config = cpp_lang_config["compile"]
+                run_config = cpp_lang_config["run"]
+            case Language.PY3:
+                compile_config = py3_lang_config["compile"]
+                run_config = py3_lang_config["run"]
+            case Language.JAVA:
+                compile_config = java_lang_config["compile"]
+                run_config = java_lang_config["run"]
+            case Language.PHP:
+                run_config = php_lang_config["run"]
+            case Language.GO:
+                compile_config = go_lang_config["compile"]
+                run_config = go_lang_config["run"]
+            case Language.JS:
+                run_config = js_lang_config["run"]
+            case _:
+                raise JudgeServerException("Unsupport language!")
+        
+        seccomp_rule = run_config["seccomp_rule"]    
+        submission_id = uuid.uuid4().hex
+        with InitSubmissionEnv(JUDGER_WORKSPACE_BASE, submission_id) as dirs: 
+            tmpdir = dirs
+            
+            # # Handle interpreted languages without compile step
+            # if compile_config is None:
+            #     src_name = run_config["exe_name"]
+            #     src_path = os.path.join(tmpdir, src_name)
+            #     exe_path = src_path
+                
+            #     # Write the source code to a file
+            #     with open(src_path, "w") as f:
+            #         f.write(request.code)
+                
+            #     # Make sure the file is executable
+            #     os.chmod(src_path, 0o755)
+            # else:
+            #     src_path = os.path.join(tmpdir, compile_config["src_name"])
+            #     exe_path = os.path.join(tmpdir, compile_config["exe_name"])
+
+            #     # Write the source code to a file
+            #     with open(src_path, "w") as f:
+            #         f.write(request.code)
+
+            #     os.chown(src_path, COMPILER_USER_UID, 0)
+            #     os.chmod(src_path, 0o400)
+
+            #     # compile source code, return exe file path
+            #     exe_path = Compiler().compile(compile_config=compile_config,
+            #                                   src_path=src_path,
+            #                                   output_dir=tmpdir,
+            #                                   time_limit=request.time_limit,
+            #                                   memory_limit=request.memory_limit)
+                
+            #     try:
+            #         # Java exe_path is SOME_PATH/Main, but the real path is SOME_PATH/Main.class
+            #         # We ignore it temporarily
+            #         os.chown(exe_path, RUN_USER_UID, 0)
+            #         os.chmod(exe_path, 0o500)
+            #     except Exception:
+            #         pass
+
             # Handle interpreted languages without compile step
             if compile_config is None:
                 src_name = run_config["exe_name"]
@@ -149,7 +209,7 @@ async def run_code(request: CodeExecutionRequest):
                 src_path=src_path  # Added for interpreted languages
             )
             run_args = shlex.split(run_command)
-           
+            
             # Log the command being executed for debugging
             logging.info(f"Running command: {run_command}")
             logging.info(f"Run args: {run_args}")
@@ -160,8 +220,8 @@ async def run_code(request: CodeExecutionRequest):
                 max_cpu_time=request.time_limit,
                 max_real_time=request.time_limit * 2,
                 max_memory=request.memory_limit,
-                max_stack=request.memory_limit,
-                max_output_size=100000,
+                max_stack=128 * 1024 * 1024,
+                max_output_size=1024 * 1024 * 16,
                 max_process_number=_judger.UNLIMITED,
                 exe_path=run_args[0],
                 input_path=input_path,
@@ -169,10 +229,10 @@ async def run_code(request: CodeExecutionRequest):
                 error_path=error_path,
                 args=run_args[1:],
                 env=run_config.get("env", []),
-                log_path="judger.log",
+                log_path=JUDGER_LOG_PATH,
                 seccomp_rule_name=seccomp_rule,
-                uid=0,  # Run as root
-                gid=0,  # Run as root
+                uid=RUN_USER_UID,  
+                gid=RUN_GROUP_GID, 
                 memory_limit_check_only=run_config.get("memory_limit_check_only", 0)
             )
 
@@ -194,7 +254,7 @@ async def run_code(request: CodeExecutionRequest):
                 if os.path.exists(error_path):
                     with open(error_path, "r") as f:
                         error_message = f.read()
-               
+                
                 error_reason = "Unknown Error"
                 if result["result"] == _judger.RESULT_CPU_TIME_LIMIT_EXCEEDED:
                     error_reason = "Time Limit Exceeded"
@@ -204,7 +264,7 @@ async def run_code(request: CodeExecutionRequest):
                     error_reason = "Memory Limit Exceeded"
                 elif result["result"] == _judger.RESULT_RUNTIME_ERROR:
                     error_reason = f"Runtime Error (Exit Code: {result['exit_code']})"
-               
+                
                 return {
                     "status": error_reason,
                     "error": error_message,
@@ -220,11 +280,17 @@ async def run_code(request: CodeExecutionRequest):
                     "expected": request.output.strip(),
                     "actual": actual_output
                 }
-
-    except Exception as e:
-        logging.exception("Error during code execution")
-        return {"status": "Error", "error": str(e)}
     
+
+@app.get("/ping")
+async def ping():
+    return JudgeServer.ping()
+
+
+@app.post("/judge")
+async def judge(request: CodeExecutionRequest):
+    return JudgeServer.judge(request)
+
 
 @app.middleware("http")
 async def check_token_middleware(request: Request, call_next):
@@ -240,129 +306,6 @@ async def check_token_middleware(request: Request, call_next):
     # Continue processing the request
     response = await call_next(request)
     return response
-
-
-default_env = ["LANG=en_US.UTF-8", "LANGUAGE=en_US:en", "LC_ALL=en_US.UTF-8"]
-
-c_lang_config = {
-    "compile": {
-        "src_name": "main.c",
-        "exe_name": "main",
-        "compile_command": "/usr/bin/gcc -DONLINE_JUDGE -O2 -w -fmax-errors=3 -std=c11 {src_path} -lm -o {exe_path}",
-    },
-    "run": {
-        "command": "{exe_path}",
-        "seccomp_rule": "c_cpp",
-        "env": []
-    }
-}
-
-cpp_lang_config = {
-    "compile": {
-        "src_name": "main.cpp",
-        "exe_name": "main",
-        "compile_command": "/usr/bin/g++ -DONLINE_JUDGE -O2 -w -fmax-errors=3 -std=c++20 {src_path} -lm -o {exe_path}",
-    },
-    "run": {
-        "command": "{exe_path}",
-        "seccomp_rule": "c_cpp",
-        "env": []
-    }
-}
-
-java_lang_config = {
-    "compile": {
-        "src_name": "Main.java",
-        "exe_name": "Main",
-        "compile_command": "/usr/bin/javac {src_path} -d {exe_dir} -encoding UTF8"
-    },
-    "run": {
-        "command": "/usr/bin/java -cp {exe_dir} -XX:MaxRAM={max_memory}k -Dfile.encoding=UTF-8 -Djava.awt.headless=true Main",
-        "seccomp_rule": None,
-        "env": default_env,
-        "memory_limit_check_only": 1
-    }
-}
-
-py3_lang_config = {
-    "compile": {
-        "src_name": "solution.py",
-        "exe_name": "__pycache__/solution.cpython-312.pyc",
-        "compile_command": "/usr/bin/python3 -m py_compile {src_path}",
-    },
-    "run": {
-        "command": "/usr/bin/python3 {src_path}", # Use source directly as Python 3.12 caching might differ
-        "seccomp_rule": "general",
-        "env": ["PYTHONIOENCODING=UTF-8"] + default_env
-    }
-}
-
-go_lang_config = {
-    "compile": {
-        "src_name": "main.go",
-        "exe_name": "main",
-        "compile_command": "/usr/bin/go build -o {exe_path} {src_path}",
-        "env": ["GOCACHE=/tmp", "GOPATH=/tmp/go"]
-    },
-    "run": {
-        "command": "{exe_path}",
-        "seccomp_rule": "general", # Using "general" instead of empty string for better security
-        "env": ["GODEBUG=madvdontneed=1", "GOCACHE=off"] + default_env,
-        "memory_limit_check_only": 1
-    }
-}
-
-php_lang_config = {
-    "run": {
-        "exe_name": "solution.php",
-        "command": "/usr/bin/php {exe_path}",
-        "seccomp_rule": "general",
-        "env": [],
-        "memory_limit_check_only": 1
-    }
-}
-
-js_lang_config = {
-    "run": {
-        "exe_name": "solution.js",
-        "command": "/usr/bin/node {exe_path}",
-        "seccomp_rule": "general",
-        "env": ["NODE_OPTIONS=--no-warnings", "NO_COLOR=true"] + default_env,
-        "memory_limit_check_only": 1
-    }
-}
-
-
-class JudgeServerException(Exception):
-    def __init__(self, message):
-        super().__init__()
-        self.message = message
-
-
-def server_info():
-    ver = _judger.VERSION
-    return {"hostname": socket.gethostname(),
-            "cpu": psutil.cpu_percent(),
-            "cpu_core": psutil.cpu_count(),
-            "memory": psutil.virtual_memory().percent,
-            "judger_version": ".".join([str((ver >> 16) & 0xff), str((ver >> 8) & 0xff), str(ver & 0xff)])}
-
-
-def get_token() -> str:
-    token = 'toivaban12345' # os.environ.get("TOKEN")
-    if token:
-        return token
-    else:
-        raise JudgeServerException("env 'TOKEN' not found")
-
-
-def get_hash_token() -> str:
-    return hashlib.sha256(get_token().encode("utf-8")).hexdigest()
-
-
-class ProblemIOMode:
-    standard = "Standard IO"
-    file = "File IO"
 
 
 if DEBUG:

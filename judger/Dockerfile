@@ -55,12 +55,11 @@ RUN apt-get update && \
         python3.12 \
         python3.12-venv \
         python3.12-dev \
-        default-jdk \
+        openjdk-21-jdk \
         gcc-13 \
         g++-13 \
         nodejs \
-        php \
-        php-cli \
+        php8.3 \
         strace \
         lsof \
         procps && \
@@ -74,7 +73,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Create necessary directories
-RUN mkdir -p /usr/lib/judger /app/bindings/Python/api /judger /tmp
+RUN mkdir -p /usr/lib/judger /app/bindings/Python/api /judger /submission
 
 # Copy built files from the builder stage with correct permissions
 COPY --from=builder --chmod=755 /app/output/libjudger.so /usr/lib/judger/libjudger.so
@@ -85,7 +84,7 @@ COPY --from=builder /app/bindings/Python/dist/ /app/
 RUN chmod 755 /usr/lib/judger/libjudger.so && \
     chmod -R 755 /app/bindings && \
     chmod -R 777 /judger && \
-    chmod -R 777 /tmp
+    chmod -R 777 /submission
 
 # Install Python dependencies
 RUN python3 -m venv .venv && \
@@ -95,6 +94,12 @@ RUN python3 -m venv .venv && \
     touch /app/bindings/__init__.py && \
     touch /app/bindings/Python/__init__.py && \
     touch /app/bindings/Python/api/__init__.py
+
+RUN <<EOS
+    set -ex
+    useradd -u 901 -r -s /sbin/nologin -M compiler
+    useradd -u 902 -r -s /sbin/nologin -M runner
+EOS
 
 # Expose port 8000
 EXPOSE 8000

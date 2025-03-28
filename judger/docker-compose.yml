@@ -22,6 +22,7 @@ services:
     environment:
       BACKEND_URL: "http://backend:80/api/judge_server_heartbeat"
       SERVICE_URL: "http://judge-server:12358"
-      TOKEN: "YOUR_TOKEN_HERE"
+      TOKEN: "toivaban12345"
+      DEBUG_MODE: "1"
     ports:
       - "8000:8000"
