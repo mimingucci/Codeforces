@@ -1,6 +1,7 @@
 package com.mimingucci.contest.infrastructure.repository;
 
 import com.mimingucci.contest.common.constant.ErrorMessageConstants;
+import com.mimingucci.contest.common.enums.Role;
 import com.mimingucci.contest.common.exception.ApiRequestException;
 import com.mimingucci.contest.domain.model.Contest;
 import com.mimingucci.contest.domain.repository.ContestRepository;
@@ -9,10 +10,14 @@ import com.mimingucci.contest.infrastructure.repository.entity.ContestEntity;
 import com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType;
 import com.mimingucci.contest.infrastructure.repository.jpa.ContestJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +33,11 @@ public class ContestRepositoryImpl implements ContestRepository {
     }
 
     @Override
-    public Contest updateContest(Long id, Contest contest) {
+    public Contest updateContest(Long userId, Set<Role> roles, Long id, Contest contest) {
         Optional<ContestEntity> optional = this.contestJpaRepository.findById(id);
         if (optional.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
         ContestEntity entity = optional.get();
+        if (!entity.getAuthors().contains(userId) && !roles.contains(Role.ADMIN) && !roles.contains(Role.SUPER_ADMIN)) throw new ApiRequestException(ErrorMessageConstants.NOT_PERMISSION, HttpStatus.FORBIDDEN);
         if (contest.getStartTime() != null) entity.setStartTime(contest.getStartTime());
         if (contest.getEndTime() != null) entity.setEndTime(contest.getEndTime());
         if (contest.getName() != null) entity.setName(contest.getName());
@@ -46,8 +52,11 @@ public class ContestRepositoryImpl implements ContestRepository {
     }
 
     @Override
-    public Boolean deleteContest(Long id) {
-        if (!this.contestJpaRepository.existsById(id)) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
+    public Boolean deleteContest(Long userId, Set<Role> roles, Long id) {
+        Optional<ContestEntity> optional = this.contestJpaRepository.findById(id);
+        if (optional.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
+        ContestEntity entity = optional.get();
+        if (!entity.getAuthors().contains(userId) && !roles.contains(Role.ADMIN) && !roles.contains(Role.SUPER_ADMIN)) throw new ApiRequestException(ErrorMessageConstants.NOT_PERMISSION, HttpStatus.FORBIDDEN);
         this.contestJpaRepository.deleteById(id);
         return true;
     }
@@ -57,5 +66,18 @@ public class ContestRepositoryImpl implements ContestRepository {
         Optional<ContestEntity> optional = this.contestJpaRepository.findById(id);
         if (optional.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
         return this.converter.toDomain(optional.get());
+    }
+
+    @Override
+    public Contest getStaredContestById(Long id) {
+        Instant now = Instant.now();
+        ContestEntity entity = contestJpaRepository.findByIdAndStartTimeLessThanEqual(id, now);
+        if (entity == null) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
+        return this.converter.toDomain(entity);
+    }
+
+    @Override
+    public Page<Contest> getListContests(String name, Pageable pageable) {
+        return this.converter.listToDomain(this.contestJpaRepository.findByNameContainingIgnoreCase(name, pageable));
     }
 }

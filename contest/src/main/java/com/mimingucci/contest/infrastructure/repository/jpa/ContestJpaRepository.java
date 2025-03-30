@@ -26,4 +26,6 @@ public interface ContestJpaRepository extends JpaRepository<ContestEntity, Long>
 
     Page<ContestEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
+    // Find a contest by ID where the startTime is less than or equal to current time
+    ContestEntity findByIdAndStartTimeLessThanEqual(Long id, Instant currentTime);
 }

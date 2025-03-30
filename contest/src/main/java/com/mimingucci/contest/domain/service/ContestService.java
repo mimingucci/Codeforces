@@ -1,4 +1,4 @@
-package com.mimingucci.contest.domain.repository;
+package com.mimingucci.contest.domain.service;
 
 import com.mimingucci.contest.common.enums.Role;
 import com.mimingucci.contest.domain.model.Contest;
@@ -7,12 +7,14 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Set;
 
-public interface ContestRepository {
+public interface ContestService {
     Contest createContest(Contest contest);
+
     Contest updateContest(Long userId, Set<Role> roles, Long id, Contest contest);
+
     Boolean deleteContest(Long userId, Set<Role> roles, Long id);
+
     Contest getContest(Long id);
-    Contest getStaredContestById(Long id);
 
     Page<Contest> getListContests(String name, Pageable pageable);
 }

@@ -1,5 +1,6 @@
 package com.mimingucci.contest.common.interceptor;
 
+import com.mimingucci.contest.common.enums.Role;
 import com.mimingucci.contest.common.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -32,7 +36,15 @@ public class JwtAuthenticationInterceptor implements HandlerInterceptor {
             // If validation successful, store claims in request attributes for later use in controllers
             request.setAttribute("userId", claims.get("id", Long.class));
             request.setAttribute("userEmail", claims.getSubject());
-            
+            // Get the roles claim as a List
+            List<String> roleNames = claims.get("roles", List.class);
+
+            // Convert role names to Role enum values
+            request.setAttribute("userRoles", roleNames.stream()
+                    .map(Role::valueOf)
+                    .collect(Collectors.toSet()));
+
+
             return true;
         } catch (Exception e) {
             log.error("JWT Authentication failed: {}", e.getMessage());

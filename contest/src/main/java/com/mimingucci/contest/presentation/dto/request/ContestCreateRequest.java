@@ -12,26 +12,28 @@ import java.time.Instant;
 
 @Data
 @ValidTimeRange(message = ErrorMessageConstants.INVALID_TIME_RANGE)
-public class ContestRequest {
+public class ContestCreateRequest {
     @NotNull
     @NotBlank
     private String name;
 
+    @NotNull
     private Instant startTime;
 
+    @NotNull
     private Instant endTime;
 
     private Boolean enabled = true;
 
     private Boolean isPublic = true;
 
-    private ContestType type;
+    private ContestType type = ContestType.NORMAL;
 
     @NotNull
     @NotEmpty
-    private Long[] authors;
+    private Long[] authors = new Long[0];
 
-    private Long[] testers;
+    private Long[] testers = new Long[0];
 
-    private Long[] coordinators;
+    private Long[] coordinators = new Long[0];
 }
