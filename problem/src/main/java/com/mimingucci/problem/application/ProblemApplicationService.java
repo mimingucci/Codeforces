@@ -7,6 +7,8 @@ import com.mimingucci.problem.presentation.dto.response.ProblemResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface ProblemApplicationService {
     ProblemResponse createProblem(ProblemCreateRequest request, HttpServletRequest httpServletRequest);
 
@@ -17,4 +19,6 @@ public interface ProblemApplicationService {
     PageableResponse<ProblemResponse> getAllProblems(Pageable pageable);
 
     PageableResponse<ProblemResponse> getAllProblemsByRating(Integer rating, Pageable pageable);
+
+    List<ProblemResponse> getAllProblemsByContestId(Long contestId);
 }

@@ -2,7 +2,6 @@ package com.mimingucci.problem.infrastructure.repository.entity;
 
 import com.mimingucci.problem.common.constant.ValidProblemRating;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -35,6 +34,9 @@ public class ProblemEntity {
     private Long author;
 
     private String solution;
+
+    @NotNull
+    private Long contest;
 
     @NotNull
     @Column(name = "time_limit", nullable = false)

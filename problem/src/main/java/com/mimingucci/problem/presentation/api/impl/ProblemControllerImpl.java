@@ -15,17 +15,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(path = PathConstants.API_V1_PROBLEM)
 @RequiredArgsConstructor
 public class ProblemControllerImpl implements ProblemController {
     private final ProblemApplicationService problemApplicationService;
-
-    @GetMapping(path = PathConstants.PROBLEM_ID)
-    @Override
-    public BaseResponse<ProblemResponse> getProblemById(@PathVariable("problemId") Long problemId) {
-        return BaseResponse.success(this.problemApplicationService.getProblemById(problemId));
-    }
 
     @PostMapping
     @Override
@@ -33,16 +29,28 @@ public class ProblemControllerImpl implements ProblemController {
         return BaseResponse.success(this.problemApplicationService.createProblem(request, httpServletRequest));
     }
 
-    @PutMapping(path = PathConstants.PROBLEM_ID)
-    @Override
-    public BaseResponse<ProblemResponse> updateProblem(@PathVariable("problemId") Long id, @RequestBody @Validated ProblemUpdateRequest request, HttpServletRequest httpServletRequest) {
-        return BaseResponse.success(this.problemApplicationService.updateProblem(id, request, httpServletRequest));
-    }
-
     @GetMapping(path = PathConstants.ALL)
     @Override
     public BaseResponse<PageableResponse<ProblemResponse>> getAllProblems(@RequestParam(name = "rating", required = false) @ValidProblemRating Integer rating, Pageable pageable) {
         if (rating == null) return BaseResponse.success(this.problemApplicationService.getAllProblems(pageable));
         return BaseResponse.success(this.problemApplicationService.getAllProblemsByRating(rating, pageable));
+    }
+
+    @GetMapping(path = PathConstants.CONTEST + PathConstants.CONTEST_ID)
+    @Override
+    public BaseResponse<List<ProblemResponse>> getAllProblemsByContestId(@PathVariable(name = "contestId") Long contestId) {
+        return BaseResponse.success(this.problemApplicationService.getAllProblemsByContestId(contestId));
+    }
+
+    @GetMapping(path = PathConstants.PROBLEM_ID)
+    @Override
+    public BaseResponse<ProblemResponse> getProblemById(@PathVariable(name = "problemId") Long problemId) {
+        return BaseResponse.success(this.problemApplicationService.getProblemById(problemId));
+    }
+
+    @PutMapping(path = PathConstants.PROBLEM_ID)
+    @Override
+    public BaseResponse<ProblemResponse> updateProblem(@PathVariable(name = "problemId") Long id, @RequestBody @Validated ProblemUpdateRequest request, HttpServletRequest httpServletRequest) {
+        return BaseResponse.success(this.problemApplicationService.updateProblem(id, request, httpServletRequest));
     }
 }

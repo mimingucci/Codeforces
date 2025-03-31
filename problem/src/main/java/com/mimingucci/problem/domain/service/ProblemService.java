@@ -4,6 +4,8 @@ import com.mimingucci.problem.domain.model.Problem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface ProblemService {
     Problem createProblem(Problem domain);
 
@@ -14,4 +16,6 @@ public interface ProblemService {
     Page<Problem> findAll(Pageable pageable);
 
     Page<Problem> findAllByRating(Integer rating, Pageable pageable);
+
+    List<Problem> findAllByContest(Long contest);
 }

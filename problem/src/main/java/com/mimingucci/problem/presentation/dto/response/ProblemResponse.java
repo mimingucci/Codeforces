@@ -19,6 +19,8 @@ public class ProblemResponse {
 
     String solution;
 
+    Long contest;
+
     Long timeLimit = 1000L;
 
     Long memoryLimit = 512000L;

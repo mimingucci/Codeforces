@@ -18,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ProblemApplicationServiceImpl implements ProblemApplicationService {
@@ -64,5 +66,10 @@ public class ProblemApplicationServiceImpl implements ProblemApplicationService 
     @Override
     public PageableResponse<ProblemResponse> getAllProblemsByRating(Integer rating, Pageable pageable) {
         return this.assembler.pageToResponse(this.service.findAllByRating(rating, pageable));
+    }
+
+    @Override
+    public List<ProblemResponse> getAllProblemsByContestId(Long contestId) {
+        return this.service.findAllByContest(contestId).stream().map(this.assembler::domainToResponse).toList();
     }
 }

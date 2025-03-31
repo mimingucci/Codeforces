@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -61,5 +62,10 @@ public class ProblemRepositoryImpl implements ProblemRepository {
         if (domain.getMemoryLimit() != null) entity.setMemoryLimit(domain.getMemoryLimit());
         if (domain.getTimeLimit() != null) entity.setTimeLimit(domain.getTimeLimit());
         return this.converter.toDomain(this.jpaRepository.save(entity));
+    }
+
+    @Override
+    public List<Problem> findAllProblemsByContest(Long contest) {
+        return this.jpaRepository.findAllProblemsByContest(contest).stream().map(this.converter::toDomain).toList();
     }
 }

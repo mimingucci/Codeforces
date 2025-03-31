@@ -8,6 +8,8 @@ import com.mimingucci.problem.presentation.dto.response.ProblemResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface ProblemController {
     BaseResponse<ProblemResponse> getProblemById(Long id);
 
@@ -16,4 +18,6 @@ public interface ProblemController {
     BaseResponse<ProblemResponse> updateProblem(Long id, ProblemUpdateRequest request, HttpServletRequest httpServletRequest);
 
     BaseResponse<PageableResponse<ProblemResponse>> getAllProblems(Integer rating, Pageable pageable);
+
+    BaseResponse<List<ProblemResponse>> getAllProblemsByContestId(Long contestId);
 }

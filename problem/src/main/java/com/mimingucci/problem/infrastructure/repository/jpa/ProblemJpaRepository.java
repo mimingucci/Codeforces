@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface ProblemJpaRepository extends JpaRepository<ProblemEntity, Long> {
     @Query("""
             SELECT problem
@@ -30,4 +32,12 @@ public interface ProblemJpaRepository extends JpaRepository<ProblemEntity, Long>
             ORDER BY problem.createdAt desc
             """)
     Page<ProblemEntity> findProblemsByAuthor(@Param("author") Long author, Pageable pageable);
+
+    @Query("""
+        SELECT problem
+        FROM Problem problem
+        WHERE problem.contest = :contest
+        ORDER BY problem.createdAt asc
+        """)
+    List<ProblemEntity> findAllProblemsByContest(@Param("contest") Long contest);
 }

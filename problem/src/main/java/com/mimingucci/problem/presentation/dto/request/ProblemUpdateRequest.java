@@ -17,6 +17,8 @@ public class ProblemUpdateRequest {
 
     Long memoryLimit = 512000L;
 
+    Long contest;
+
     Integer rating;
 
     Integer score;
