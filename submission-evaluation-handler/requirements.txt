@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+aiokafka  
+python-dotenv
+pydantic
+pydantic_settings 
+py_eureka_client
+circuitbreaker
