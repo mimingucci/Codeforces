@@ -1,5 +1,7 @@
 package com.mimingucci.submission.domain.service.impl;
 
+import com.mimingucci.submission.domain.broker.producer.JudgeSubmissionProducer;
+import com.mimingucci.submission.domain.event.JudgeSubmissionEvent;
 import com.mimingucci.submission.domain.model.Submission;
 import com.mimingucci.submission.domain.repository.SubmissionRepository;
 import com.mimingucci.submission.domain.service.SubmissionService;
@@ -13,9 +15,13 @@ import org.springframework.stereotype.Service;
 public class SubmissionServiceImpl implements SubmissionService {
     private final SubmissionRepository repository;
 
+    private final JudgeSubmissionProducer producer;
+
     @Override
     public Submission createSubmission(Submission submission) {
-        return repository.save(submission);
+        Submission domain = repository.save(submission);
+        producer.sendSubmissionToJudge(new JudgeSubmissionEvent(domain.getId(), domain.getProblem(), domain.getSourceCode()));
+        return domain;
     }
 
     @Override

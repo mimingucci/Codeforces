@@ -1,6 +1,7 @@
 package com.mimingucci.submission.infrastructure.repository;
 
 import com.mimingucci.submission.common.constant.ErrorMessageConstants;
+import com.mimingucci.submission.common.enums.SubmissionVerdict;
 import com.mimingucci.submission.common.exception.ApiRequestException;
 import com.mimingucci.submission.domain.model.Submission;
 import com.mimingucci.submission.domain.repository.SubmissionRepository;
@@ -21,20 +22,19 @@ import java.time.Instant;
 public class SubmissionRepositoryImpl implements SubmissionRepository {
     private final SubmissionJpaRepository jpaRepository;
 
-    private final SubmissionConverter converter;
-
     @Override
     public Submission save(Submission submission) {
-        SubmissionEntity entity = converter.toEntity(submission);
+        SubmissionEntity entity = SubmissionConverter.INSTANCE.toEntity(submission);
         entity.setId(IdGenerator.INSTANCE.nextId());
         entity.setSent(Instant.now());
-        return converter.toDomain(jpaRepository.save(entity));
+        entity.setVerdict(SubmissionVerdict.IN_QUEUE);
+        return SubmissionConverter.INSTANCE.toDomain(jpaRepository.save(entity));
     }
 
     @Override
     public Submission findById(Long id) {
         SubmissionEntity entity = jpaRepository.findById(id).orElseThrow(() -> new ApiRequestException(ErrorMessageConstants.SUBMISSION_NOT_FOUND, HttpStatus.NOT_FOUND));
-        return converter.toDomain(entity);
+        return SubmissionConverter.INSTANCE.toDomain(entity);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class SubmissionRepositoryImpl implements SubmissionRepository {
     @Override
     public Page<Submission> findAllByUserId(Long userId, Pageable pageable) {
         Page<SubmissionEntity> page = jpaRepository.findByAuthor(userId, pageable);
-        return page.map(this.converter::toDomain);
+        return page.map(SubmissionConverter.INSTANCE::toDomain);
     }
 
     @Override
@@ -55,6 +55,6 @@ public class SubmissionRepositoryImpl implements SubmissionRepository {
             entity.setJudged(Instant.now());
             entity.setVerdict(submission.getVerdict());
         }
-        return converter.toDomain(jpaRepository.save(entity));
+        return SubmissionConverter.INSTANCE.toDomain(jpaRepository.save(entity));
     }
 }

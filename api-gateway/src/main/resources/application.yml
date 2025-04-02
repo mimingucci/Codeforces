@@ -17,6 +17,10 @@ spring:
                     uri: lb://auth
                     predicates:
                         - Path=/api/v1/auth/**
+                -   id: submission
+                    uri: lb://submission
+                    predicates:
+                        - Path=/api/v1/submission/**
 
 eureka:
     client:
