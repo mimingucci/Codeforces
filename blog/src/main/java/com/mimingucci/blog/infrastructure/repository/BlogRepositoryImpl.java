@@ -19,19 +19,17 @@ public class BlogRepositoryImpl implements BlogRepository {
 
     private final BlogJpaRepository blogJpaRepository;
 
-    private final BlogConverter converter;
-
     @Override
     public Blog findById(Long id) {
         Optional<BlogEntity> entity = this.blogJpaRepository.findById(id);
         if (entity.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.BLOG_NOT_FOUND, HttpStatus.NOT_FOUND);
-        return this.converter.toDomain(entity.get());
+        return BlogConverter.INSTANCE.toDomain(entity.get());
     }
 
     @Override
     public Blog createBlog(Blog blog) {
-        BlogEntity entity = this.converter.toEntity(blog);
-        return this.converter.toDomain(this.blogJpaRepository.save(entity));
+        BlogEntity entity = BlogConverter.INSTANCE.toEntity(blog);
+        return BlogConverter.INSTANCE.toDomain(this.blogJpaRepository.save(entity));
     }
 
     @Override

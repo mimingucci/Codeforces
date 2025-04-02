@@ -13,13 +13,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserApplicationServiceImpl implements UserApplicationService {
-    private final UserAssembler userAssembler;
 
     private final UserService userService;
 
     @Override
     public UserUpdateResponse updateProfile(UserUpdateRequest request) {
-        User updatedUser = this.userService.updateUserInfo(this.userAssembler.regToDomain(request));
+        User updatedUser = this.userService.updateUserInfo(UserAssembler.INSTANCE.regToDomain(request));
         return new UserUpdateResponse(updatedUser);
     }
 

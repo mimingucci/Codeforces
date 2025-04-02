@@ -22,31 +22,29 @@ import java.util.Optional;
 public class ProblemRepositoryImpl implements ProblemRepository {
     private final ProblemJpaRepository jpaRepository;
 
-    private final ProblemConverter converter;
-
     @Override
     public Problem findById(Long id) {
         Optional<ProblemEntity> optional = this.jpaRepository.findById(id);
         if (optional.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
-        return this.converter.toDomain(optional.get());
+        return ProblemConverter.INSTANCE.toDomain(optional.get());
     }
 
     @Override
     public Problem createProblem(Problem domain) {
         domain.setId(IdGenerator.INSTANCE.nextId());
-        return this.converter.toDomain(this.jpaRepository.save(this.converter.toEntity(domain)));
+        return ProblemConverter.INSTANCE.toDomain(this.jpaRepository.save(ProblemConverter.INSTANCE.toEntity(domain)));
     }
 
     @Override
     public Page<Problem> findProblems(Pageable pageable) {
         Page<ProblemEntity> entities = this.jpaRepository.findProblems(pageable);
-        return entities.map(this.converter::toDomain);
+        return entities.map(ProblemConverter.INSTANCE::toDomain);
     }
 
     @Override
     public Page<Problem> findProblemsByRating(Integer rating, Pageable pageable) {
         Page<ProblemEntity> entities = this.jpaRepository.findProblemsByRating(rating, pageable);
-        return entities.map(this.converter::toDomain);
+        return entities.map(ProblemConverter.INSTANCE::toDomain);
     }
 
     @Override
@@ -61,11 +59,11 @@ public class ProblemRepositoryImpl implements ProblemRepository {
         if (domain.getTitle() != null) entity.setTitle(domain.getTitle());
         if (domain.getMemoryLimit() != null) entity.setMemoryLimit(domain.getMemoryLimit());
         if (domain.getTimeLimit() != null) entity.setTimeLimit(domain.getTimeLimit());
-        return this.converter.toDomain(this.jpaRepository.save(entity));
+        return ProblemConverter.INSTANCE.toDomain(this.jpaRepository.save(entity));
     }
 
     @Override
     public List<Problem> findAllProblemsByContest(Long contest) {
-        return this.jpaRepository.findAllProblemsByContest(contest).stream().map(this.converter::toDomain).toList();
+        return this.jpaRepository.findAllProblemsByContest(contest).stream().map(ProblemConverter.INSTANCE::toDomain).toList();
     }
 }

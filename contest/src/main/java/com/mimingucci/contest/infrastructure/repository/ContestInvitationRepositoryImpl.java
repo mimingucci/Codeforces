@@ -16,11 +16,9 @@ import org.springframework.stereotype.Service;
 public class ContestInvitationRepositoryImpl implements ContestInvitationRepository {
     private final ContestInvitationJpaRepository contestInvitationJpaRepository;
 
-    private final ContestInvitationConverter converter;
-
     @Override
     public ContestInvitation invite(ContestInvitation contestInvitation) {
-        return this.converter.toDomain(this.contestInvitationJpaRepository.save(this.converter.toEntity(contestInvitation)));
+        return ContestInvitationConverter.INSTANCE.toDomain(this.contestInvitationJpaRepository.save(ContestInvitationConverter.INSTANCE.toEntity(contestInvitation)));
     }
 
     @Override

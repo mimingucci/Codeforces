@@ -18,18 +18,14 @@ import org.springframework.stereotype.Service;
 public class ContestRegistrationRepositoryImpl implements ContestRegistrationRepository {
     private final ContestRegistrationJpaRepository contestRegistrationJpaRepository;
 
-    private final ContestRegistrationConverter converter;
-
-    private final ContestRegistrationIdConverter idConverter;
-
     @Override
     public Boolean hasRegistered(ContestRegistrationId contestRegistrationId) {
-        return this.contestRegistrationJpaRepository.existsById(this.idConverter.toEntity(contestRegistrationId));
+        return this.contestRegistrationJpaRepository.existsById(ContestRegistrationIdConverter.INSTANCE.toEntity(contestRegistrationId));
     }
 
     @Override
     public ContestRegistration register(ContestRegistration contestRegistration) {
-        return this.converter.toDomain(this.contestRegistrationJpaRepository.save(this.converter.toEntity(contestRegistration)));
+        return ContestRegistrationConverter.INSTANCE.toDomain(this.contestRegistrationJpaRepository.save(ContestRegistrationConverter.INSTANCE.toEntity(contestRegistration)));
     }
 
     @Override
@@ -39,13 +35,13 @@ public class ContestRegistrationRepositoryImpl implements ContestRegistrationRep
         if (contestRegistration.getParticipated() != null)
             entity.setParticipated(contestRegistration.getParticipated());
         ContestRegistrationEntity updatedEntity = this.contestRegistrationJpaRepository.save(entity);
-        return this.converter.toDomain(updatedEntity);
+        return ContestRegistrationConverter.INSTANCE.toDomain(updatedEntity);
     }
 
     @Override
     public Boolean deleteRegistration(ContestRegistrationId id) {
-        if (!this.contestRegistrationJpaRepository.existsById(this.idConverter.toEntity(id))) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
-        this.contestRegistrationJpaRepository.deleteById(this.idConverter.toEntity(id));
+        if (!this.contestRegistrationJpaRepository.existsById(ContestRegistrationIdConverter.INSTANCE.toEntity(id))) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
+        this.contestRegistrationJpaRepository.deleteById(ContestRegistrationIdConverter.INSTANCE.toEntity(id));
         return true;
     }
 }

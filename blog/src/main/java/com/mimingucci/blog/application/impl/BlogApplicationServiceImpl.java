@@ -19,26 +19,24 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BlogApplicationServiceImpl implements BlogApplicationService {
-    private final BlogAssembler assembler;
-
     private final BlogService service;
 
     private final JwtUtil jwtUtil;
 
     @Override
     public BlogCreateResponse createBlog(BlogCreateRequest request, HttpServletRequest httpRequest) {
-        Blog domain = this.assembler.createRequestToDomain(request);
+        Blog domain = BlogAssembler.INSTANCE.createRequestToDomain(request);
         try {
             Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(httpRequest);
             domain.setAuthor(claims.get("id", Long.class));
         } catch (Exception e) {
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
-        return this.assembler.domainToCreateResponse(this.service.createBlog(domain));
+        return BlogAssembler.INSTANCE.domainToCreateResponse(this.service.createBlog(domain));
     }
 
     @Override
     public BlogGetResponse findBlogById(Long id) {
-        return this.assembler.domainToGetResponse(this.service.findBlogById(id));
+        return BlogAssembler.INSTANCE.domainToGetResponse(this.service.findBlogById(id));
     }
 }

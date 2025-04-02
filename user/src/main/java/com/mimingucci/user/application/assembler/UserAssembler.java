@@ -7,7 +7,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public abstract class UserAssembler {
+public interface UserAssembler {
+    UserAssembler INSTANCE = org.mapstruct.factory.Mappers.getMapper(UserAssembler.class);
+
     public abstract User regToDomain(UserUpdateRequest request);
 
     public abstract UserEntity toEntity(User domain);

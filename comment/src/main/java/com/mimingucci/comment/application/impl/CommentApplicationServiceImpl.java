@@ -23,25 +23,23 @@ import java.util.List;
 public class CommentApplicationServiceImpl implements CommentApplicationService {
     private final CommentService service;
 
-    private final CommentAssembler assembler;
-
     private final JwtUtil jwtUtil;
 
     @Override
     public CommentResponse create(CommentCreateRequest request, HttpServletRequest httpRequest) {
-        Comment comment = this.assembler.createRequestToDomain(request);
+        Comment comment = CommentAssembler.INSTANCE.createRequestToDomain(request);
         try {
             Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(httpRequest);
             comment.setAuthor(claims.get("id", Long.class));
         } catch (Exception e) {
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
-        return this.assembler.domainToResponse(this.service.createComment(comment));
+        return CommentAssembler.INSTANCE.domainToResponse(this.service.createComment(comment));
     }
 
     @Override
     public CommentResponse update(Long id, CommentUpdateRequest request, HttpServletRequest httpRequest) {
-        Comment comment = this.assembler.updateToDomain(request);
+        Comment comment = CommentAssembler.INSTANCE.updateToDomain(request);
         comment.setId(id);
         try {
             Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(httpRequest);
@@ -49,16 +47,16 @@ public class CommentApplicationServiceImpl implements CommentApplicationService 
         } catch (Exception e) {
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
-        return this.assembler.domainToResponse(this.service.updateComment(comment));
+        return CommentAssembler.INSTANCE.domainToResponse(this.service.updateComment(comment));
     }
 
     @Override
     public List<CommentResponse> getByBlogId(Long blogId) {
-        return this.assembler.listToResponse(this.service.findCommentsByBlogId(blogId));
+        return CommentAssembler.INSTANCE.listToResponse(this.service.findCommentsByBlogId(blogId));
     }
 
     @Override
     public List<CommentResponse> getByUserId(Long userId) {
-        return this.assembler.listToResponse(this.service.findCommentsByUserId(userId));
+        return CommentAssembler.INSTANCE.listToResponse(this.service.findCommentsByUserId(userId));
     }
 }

@@ -24,12 +24,10 @@ import java.util.Set;
 public class ContestRepositoryImpl implements ContestRepository {
     private final ContestJpaRepository contestJpaRepository;
 
-    private final ContestConverter converter;
-
     @Override
     public Contest createContest(Contest contest) {
-        ContestEntity entity = this.converter.toEntity(contest);
-        return this.converter.toDomain(this.contestJpaRepository.save(entity));
+        ContestEntity entity = ContestConverter.INSTANCE.toEntity(contest);
+        return ContestConverter.INSTANCE.toDomain(this.contestJpaRepository.save(entity));
     }
 
     @Override
@@ -48,7 +46,7 @@ public class ContestRepositoryImpl implements ContestRepository {
             if (contest.getEnabled() != null) entity.setEnabled(contest.getEnabled());
             if (contest.getIsPublic() != null) entity.setIsPublic(contest.getIsPublic());
         }
-        return this.converter.toDomain(this.contestJpaRepository.save(entity));
+        return ContestConverter.INSTANCE.toDomain(this.contestJpaRepository.save(entity));
     }
 
     @Override
@@ -65,7 +63,7 @@ public class ContestRepositoryImpl implements ContestRepository {
     public Contest getContest(Long id) {
         Optional<ContestEntity> optional = this.contestJpaRepository.findById(id);
         if (optional.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
-        return this.converter.toDomain(optional.get());
+        return ContestConverter.INSTANCE.toDomain(optional.get());
     }
 
     @Override
@@ -73,11 +71,11 @@ public class ContestRepositoryImpl implements ContestRepository {
         Instant now = Instant.now();
         ContestEntity entity = contestJpaRepository.findByIdAndStartTimeLessThanEqual(id, now);
         if (entity == null) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
-        return this.converter.toDomain(entity);
+        return ContestConverter.INSTANCE.toDomain(entity);
     }
 
     @Override
     public Page<Contest> getListContests(String name, Pageable pageable) {
-        return this.converter.listToDomain(this.contestJpaRepository.findByNameContainingIgnoreCase(name, pageable));
+        return ContestConverter.INSTANCE.listToDomain(this.contestJpaRepository.findByNameContainingIgnoreCase(name, pageable));
     }
 }

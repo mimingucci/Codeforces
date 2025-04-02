@@ -6,14 +6,17 @@ import com.mimingucci.testcase.presentation.dto.request.TestCaseRequest;
 import com.mimingucci.testcase.presentation.dto.response.TestCaseResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public abstract class TestCaseAssembler {
-    public abstract TestCase toDomain(TestCaseRequest request);
+public interface TestCaseAssembler {
+    TestCaseAssembler INSTANCE = Mappers.getMapper(TestCaseAssembler.class);
 
-    public List<TestCase> toListDomain(TestCaseCreateBatchRequest batch) {
+    TestCase toDomain(TestCaseRequest request);
+
+    default List<TestCase> toListDomain(TestCaseCreateBatchRequest batch) {
         List<TestCase> domains = batch.getData().stream().map(this::toDomain).toList();
         for (TestCase tc : domains) {
             tc.setProblem(batch.getProblem());
@@ -21,5 +24,5 @@ public abstract class TestCaseAssembler {
         return domains;
     }
 
-    public abstract TestCaseResponse toResponse(TestCase domain);
+    TestCaseResponse toResponse(TestCase domain);
 }

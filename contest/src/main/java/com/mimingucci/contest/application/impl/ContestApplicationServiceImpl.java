@@ -17,23 +17,22 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class ContestApplicationServiceImpl implements ContestApplicationService {
-    private final ContestAssembler assembler;
 
     private final ContestService service;
 
     @Override
     public ContestResponse createContest(ContestCreateRequest contest) {
-        return this.assembler.domainToResponse(this.service.createContest(this.assembler.createToDomain(contest)));
+        return ContestAssembler.INSTANCE.domainToResponse(this.service.createContest(ContestAssembler.INSTANCE.createToDomain(contest)));
     }
 
     @Override
     public ContestResponse getContest(Long contestId) {
-        return this.assembler.domainToResponse(this.service.getContest(contestId));
+        return ContestAssembler.INSTANCE.domainToResponse(this.service.getContest(contestId));
     }
 
     @Override
     public ContestResponse updateContest(Long userId, Set<Role> roles, Long contestId, ContestUpdateRequest contest) {
-        return this.assembler.domainToResponse(this.service.updateContest(userId, roles, contestId, this.assembler.updateToDomain(contest)));
+        return ContestAssembler.INSTANCE.domainToResponse(this.service.updateContest(userId, roles, contestId, ContestAssembler.INSTANCE.updateToDomain(contest)));
     }
 
     @Override
@@ -43,6 +42,6 @@ public class ContestApplicationServiceImpl implements ContestApplicationService 
 
     @Override
     public PageableResponse<ContestResponse> getListContests(String name, Pageable pageable) {
-        return this.assembler.pageToResponse(this.service.getListContests(name, pageable));
+        return ContestAssembler.INSTANCE.pageToResponse(this.service.getListContests(name, pageable));
     }
 }

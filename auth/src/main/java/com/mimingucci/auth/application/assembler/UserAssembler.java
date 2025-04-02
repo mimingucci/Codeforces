@@ -10,11 +10,14 @@ import com.mimingucci.auth.presentation.dto.request.UserLoginRequest;
 import com.mimingucci.auth.presentation.dto.request.UserRegisterRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.factory.Mappers;
 
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public abstract class UserAssembler {
-    public User registerToDomain(UserRegisterRequest request) {
+public interface UserAssembler {
+    UserAssembler INSTANCE = Mappers.getMapper(UserAssembler.class);
+
+    default User registerToDomain(UserRegisterRequest request) {
         User user = this.regToDomain(request);
         user.setId(IdGenerator.INSTANCE.nextId());
         user.addRole(Role.USER);
@@ -22,13 +25,13 @@ public abstract class UserAssembler {
         return user;
     }
 
-    public abstract User regToDomain(UserRegisterRequest request);
+    User regToDomain(UserRegisterRequest request);
 
-    public abstract User loginToDomain(UserLoginRequest request);
+    User loginToDomain(UserLoginRequest request);
 
-    public abstract UserEntity toEntity(User domain);
+    UserEntity toEntity(User domain);
 
-    public abstract User forgotToDomain(UserForgotPasswordRequest request);
+    User forgotToDomain(UserForgotPasswordRequest request);
 
-    public abstract User changePasswordRequestToDomain(UserChangePasswordRequest request);
+    User changePasswordRequestToDomain(UserChangePasswordRequest request);
 }

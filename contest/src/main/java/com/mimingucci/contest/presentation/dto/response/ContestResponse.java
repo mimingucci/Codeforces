@@ -4,13 +4,14 @@ import com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
 import java.util.Set;
 
 @Data
-@Builder
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ContestResponse {
     String name;

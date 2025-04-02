@@ -2,12 +2,12 @@ package com.mimingucci.user.presentation.dto.response;
 
 import com.mimingucci.user.domain.model.User;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Data
-@Builder
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateResponse {
     private String email;

@@ -23,7 +23,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProblemApplicationServiceImpl implements ProblemApplicationService {
-    private final ProblemAssembler assembler;
 
     private final ProblemService service;
 
@@ -31,45 +30,45 @@ public class ProblemApplicationServiceImpl implements ProblemApplicationService 
 
     @Override
     public ProblemResponse createProblem(ProblemCreateRequest request, HttpServletRequest httpServletRequest) {
-        Problem domain = this.assembler.createToDomain(request);
+        Problem domain = ProblemAssembler.INSTANCE.createToDomain(request);
         try {
             Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(httpServletRequest);
             domain.setAuthor(claims.get("id", Long.class));
         } catch (Exception e) {
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
-        return this.assembler.domainToResponse(this.service.createProblem(domain));
+        return ProblemAssembler.INSTANCE.domainToResponse(this.service.createProblem(domain));
     }
 
     @Override
     public ProblemResponse getProblemById(Long id) {
-        return this.assembler.domainToResponse(this.service.findById(id));
+        return ProblemAssembler.INSTANCE.domainToResponse(this.service.findById(id));
     }
 
     @Override
     public ProblemResponse updateProblem(Long id, ProblemUpdateRequest request, HttpServletRequest httpServletRequest) {
-        Problem domain = this.assembler.updateToDomain(request);
+        Problem domain = ProblemAssembler.INSTANCE.updateToDomain(request);
         try {
             Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(httpServletRequest);
             domain.setAuthor(claims.get("id", Long.class));
         } catch (Exception e) {
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
-        return this.assembler.domainToResponse(this.service.updateProblem(id, domain));
+        return ProblemAssembler.INSTANCE.domainToResponse(this.service.updateProblem(id, domain));
     }
 
     @Override
     public PageableResponse<ProblemResponse> getAllProblems(Pageable pageable) {
-        return this.assembler.pageToResponse(this.service.findAll(pageable));
+        return ProblemAssembler.INSTANCE.pageToResponse(this.service.findAll(pageable));
     }
 
     @Override
     public PageableResponse<ProblemResponse> getAllProblemsByRating(Integer rating, Pageable pageable) {
-        return this.assembler.pageToResponse(this.service.findAllByRating(rating, pageable));
+        return ProblemAssembler.INSTANCE.pageToResponse(this.service.findAllByRating(rating, pageable));
     }
 
     @Override
     public List<ProblemResponse> getAllProblemsByContestId(Long contestId) {
-        return this.service.findAllByContest(contestId).stream().map(this.assembler::domainToResponse).toList();
+        return this.service.findAllByContest(contestId).stream().map(ProblemAssembler.INSTANCE::domainToResponse).toList();
     }
 }

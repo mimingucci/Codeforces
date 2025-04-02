@@ -7,11 +7,14 @@ import com.mimingucci.problem.presentation.dto.response.PageableResponse;
 import com.mimingucci.problem.presentation.dto.response.ProblemResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public abstract class ProblemAssembler {
-    public PageableResponse<ProblemResponse> pageToResponse(Page<Problem> page) {
+public interface ProblemAssembler {
+    ProblemAssembler INSTANCE = Mappers.getMapper(ProblemAssembler.class);
+
+    default PageableResponse<ProblemResponse> pageToResponse(Page<Problem> page) {
         PageableResponse<ProblemResponse> response = new PageableResponse<>();
         response.setContent(page.getContent().stream().map(this::domainToResponse).toList());
         response.setPageNumber(page.getNumber());
@@ -23,9 +26,9 @@ public abstract class ProblemAssembler {
         return response;
     }
 
-    public abstract ProblemResponse domainToResponse(Problem domain);
+    ProblemResponse domainToResponse(Problem domain);
 
-    public abstract Problem createToDomain(ProblemCreateRequest request);
+    Problem createToDomain(ProblemCreateRequest request);
 
-    public abstract Problem updateToDomain(ProblemUpdateRequest request);
+    Problem updateToDomain(ProblemUpdateRequest request);
 }

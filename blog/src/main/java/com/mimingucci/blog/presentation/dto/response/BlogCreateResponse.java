@@ -1,14 +1,14 @@
 package com.mimingucci.blog.presentation.dto.response;
 
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
 
 @Data
-@Builder
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BlogCreateResponse {
     Long id;

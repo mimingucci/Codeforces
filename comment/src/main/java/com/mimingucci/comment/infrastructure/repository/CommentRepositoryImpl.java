@@ -19,12 +19,10 @@ import java.util.Optional;
 public class CommentRepositoryImpl implements CommentRepository {
     private final CommentJpaRepository commentJpaRepository;
 
-    private final CommentConverter converter;
-
     @Override
     public Comment createComment(Comment domain) {
-        CommentEntity entity = this.converter.toEntity(domain);
-        return this.converter.toDomain(this.commentJpaRepository.save(entity));
+        CommentEntity entity = CommentConverter.INSTANCE.toEntity(domain);
+        return CommentConverter.INSTANCE.toDomain(this.commentJpaRepository.save(entity));
     }
 
     @Override
@@ -34,7 +32,7 @@ public class CommentRepositoryImpl implements CommentRepository {
         CommentEntity entity = optional.get();
         if (entity.getAuthor().equals(domain.getAuthor())) throw new ApiRequestException(ErrorMessageConstants.NOT_PERMISSION, HttpStatus.CONFLICT);
         entity.setContent(domain.getContent());
-        return this.converter.toDomain(this.commentJpaRepository.save(entity));
+        return CommentConverter.INSTANCE.toDomain(this.commentJpaRepository.save(entity));
     }
 
     @Override
@@ -49,18 +47,18 @@ public class CommentRepositoryImpl implements CommentRepository {
     public Comment findById(Long id) {
         Optional<CommentEntity> optional = this.commentJpaRepository.findById(id);
         if (optional.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.COMMENT_NOT_FOUND, HttpStatus.NOT_FOUND);
-        return this.converter.toDomain(optional.get());
+        return CommentConverter.INSTANCE.toDomain(optional.get());
     }
 
     @Override
     public List<Comment> findByBlogId(Long blogId) {
         List<CommentEntity> entities = this.commentJpaRepository.findAllByBlogId(blogId);
-        return entities.stream().map(this.converter::toDomain).toList();
+        return entities.stream().map(CommentConverter.INSTANCE::toDomain).toList();
     }
 
     @Override
     public List<Comment> findByUserId(Long userId) {
         List<CommentEntity> entities = this.commentJpaRepository.findAllByUserId(userId);
-        return entities.stream().map(this.converter::toDomain).toList();
+        return entities.stream().map(CommentConverter.INSTANCE::toDomain).toList();
     }
 }

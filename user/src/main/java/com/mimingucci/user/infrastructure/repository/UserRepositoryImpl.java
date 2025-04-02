@@ -18,20 +18,18 @@ import java.util.Optional;
 public class UserRepositoryImpl implements UserRepository {
     private final UserJpaRepository userJpaRepository;
 
-    private final UserConverter converter;
-
     @Override
     public User findByEmail(String email) {
         Optional<UserEntity> optionalEntity = this.userJpaRepository.findByEmail(email);
         if (optionalEntity.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-        return this.converter.toDomain(optionalEntity.get());
+        return UserConverter.INSTANCE.toDomain(optionalEntity.get());
     }
 
     @Override
     public User findByUsername(String username) {
         Optional<UserEntity> optionalEntity = this.userJpaRepository.findByUsername(username);
         if (optionalEntity.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-        return this.converter.toDomain(optionalEntity.get());
+        return UserConverter.INSTANCE.toDomain(optionalEntity.get());
     }
 
     @Override
@@ -46,7 +44,7 @@ public class UserRepositoryImpl implements UserRepository {
         if (domain.getRoles() != null) entity.setRoles(domain.getRoles());
         if (domain.getContribute() != null) entity.setContribute(domain.getContribute());
         UserEntity updatedEntity = this.userJpaRepository.save(entity);
-        return this.converter.toDomain(updatedEntity);
+        return UserConverter.INSTANCE.toDomain(updatedEntity);
     }
 
     @Override
@@ -58,6 +56,6 @@ public class UserRepositoryImpl implements UserRepository {
     public User findById(Long userId) {
         Optional<UserEntity> optionalEntity = this.userJpaRepository.findById(userId);
         if (optionalEntity.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-        return this.converter.toDomain(optionalEntity.get());
+        return UserConverter.INSTANCE.toDomain(optionalEntity.get());
     }
 }

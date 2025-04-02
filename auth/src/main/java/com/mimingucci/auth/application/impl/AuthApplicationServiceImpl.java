@@ -20,27 +20,25 @@ public class AuthApplicationServiceImpl implements AuthApplicationService {
 
     private final AuthService authService;
 
-    private final UserAssembler userAssembler;
-
     @Override
     public UserLoginResponse login(UserLoginRequest request) {
-        return this.authService.login(this.userAssembler.loginToDomain(request));
+        return this.authService.login(UserAssembler.INSTANCE.loginToDomain(request));
     }
 
     @Override
     public UserRegisterResponse register(UserRegisterRequest request) {
-        return this.authService.register(this.userAssembler.registerToDomain(request));
+        return this.authService.register(UserAssembler.INSTANCE.registerToDomain(request));
     }
 
     @Override
     public UserForgotPasswordResponse forgotPassword(UserForgotPasswordRequest request) {
-        return this.authService.forgotPassword(this.userAssembler.forgotToDomain(request));
+        return this.authService.forgotPassword(UserAssembler.INSTANCE.forgotToDomain(request));
     }
 
     @Override
     public void changePassword(UserChangePasswordRequest request, HttpServletRequest httpRequest) {
         String email = (String) httpRequest.getAttribute("email"); // Get email from the request attributes
         request.setEmail(email);
-        this.authService.changePassword(this.userAssembler.changePasswordRequestToDomain(request));
+        this.authService.changePassword(UserAssembler.INSTANCE.changePasswordRequestToDomain(request));
     }
 }

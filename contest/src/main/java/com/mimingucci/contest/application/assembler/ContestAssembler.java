@@ -7,17 +7,20 @@ import com.mimingucci.contest.presentation.dto.response.ContestResponse;
 import com.mimingucci.contest.presentation.dto.response.PageableResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public abstract class ContestAssembler {
-    public abstract Contest createToDomain(ContestCreateRequest request);
+public interface ContestAssembler {
+    ContestAssembler INSTANCE = Mappers.getMapper(ContestAssembler.class);
 
-    public abstract Contest updateToDomain(ContestUpdateRequest request);
+    Contest createToDomain(ContestCreateRequest request);
 
-    public abstract ContestResponse domainToResponse(Contest domain);
+    Contest updateToDomain(ContestUpdateRequest request);
 
-    public PageableResponse<ContestResponse> pageToResponse(Page<Contest> page) {
+    ContestResponse domainToResponse(Contest domain);
+
+    default PageableResponse<ContestResponse> pageToResponse(Page<Contest> page) {
         PageableResponse<ContestResponse> response = new PageableResponse<>();
         response.setContent(page.getContent().stream().map(this::domainToResponse).toList());
         response.setPageNumber(page.getNumber());

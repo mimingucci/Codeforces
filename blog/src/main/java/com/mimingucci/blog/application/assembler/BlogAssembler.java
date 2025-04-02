@@ -9,16 +9,18 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public abstract class BlogAssembler {
-    public Blog createRequestToDomain(BlogCreateRequest request) {
+public interface BlogAssembler {
+    BlogAssembler INSTANCE = org.mapstruct.factory.Mappers.getMapper(BlogAssembler.class);
+
+    default Blog createRequestToDomain(BlogCreateRequest request) {
         Blog blog = this.createToDomain(request);
         blog.setId(IdGenerator.INSTANCE.nextId());
         return blog;
     }
 
-    public abstract Blog createToDomain(BlogCreateRequest request);
+    Blog createToDomain(BlogCreateRequest request);
 
-    public abstract BlogCreateResponse domainToCreateResponse(Blog domain);
+    BlogCreateResponse domainToCreateResponse(Blog domain);
 
-    public abstract BlogGetResponse domainToGetResponse(Blog domain);
+    BlogGetResponse domainToGetResponse(Blog domain);
 }

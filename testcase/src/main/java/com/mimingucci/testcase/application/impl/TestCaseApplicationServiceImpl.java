@@ -19,7 +19,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TestCaseApplicationServiceImpl implements TestCaseApplicationService {
-    private final TestCaseAssembler assembler;
 
     private final JwtUtil jwtUtil;
 
@@ -27,12 +26,12 @@ public class TestCaseApplicationServiceImpl implements TestCaseApplicationServic
 
     @Override
     public TestCaseResponse getTestCaseById(Long testCaseId) {
-        return this.assembler.toResponse(service.getTestCase(testCaseId));
+        return TestCaseAssembler.INSTANCE.toResponse(service.getTestCase(testCaseId));
     }
 
     @Override
     public List<TestCaseResponse> getTestCaseByProblemId(Long problemId) {
-        return service.getTestCasesByProblemId(problemId).stream().map(this.assembler::toResponse).toList();
+        return service.getTestCasesByProblemId(problemId).stream().map(TestCaseAssembler.INSTANCE::toResponse).toList();
     }
 
     @Override
@@ -40,7 +39,7 @@ public class TestCaseApplicationServiceImpl implements TestCaseApplicationServic
         Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
         try {
             Long author = claims.get("id", Long.class);
-            return this.assembler.toResponse(service.createTestCase(author, this.assembler.toDomain(testCase)));
+            return TestCaseAssembler.INSTANCE.toResponse(service.createTestCase(author, TestCaseAssembler.INSTANCE.toDomain(testCase)));
         } catch (Exception e) {
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
@@ -51,7 +50,7 @@ public class TestCaseApplicationServiceImpl implements TestCaseApplicationServic
         Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
         try {
             Long author = claims.get("id", Long.class);
-            return this.assembler.toResponse(service.updateTestCase(author, testCaseId, this.assembler.toDomain(testCase)));
+            return TestCaseAssembler.INSTANCE.toResponse(service.updateTestCase(author, testCaseId, TestCaseAssembler.INSTANCE.toDomain(testCase)));
         } catch (Exception e) {
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }

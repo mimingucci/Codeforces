@@ -18,30 +18,28 @@ import java.util.List;
 public class TestCaseRepositoryImpl implements TestCaseRepository {
     private final TestCaseJpaRepository testCaseJpaRepository;
 
-    private final TestCaseConverter testCaseConverter;
-
     @Override
     public TestCase createTestCase(TestCase testCase) {
-        TestCaseEntity entity = testCaseConverter.toEntity(testCase);
-        return testCaseConverter.toModel(testCaseJpaRepository.save(entity));
+        TestCaseEntity entity = TestCaseConverter.INSTANCE.toEntity(testCase);
+        return TestCaseConverter.INSTANCE.toModel(testCaseJpaRepository.save(entity));
     }
 
     @Override
     public void createTestCases(List<TestCase> testCases) {
-        List<TestCaseEntity> entities = testCases.stream().map(testCaseConverter::toEntity).toList();
+        List<TestCaseEntity> entities = testCases.stream().map(TestCaseConverter.INSTANCE::toEntity).toList();
         testCaseJpaRepository.saveAll(entities);
     }
 
     @Override
     public TestCase getTestCase(Long id) {
         TestCaseEntity entity = testCaseJpaRepository.findById(id).orElseThrow(() -> new ApiRequestException(ErrorMessageConstants.TEST_CASE_NOT_FOUND, HttpStatus.NOT_FOUND));
-        return testCaseConverter.toModel(entity);
+        return TestCaseConverter.INSTANCE.toModel(entity);
     }
 
     @Override
     public List<TestCase> getTestCasesByProblemId(Long problemId) {
         List<TestCaseEntity> entities = testCaseJpaRepository.findAllByProblemId(problemId);
-        return entities.stream().map(testCaseConverter::toModel).toList();
+        return entities.stream().map(TestCaseConverter.INSTANCE::toModel).toList();
     }
 
     @Override
@@ -57,6 +55,6 @@ public class TestCaseRepositoryImpl implements TestCaseRepository {
         TestCaseEntity entity = testCaseJpaRepository.findById(id).orElseThrow(() -> new ApiRequestException(ErrorMessageConstants.TEST_CASE_NOT_FOUND, HttpStatus.NOT_FOUND));
         if (testCase.getInput() != null) entity.setInput(testCase.getInput());
         if (testCase.getOutput() != null) entity.setOutput(testCase.getOutput());
-        return testCaseConverter.toModel(testCaseJpaRepository.save(entity));
+        return TestCaseConverter.INSTANCE.toModel(testCaseJpaRepository.save(entity));
     }
 }
