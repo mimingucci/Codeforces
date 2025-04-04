@@ -1,2 +1,3 @@
-from flask import Flask
+from datetime import datetime,timezone
 
+print(datetime.now(timezone.utc))

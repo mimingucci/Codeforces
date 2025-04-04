@@ -1,6 +1,6 @@
 from enum import Enum
 
-class Verdict(Enum):
+class Verdict(str, Enum):
     AC = 'ACCEPT', 
     WA = 'WRONG_ANSWER', 
     TLE = 'TIME_LIMIT_EXCEED', 
