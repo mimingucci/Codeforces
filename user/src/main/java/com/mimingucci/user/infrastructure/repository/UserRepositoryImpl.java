@@ -56,6 +56,7 @@ public class UserRepositoryImpl implements UserRepository {
     public User findById(Long userId) {
         Optional<UserEntity> optionalEntity = this.userJpaRepository.findById(userId);
         if (optionalEntity.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        System.out.println(optionalEntity.get().getId() + " - " + optionalEntity.get().getRoles().toString());
         return UserConverter.INSTANCE.toDomain(optionalEntity.get());
     }
 }

@@ -48,8 +48,9 @@ public class ContestControllerImpl implements ContestController {
         return BaseResponse.success();
     }
 
+    @GetMapping(path = PathConstants.ALL)
     @Override
-    public BaseResponse<PageableResponse<ContestResponse>> getListContests(String name, Pageable pageable) {
+    public BaseResponse<PageableResponse<ContestResponse>> getListContests(@RequestParam(name = "name", defaultValue = "") String name, Pageable pageable) {
         return BaseResponse.success(service.getListContests(name, pageable));
     }
 }

@@ -14,6 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ContestResponse {
+    Long id;
     String name;
     Instant startTime;
     Instant endTime;

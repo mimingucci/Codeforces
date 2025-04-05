@@ -12,14 +12,14 @@ import java.util.List;
 public interface ProblemJpaRepository extends JpaRepository<ProblemEntity, Long> {
     @Query("""
             SELECT problem
-            FROM Problem problem
+            FROM ProblemEntity problem
             ORDER BY problem.createdAt desc
             """)
     Page<ProblemEntity> findProblems(Pageable pageable);
 
     @Query("""
             SELECT problem
-            FROM Problem problem
+            FROM ProblemEntity problem
             WHERE problem.rating = :rating
             ORDER BY problem.createdAt desc
             """)
@@ -27,7 +27,7 @@ public interface ProblemJpaRepository extends JpaRepository<ProblemEntity, Long>
 
     @Query("""
             SELECT problem
-            FROM Problem problem
+            FROM ProblemEntity problem
             WHERE problem.author = :author
             ORDER BY problem.createdAt desc
             """)
@@ -35,7 +35,7 @@ public interface ProblemJpaRepository extends JpaRepository<ProblemEntity, Long>
 
     @Query("""
         SELECT problem
-        FROM Problem problem
+        FROM ProblemEntity problem
         WHERE problem.contest = :contest
         ORDER BY problem.createdAt asc
         """)

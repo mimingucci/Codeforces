@@ -76,6 +76,6 @@ public class ContestRepositoryImpl implements ContestRepository {
 
     @Override
     public Page<Contest> getListContests(String name, Pageable pageable) {
-        return ContestConverter.INSTANCE.listToDomain(this.contestJpaRepository.findByNameContainingIgnoreCase(name, pageable));
+        return this.contestJpaRepository.findByNameContainingIgnoreCase(name, pageable).map(ContestConverter.INSTANCE::toDomain);
     }
 }

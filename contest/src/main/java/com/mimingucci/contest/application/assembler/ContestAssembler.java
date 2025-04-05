@@ -7,10 +7,11 @@ import com.mimingucci.contest.presentation.dto.response.ContestResponse;
 import com.mimingucci.contest.presentation.dto.response.PageableResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedSourcePolicy = ReportingPolicy.IGNORE, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ContestAssembler {
     ContestAssembler INSTANCE = Mappers.getMapper(ContestAssembler.class);
 

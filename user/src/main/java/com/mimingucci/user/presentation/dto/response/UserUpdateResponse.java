@@ -1,6 +1,5 @@
 package com.mimingucci.user.presentation.dto.response;
 
-import com.mimingucci.user.domain.model.User;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,15 +24,4 @@ public class UserUpdateResponse {
     private Integer contribute;
 
     private String avatar;
-
-    public UserUpdateResponse(User user) {
-        this.avatar = user.getAvatar();
-        this.email = user.getEmail();
-        this.contribute = user.getContribute();
-        this.rating = user.getRating();
-        this.description = user.getDescription();
-        this.firstname = user.getFirstname();
-        this.lastname = user.getLastname();
-        this.enabled = user.getEnabled();
-    }
 }

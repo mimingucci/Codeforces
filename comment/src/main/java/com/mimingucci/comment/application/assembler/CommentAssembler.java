@@ -7,13 +7,20 @@ import com.mimingucci.comment.presentation.dto.request.CommentUpdateRequest;
 import com.mimingucci.comment.presentation.dto.response.CommentResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedSourcePolicy = ReportingPolicy.IGNORE, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CommentAssembler {
     CommentAssembler INSTANCE = Mappers.getMapper(CommentAssembler.class);
+
+    Comment createToDomain(CommentCreateRequest request);
+
+    CommentResponse domainToResponse(Comment domain);
+
+    Comment updateToDomain(CommentUpdateRequest request);
 
     default Comment createRequestToDomain(CommentCreateRequest request) {
         Comment comment = this.createToDomain(request);
@@ -24,10 +31,4 @@ public interface CommentAssembler {
     default List<CommentResponse> listToResponse(List<Comment> comments) {
         return comments.stream().map(this::domainToResponse).toList();
     }
-
-    Comment createToDomain(CommentCreateRequest request);
-
-    CommentResponse domainToResponse(Comment domain);
-
-    Comment updateToDomain(CommentUpdateRequest request);
 }

@@ -1,42 +1,110 @@
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Set
 from event import SubmissionJudgedEvent
 from datetime import datetime, timedelta
 from judge_status import Verdict
-from model import LeaderboardEntry
+from leaderboard.model import LeaderboardEntry
+# from leaderboard.repository import EventRepository
 import copy
+import os
+
 
 class LeaderboardService:
-    def __init__(self):
-        # Contest ID -> Dictionary of user standings
-        self.contest_standings: Dict[int, Dict[int, Dict]] = {}
-        
-        # Virtual contest data: (user_id, contest_id) -> virtual start time
-        self.virtual_contests: Dict[Tuple[int, int], datetime] = {}
-        
-        # Submission history for virtual contests: contest_id -> list of submissions in chronological order
-        self.submission_history: Dict[int, List[SubmissionJudgedEvent]] = {}
+    # Singleton instance
+    _instance = None
 
-        # Contest ID -> real start time - real end time
-        self.contest_metadata: Dict[int, Tuple[datetime, datetime]] = {}
-    
-    def process_submission_event(self, event: SubmissionJudgedEvent, is_virtual: bool = False):
+    @classmethod
+    def get_instance(cls):
+        """Get the singleton instance of LeaderboardService"""
+        if cls._instance is None:
+            # Get database config from environment or default values
+            db_host = os.getenv("DB_HOST", "localhost")
+            db_user = os.getenv("DB_USER", "root")
+            db_password = os.getenv("DB_PASSWORD", "Andrew1122:))")
+            db_name = os.getenv("DB_NAME", "codeforces")
+
+            cls._instance = LeaderboardService(db_host, db_user, db_password, db_name)
+        return cls._instance
+
+    def __init__(self, db_host="localhost", db_user="root", db_password="Andrew1122:))", db_name="codeforces"):
+        """Initialize the leaderboard service with database connection"""
+        # In-memory data structures
+        self.contest_standings: Dict[int, Dict[int, Dict]] = {}
+
+        # Cache of submissions by contest for quick access
+        self.submission_cache: Dict[int, List[SubmissionJudgedEvent]] = {}
+
+        # Set of active contests we've seen
+        self.active_contests: Set[int] = set()
+
+        self.contests_metadata: Dict[int, datetime] = {}
+
+        # Database repository for events
+        # self.repository = EventRepository(db_host, db_user, db_password, db_name)
+
+    # def _load_data_from_db(self):
+    #     """Load initial event data from database"""
+    #     try:
+    #         # Get all contests that have events
+    #         contest_ids = self.repository.get_all_contests()
+    #
+    #         for contest_id in contest_ids:
+    #             self.active_contests.add(contest_id)
+    #
+    #             # Load events for this contest
+    #             self._load_contest_events(contest_id)
+    #
+    #         print(f"Loaded data for {len(self.active_contests)} contests")
+    #     except Exception as e:
+    #         print(f"Error loading data from database: {e}")
+    #
+    # def _load_contest_events(self, contest_id: int):
+    #     """Load all events for a specific contest and rebuild standings"""
+    #     # Get events from DB
+    #     raw_events = self.repository.get_events_by_contest(contest_id)
+    #
+    #     # Convert to SubmissionJudgedEvent objects
+    #     events = []
+    #     for event_data in raw_events:
+    #         try:
+    #             event = SubmissionJudgedEvent(
+    #                 id=event_data["submission_id"],
+    #                 author=event_data["author_id"],
+    #                 contest=event_data["contest_id"],
+    #                 problem=event_data["problem_id"],
+    #                 verdict=Verdict(event_data["verdict"]),
+    #                 execution_time_ms=event_data["execution_time_ms"],
+    #                 memory_used_kb=event_data["memory_used_kb"],
+    #                 score=event_data["score"],
+    #                 judged_on=event_data["judged_on"]
+    #             )
+    #             events.append(event)
+    #         except Exception as e:
+    #             print(f"Error converting event data: {e}")
+    #
+    #     # Cache the events
+    #     self.submission_cache[contest_id] = events
+    #
+    #     # Reset standings for this contest
+    #     self.contest_standings[contest_id] = {}
+    #
+    #     # Process each event to rebuild standings
+    #     for event in events:
+    #         self.process_submission_event(event, skip_save=True)
+
+    def process_submission_event(self, event: SubmissionJudgedEvent):
         """Process a new submission verdict event and update the leaderboard"""
         contest_id = event.contest
         user_id = event.author
         problem_id = event.id
-        
+
+        # Add to active contests
+        if contest_id not in self.active_contests:
+            return
+
         # Initialize contest standings if needed
         if contest_id not in self.contest_standings:
             self.contest_standings[contest_id] = {}
-            
-        # Store event in submission history for future virtual contests
-        if not is_virtual:
-            if contest_id not in self.submission_history:
-                self.submission_history[contest_id] = []
-            self.submission_history[contest_id].append(event)
-            # Sort by timestamp to ensure chronological order
-            self.submission_history[contest_id].sort(key=lambda e: e.judged_on)
-        
+
         # Initialize user standing if needed
         if user_id not in self.contest_standings[contest_id]:
             self.contest_standings[contest_id][user_id] = {
@@ -46,107 +114,107 @@ class LeaderboardService:
                 "problem_attempts": {},
                 "problem_solve_times": {},
             }
-        
+
         user_standing = self.contest_standings[contest_id][user_id]
-        
+
         # Only update if problem not already solved by user
         if problem_id not in user_standing["solved_problems"]:
             # Initialize problem attempts counter if needed
             if problem_id not in user_standing["problem_attempts"]:
                 user_standing["problem_attempts"][problem_id] = 0
-            
+
             # Update standing based on verdict
             if event.verdict == Verdict.AC:
                 user_standing["solved_problems"].append(problem_id)
-                
+
+                contest_start_time = self.contests_metadata[contest_id]
+
                 # Calculate solve time (in minutes from contest start)
-                contest_start_time = self._get_contest_start_time(contest_id)
-                
-                if is_virtual:
-                    # For virtual contests, adjust time based on virtual start
-                    virtual_start = self.virtual_contests.get((user_id, contest_id))
-                    if virtual_start:
-                        # Calculate time since virtual start
-                        solve_time = (event.judged_on - virtual_start).total_seconds() // 60
-                else:
-                    # For real contests, use time since actual contest start
-                    solve_time = (event.judged_on - contest_start_time).total_seconds() // 60
-                
-                user_standing["problem_solve_times"][problem_id] = solve_time
-                
+                solve_time = (event.judged_on - contest_start_time).total_seconds() // 60
+                user_standing["problem_solve_times"][problem_id] = int(solve_time)
+
                 # Update score
                 if event.score is not None:
                     score = event.score
                 else:
                     score = 1  # Default score for binary scoring
-                
+
                 user_standing["total_score"] += score
-                
-                # Add penalty: solve time + 20 minutes per wrong attempt (example penalty rule)
+
+                # Add penalty: solve time + 10 minutes per wrong attempt (example penalty rule)
                 wrong_attempts = user_standing["problem_attempts"][problem_id]
-                penalty = int(solve_time) + (wrong_attempts * 20)
+                penalty = int(solve_time) + (wrong_attempts * 10)
                 user_standing["penalty"] += penalty
             else:
                 # Increment wrong attempt counter for non-accepted verdicts
                 user_standing["problem_attempts"][problem_id] += 1
-        
+
         # Recalculate ranks after processing
         self._recalculate_ranks(contest_id)
-    
-    def start_virtual_contest(self, user_id: int, contest_id: int, virtual_start_time: datetime):
-        """Start a virtual contest for a user"""
-        # Record virtual start time
-        self.virtual_contests[(user_id, contest_id)] = virtual_start_time
-        
-        # Remove any existing standings for this user in this contest
-        if contest_id in self.contest_standings and user_id in self.contest_standings[contest_id]:
-            del self.contest_standings[contest_id][user_id]
-    
-    def replay_submissions_for_virtual_contest(self, user_id: int, contest_id: int, 
-                                              virtual_end_time: Optional[datetime] = None):
-        """
-        Replay all submissions for a contest up to the current virtual contest time
-        This simulates what would have happened in the real contest time
-        """
-        if contest_id not in self.submission_history:
-            return  # No submissions to replay
-        
-        virtual_start = self.virtual_contests.get((user_id, contest_id))
-        if not virtual_start:
-            return  # No virtual contest started
-        
-        real_contest_start = self._get_contest_start_time(contest_id)
-        
-        # If no end time specified, replay all submissions
-        if virtual_end_time is None:
-            virtual_end_time = datetime.now()
-        
-        # Calculate how much virtual contest time has elapsed
-        virtual_elapsed = (virtual_end_time - virtual_start).total_seconds()
-        
-        # Process each submission that would have occurred within this time window
-        for event in self.submission_history[contest_id]:
-            # Calculate when this event happened in real contest time
-            real_elapsed = (event.timestamp - real_contest_start).total_seconds()
-            
-            # Only process if the event would have happened by now in virtual time
-            if real_elapsed <= virtual_elapsed:
-                # Create a copy of the event with adjusted timestamp for virtual time
-                virtual_event = copy.deepcopy(event)
-                virtual_event.timestamp = virtual_start + timedelta(seconds=real_elapsed)
-                
-                # Process this event as a virtual submission
-                self.process_submission_event(virtual_event, is_virtual=True)
-    
-    def get_leaderboard(self, contest_id: int, limit: int = 100, 
-                       user_id: Optional[int] = None) -> List[LeaderboardEntry]:
+
+    def start_contest(self, contest_id: int):
+        self.active_contests.add(contest_id)
+        self.contests_metadata[contest_id] = datetime.now()
+        self.contest_standings[contest_id] = {}
+
+    def end_contest(self, contest_id: int):
+        self.active_contests.discard(contest_id)
+        self.contests_metadata.pop(contest_id)
+
+
+    # def replay_submissions_for_virtual_contest(self, user_id: int, contest_id: int):
+    #     """
+    #     Replay all submissions for a contest up to the current virtual contest time
+    #     This simulates what would have happened in the real contest time
+    #     """
+    #     # Make sure we have events loaded
+    #     if contest_id not in self.submission_cache:
+    #         self._load_contest_events(contest_id)
+    #
+    #     # Make sure user is registered for virtual contest
+    #     virtual_start, virtual_end_time = self.virtual_contests.get((user_id, contest_id))
+    #     if not virtual_start:
+    #         return  # No virtual contest started
+    #
+    #     # If no end time specified, replay all submissions
+    #     if virtual_end_time is None:
+    #         virtual_end_time = datetime.now()
+    #
+    #     # Get the earliest event timestamp as contest start time
+    #     if not self.submission_cache[contest_id]:
+    #         return  # No events to replay
+    #
+    #     real_contest_start = min(e.judged_on for e in self.submission_cache[contest_id])
+    #
+    #     # Calculate how much virtual contest time has elapsed
+    #     virtual_elapsed = (virtual_end_time - virtual_start).total_seconds()
+    #
+    #     # Process each submission that would have occurred within this time window
+    #     for event in self.submission_cache[contest_id]:
+    #         # Calculate when this event happened in real contest time
+    #         real_elapsed = (event.judged_on - real_contest_start).total_seconds()
+    #
+    #         # Only process if the event would have happened by now in virtual time
+    #         if real_elapsed <= virtual_elapsed:
+    #             # Create a copy of the event with adjusted timestamp for virtual time
+    #             virtual_event = copy.deepcopy(event)
+    #             virtual_event.judged_on = virtual_start + timedelta(seconds=real_elapsed)
+    #
+    #             # Process this event as a virtual submission
+    #             self.process_submission_event(virtual_event, is_virtual=True)
+
+    def get_leaderboard(self, contest_id: int,
+                        user_id: Optional[int] = None) -> List[LeaderboardEntry]:
         """Get the current leaderboard for a contest"""
-        if contest_id not in self.contest_standings:
+        if contest_id not in self.active_contests:
             return []
-            
+
         # Convert standings dictionary to list of LeaderboardEntry objects
         entries = []
         for uid, standing in self.contest_standings[contest_id].items():
+            if user_id is not None and uid != user_id:
+                continue
+
             entry = LeaderboardEntry(
                 user_id=uid,
                 rank=standing.get("rank", 0),
@@ -157,17 +225,11 @@ class LeaderboardService:
                 problem_solve_times=standing["problem_solve_times"]
             )
             entries.append(entry)
-        
-        # Sort by score (descending) and penalty (ascending)
-        entries.sort(key=lambda e: (-e.total_score, e.penalty))
-        
-        # If user_id is provided, return only that user's standing
-        if user_id is not None:
-            for entry in entries:
-                if entry.user_id == user_id:
-                    return [entry]
-        else:
-            return entries
+
+        # Sort by rank (ascending)
+        entries.sort(key=lambda e: e.rank)
+
+        return entries
 
     def _recalculate_ranks(self, contest_id):
         """
@@ -176,7 +238,7 @@ class LeaderboardService:
         1. Higher total score
         2. Lower penalty time (for tie-breaking)
         """
-        if contest_id not in self.contest_standings:
+        if contest_id not in self.active_contests:
             return
 
         # Get all participants for this contest
@@ -212,19 +274,55 @@ class LeaderboardService:
             prev_score = standing["total_score"]
             prev_penalty = standing["penalty"]
 
-        for uid, standing in sorted_participants:
-            self.contest_standings[contest_id][uid] = standing
+            self.contest_standings[contest_id][user_id] = standing
 
-    def _get_contest_start_time(self, contest_id):
-        if contest_id not in self.contest_metadata:
-            return datetime.max
-        else:
-            return self.contest_metadata[contest_id][0]
-
-    def start_contest(self, contest_id: int, start_time: datetime, end_time: datetime):
-        self.contest_metadata[contest_id] = (start_time, end_time)
-        self.contest_standings[contest_id] = {}
-        self.submission_history[contest_id] = []
+    # def get_user_statistics(self, user_id: int, contest_id: int) -> Dict:
+    #     """Get detailed statistics for a user in a contest"""
+    #     # Make sure contest is loaded
+    #     if contest_id not in self.contest_standings:
+    #         if contest_id in self.active_contests:
+    #             self._load_contest_events(contest_id)
+    #         else:
+    #             return {
+    #                 "total_score": 0,
+    #                 "penalty": 0,
+    #                 "rank": 0,
+    #                 "solved_count": 0,
+    #                 "problems": []
+    #             }
+    #
+    #     if user_id not in self.contest_standings[contest_id]:
+    #         return {
+    #             "total_score": 0,
+    #             "penalty": 0,
+    #             "rank": 0,
+    #             "solved_count": 0,
+    #             "problems": []
+    #         }
+    #
+    #     user_standing = self.contest_standings[contest_id][user_id]
+    #
+    #     # Calculate additional statistics
+    #     problem_stats = []
+    #     for problem_id in user_standing["problem_attempts"].keys():
+    #         solved = problem_id in user_standing["solved_problems"]
+    #         attempts = user_standing["problem_attempts"].get(problem_id, 0)
+    #         solve_time = user_standing["problem_solve_times"].get(problem_id, 0) if solved else 0
+    #
+    #         problem_stats.append({
+    #             "problem_id": problem_id,
+    #             "solved": solved,
+    #             "attempts": attempts,
+    #             "solve_time_minutes": solve_time if solved else 0
+    #         })
+    #
+    #     return {
+    #         "total_score": user_standing["total_score"],
+    #         "penalty": user_standing["penalty"],
+    #         "rank": user_standing.get("rank", 0),
+    #         "solved_count": len(user_standing["solved_problems"]),
+    #         "problems": problem_stats
+    #     }
 
 
 

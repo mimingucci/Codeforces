@@ -1,5 +1,6 @@
 package com.mimingucci.problem.common.constant;
 
+import com.mimingucci.problem.common.validator.ProblemRatingValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 

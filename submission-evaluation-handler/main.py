@@ -6,24 +6,24 @@ from fastapi import FastAPI, HTTPException
 from service.kafka_consumer import KafkaConsumer
 from circuitbreaker import circuit
 from event import JudgeSubmissionEvent
-from util import logger
 from service.kafka_util import _kafka_producer
+from leaderboard.api import router as leaderboard_router
 
 app = FastAPI()
 app.debug = 1
 
+# Add the leaderboard router to FastAPI
+app.include_router(leaderboard_router)
+
 @circuit(failure_threshold=3, recovery_timeout=10)
 async def getAllTestCasesByProblemId(problemId: int):
     try:
-        service_instance = await eureka_client.get_service_url("testcase")
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.get(f"{service_instance}/api/v1/testcase/problem/{problemId}")
-            response.raise_for_status()  # Raise an error for non-2xx responses
-        return response.json() 
+        response = await eureka_client.do_service_async("testcase", f"/api/v1/testcase/problem/{problemId}")
+        print(response)
     except httpx.HTTPStatusError as e:
-        raise HTTPException(code=e.response.status_code, message=f"Error from testcase service: {e.response.text}")
+        raise HTTPException(status_code=e.response.status_code, detail=f"Error from testcase service: {e.response.text}")
     except httpx.RequestError as e:
-        raise HTTPException(code=500, message=f"Service unreachable: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Service unreachable: {str(e)}")
 
 
 class SubmissionHandler(KafkaConsumer):

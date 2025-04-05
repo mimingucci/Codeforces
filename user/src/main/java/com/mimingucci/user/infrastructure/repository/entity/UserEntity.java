@@ -1,6 +1,7 @@
 package com.mimingucci.user.infrastructure.repository.entity;
 
 import com.mimingucci.user.common.enums.Role;
+import com.mimingucci.user.infrastructure.repository.converter.RoleSetConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -28,7 +30,8 @@ public class UserEntity {
 
     private Boolean enabled;
 
-    private Set<Role> roles;
+    @Convert(converter = RoleSetConverter.class)
+    private Set<Role> roles = new HashSet<>();
 
     @Column(nullable = false, updatable = false, name = "created_at")
     private Instant createdAt; // UTC timestamp

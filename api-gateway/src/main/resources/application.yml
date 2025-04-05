@@ -21,10 +21,32 @@ spring:
                     uri: lb://submission
                     predicates:
                         - Path=/api/v1/submission/**
+                -   id: blog
+                    uri: lb://blog
+                    predicates:
+                        - Path=/api/v1/blog/**
+                -   id: comment
+                    uri: lb://comment
+                    predicates:
+                        - Path=/api/v1/comment/**
+                -   id: contest
+                    uri: lb://contest
+                    predicates:
+                        - Path=/api/v1/contest/**
+                -   id: problem
+                    uri: lb://problem
+                    predicates:
+                        - Path=/api/v1/problem/**
+                -   id: user
+                    uri: lb://user
+                    predicates:
+                        - Path=/api/v1/user/**
+
 
 eureka:
     client:
         register-with-eureka: true
+        fetch-registry: true
         service-url:
             defaultZone: http://localhost:8761/eureka/
 

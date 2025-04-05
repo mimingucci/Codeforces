@@ -7,11 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
 public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByUsername(String username);
 
@@ -22,14 +20,14 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
     Boolean existsByEmail(String email);
 
     @Modifying
-    @Query("UPDATE User user SET user.contribute = user.contribute + 1 WHERE user.id = :userId")
+    @Query("UPDATE UserEntity user SET user.contribute = user.contribute + 1 WHERE user.id = :userId")
     void increaseContributeCount(@Param("userId") Long id);
 
     @Modifying
-    @Query("UPDATE User user SET user.contribute = user.contribute - 1 WHERE user.id = :userId")
+    @Query("UPDATE UserEntity user SET user.contribute = user.contribute - 1 WHERE user.id = :userId")
     void decreaseContributeCount(@Param("userId") Long id);
 
     @Modifying
-    @Query("UPDATE User user SET user.rating = user.rating + :rating WHERE user.id = :userId")
+    @Query("UPDATE UserEntity user SET user.rating = user.rating + :rating WHERE user.id = :userId")
     void updateRating(@Param("userId") Long id, @Param("rating") Integer rating);
 }

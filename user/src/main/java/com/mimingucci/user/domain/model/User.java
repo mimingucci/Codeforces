@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Data
 public class User {
-    private Long Id;
+    private Long id;
 
     private String email;
 

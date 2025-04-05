@@ -7,6 +7,7 @@ import com.mimingucci.blog.domain.repository.BlogRepository;
 import com.mimingucci.blog.infrastructure.repository.converter.BlogConverter;
 import com.mimingucci.blog.infrastructure.repository.entity.BlogEntity;
 import com.mimingucci.blog.infrastructure.repository.jpa.BlogJpaRepository;
+import com.mimingucci.blog.infrastructure.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,10 @@ public class BlogRepositoryImpl implements BlogRepository {
 
     @Override
     public Blog createBlog(Blog blog) {
+        System.out.println(blog.getContent());
         BlogEntity entity = BlogConverter.INSTANCE.toEntity(blog);
+        entity.setId(IdGenerator.INSTANCE.nextId());
+        System.out.println(entity.getContent());
         return BlogConverter.INSTANCE.toDomain(this.blogJpaRepository.save(entity));
     }
 

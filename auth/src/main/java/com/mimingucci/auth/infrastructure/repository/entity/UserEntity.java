@@ -1,6 +1,7 @@
 package com.mimingucci.auth.infrastructure.repository.entity;
 
 import com.mimingucci.auth.common.enums.Role;
+import com.mimingucci.auth.infrastructure.repository.converter.RoleSetConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,6 +31,7 @@ public class UserEntity {
 
     private Integer rating;
 
+    @Convert(converter = RoleSetConverter.class)
     private Set<Role> roles;
 
     @Column(nullable = false, updatable = false, name = "created_at")

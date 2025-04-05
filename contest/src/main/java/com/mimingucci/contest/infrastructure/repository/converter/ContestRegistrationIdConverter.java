@@ -2,9 +2,11 @@ package com.mimingucci.contest.infrastructure.repository.converter;
 
 import com.mimingucci.contest.infrastructure.repository.entity.ContestRegistrationId;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedSourcePolicy = ReportingPolicy.IGNORE, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ContestRegistrationIdConverter {
     ContestRegistrationIdConverter INSTANCE = Mappers.getMapper(ContestRegistrationIdConverter.class);
 

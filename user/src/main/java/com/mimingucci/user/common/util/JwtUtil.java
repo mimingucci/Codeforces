@@ -24,10 +24,10 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    @Value("${jwt.private-key-path}")
+    @Value("${jwt.private-key}")
     private String privateKeyPath;
 
-    @Value("${jwt.public-key-path}")
+    @Value("${jwt.public-key}")
     private String publicKeyPath;
 
     @Autowired

@@ -6,10 +6,11 @@ import com.mimingucci.submission.presentation.dto.response.PageableResponse;
 import com.mimingucci.submission.presentation.dto.response.SubmissionResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedSourcePolicy = ReportingPolicy.IGNORE, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SubmissionAssembler {
     SubmissionAssembler INSTANCE = Mappers.getMapper(SubmissionAssembler.class);
 

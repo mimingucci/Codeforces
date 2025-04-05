@@ -1,7 +1,7 @@
 package com.mimingucci.user.presentation.dto.response;
 
-import com.mimingucci.user.domain.model.User;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,16 +27,4 @@ public class UserGetResponse {
     private Integer contribute;
 
     private String avatar;
-
-    public UserGetResponse(User user) {
-        this.id = user.getId();
-        this.avatar = user.getAvatar();
-        this.email = user.getEmail();
-        this.contribute = user.getContribute();
-        this.rating = user.getRating();
-        this.description = user.getDescription();
-        this.firstname = user.getFirstname();
-        this.lastname = user.getLastname();
-        this.enabled = user.getEnabled();
-    }
 }

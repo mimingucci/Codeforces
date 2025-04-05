@@ -20,8 +20,8 @@ public class BlogServiceImpl implements BlogService {
     public Blog createBlog(Blog domain) {
         Blog blog = this.blogRepository.createBlog(domain);
         // send events to broker
-        this.blogProducer.sendUserAddBlogEvent(BlogAddAuthorEvent.builder().userId(domain.getAuthor()).blogId(domain.getId()).build());
-        this.blogProducer.sendBlogAddTagEvent(BlogAddTagEvent.builder().tagIds(domain.getTags()).build());
+//        this.blogProducer.sendUserAddBlogEvent(BlogAddAuthorEvent.builder().userId(domain.getAuthor()).blogId(domain.getId()).build());
+//        this.blogProducer.sendBlogAddTagEvent(BlogAddTagEvent.builder().tagIds(domain.getTags()).build());
         return blog;
     }
 

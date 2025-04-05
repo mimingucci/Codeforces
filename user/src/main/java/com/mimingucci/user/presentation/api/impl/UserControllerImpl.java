@@ -8,10 +8,8 @@ import com.mimingucci.user.presentation.dto.response.BaseResponse;
 import com.mimingucci.user.presentation.dto.response.UserGetResponse;
 import com.mimingucci.user.presentation.dto.response.UserUpdateResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,13 +19,13 @@ public class UserControllerImpl implements UserController {
 
     @PutMapping(path = PathConstants.UPDATE)
     @Override
-    public BaseResponse<UserUpdateResponse> updateProfile(UserUpdateRequest request) {
+    public BaseResponse<UserUpdateResponse> updateProfile(@RequestBody @Validated UserUpdateRequest request) {
         return BaseResponse.success(this.userApplicationService.updateProfile(request));
     }
 
     @GetMapping(path = PathConstants.USER_ID)
     @Override
-    public BaseResponse<UserGetResponse> getUserById(Long userId) {
+    public BaseResponse<UserGetResponse> getUserById(@PathVariable("userId") Long userId) {
         return BaseResponse.success(this.userApplicationService.getUserById(userId));
     }
 }

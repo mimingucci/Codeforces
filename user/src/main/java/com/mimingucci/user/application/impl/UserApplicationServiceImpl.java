@@ -4,6 +4,7 @@ import com.mimingucci.user.application.UserApplicationService;
 import com.mimingucci.user.application.assembler.UserAssembler;
 import com.mimingucci.user.domain.model.User;
 import com.mimingucci.user.domain.service.UserService;
+import com.mimingucci.user.infrastructure.repository.converter.UserConverter;
 import com.mimingucci.user.presentation.dto.request.UserUpdateRequest;
 import com.mimingucci.user.presentation.dto.response.UserGetResponse;
 import com.mimingucci.user.presentation.dto.response.UserUpdateResponse;
@@ -19,12 +20,12 @@ public class UserApplicationServiceImpl implements UserApplicationService {
     @Override
     public UserUpdateResponse updateProfile(UserUpdateRequest request) {
         User updatedUser = this.userService.updateUserInfo(UserAssembler.INSTANCE.regToDomain(request));
-        return new UserUpdateResponse(updatedUser);
+        return UserAssembler.INSTANCE.toUpdateResponse(updatedUser);
     }
 
     @Override
     public UserGetResponse getUserById(Long userId) {
         User user = this.userService.getUserById(userId);
-        return new UserGetResponse(user);
+        return UserAssembler.INSTANCE.toGetResponse(user);
     }
 }

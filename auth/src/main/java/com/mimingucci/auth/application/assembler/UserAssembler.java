@@ -10,20 +10,13 @@ import com.mimingucci.auth.presentation.dto.request.UserLoginRequest;
 import com.mimingucci.auth.presentation.dto.request.UserRegisterRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedSourcePolicy = ReportingPolicy.IGNORE, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserAssembler {
     UserAssembler INSTANCE = Mappers.getMapper(UserAssembler.class);
-
-    default User registerToDomain(UserRegisterRequest request) {
-        User user = this.regToDomain(request);
-        user.setId(IdGenerator.INSTANCE.nextId());
-        user.addRole(Role.USER);
-        user.setEnabled(false);
-        return user;
-    }
 
     User regToDomain(UserRegisterRequest request);
 
@@ -34,4 +27,12 @@ public interface UserAssembler {
     User forgotToDomain(UserForgotPasswordRequest request);
 
     User changePasswordRequestToDomain(UserChangePasswordRequest request);
+
+    default User registerToDomain(UserRegisterRequest request) {
+        User user = this.regToDomain(request);
+        user.setId(IdGenerator.INSTANCE.nextId());
+        user.addRole(Role.USER);
+        user.setEnabled(false);
+        return user;
+    }
 }

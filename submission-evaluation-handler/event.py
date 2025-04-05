@@ -13,6 +13,7 @@ class SubmissionJudgedEvent(BaseModel):
     verdict: Verdict
     author: int
     contest: int
+    problem: int
     execution_time_ms: Optional[int] = None
     memory_used_kb: Optional[int] = None
     score: Optional[int] = None
