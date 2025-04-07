@@ -1,4 +1,4 @@
-package com.mimingucci.ranking.domain.model;
+package com.mimingucci.leaderboard;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +11,5 @@ import java.util.List;
 @AllArgsConstructor
 public class LeaderboardUpdate {
     private Long contestId;
-
     private List<LeaderboardEntry> entries;
 }

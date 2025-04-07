@@ -1,10 +1,14 @@
 package com.mimingucci.ranking.domain.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mimingucci.ranking.common.enums.SubmissionVerdict;
 import com.mimingucci.ranking.domain.event.SubmissionResultEvent;
 import com.mimingucci.ranking.domain.model.ContestMetadata;
 import com.mimingucci.ranking.domain.model.LeaderboardEntry;
 import com.mimingucci.ranking.domain.model.LeaderboardUpdate;
+import com.mimingucci.ranking.domain.model.LeaderboardUpdateSerializable;
 import com.mimingucci.ranking.domain.repository.LeaderboardEntryRepository;
 import com.mimingucci.ranking.domain.repository.SubmissionResultRepository;
 import org.apache.flink.api.common.state.*;
@@ -16,7 +20,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
-public class LeaderboardProcessFunction extends KeyedBroadcastProcessFunction<Long, SubmissionResultEvent, ContestMetadata, LeaderboardUpdate> {
+public class LeaderboardProcessFunction extends KeyedBroadcastProcessFunction<Long, SubmissionResultEvent, ContestMetadata, LeaderboardUpdateSerializable> {
 
     private transient MapState<Long, LeaderboardEntry> leaderboard;
 
@@ -73,7 +77,7 @@ public class LeaderboardProcessFunction extends KeyedBroadcastProcessFunction<Lo
     }
 
     @Override
-    public void processElement(SubmissionResultEvent event, ReadOnlyContext ctx, Collector<LeaderboardUpdate> out) throws Exception {
+    public void processElement(SubmissionResultEvent event, ReadOnlyContext ctx, Collector<LeaderboardUpdateSerializable> out) throws Exception {
         ReadOnlyBroadcastState<Long, ContestMetadata> metadataState = ctx.getBroadcastState(metadataDescriptor);
         ContestMetadata metadata = metadataState.get(event.getContest());
 
@@ -123,23 +127,29 @@ public class LeaderboardProcessFunction extends KeyedBroadcastProcessFunction<Lo
         leaderboard.put(event.getAuthor(), entry);
 
         List<LeaderboardEntry> sortedEntries = recalculate_ranks();
-        out.collect(new LeaderboardUpdate(
-                event.getContest(),
-                sortedEntries
-        ));
+
+        ObjectMapper mapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        String json = mapper.writeValueAsString(new LeaderboardUpdate(event.getContest(), sortedEntries));
+        out.collect(new LeaderboardUpdateSerializable(event.getContest(), json));
     }
 
     @Override
-    public void processBroadcastElement(ContestMetadata metadata, Context ctx, Collector<LeaderboardUpdate> out) throws Exception {
+    public void processBroadcastElement(ContestMetadata metadata, Context ctx, Collector<LeaderboardUpdateSerializable> out) throws Exception {
         BroadcastState<Long, ContestMetadata> state = ctx.getBroadcastState(metadataDescriptor);
         state.put(metadata.getId(), metadata);
         if (metadata.getEndTime() != null && Instant.now().isAfter(metadata.getEndTime())) {
             // contest is over
             List<LeaderboardEntry> sortedEntries = recalculate_ranks();
-            out.collect(new LeaderboardUpdate(
-                    metadata.getId(),
-                    sortedEntries
-            ));
+
+            ObjectMapper mapper = new ObjectMapper()
+                    .registerModule(new JavaTimeModule())
+                    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+            String json = mapper.writeValueAsString(new LeaderboardUpdate(metadata.getId(), sortedEntries));
+            out.collect(new LeaderboardUpdateSerializable(metadata.getId(), json));
 
             List<LeaderboardEntry> entries = new ArrayList<>();
             for (var entry : this.leaderboard.values()) {

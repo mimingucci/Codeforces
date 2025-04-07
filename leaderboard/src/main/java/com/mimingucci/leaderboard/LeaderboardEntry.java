@@ -1,6 +1,5 @@
-package com.mimingucci.ranking.domain.model;
+package com.mimingucci.leaderboard;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,22 +14,11 @@ import java.util.Set;
 @AllArgsConstructor
 public class LeaderboardEntry {
     private Long userId;
-
     private Long contestId;
-
-    private Integer rank = -1;
-
-    private Integer totalScore = 0;
-
-    private Integer penalty = 0;
-
-    @JsonDeserialize(as = HashSet.class)
+    private Integer rank;
+    private Integer totalScore;
+    private Integer penalty;
     private Set<Long> solvedProblems = new HashSet<>();
-
-    @JsonDeserialize(as = HashMap.class)
     private Map<Long, Integer> problemAttempts = new HashMap<>();
-
-    @JsonDeserialize(as = HashMap.class)
     private Map<Long, Integer> problemSolveTimes = new HashMap<>();
-
 }

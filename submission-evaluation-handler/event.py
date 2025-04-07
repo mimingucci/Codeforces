@@ -2,11 +2,19 @@ from pydantic import BaseModel
 from judge_status import Verdict
 from typing import Optional
 from datetime import datetime
+from judge import Language
 
 class JudgeSubmissionEvent(BaseModel):
     id: int
     problem: int
     sourceCode: str
+    # contest: int
+    # author: int
+    # score: int
+    # timeLimit: int
+    # memoryLimit: int
+    # language: Language
+
 
 class SubmissionJudgedEvent(BaseModel):
     id: int

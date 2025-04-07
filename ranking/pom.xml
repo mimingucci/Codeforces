@@ -89,6 +89,10 @@
 			<artifactId>spring-kafka-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.flink/flink-streaming-java -->
 		<dependency>
 			<groupId>org.apache.flink</groupId>

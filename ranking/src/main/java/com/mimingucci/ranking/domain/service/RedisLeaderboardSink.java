@@ -1,17 +1,16 @@
 package com.mimingucci.ranking.domain.service;
 
-import com.google.gson.Gson;
-import com.mimingucci.ranking.domain.model.LeaderboardEntry;
-import com.mimingucci.ranking.domain.model.LeaderboardUpdate;
+import com.mimingucci.ranking.domain.model.LeaderboardUpdateSerializable;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import redis.clients.jedis.Jedis;
 
-public class RedisLeaderboardSink extends RichSinkFunction<LeaderboardUpdate> {
+public class RedisLeaderboardSink extends RichSinkFunction<LeaderboardUpdateSerializable> {
     private final String host;
     private final int port;
     private final String keyPrefix;
     private transient Jedis jedis;
+
 
     public RedisLeaderboardSink(String host, int port, String keyPrefix) {
         this.host = host;
@@ -25,24 +24,17 @@ public class RedisLeaderboardSink extends RichSinkFunction<LeaderboardUpdate> {
     }
 
     @Override
-    public void invoke(LeaderboardUpdate update, Context context) {
+    public void invoke(LeaderboardUpdateSerializable update, Context context) {
         String key = keyPrefix + update.getContestId();
 
         // Clear previous values
         jedis.del(key);
 
-        // Add all entries to Redis sorted set
-        for (LeaderboardEntry entry : update.getEntries()) {
-            jedis.zadd(key, entry.getRank(), serializeEntry(entry));
-        }
+        // Store as plain string value
+        jedis.set(key, update.getData());
 
         // Set expiration if needed
         jedis.expire(key, 86400); // Expire after 24 hours
-    }
-
-    private String serializeEntry(LeaderboardEntry entry) {
-        // Convert to JSON or your preferred format
-        return new Gson().toJson(entry);
     }
 
     @Override

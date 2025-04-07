@@ -316,7 +316,7 @@ async def startup_event():
         eureka_server="http://192.168.0.106:8761/eureka",
         app_name="judger",
         instance_port=8090,
-        instance_host="172.19.0.2"
+        # instance_host="172.19.0.2"
     )
 
 

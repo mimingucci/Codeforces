@@ -5,7 +5,7 @@ import com.mimingucci.ranking.common.deserializer.ContestMetadataDeserialization
 import com.mimingucci.ranking.common.deserializer.SubmissionResultEventDeserializationSchema;
 import com.mimingucci.ranking.domain.event.SubmissionResultEvent;
 import com.mimingucci.ranking.domain.model.ContestMetadata;
-import com.mimingucci.ranking.domain.model.LeaderboardUpdate;
+import com.mimingucci.ranking.domain.model.LeaderboardUpdateSerializable;
 import com.mimingucci.ranking.domain.repository.LeaderboardEntryRepository;
 import com.mimingucci.ranking.domain.repository.SubmissionResultRepository;
 import jakarta.annotation.PostConstruct;
@@ -68,7 +68,7 @@ public class LeaderboardFlinkService {
                 .setStartingOffsets(OffsetsInitializer.latest())
                 .build();
 
-        DataStream<LeaderboardUpdate> leaderboardStream = env
+        DataStream<LeaderboardUpdateSerializable> leaderboardStream = env
                 .fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "Kafka Source")
                 .keyBy(SubmissionResultEvent::getContest)
                 .connect(broadcastMetadata)
@@ -76,7 +76,8 @@ public class LeaderboardFlinkService {
                 .name("Leaderboard Processor");
 
         // Add Redis sink
-        leaderboardStream.addSink(new RedisLeaderboardSink(
+        leaderboardStream
+                .addSink(new RedisLeaderboardSink(
                 "localhost",
                 6379,
                 "leaderboard"
