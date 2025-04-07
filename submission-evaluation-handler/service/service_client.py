@@ -1,3 +1,5 @@
+import json
+
 import httpx
 import py_eureka_client.eureka_client as eureka_client
 from fastapi import HTTPException
@@ -11,7 +13,7 @@ class ServiceClient:
     
     @staticmethod
     @circuit(failure_threshold=3, recovery_timeout=10)
-    async def get(service_name: str, endpoint: str, params: Optional[Dict[str, Any]] = None, 
+    async def get(service_name: str, endpoint: str, params: str = None,
                  headers: Optional[Dict[str, str]] = None, timeout: float = 10.0) -> Any:
         """
         Make a GET request to another microservice
@@ -27,13 +29,13 @@ class ServiceClient:
             Parsed JSON response
         """
         try:
-            service_url = await eureka_client.get_service_url(service_name)
-            url = f"{service_url}{endpoint}"
-            
-            async with httpx.AsyncClient(timeout=timeout) as client:
-                response = await client.get(url, params=params, headers=headers)
-                response.raise_for_status()
-                return response.json()
+            res = await eureka_client.do_service_async(service_name,
+                                                       endpoint,
+                                                       params,
+                                                       headers=headers,
+                                                       timeout=timeout,
+                                                       method="GET")
+            return res
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, 
                                detail=f"Error from {service_name} service: {e.response.text}")
@@ -44,7 +46,7 @@ class ServiceClient:
     @staticmethod
     @circuit(failure_threshold=3, recovery_timeout=10)
     async def post(service_name: str, endpoint: str, json_data: Optional[Dict[str, Any]] = None,
-                  params: Optional[Dict[str, Any]] = None, headers: Optional[Dict[str, str]] = None, 
+                  params: str = None, headers: Optional[Dict[str, str]] = None,
                   timeout: float = 10.0) -> Any:
         """
         Make a POST request to another microservice
@@ -61,13 +63,14 @@ class ServiceClient:
             Parsed JSON response
         """
         try:
-            service_url = await eureka_client.get_service_url(service_name)
-            url = f"{service_url}{endpoint}"
-            
-            async with httpx.AsyncClient(timeout=timeout) as client:
-                response = await client.post(url, json=json_data, params=params, headers=headers)
-                response.raise_for_status()
-                return response.json()
+            res = await eureka_client.do_service_async(service_name,
+                                                       endpoint,
+                                                       params,
+                                                       data=json.dumps(json_data),
+                                                       headers=headers,
+                                                       timeout=timeout,
+                                                       method="POST")
+            return res
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, 
                                detail=f"Error from {service_name} service: {e.response.text}")
@@ -78,7 +81,7 @@ class ServiceClient:
     @staticmethod
     @circuit(failure_threshold=3, recovery_timeout=10)
     async def put(service_name: str, endpoint: str, json_data: Optional[Dict[str, Any]] = None,
-                 params: Optional[Dict[str, Any]] = None, headers: Optional[Dict[str, str]] = None, 
+                 params: str = None, headers: Optional[Dict[str, str]] = None,
                  timeout: float = 10.0) -> Any:
         """
         Make a PUT request to another microservice
@@ -95,13 +98,14 @@ class ServiceClient:
             Parsed JSON response
         """
         try:
-            service_url = await eureka_client.get_service_url(service_name)
-            url = f"{service_url}{endpoint}"
-            
-            async with httpx.AsyncClient(timeout=timeout) as client:
-                response = await client.put(url, json=json_data, params=params, headers=headers)
-                response.raise_for_status()
-                return response.json()
+            res = await eureka_client.do_service_async(service_name,
+                                                       endpoint,
+                                                       params,
+                                                       data=json.dumps(json_data),
+                                                       headers=headers,
+                                                       timeout=timeout,
+                                                       method="PUT")
+            return res
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, 
                                detail=f"Error from {service_name} service: {e.response.text}")
@@ -111,7 +115,7 @@ class ServiceClient:
 
     @staticmethod
     @circuit(failure_threshold=3, recovery_timeout=10)
-    async def delete(service_name: str, endpoint: str, params: Optional[Dict[str, Any]] = None,
+    async def delete(service_name: str, endpoint: str, params: str = None,
                     headers: Optional[Dict[str, str]] = None, timeout: float = 10.0) -> Any:
         """
         Make a DELETE request to another microservice
@@ -127,13 +131,13 @@ class ServiceClient:
             Parsed JSON response
         """
         try:
-            service_url = await eureka_client.get_service_url(service_name)
-            url = f"{service_url}{endpoint}"
-            
-            async with httpx.AsyncClient(timeout=timeout) as client:
-                response = await client.delete(url, params=params, headers=headers)
-                response.raise_for_status()
-                return response.json()
+            res = await eureka_client.do_service_async(service_name,
+                                                       endpoint,
+                                                       params,
+                                                       headers=headers,
+                                                       timeout=timeout,
+                                                       method="DELETE")
+            return res
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=e.response.status_code, 
                                detail=f"Error from {service_name} service: {e.response.text}")

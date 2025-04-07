@@ -1,29 +1,15 @@
 # main.py
 import asyncio
-import httpx
 import py_eureka_client.eureka_client as eureka_client
 from fastapi import FastAPI, HTTPException
 from service.kafka_consumer import KafkaConsumer
-from circuitbreaker import circuit
 from event import JudgeSubmissionEvent
 from service.kafka_util import _kafka_producer
-from leaderboard.api import router as leaderboard_router
+from service.service_client import ServiceClient
+from judge import Judge, Language
 
 app = FastAPI()
 app.debug = 1
-
-# Add the leaderboard router to FastAPI
-app.include_router(leaderboard_router)
-
-@circuit(failure_threshold=3, recovery_timeout=10)
-async def getAllTestCasesByProblemId(problemId: int):
-    try:
-        response = await eureka_client.do_service_async("testcase", f"/api/v1/testcase/problem/{problemId}")
-        print(response)
-    except httpx.HTTPStatusError as e:
-        raise HTTPException(status_code=e.response.status_code, detail=f"Error from testcase service: {e.response.text}")
-    except httpx.RequestError as e:
-        raise HTTPException(status_code=500, detail=f"Service unreachable: {str(e)}")
 
 
 class SubmissionHandler(KafkaConsumer):
@@ -32,7 +18,9 @@ class SubmissionHandler(KafkaConsumer):
         print(f"Handling message from {message.value}")
         try:
             event = JudgeSubmissionEvent(**message.value)
-            print(f"{event.id} - {event.problem} - {event.sourceCode}")
+            judger = Judge(src=event.sourceCode, inputs=["1 2 3", "1 2"], outputs=["1", "2"], language=Language.CPP)
+            rep = await judger.run()
+            print(rep)
         except Exception as e: 
             print(f"Invalid message format: {e}")
 
@@ -41,7 +29,7 @@ class SubmissionHandler(KafkaConsumer):
 async def startup_event():
     # Initialize eureka client first
     await eureka_client.init_async(
-        eureka_server="http://localhost:8761/",
+        eureka_server="http://localhost:8761/eureka",
         app_name="submission-evaluation-handler",
         instance_port=8000
     )

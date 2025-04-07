@@ -1,5 +1,5 @@
 import asyncio
-from kafka_producer import KafkaProducer
+from service.kafka_producer import KafkaProducer
 from typing import Dict, Any, Optional
 
 # Singleton instance of the Kafka producer

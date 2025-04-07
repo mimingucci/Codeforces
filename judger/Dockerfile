@@ -88,7 +88,7 @@ RUN chmod 755 /usr/lib/judger/libjudger.so && \
 
 # Install Python dependencies
 RUN python3 -m venv .venv && \
-    .venv/bin/pip install --no-cache-dir fastapi uvicorn pydantic idna psutil requests && \
+    .venv/bin/pip install --no-cache-dir fastapi uvicorn pydantic idna psutil requests py_eureka_client && \
     .venv/bin/pip install *.whl && \
     # Create empty __init__.py files
     touch /app/bindings/__init__.py && \
@@ -101,8 +101,8 @@ RUN <<EOS
     useradd -u 902 -r -s /sbin/nologin -M runner
 EOS
 
-# Expose port 8000
-EXPOSE 8000
+# Expose port 8090
+EXPOSE 8090
 
 # Command to run FastAPI app with root privileges
-CMD [".venv/bin/uvicorn", "bindings.Python.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "debug"]
+CMD [".venv/bin/uvicorn", "bindings.Python.api.main:app", "--host", "0.0.0.0", "--port", "8090", "--log-level", "debug"]

@@ -12,6 +12,7 @@ import shutil
 # import uvicorn
 # coding=utf-8
 from enum import Enum
+import py_eureka_client.eureka_client as eureka_client
 from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
 from languages import *
@@ -306,6 +307,17 @@ async def check_token_middleware(request: Request, call_next):
     # Continue processing the request
     response = await call_next(request)
     return response
+
+
+@app.on_event("startup")
+async def startup_event():
+    # Initialize eureka client first
+    await eureka_client.init_async(
+        eureka_server="http://192.168.0.106:8761/eureka",
+        app_name="judger",
+        instance_port=8090,
+        instance_host="172.19.0.2"
+    )
 
 
 if DEBUG:
