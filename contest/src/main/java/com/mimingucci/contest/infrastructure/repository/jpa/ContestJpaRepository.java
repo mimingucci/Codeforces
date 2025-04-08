@@ -28,4 +28,10 @@ public interface ContestJpaRepository extends JpaRepository<ContestEntity, Long>
 
     // Find a contest by ID where the startTime is less than or equal to current time
     ContestEntity findByIdAndStartTimeLessThanEqual(Long id, Instant currentTime);
+
+    @Query("SELECT c FROM ContestEntity c WHERE " +
+            "NOT (c.endTime < :currentTime OR c.startTime > :periodEnd)")
+    List<ContestEntity> findContestsRelevantForPeriod(
+            @Param("currentTime") Instant currentTime,
+            @Param("periodEnd") Instant periodEnd);
 }

@@ -1,4 +1,4 @@
-package com.mimingucci.leaderboard;
+package com.mimingucci.leaderboard.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

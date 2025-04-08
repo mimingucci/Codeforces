@@ -1,4 +1,4 @@
-package com.mimingucci.leaderboard;
+package com.mimingucci.leaderboard.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,11 +14,19 @@ import java.util.Set;
 @AllArgsConstructor
 public class LeaderboardEntry {
     private Long userId;
+
     private Long contestId;
-    private Integer rank;
-    private Integer totalScore;
-    private Integer penalty;
+
+    private Integer rank = -1;
+
+    private Integer totalScore = 0;
+
+    private Integer penalty = 0;
+
     private Set<Long> solvedProblems = new HashSet<>();
+
     private Map<Long, Integer> problemAttempts = new HashMap<>();
+
     private Map<Long, Integer> problemSolveTimes = new HashMap<>();
+
 }

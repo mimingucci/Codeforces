@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -72,6 +73,11 @@ public class ContestRepositoryImpl implements ContestRepository {
         ContestEntity entity = contestJpaRepository.findByIdAndStartTimeLessThanEqual(id, now);
         if (entity == null) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
         return ContestConverter.INSTANCE.toDomain(entity);
+    }
+
+    @Override
+    public List<Contest> findContestsRelevantForPeriod(Instant startTime, Instant endTime) {
+        return contestJpaRepository.findContestsRelevantForPeriod(startTime, endTime).stream().map(ContestConverter.INSTANCE::toDomain).toList();
     }
 
     @Override

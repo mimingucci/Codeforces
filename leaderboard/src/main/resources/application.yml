@@ -1,0 +1,16 @@
+eureka:
+    client:
+        register-with-eureka: true
+        service-url:
+            defaultZone: http://localhost:8761/eureka/
+
+spring:
+    data:
+        web:
+            pageable:
+                default-page-size: 50        # Sets the default page size
+                max-page-size: 1000          # Sets the maximum allowed page size
+                page-parameter: page         # The parameter name for the page number (default is "page")
+                size-parameter: size         # The parameter name for the page size (default is "size")
+                one-indexed-parameters: false # Whether page parameters are 1-based (default is false meaning 0-based)
+                prefix:                      # Optional prefix for pagination parameters
