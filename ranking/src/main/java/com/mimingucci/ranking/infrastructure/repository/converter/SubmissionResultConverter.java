@@ -14,6 +14,8 @@ public interface SubmissionResultConverter {
 
     SubmissionResultEntity eventToEntity(SubmissionResultEvent event);
 
+    SubmissionResultEvent toEvent(SubmissionResultEntity entity);
+
     default SubmissionResultEntity toEntity(SubmissionResultEvent event) {
         SubmissionResultEntity entity = this.eventToEntity(event);
         entity.setId(IdGenerator.INSTANCE.nextId());

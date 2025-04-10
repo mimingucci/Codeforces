@@ -25,6 +25,24 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
+  kafka-topics-setup:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: kafka-topics-setup
+    depends_on:
+      - kafka
+    command: >
+      bash -c "
+        echo 'Waiting for Kafka to be ready...' &&
+        cub kafka-ready -b kafka:29092 1 30 &&
+        echo 'Creating Kafka topics if not exists' &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1 --topic contest.action &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1 --topic submission.result &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1 --topic submission.judge &&
+        echo 'Successfully created topics'"
+    environment:
+      # This makes the service exit after creating topics, rather than keep running
+      KAFKA_BROKER_ID: ignored
+      KAFKA_ZOOKEEPER_CONNECT: ignored
   redis:
     image: redis:7.2
     container_name: redis

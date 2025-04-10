@@ -3,9 +3,12 @@ package com.mimingucci.ranking.domain.service;
 import com.mimingucci.ranking.common.constant.KafkaTopicConstants;
 import com.mimingucci.ranking.common.deserializer.ContestMetadataDeserializationSchema;
 import com.mimingucci.ranking.common.deserializer.SubmissionResultEventDeserializationSchema;
+import com.mimingucci.ranking.common.deserializer.VirtualContestMetadataDeserializationSchema;
 import com.mimingucci.ranking.domain.event.SubmissionResultEvent;
 import com.mimingucci.ranking.domain.model.ContestMetadata;
 import com.mimingucci.ranking.domain.model.LeaderboardUpdateSerializable;
+import com.mimingucci.ranking.domain.model.VirtualContestMetadata;
+import com.mimingucci.ranking.domain.model.VirtualLeaderboardUpdateSerializable;
 import com.mimingucci.ranking.domain.repository.LeaderboardEntryRepository;
 import com.mimingucci.ranking.domain.repository.SubmissionResultRepository;
 import jakarta.annotation.PostConstruct;
@@ -41,6 +44,7 @@ public class LeaderboardFlinkService {
     public void startJob() throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
+        // Regular contest processing
         KafkaSource<ContestMetadata> contestMetadataSource = KafkaSource.<ContestMetadata>builder()
                 .setBootstrapServers("localhost:9092")
                 .setGroupId("leaderboard-consumer")
@@ -80,8 +84,48 @@ public class LeaderboardFlinkService {
                 .addSink(new RedisLeaderboardSink(
                 "localhost",
                 6379,
-                "leaderboard"
+                "leaderboard:"
         )).name("Redis Sink");
+
+        // Virtual contest processing
+        KafkaSource<VirtualContestMetadata> virtualContestMetadataSource = KafkaSource.<VirtualContestMetadata>builder()
+                .setBootstrapServers("localhost:9092")
+                .setGroupId("virtual-leaderboard-consumer")
+                .setTopics(KafkaTopicConstants.VIRTUAL_CONTEST_ACTION)
+                .setValueOnlyDeserializer(new VirtualContestMetadataDeserializationSchema())
+                .setStartingOffsets(OffsetsInitializer.latest())
+                .build();
+
+        DataStream<VirtualContestMetadata> virtualContestMetadataStream = env
+                .fromSource(virtualContestMetadataSource, WatermarkStrategy.noWatermarks(), "Virtual Contest Metadata Source");
+
+        MapStateDescriptor<String, VirtualContestMetadata> virtualMetadataDescriptor =
+                new MapStateDescriptor<>("virtualContestMetadata", String.class, VirtualContestMetadata.class);
+
+        BroadcastStream<VirtualContestMetadata> broadcastVirtualMetadata = virtualContestMetadataStream.broadcast(virtualMetadataDescriptor);
+
+        KafkaSource<SubmissionResultEvent> virtualKafkaSource = KafkaSource.<SubmissionResultEvent>builder()
+                .setBootstrapServers("localhost:9092")
+                .setGroupId("virtual-leaderboard-consumer")
+                .setTopics(KafkaTopicConstants.VIRTUAL_SUBMISSION_RESULT)
+                .setValueOnlyDeserializer(new SubmissionResultEventDeserializationSchema())
+                .setStartingOffsets(OffsetsInitializer.latest())
+                .build();
+
+        DataStream<VirtualLeaderboardUpdateSerializable> virtualLeaderboardStream = env
+                .fromSource(virtualKafkaSource, WatermarkStrategy.noWatermarks(), "Virtual Kafka Source")
+                .keyBy(SubmissionResultEvent::getContest)
+                .connect(broadcastVirtualMetadata)
+                .process(new VirtualLeaderboardProcessFunction(virtualMetadataDescriptor, leaderboardEntryRepository))
+                .name("Virtual Leaderboard Processor");
+
+        // Add Redis sinks for virtual contests
+        virtualLeaderboardStream
+                .addSink(new RedisVirtualLeaderboardSink(
+                        "localhost",
+                        6379,
+                        "virtual-leaderboard:"
+                )).name("Virtual Redis Sink");
 
         env.execute("Flink Leaderboard Job");
     }

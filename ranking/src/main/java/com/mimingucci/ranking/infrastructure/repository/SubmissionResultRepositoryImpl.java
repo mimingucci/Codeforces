@@ -18,4 +18,9 @@ public class SubmissionResultRepositoryImpl implements SubmissionResultRepositor
     public void saveSubmissionResultEventsDuringContest(List<SubmissionResultEvent> events) {
         repository.saveAll(events.stream().map(SubmissionResultConverter.INSTANCE::toEntity).toList());
     }
+
+    @Override
+    public List<SubmissionResultEvent> findByContestId(Long contest) {
+        return repository.findByContest(contest).stream().map(SubmissionResultConverter.INSTANCE::toEvent).toList();
+    }
 }
