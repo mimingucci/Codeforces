@@ -8,10 +8,15 @@ import com.mimingucci.user.infrastructure.repository.converter.UserConverter;
 import com.mimingucci.user.infrastructure.repository.entity.UserEntity;
 import com.mimingucci.user.infrastructure.repository.jpa.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -58,5 +63,56 @@ public class UserRepositoryImpl implements UserRepository {
         if (optionalEntity.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         System.out.println(optionalEntity.get().getId() + " - " + optionalEntity.get().getRoles().toString());
         return UserConverter.INSTANCE.toDomain(optionalEntity.get());
+    }
+
+    @Override
+    public List<User> findByCountry(Long countryId) {
+        return this.userJpaRepository.findByCountryId(countryId).stream().map(UserConverter.INSTANCE::toDomain).toList();
+    }
+
+    @Override
+    public Page<User> findByCountry(Long countryId, Pageable pageable) {
+        return this.userJpaRepository.findByCountryId(countryId, pageable).map(UserConverter.INSTANCE::toDomain);
+    }
+
+    @Override
+    public List<User> findByState(Long stateId) {
+        return this.userJpaRepository.findByStateId(stateId).stream().map(UserConverter.INSTANCE::toDomain).toList();
+    }
+
+    @Override
+    public Page<User> findByState(Long stateId, Pageable pageable) {
+        return this.userJpaRepository.findByStateId(stateId, pageable).map(UserConverter.INSTANCE::toDomain);
+    }
+
+    @Override
+    public List<User> findByCountryAndState(Long countryId, Long stateId) {
+        return List.of();
+    }
+
+    @Override
+    public long getCountryUserCount(Long countryId) {
+        return 0;
+    }
+
+    @Override
+    public long getStateUserCount(Long stateId) {
+        return 0;
+    }
+
+    @Override
+    public boolean existsById(Long userId) {
+        return userJpaRepository.existsById(userId);
+    }
+
+    @Override
+    public List<User> findByIds(Collection<Long> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return List.of();
+        }
+        return userJpaRepository.findByIdIn(userIds)
+                .stream()
+                .map(UserConverter.INSTANCE::toDomain)
+                .collect(Collectors.toList());
     }
 }

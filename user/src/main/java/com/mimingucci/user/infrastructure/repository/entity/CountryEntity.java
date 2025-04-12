@@ -1,10 +1,12 @@
 package com.mimingucci.user.infrastructure.repository.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -12,14 +14,18 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class CountryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(nullable = false, length = 45)
+    @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "country")
-    private Set<StateEntity> states;
+    @Column(nullable = false, unique = true, length = 5)
+    private String code;
+
+    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
+    private Set<StateEntity> states = new HashSet<>();
 }

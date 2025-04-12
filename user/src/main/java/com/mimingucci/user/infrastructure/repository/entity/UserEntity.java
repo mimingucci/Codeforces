@@ -1,6 +1,7 @@
 package com.mimingucci.user.infrastructure.repository.entity;
 
 import com.mimingucci.user.common.enums.Role;
+import com.mimingucci.user.domain.model.chat.UserStatus;
 import com.mimingucci.user.infrastructure.repository.converter.RoleSetConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,8 +23,10 @@ public class UserEntity {
     @Id
     private Long id;
 
+    @Column(unique = true, nullable = false, updatable = false)
     private String email;
 
+    @Column(unique = true, nullable = false)
     private String username;
 
     private String password;
@@ -50,7 +53,17 @@ public class UserEntity {
 
     private String avatar;
 
-    @ManyToOne
+    @Enumerated(EnumType.STRING)
+    private UserStatus.Status status = UserStatus.Status.OFFLINE;
+
+    @Column(name = "last_active")
+    private Instant lastActive;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "state_id")
+    private StateEntity state;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "country_id")
     private CountryEntity country;
 

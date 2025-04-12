@@ -41,6 +41,12 @@ spring:
                     uri: lb://user
                     predicates:
                         - Path=/api/v1/user/**
+                -   id: chat
+                    uri: lb://chat
+                    predicates:
+                        - Path=/api/v1/chat/**
+                    metadata:
+                        protocol: ws
 
 
 eureka:
