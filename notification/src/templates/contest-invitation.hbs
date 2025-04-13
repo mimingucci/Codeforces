@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Contest Invitation - {{contestName}}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .header {
+      background-color: #1a75ff;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .content {
+      padding: 20px;
+    }
+    .footer {
+      background-color: #f5f5f5;
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 0.8em;
+      color: #666;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 20px 0;
+      color: white;
+      background-color: #1a75ff;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .contest-info {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 15px 0;
+      border-left: 4px solid #1a75ff;
+    }
+    .time-info {
+      font-weight: bold;
+      color: #1a75ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Contest Invitation</h1>
+  </div>
+  
+  <div class="content">
+    <p>Hello {{name}},</p>
+    
+    <p>You're invited to participate in the upcoming contest:</p>
+    
+    <div class="contest-info">
+      <h2>{{contestName}}</h2>
+      <p class="time-info">Start Time: {{startTime}}</p>
+      <p class="time-info">End Time: {{endTime}}</p>
+      <p class="time-info">Duration: {{duration}}</p>
+    </div>
+    
+    <p>Don't miss this opportunity to:</p>
+    <ul>
+      <li>Test your programming skills</li>
+      <li>Compete with other participants</li>
+      <li>Improve your rating</li>
+      <li>Learn new problem-solving techniques</li>
+    </ul>
+
+    <p>Make sure to:</p>
+    <ul>
+      <li>Read the contest rules carefully</li>
+      <li>Test your coding environment before the contest</li>
+      <li>Join a few minutes early to review the problems</li>
+    </ul>
+    
+    <a href="{{contestUrl}}" class="button">Register for Contest</a>
+    
+    <p>You can set a reminder and review contest details by clicking the button above.</p>
+    
+    <p>Good luck!</p>
+    <p>The Codeforces Team</p>
+  </div>
+  
+  <div class="footer">
+    <p>This email was sent to {{recipient}}. You received this because you're registered on Codeforces.</p>
+    <p>To manage email preferences, visit your <a href="https://codeforces.com/settings">account settings</a>.</p>
+    <p>&copy; {{year}} Codeforces. All rights reserved.</p>
+  </div>
+</body>
+</html>

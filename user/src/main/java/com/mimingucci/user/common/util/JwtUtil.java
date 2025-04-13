@@ -5,6 +5,7 @@ import com.mimingucci.user.domain.model.User;
 import com.mimingucci.user.domain.repository.UserRepository;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -190,5 +191,19 @@ public class JwtUtil {
         } catch (Exception e) {
             return null; // If any error occurs, return null
         }
+    }
+
+    public Claims extractClaimsFromHttpRequest(HttpServletRequest request) {
+        // Extract the JWT token from the Authorization header
+        final String authorizationHeader = request.getHeader("Authorization");
+
+        Claims claims = null;
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7); // Remove "Bearer " prefix
+            claims = this.extractAllClaims(token); // Extract email from the token
+        }
+
+        return claims;
     }
 }

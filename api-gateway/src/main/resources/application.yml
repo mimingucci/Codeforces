@@ -42,7 +42,7 @@ spring:
                     predicates:
                         - Path=/api/v1/user/**
                 -   id: chat
-                    uri: lb://chat
+                    uri: lb:ws://user
                     predicates:
                         - Path=/api/v1/chat/**
                     metadata:

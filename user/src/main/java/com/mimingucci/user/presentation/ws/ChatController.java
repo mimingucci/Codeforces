@@ -1,18 +1,14 @@
 package com.mimingucci.user.presentation.ws;
 
 import com.mimingucci.user.domain.model.chat.ChatMessage;
-import com.mimingucci.user.domain.model.chat.ChatRoom;
 import com.mimingucci.user.domain.service.chat.ChatService;
 import com.mimingucci.user.presentation.dto.request.ChatMessageRequest;
-import com.mimingucci.user.presentation.dto.request.MessageReactionRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-
-import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor

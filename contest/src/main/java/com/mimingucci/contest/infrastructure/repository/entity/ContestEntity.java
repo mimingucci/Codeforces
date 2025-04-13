@@ -40,13 +40,13 @@ public class ContestEntity {
     @Column(nullable = false, name = "is_public")
     private Boolean isPublic = true;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private Set<Long> coordinators = new HashSet<>();
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private Set<Long> authors = new HashSet<>();
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private Set<Long> testers = new HashSet<>();
 
     @Column(nullable = false, updatable = false, name = "created_at")

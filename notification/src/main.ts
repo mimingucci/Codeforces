@@ -22,23 +22,64 @@ async function bootstrap() {
   const ipAddr = configService.get<string>('IP_ADDR', 'localhost');
 
   const client = new Eureka({
-    // application instance information
     instance: {
-      app: 'notification',
+      app: serviceName,
       hostName: hostName,
       ipAddr: ipAddr,
-      port: port,
+      port: {
+        '$': port,
+        '@enabled': true,
+      },
+      vipAddress: serviceName,
+      dataCenterInfo: {
+        '@class': 'com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo',
+        name: 'MyOwn',
+      },
+      statusPageUrl: `http://${hostName}:${port}/info`,
+      healthCheckUrl: `http://${hostName}:${port}/health`,
+      homePageUrl: `http://${hostName}:${port}`,
+      instanceId: `${hostName}:${serviceName}:${port}`,
     },
     eureka: {
-      // eureka server host / port
       host: eurekaHost,
       port: eurekaPort,
+      servicePath: '/eureka/apps/',
+      maxRetries: 10,
+      requestRetryDelay: 2000,
+      preferIpAddress: true
     },
   });
   
   await app.listen(port);
+
   await client.start();
+
+  process.on('SIGINT', async () => {
+    logger.log('Received SIGINT. Deregistering from Eureka...');
+    await client.stop();
+    process.exit();
+  });
+  
+  process.on('SIGTERM', async () => {
+    logger.log('Received SIGTERM. Deregistering from Eureka...');
+    await client.stop();
+    process.exit();
+  });
+
+  client.on('started', () => {
+    logger.log('Eureka client started');
+  });
+  
+  client.on('error', (error) => {
+    logger.error('Eureka client error:', error);
+  });
+  
+  client.on('deregistered', () => {
+    logger.log('Eureka client deregistered');
+  });
+
   logger.log(`Notification service is running on port ${port}`);
+  
   logger.log(`Registered with Eureka at ${eurekaHost}:${eurekaPort} as ${serviceName}`);
 }
 bootstrap();

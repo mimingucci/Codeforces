@@ -36,7 +36,9 @@ services:
         cub kafka-ready -b kafka:29092 1 30 &&
         echo 'Creating Kafka topics if not exists' &&
         kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1 --topic contest.action &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1 --topic virtual.contest.action &&
         kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1 --topic submission.result &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1 --topic virtual.submission.result &&
         kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1 --topic submission.judge &&
         echo 'Successfully created topics'"
     environment:

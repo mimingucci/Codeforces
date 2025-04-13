@@ -33,7 +33,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 Claims claims = this.jwtUtil.extractAllClaims(token);
 
                 Long userId = claims.get("id", Long.class);
-                String username = claims.getSubject();
+                String userEmail = claims.getSubject();
                 // Store in session attributes
                 accessor.setUser(new Principal() {
                     @Override
@@ -42,7 +42,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                     }
                 });
                 accessor.getSessionAttributes().put("userId", userId);
-                accessor.getSessionAttributes().put("username", username);
+                accessor.getSessionAttributes().put("userEmail", userEmail);
             }
         }
         return message;

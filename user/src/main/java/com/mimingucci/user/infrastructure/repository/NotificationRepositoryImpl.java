@@ -60,4 +60,14 @@ public class NotificationRepositoryImpl implements NotificationRepository {
                 .map(chatConverter::toNotificationDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Notification findById(Long id) {
+        NotificationEntity existingEntity = repository.findById(id)
+                .orElseThrow(() -> new ApiRequestException(
+                        ErrorMessageConstants.NOTIFICATION_NOT_FOUND,
+                        HttpStatus.NOT_FOUND
+                ));
+        return chatConverter.toNotificationDomain(existingEntity);
+    }
 }

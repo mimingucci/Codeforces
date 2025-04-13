@@ -7,6 +7,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import * as path from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { NotificationModule } from './notification/notification.module';
+import { HealthModule } from './health/health.module';
+import { HealthController } from './health/health.controller';
 
 @Module({
   imports: [
@@ -57,8 +59,10 @@ import { NotificationModule } from './notification/notification.module';
     }),
 
     NotificationModule,
+
+    HealthModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [AppService],
 })
 export class AppModule {}

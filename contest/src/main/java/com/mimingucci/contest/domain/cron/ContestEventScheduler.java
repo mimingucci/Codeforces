@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
-import java.util.stream.Collectors;
 
 @Component
 public class ContestEventScheduler {
@@ -206,7 +205,6 @@ public class ContestEventScheduler {
 
     private void scheduleContestEvents(Contest contest) {
         Instant now = Instant.now();
-
         // Schedule start event if it's in the future
         if (contest.getStartTime().isAfter(now)) {
             ScheduledFuture<?> startTask = taskScheduler.schedule(
@@ -261,7 +259,7 @@ public class ContestEventScheduler {
      */
     @Scheduled(cron = "0 * * * * ?") // Run every minute at 0 seconds
     public void checkContestStartsAndEnds() {
-        logger.debug("Running minutely contest check...");
+        logger.info("Running minutely contest check...");
 
         if (contestsById.isEmpty()) {
             return; // Nothing to check

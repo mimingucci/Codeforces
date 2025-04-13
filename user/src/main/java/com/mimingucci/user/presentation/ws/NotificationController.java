@@ -1,39 +1,53 @@
 package com.mimingucci.user.presentation.ws;
 
+import com.mimingucci.user.common.constant.PathConstants;
 import com.mimingucci.user.domain.model.chat.Notification;
-import com.mimingucci.user.domain.repository.NotificationRepository;
+import com.mimingucci.user.domain.service.chat.NotificationService;
 import com.mimingucci.user.presentation.dto.response.BaseResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/notification")
+@RequestMapping(path = PathConstants.API_V1_USER + "/notification")
 @RequiredArgsConstructor
 public class NotificationController {
-    private final NotificationRepository notificationRepository;
+    private final NotificationService service;
 
     @GetMapping("/unread/count")
-    public BaseResponse<Long> getUnreadCount(@AuthenticationPrincipal UserDetails user) {
+    public BaseResponse<Long> getUnreadCount(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
         return BaseResponse.success(
-                notificationRepository.countByUserAndIsReadFalse(Long.valueOf(user.getUsername()))
+                service.getUnreadCount(userId)
         );
     }
 
     @GetMapping
     public BaseResponse<List<Notification>> getNotifications(
-            @AuthenticationPrincipal UserDetails user,
+            HttpServletRequest request,
             @RequestParam(defaultValue = "false") boolean unreadOnly) {
-        if (unreadOnly) {
-            return ResponseEntity.ok(
-                    notificationRepository.findByUserAndIsReadFalse(Long.valueOf(user.getUsername()))
-            );
-        }
-        return ResponseEntity.ok(
-                notificationRepository.getAll(Long.valueOf(user.getUsername()))
-        );
+        Long userId = (Long) request.getAttribute("userId");
+        List<Notification> notifications = unreadOnly ?
+                service.getUnreadNotifications(userId) :
+                service.getAllNotifications(userId);
+        return BaseResponse.success(notifications);
+    }
+
+    @PostMapping("/{notificationId}/read")
+    public BaseResponse<Void> markAsRead(
+            HttpServletRequest request,
+            @PathVariable Long notificationId) {
+        Long userId = (Long) request.getAttribute("userId");
+        service.markAsRead(notificationId, userId);
+        return BaseResponse.success();
+    }
+
+    @PostMapping("/read-all")
+    public BaseResponse<Void> markAllAsRead(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        service.markAllAsRead(userId);
+        return BaseResponse.success();
     }
 }
