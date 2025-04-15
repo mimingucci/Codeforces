@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException
 from service.kafka_consumer import KafkaConsumer
 from event import JudgeSubmissionEvent
 from service.kafka_util import _kafka_producer, publish_event
-from judge import Judge, Language
+from judge import Judge, Language, Rule, Verdict
 from datetime import datetime, timezone
 
 app = FastAPI()
@@ -15,22 +15,68 @@ app.debug = 1
 class SubmissionHandler(KafkaConsumer):
     async def handle_message(self, message):
         # Implement your message handling logic here
-        print(f"Handling message from {message.value}")
         try:
             event = JudgeSubmissionEvent(**message.value)
-            # judger = Judge(src=event.sourceCode, inputs=["1 2 3", "1 2"], outputs=["1", "2"], language=event.language)
-            # rep = await judger.run()
-            # print(rep)
-            await publish_event("submission.result", {
-                "verdict": "ACCEPT",
-                "author": 2,
-                "contest": 4,
-                "problem": 1,
-                "execution_time_ms": 1000,
-                "memory_used_kb": 200000,
-                "score": 500,
-                "judged_on": datetime.now(timezone.utc).isoformat()
-            })
+            judger = Judge(src=event.sourceCode, inputs=["1 2 3", "1 2"], outputs=["1", "2"],  time_limit=event.timeLimit, memory_limit=event.memoryLimit, language=event.language, rule=Rule.DEFAULT)
+            rep = await judger.run()
+            if event.rule == Rule.ICPC:
+                ac = 0
+                max_time_limit, max_memory_limit, verdict = 0, 0, Verdict.ACCEPT
+                for tc in rep:
+                    max_time_limit = max(max_time_limit, tc.get("real_time_ms", 0))
+                    max_memory_limit = max(max_memory_limit, tc.get("memory_bytes", 0))
+                    if str(tc["status"]) != "Accepted":
+                        if verdict != Verdict.ACCEPT:
+                            continue
+                        if str(tc["status"]).startswith("Time Limit Exceeded"):
+                            verdict = Verdict.TIME_LIMIT_EXCEED
+                        elif str(tc["status"]).startswith("Memory Limit Exceeded"):
+                            verdict = Verdict.MEMORY_LIMIT_EXCEED
+                        elif str(tc["status"]).startswith("Runtime Error"):
+                            verdict = Verdict.RUNTIME_ERROR
+                        elif str(tc["status"]).startswith("Wrong Answer"):
+                            verdict = Verdict.WRONG_ANSWER
+                        else:
+                            verdict = Verdict.COMPILE_ERROR
+                    else:
+                        ac += 1
+                await publish_event("submission.result", {
+                    "verdict": verdict,
+                    "author": event.author,
+                    "contest": event.contest,
+                    "problem": event.problem,
+                    "execution_time_ms": max_time_limit,
+                    "memory_used_bytes": max_memory_limit,
+                    "score": (event.score * ac) // max(len(rep), 1),
+                    "judged_on": datetime.now(timezone.utc).isoformat()
+                })
+            else:
+                max_time_limit, max_memory_limit, verdict = 0, 0, Verdict.ACCEPT
+                for tc in rep:
+                    max_time_limit = max(max_time_limit, tc.get("real_time_ms", 0))
+                    max_memory_limit = max(max_memory_limit, tc.get("memory_bytes", 0))
+                    if str(tc["status"]) != "Accepted":
+                        if str(tc["status"]).startswith("Time Limit Exceeded"):
+                            verdict = Verdict.TIME_LIMIT_EXCEED
+                        elif str(tc["status"]).startswith("Memory Limit Exceeded"):
+                            verdict = Verdict.MEMORY_LIMIT_EXCEED
+                        elif str(tc["status"]).startswith("Runtime Error"):
+                            verdict = Verdict.RUNTIME_ERROR
+                        elif str(tc["status"]).startswith("Wrong Answer"):
+                            verdict = Verdict.WRONG_ANSWER
+                        else:
+                            verdict = Verdict.COMPILE_ERROR
+                        break
+                await publish_event("submission.result", {
+                    "verdict": verdict,
+                    "author": event.author,
+                    "contest": event.contest,
+                    "problem": event.problem,
+                    "execution_time_ms": max_time_limit,
+                    "memory_used_bytes": max_memory_limit,
+                    "score": event.score if verdict == Verdict.ACCEPT else 0,
+                    "judged_on": datetime.now(timezone.utc).isoformat()
+                })
         except Exception as e: 
             print(f"Invalid message format: {e}")
 

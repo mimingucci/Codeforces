@@ -54,5 +54,36 @@ services:
       - redis-data:/data
     restart: unless-stopped
 
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "33066:33066"
+    environment:
+      MYSQL_ROOT_PASSWORD: Andrew1122:))
+      MYSQL_DATABASE: codeforces
+      MYSQL_USER: root
+      MYSQL_PASSWORD: Andrew1122:))
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  eureka-server:
+    build:
+      context: ./eureka
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
 volumes:
   redis-data:
+  mysql-data:

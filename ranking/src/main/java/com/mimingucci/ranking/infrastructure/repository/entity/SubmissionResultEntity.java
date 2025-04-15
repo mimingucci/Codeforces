@@ -30,7 +30,7 @@ public class SubmissionResultEntity {
 
     private Long execution_time_ms;
 
-    private Long memory_used_kb;
+    private Long memory_used_bytes;
 
     private Integer score;
 

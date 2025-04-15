@@ -219,7 +219,7 @@ class JudgeServer:
             # Execute the program using _judger
             result = _judger.run(
                 max_cpu_time=request.time_limit,
-                max_real_time=request.time_limit * 2,
+                max_real_time=request.time_limit,
                 max_memory=request.memory_limit,
                 max_stack=128 * 1024 * 1024,
                 max_output_size=1024 * 1024 * 16,
@@ -236,8 +236,6 @@ class JudgeServer:
                 gid=RUN_GROUP_GID, 
                 memory_limit_check_only=run_config.get("memory_limit_check_only", 0)
             )
-
-            logging.info(f"Judger result: {result}")
 
             # Read the actual output
             if os.path.exists(output_path):
@@ -267,6 +265,8 @@ class JudgeServer:
                     error_reason = f"Runtime Error (Exit Code: {result['exit_code']})"
                 
                 return {
+                    "real_time_ms": result.get('real_time', 0),
+                    "memory_bytes": result.get('memory', 0),
                     "status": error_reason,
                     "error": error_message,
                     "result": result
@@ -274,12 +274,19 @@ class JudgeServer:
 
             # Compare actual output with expected output
             if actual_output == request.output.strip():
-                return {"status": "Accepted", "output": actual_output}
+                return {
+                    "status": "Accepted", 
+                    "output": actual_output,
+                    "real_time_ms": result.get('real_time', 0),
+                    "memory_bytes": result.get('memory', 0),
+                }
             else:
                 return {
                     "status": "Wrong Answer",
                     "expected": request.output.strip(),
-                    "actual": actual_output
+                    "actual": actual_output, 
+                    "real_time_ms": result.get('real_time', 0),
+                    "memory_bytes": result.get('memory', 0),
                 }
     
 
@@ -312,12 +319,13 @@ async def check_token_middleware(request: Request, call_next):
 @app.on_event("startup")
 async def startup_event():
     # Initialize eureka client first
-    await eureka_client.init_async(
-        eureka_server="http://192.168.0.106:8761/eureka",
-        app_name="judger",
-        instance_port=8090,
-        # instance_host="172.19.0.2"
-    )
+    # await eureka_client.init_async(
+    #     eureka_server="http://192.168.0.106:8761/eureka",
+    #     app_name="judger",
+    #     instance_port=8090,
+    #     # instance_host="172.19.0.2"
+    # )
+    pass
 
 
 if DEBUG:

@@ -20,4 +20,9 @@ public class ErrorMessageConstants {
 
     public static final String CONTEST_NOT_FOUND = "Contest not found";
     public static final String INVALID_TIME_RANGE  = "Contest end time must be equal to or after start time";
+    public static final String CONTEST_HAS_STARTED = "Contest has started";
+    public static final String CONTEST_HAS_FINISHED = "Contest has finished";
+
+    public static final String CONTEST_REGISTRATION_NOT_FOUND = "Contest registration not found";
+
 }

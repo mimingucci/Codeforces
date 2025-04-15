@@ -23,7 +23,7 @@ public class VirtualSubmissionResultEvent {
 
     Long execution_time_ms;
 
-    Long memory_used_kb;
+    Long memory_used_bytes;
 
     Integer score;
 

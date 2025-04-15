@@ -11,6 +11,18 @@ class Language(Enum):
     PHP = "Php"
     GO = "Golang"
 
+class Rule(Enum):
+    DEFAULT = "DEFAULT"
+    ICPC = "ICPC"
+
+class Verdict(Enum):
+    ACCEPT = "ACCEPT",
+    WRONG_ANSWER = "WRONG_ANSWER",
+    TIME_LIMIT_EXCEED = "TIME_LIMIT_EXCEED",
+    MEMORY_LIMIT_EXCEED = "MEMORY_LIMIT_EXCEED",
+    RUNTIME_ERROR = "RUNTIME_ERROR",
+    COMPILE_ERROR = "COMPILE_ERROR"
+
 # Request model
 class CodeExecutionRequest(BaseModel):
     code: str  # C++ source code as a string
@@ -21,13 +33,14 @@ class CodeExecutionRequest(BaseModel):
     language: Language
 
 class Judge(object):
-    def __init__(self, src: str, inputs: list[str], outputs: list[str], time_limit: int = 2000, memory_limit: int = 512000000, language: Language = Language.C) -> None:
+    def __init__(self, src: str, inputs: list[str], outputs: list[str], time_limit: int = 2000, memory_limit: int = 512000000, language: Language = Language.C, rule: Rule = Rule.DEFAULT) -> None:
         self.src = src
         self.inputs = inputs
         self.outputs = outputs
         self.time_limit = time_limit
         self.memory_limit = memory_limit
         self.language = language
+        self.rule = rule
     
     async def _judge_one(self, input_date: str, output_date: str):
         response = await ServiceClient.post(json_data={
@@ -51,4 +64,6 @@ class Judge(object):
         results = []
         for i in range(len(self.inputs)):
             results.append(await self._judge_one(input_date=self.inputs[i], output_date=self.outputs[i]))
+            if results[-1]["status"] != "Accepted" and self.rule == Rule.DEFAULT:
+                return results
         return results
