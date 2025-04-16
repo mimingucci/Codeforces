@@ -10,4 +10,5 @@ public class PathConstants {
     public static final String API_V1_CONTEST = API_V1 + CONTEST;
     public static final String CONTEST_ID = "/{contestId}";
     public static final String ALL = "/all";
+    public static final String CHECK = "/check";
 }

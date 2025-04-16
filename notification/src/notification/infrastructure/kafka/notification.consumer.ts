@@ -4,9 +4,9 @@ import { CommandBus } from '@nestjs/cqrs';
 import { SendEmailNotificationCommand } from '../../application/commands/send-email-notification.command';
 import { Logger } from '@nestjs/common';
 import { EmailTemplate } from '../../domain/value-objects/email-template.enum';
-import { KafkaTopic } from 'src/notification/domain/value-objects/kafka-topics.enum';
-import { UserNotificationMessage, ContestNotificationMessage, SystemNotificationMessage } from '../../domain/types/kafka-messages.type';
-
+import { KafkaTopic, KafkaTopicType } from 'src/notification/domain/value-objects/kafka-topics.enum';
+import { VerificationNotificationMessage, WelcomeNotificationMessage, ForgotPasswordNotificationMessage, PasswordChangedNotificationMessage } from '../../domain/types/kafka-messages.type';
+import { KafkaMessage } from 'kafkajs';
 
 @Injectable()
 export class NotificationConsumer implements OnModuleInit {
@@ -26,85 +26,141 @@ export class NotificationConsumer implements OnModuleInit {
     );
   }
 
-  async handleMessage(message: any): Promise<void> {
-    const { topic, value } = message;
-    const payload = JSON.parse(value.toString());
+  async handleMessage(message: KafkaMessage): Promise<void> {
+    const { value } = message;
+    const payload = value && JSON.parse(value.toString());
+    if (!payload) return;
     
-    this.logger.log(`Received email notification request: ${JSON.stringify(payload)}`);
-
+    this.logger.log(`Received email notification request: ${payload?.forgotPasswordToken}`);
+    const { type, ... data} = payload;
     try {
-      switch (topic) {
-        case KafkaTopic.USER_NOTIFICATION:
-          await this.handleEmailNotification(payload as UserNotificationMessage);
+      switch (type) {
+        case KafkaTopicType.REGISTER:
+          await this.handleEmailVerification(data as VerificationNotificationMessage);
+          break;
+        case KafkaTopicType.WELCOME:
+          await this.handleEmailWelcome(data as WelcomeNotificationMessage);
           break;
 
-        case KafkaTopic.CONTEST_NOTIFICATION:
-          await this.handleContestNotification(payload as ContestNotificationMessage);
+        case KafkaTopicType.FORGOT_PASSWORD:
+          await this.handleNotificationForgotPassword(payload as ForgotPasswordNotificationMessage);
           break;
 
-        case KafkaTopic.SYSTEM_NOTIFICATION:
-          await this.handleSystemNotification(payload as SystemNotificationMessage);
+        case KafkaTopicType.PASSWORD_CHANGED:
+          await this.handleNotificationPasswordChanged(payload as PasswordChangedNotificationMessage);
           break;
 
         default:
-          this.logger.warn(`Unknown topic: ${topic}`);
+          this.logger.warn(`Unknown type: ${type}`);
       }
     } catch (error) {
       this.logger.error(
-        `Error processing message from topic ${topic}: ${error.message}`,
+        `Error processing message from topic ${type}: ${error.message}`,
         error.stack,
       );
     }
   }
 
-  private async handleEmailNotification(payload: UserNotificationMessage): Promise<void> {
-    const { userId, recipient, templateName, subject, data } = payload;
+  private async handleEmailVerification(payload: VerificationNotificationMessage): Promise<void> {
+    const template = EmailTemplate.VERIFICATION;
     
-    const template = EmailTemplate[templateName.toUpperCase()];
     if (!template) {
-      this.logger.error(`Unknown email template: ${templateName}`);
+      this.logger.error(`Unknown email template: ${template}`);
       return;
     }
 
     await this.commandBus.execute(
       new SendEmailNotificationCommand(
-        userId,
-        recipient,
+        payload.email,
         template,
-        subject,
-        data,
+        "Verify Registration",
+        {
+          ...payload,
+          year: new Date().getFullYear(),
+          verificationLink: payload.email
+        } as Record<string, any>,
       ),
     );
   }
 
-  private async handleContestNotification(payload: ContestNotificationMessage): Promise<void> {
-    const { contestId, contestName, startTime, endTime, participants } = payload;
+  private async handleEmailWelcome(payload: WelcomeNotificationMessage): Promise<void> {
+    const template = EmailTemplate.WELCOME;
     
-    // Send contest notification emails to all participants
-    for (const participant of participants) {
-      await this.commandBus.execute(
-        new SendEmailNotificationCommand(
-          participant,
-          participant, // assuming participant is email
-          EmailTemplate.CONTEST_INVITATION,
-          `Contest Invitation: ${contestName}`,
-          {
-            contestId,
-            contestName,
-            startTime,
-            endTime,
-          }
-        ),
-      );
+    if (!template) {
+      this.logger.error(`Unknown email template: ${template}`);
+      return;
     }
+
+    await this.commandBus.execute(
+      new SendEmailNotificationCommand(
+        payload.email,
+        template,
+        "Welcome Codeforces!",
+        {
+          ...payload,
+          year: new Date().getFullYear(),
+        } as Record<string, any>,
+      ),
+    );
   }
 
-  private async handleSystemNotification(payload: SystemNotificationMessage): Promise<void> {
-    const { type, message, targets, priority } = payload;
+  private async handleNotificationForgotPassword(payload: ForgotPasswordNotificationMessage): Promise<void> {
+    const template = EmailTemplate.PASSWORD_RESET;
     
-    // Handle system notifications (could be emails, websocket messages, etc.)
-    this.logger.log(`Processing system notification: ${type} with priority ${priority}`);
+    if (!template) {
+      this.logger.error(`Unknown email template: ${template}`);
+      return;
+    }
+
+    await this.commandBus.execute(
+      new SendEmailNotificationCommand(
+        payload.email,
+        template,
+        "Reset Password",
+        {
+          ...payload,
+          year: new Date().getFullYear(),
+          resetLink: payload.forgotPasswordToken
+        } as Record<string, any>,
+      ),
+    );
+  }
+
+  private async handleNotificationPasswordChanged(payload: PasswordChangedNotificationMessage): Promise<void> {
+    const template = EmailTemplate.PASSWORD_CHANGED;
     
-    // Implementation depends on your system notification requirements
+    if (!template) {
+      this.logger.error(`Unknown email template: ${template}`);
+      return;
+    }
+
+    await this.commandBus.execute(
+      new SendEmailNotificationCommand(
+        payload.email,
+        template,
+        "Password Was Changed Succesfully",
+        {
+          ...payload,
+          year: new Date().getFullYear(),
+          timestamp: this.formatDateUTC(new Date(payload.createdAt * 1000)), // Multiply by 1000 to convert seconds to milliseconds
+        } as Record<string, any>,
+      ),
+    );
+  }
+
+  private formatDateUTC(date: Date): string {
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: 'UTC',
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    };
+  
+    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
+    return `${formattedDate} [UTC+0]`;
   }
 }

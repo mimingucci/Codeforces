@@ -7,6 +7,7 @@ public class ErrorMessageConstants {
 
     public static final String JWT_TOKEN_EXPIRED = "JWT token is expired or invalid";
     public static final String JWT_TOKEN_NOT_FOUND = "JWT token is not found, please provide your token to continue.";
+    public static final String TOKEN_NOT_MATCH = "Token is not match.";
 
     public static final String USER_NOT_FOUND = "User not found";
     public static final String USER_PROFILE_BLOCKED = "User profile blocked";
@@ -25,4 +26,5 @@ public class ErrorMessageConstants {
     public static final String EMPTY_CURRENT_PASSWORD = "Current password cannot be empty.";
     public static final String EMPTY_PASSWORD_CONFIRMATION = "Password confirmation cannot be empty.";
     public static final String SHORT_PASSWORD = "Your password needs to be at least 8 characters. Please enter a longer one.";
+    public static final String ACCOUNT_ALREADY_ENABLED = "Your account has been enabled";
 }

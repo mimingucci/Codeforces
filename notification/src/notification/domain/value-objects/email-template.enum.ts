@@ -4,4 +4,5 @@ export enum EmailTemplate {
   VERIFICATION = 'verification',
   NEW_MESSAGE = 'new-message',
   CONTEST_INVITATION = 'contest-invitation',
+  PASSWORD_CHANGED = 'password-changed',
 }

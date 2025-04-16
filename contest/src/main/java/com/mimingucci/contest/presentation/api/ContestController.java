@@ -29,4 +29,6 @@ public interface ContestController {
     BaseResponse<?> cancelRegister(HttpServletRequest request, Long contestId);
 
     BaseResponse<ContestRegistrationDto> getRegisterById(Long contestId, HttpServletRequest request);
+
+    BaseResponse<Boolean> canSubmit(Long userId, Long contestId);
 }

@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -13,4 +15,10 @@ import lombok.NoArgsConstructor;
 public class SubmissionJudgedEvent {
     Long id;
     SubmissionVerdict verdict;
+    Long author;
+    Long contest;
+    Long problem;
+    Long execution_time_ms;
+    Long memory_used_bytes;
+    Instant judged_on;
 }

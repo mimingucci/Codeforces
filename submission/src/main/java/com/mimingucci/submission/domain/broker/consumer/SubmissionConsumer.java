@@ -18,6 +18,8 @@ public class SubmissionConsumer {
         Submission submission = new Submission();
         submission.setVerdict(event.getVerdict());
         submission.setId(event.getId());
+        submission.setExecution_time_ms(event.getExecution_time_ms());
+        submission.setMemory_used_bytes(event.getMemory_used_bytes());
         service.updateSubmission(event.getId(), submission);
     }
 }

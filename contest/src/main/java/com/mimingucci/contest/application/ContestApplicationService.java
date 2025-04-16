@@ -31,4 +31,6 @@ public interface ContestApplicationService {
     ContestRegistrationDto updateRegister(Long userId, ContestRegistrationDto request);
 
     void cancelRegister(Long userId, Long contestId);
+
+    Boolean checkUserCanSubmit(Long userId, Long contestId);
 }

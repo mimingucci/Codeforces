@@ -3,19 +3,15 @@ package com.mimingucci.auth.presentation.api.impl;
 import com.mimingucci.auth.application.AuthApplicationService;
 import com.mimingucci.auth.common.constant.PathConstants;
 import com.mimingucci.auth.presentation.api.AuthController;
-import com.mimingucci.auth.presentation.dto.request.UserChangePasswordRequest;
-import com.mimingucci.auth.presentation.dto.request.UserForgotPasswordRequest;
-import com.mimingucci.auth.presentation.dto.request.UserLoginRequest;
-import com.mimingucci.auth.presentation.dto.request.UserRegisterRequest;
+import com.mimingucci.auth.presentation.dto.request.*;
 import com.mimingucci.auth.presentation.dto.response.BaseResponse;
 import com.mimingucci.auth.presentation.dto.response.UserForgotPasswordResponse;
 import com.mimingucci.auth.presentation.dto.response.UserLoginResponse;
 import com.mimingucci.auth.presentation.dto.response.UserRegisterResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -47,5 +43,17 @@ public class AuthControllerImpl implements AuthController {
     public BaseResponse<?> changePassword(UserChangePasswordRequest request, HttpServletRequest httpRequest) {
         this.authApplicationService.changePassword(request, httpRequest);
         return BaseResponse.success();
+    }
+
+    @PostMapping(path = PathConstants.VERIFY)
+    @Override
+    public BaseResponse<Boolean> verifyAccount(@RequestBody @Validated UserVerificationRequest request) {
+        return BaseResponse.success(this.authApplicationService.verify(request));
+    }
+
+    @PostMapping(path = PathConstants.RESET_PASSWORD)
+    @Override
+    public BaseResponse<Boolean> resetPassword(@RequestBody @Validated UserResetPasswordRequest request) {
+        return BaseResponse.success(this.authApplicationService.resetPassword(request));
     }
 }

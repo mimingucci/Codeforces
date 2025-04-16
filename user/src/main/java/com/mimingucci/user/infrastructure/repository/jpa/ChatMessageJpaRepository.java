@@ -28,19 +28,19 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessageEntit
             Pageable pageable
     );
 
-    // Find unread messages for a user in a chat
-    @Query("SELECT m FROM ChatMessageEntity m WHERE m.chat = :chatId AND :userId NOT MEMBER OF m.isRead ORDER BY m.createdAt DESC")
-    List<ChatMessageEntity> findUnreadMessagesByChatForUser(
-            @Param("chatId") Long chatId,
-            @Param("userId") Long userId
-    );
+//    // Find unread messages for a user in a chat
+//    @Query("SELECT m FROM ChatMessageEntity m WHERE m.chat = :chatId AND :userId NOT MEMBER OF m.isRead ORDER BY m.createdAt DESC")
+//    List<ChatMessageEntity> findUnreadMessagesByChatForUser(
+//            @Param("chatId") Long chatId,
+//            @Param("userId") Long userId
+//    );
 
-    // Count unread messages for a user in a chat
-    @Query("SELECT COUNT(m) FROM ChatMessageEntity m WHERE m.chat = :chatId AND :userId NOT MEMBER OF m.isRead")
-    long countUnreadMessagesByChatForUser(
-            @Param("chatId") Long chatId,
-            @Param("userId") Long userId
-    );
+//    // Count unread messages for a user in a chat
+//    @Query("SELECT COUNT(m) FROM ChatMessageEntity m WHERE m.chat = :chatId AND :userId NOT MEMBER OF m.isRead")
+//    long countUnreadMessagesByChatForUser(
+//            @Param("chatId") Long chatId,
+//            @Param("userId") Long userId
+//    );
 
     // Get latest N messages for a chat
     @Query(value = "SELECT * FROM message WHERE chat = :chatId ORDER BY created_at DESC LIMIT :limit",

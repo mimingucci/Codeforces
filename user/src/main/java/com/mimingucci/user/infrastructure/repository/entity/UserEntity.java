@@ -53,6 +53,9 @@ public class UserEntity {
 
     private String avatar;
 
+    @Column(name = "forgot_password_token")
+    private String forgotPasswordToken = "";
+
     @Enumerated(EnumType.STRING)
     private UserStatus.Status status = UserStatus.Status.OFFLINE;
 

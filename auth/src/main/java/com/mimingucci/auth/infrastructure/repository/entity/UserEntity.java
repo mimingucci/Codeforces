@@ -31,6 +31,9 @@ public class UserEntity {
 
     private Integer rating;
 
+    @Column(name = "forgot_password_token")
+    private String forgotPasswordToken = "";
+
     @Convert(converter = RoleSetConverter.class)
     private Set<Role> roles;
 
@@ -40,7 +43,7 @@ public class UserEntity {
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now(); // Set to current UTC time
-        this.enabled = true;
+        this.enabled = false;
         this.rating = 0;
     }
 }

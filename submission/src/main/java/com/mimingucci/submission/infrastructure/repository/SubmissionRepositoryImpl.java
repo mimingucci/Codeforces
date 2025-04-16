@@ -55,6 +55,8 @@ public class SubmissionRepositoryImpl implements SubmissionRepository {
             entity.setJudged(Instant.now());
             entity.setVerdict(submission.getVerdict());
         }
+        if (submission.getExecution_time_ms() != null) entity.setExecution_time_ms(submission.getExecution_time_ms());
+        if (submission.getMemory_used_bytes() != null) entity.setMemory_used_bytes(submission.getMemory_used_bytes());
         return SubmissionConverter.INSTANCE.toDomain(jpaRepository.save(entity));
     }
 }

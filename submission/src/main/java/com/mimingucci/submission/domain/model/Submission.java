@@ -16,6 +16,10 @@ public class Submission {
 
     private Long contest;
 
+    private Long execution_time_ms;
+
+    private Long memory_used_bytes;
+
     private String sourceCode;
 
     private SubmissionVerdict verdict;

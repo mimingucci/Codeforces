@@ -57,6 +57,12 @@ public class ContestControllerImpl implements ContestController {
         return BaseResponse.success(service.getRegisterById((Long) request.getAttribute("userId"), contestId));
     }
 
+    @GetMapping(path = PathConstants.CONTEST_ID + PathConstants.CHECK)
+    @Override
+    public BaseResponse<Boolean> canSubmit(@RequestParam(required = true, name = "userId") Long userId, @PathVariable(name = "contestId") Long contestId) {
+        return BaseResponse.success(service.checkUserCanSubmit(userId, contestId));
+    }
+
     @PostMapping
     @Override
     public BaseResponse<ContestResponse> createContest(HttpServletRequest request, @RequestBody @Validated ContestCreateRequest contest) {

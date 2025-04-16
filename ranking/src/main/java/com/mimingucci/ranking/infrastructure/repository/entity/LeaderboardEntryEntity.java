@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Entity
-@Table(name = "leaderboard-entry")
+@Table(name = "leaderboard_entry")
 @Getter
 @Setter
 @NoArgsConstructor

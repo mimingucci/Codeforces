@@ -14,8 +14,8 @@ async function bootstrap() {
     whitelist: true,
   }));
   
-  const port = configService.get<number>('PORT', 9093);
-  const serviceName = configService.get<string>('EUREKA_SERVICE_NAME', 'notification-service');
+  const port = configService.get<number>('PORT', 8095);
+  const serviceName = configService.get<string>('EUREKA_SERVICE_NAME', 'notification');
   const eurekaHost = configService.get<string>('EUREKA_HOST', 'localhost');
   const eurekaPort = configService.get<number>('EUREKA_PORT', 8761);
   const hostName = configService.get<string>('HOST_NAME', 'localhost');

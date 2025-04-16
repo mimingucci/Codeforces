@@ -1,14 +1,16 @@
-package com.mimingucci.auth.domain.event;
+package com.mimingucci.ranking.domain.client.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserForgotPasswordEvent {
+public class UserResponse {
+    private Long id;
+
     private String email;
+
+    private Integer rating;
 }

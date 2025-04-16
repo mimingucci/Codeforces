@@ -76,4 +76,9 @@ public class ContestApplicationServiceImpl implements ContestApplicationService 
     public void cancelRegister(Long userId, Long contestId) {
         registrationService.cancelRegistration(contestId, userId);
     }
+
+    @Override
+    public Boolean checkUserCanSubmit(Long userId, Long contestId) {
+        return registrationService.checkUserCanSubmit(userId, contestId);
+    }
 }

@@ -20,3 +20,22 @@ export interface SystemNotificationMessage {
   targets: string[];
   priority: 'HIGH' | 'MEDIUM' | 'LOW';
 }
+
+export interface VerificationNotificationMessage {
+  email: string;
+  verificationCode: String;
+}
+
+export interface WelcomeNotificationMessage {
+  email: string;
+}
+
+export interface ForgotPasswordNotificationMessage {
+  email: string;
+  forgotPasswordToken: string;
+}
+
+export interface PasswordChangedNotificationMessage {
+  email: string,
+  createdAt: number,
+}

@@ -79,7 +79,19 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24 hours
+                .signWith(privateKey, SignatureAlgorithm.RS256)
+                .compact();
+    }
+
+    /**
+     * Generates a JWT token for the given email.
+     */
+    public String generateCustomToken(String subject) {
+        return Jwts.builder()
+                .setSubject(subject)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24 hours
                 .signWith(privateKey, SignatureAlgorithm.RS256)
                 .compact();
     }

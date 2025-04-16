@@ -33,6 +33,10 @@ public class SubmissionEntity {
 
     private Instant judged = null;
 
+    private Long execution_time_ms = 0L;
+
+    private Long memory_used_bytes = 0L;
+
     private SubmissionLanguage language;
 
     @Column(name = "source_code", nullable = false, updatable = false)

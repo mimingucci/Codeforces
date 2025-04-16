@@ -53,4 +53,13 @@ public class ContestRegistrationServiceImpl implements ContestRegistrationServic
     public ContestRegistration getById(Long userId, Long contestId) {
         return repository.getById(userId, contestId);
     }
+
+    @Override
+    public Boolean checkUserCanSubmit(Long userId, Long contestId) {
+        Contest contest = this.contestRepository.getContest(contestId);
+        if (Instant.now().isAfter(contest.getEndTime())) return true;
+        if (Instant.now().isBefore(contest.getStartTime())) return false;
+        ContestRegistration registration = this.repository.getById(userId, contestId);
+        return registration != null;
+    }
 }

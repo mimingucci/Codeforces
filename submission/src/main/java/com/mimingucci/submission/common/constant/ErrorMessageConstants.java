@@ -18,5 +18,8 @@ public class ErrorMessageConstants {
     public static final String NAME_NOT_VALID = "Please enter a valid name.";
 
     public static final String SUBMISSION_NOT_FOUND = "Submission not found";
+    public static final String CAN_NOT_SUBMIT = "You cannot submit code";
+    public static final String PROBLEM_NOT_FOUND = "Problem not found";
+    public static final String CONFLICT_DATA = "Conflict data";
 }
 

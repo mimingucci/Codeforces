@@ -10,7 +10,7 @@ import lombok.Setter;
 import java.time.Instant;
 
 @Entity
-@Table(name = "submission-result")
+@Table(name = "submission_result")
 @Getter
 @Setter
 @NoArgsConstructor

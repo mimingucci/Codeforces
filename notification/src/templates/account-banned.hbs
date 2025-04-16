@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Account Suspension Notice - Codeforces</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .header {
+      background-color: #dc3545;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .content {
+      padding: 20px;
+      background-color: #fff;
+    }
+    .warning-box {
+      background-color: #fff3f4;
+      border: 1px solid #dc3545;
+      border-radius: 4px;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    .footer {
+      background-color: #f5f5f5;
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 0.8em;
+      color: #666;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 20px 0;
+      color: white;
+      background-color: #dc3545;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Account Suspension Notice</h1>
+  </div>
+  
+  <div class="content">
+    <p>Dear {{email}},</p>
+    
+    <div class="warning-box">
+      <p><strong>Your Codeforces account has been suspended effective from {{banDate}}.</strong></p>
+    </div>
+
+    <p>This action has been taken due to:</p>
+    <p><strong>{{reason}}</strong></p>
+
+    <p>Duration of suspension: {{duration}}</p>
+    
+    <p>This suspension means you will not be able to:</p>
+    <ul>
+      <li>Participate in contests</li>
+      <li>Submit solutions to problems</li>
+      <li>Post in forums or comments</li>
+      <li>Rate or vote on content</li>
+    </ul>
+
+    {{#if appealAllowed}}
+    <p>If you believe this decision was made in error, you may appeal this suspension by:</p>
+    <ol>
+      <li>Reviewing our <a href="{{rulesUrl}}">community guidelines</a></li>
+      <li>Submitting an appeal through our <a href="{{appealUrl}}">appeal form</a></li>
+    </ol>
+    {{/if}}
+
+    <p>Please note that repeated violations of our community guidelines may result in permanent account termination.</p>
+  </div>
+  
+  <div class="footer">
+    <p>This is an automated message, please do not reply to this email.</p>
+    <p>&copy; {{year}} Codeforces. All rights reserved.</p>
+  </div>
+</body>
+</html>

@@ -13,11 +13,11 @@ import java.util.Optional;
 public interface ChatRoomJpaRepository extends JpaRepository<ChatRoomEntity, Long> {
 
     // Find rooms where user is participant
-    @Query("SELECT cr FROM ChatRoomEntity cr WHERE :userId MEMBER OF cr.participants")
+    @Query("SELECT cr FROM ChatRoomEntity cr WHERE :userId IN (SELECT CAST(unnest(string_to_array(cr.participants, ',')) AS LONG))")
     List<ChatRoomEntity> findRoomsByParticipantId(@Param("userId") Long userId);
 
     // Find rooms where user is admin
-    @Query("SELECT cr FROM ChatRoomEntity cr WHERE :userId MEMBER OF cr.admins")
+    @Query("SELECT cr FROM ChatRoomEntity cr WHERE :userId IN (SELECT CAST(unnest(string_to_array(cr.admins, ',')) AS LONG))")
     List<ChatRoomEntity> findRoomsByAdminId(@Param("userId") Long userId);
 
     // Find group chats only
@@ -31,8 +31,8 @@ public interface ChatRoomJpaRepository extends JpaRepository<ChatRoomEntity, Lon
 
     // Find direct chat between two users
     @Query("SELECT cr FROM ChatRoomEntity cr WHERE cr.isGroupChat = false " +
-            "AND :userOneId MEMBER OF cr.participants " +
-            "AND :userTwoId MEMBER OF cr.participants")
+            "AND :userOneId IN (SELECT CAST(unnest(string_to_array(cr.participants, ',')) AS LONG)) " +
+            "AND :userTwoId IN (SELECT CAST(unnest(string_to_array(cr.participants, ',')) AS LONG))")
     Optional<ChatRoomEntity> findDirectChatBetweenUsers(
             @Param("userOneId") Long userOneId,
             @Param("userTwoId") Long userTwoId

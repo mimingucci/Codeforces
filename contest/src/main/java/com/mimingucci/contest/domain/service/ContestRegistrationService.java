@@ -14,4 +14,6 @@ public interface ContestRegistrationService {
     ContestRegistration update(ContestRegistration domain);
 
     ContestRegistration getById(Long userId, Long contestId);
+
+    Boolean checkUserCanSubmit(Long userId, Long contestId);
 }

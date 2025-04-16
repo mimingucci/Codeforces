@@ -1,5 +1,6 @@
 # main.py
 import asyncio
+import os
 import py_eureka_client.eureka_client as eureka_client
 from fastapi import FastAPI, HTTPException
 from service.kafka_consumer import KafkaConsumer
@@ -7,6 +8,7 @@ from event import JudgeSubmissionEvent
 from service.kafka_util import _kafka_producer, publish_event
 from judge import Judge, Language, Rule, Verdict
 from datetime import datetime, timezone
+from service.service_client import ServiceClient
 
 app = FastAPI()
 app.debug = 1
@@ -17,7 +19,20 @@ class SubmissionHandler(KafkaConsumer):
         # Implement your message handling logic here
         try:
             event = JudgeSubmissionEvent(**message.value)
-            judger = Judge(src=event.sourceCode, inputs=["1 2 3", "1 2"], outputs=["1", "2"],  time_limit=event.timeLimit, memory_limit=event.memoryLimit, language=event.language, rule=Rule.DEFAULT)
+            # Fetch test cases from test case service
+            test_cases_response = await ServiceClient.get(
+                service_name="testcase", 
+                endpoint=f"/api/v1/testcase/problem/{event.problem}"
+            )
+            
+            # Extract inputs and outputs from test cases
+            inputs = []
+            outputs = []
+            for test_case in test_cases_response.get("data", []):
+                inputs.append(test_case.get("input", ""))
+                outputs.append(test_case.get("output", ""))
+
+            judger = Judge(src=event.sourceCode, inputs=inputs, outputs=outputs, time_limit=event.timeLimit, memory_limit=event.memoryLimit, language=event.language, rule=Rule.DEFAULT)
             rep = await judger.run()
             if event.rule == Rule.ICPC:
                 ac = 0
@@ -41,6 +56,7 @@ class SubmissionHandler(KafkaConsumer):
                     else:
                         ac += 1
                 await publish_event("submission.result", {
+                    "id": event.id, 
                     "verdict": verdict,
                     "author": event.author,
                     "contest": event.contest,
@@ -68,6 +84,7 @@ class SubmissionHandler(KafkaConsumer):
                             verdict = Verdict.COMPILE_ERROR
                         break
                 await publish_event("submission.result", {
+                    "id": event.id, 
                     "verdict": verdict,
                     "author": event.author,
                     "contest": event.contest,
@@ -83,9 +100,11 @@ class SubmissionHandler(KafkaConsumer):
 
 @app.on_event("startup")
 async def startup_event():
+    # Get configuration from environment variables
+    eureka_server = os.getenv("EUREKA_SERVER_URL", "http://localhost:8761/eureka")
     # Initialize eureka client first
     await eureka_client.init_async(
-        eureka_server="http://localhost:8761/eureka",
+        eureka_server=eureka_server,
         app_name="submission-evaluation-handler",
         instance_port=8000
     )

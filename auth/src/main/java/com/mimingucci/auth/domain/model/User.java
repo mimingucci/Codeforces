@@ -18,6 +18,8 @@ public class User {
 
     private Boolean enabled;
 
+    private String forgotPasswordToken;
+
     public boolean hasRole(Role role) {
         return this.roles.contains(role);
     }

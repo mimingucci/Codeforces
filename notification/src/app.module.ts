@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService, ConfigModule } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import * as path from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
@@ -12,6 +12,10 @@ import { HealthController } from './health/health.controller';
 
 @Module({
   imports: [
+    // Add ConfigModule at the top level
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     // Kafka client
     ClientsModule.registerAsync([
       {
@@ -36,6 +40,7 @@ import { HealthController } from './health/health.controller';
     MailerModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         transport: {
+          service: 'gmail',
           host: configService.get('MAIL_HOST', 'smtp.gmail.com'),
           port: configService.get('MAIL_PORT', 587),
           secure: configService.get('MAIL_SECURE', false),
