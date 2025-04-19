@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "blog")
@@ -24,6 +26,14 @@ public class BlogEntity {
 
     private Long author;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "blog_tags",
+            joinColumns = @JoinColumn(name = "blog_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<TagEntity> tags = new HashSet<>();
+
     @Column(nullable = false, updatable = false, name = "created_at")
     private Instant createdAt; // UTC timestamp
 
@@ -38,5 +48,13 @@ public class BlogEntity {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = Instant.now();
+    }
+
+    public void addTag(TagEntity tag) {
+        this.tags.add(tag);
+    }
+
+    public void removeTag(TagEntity tag) {
+        this.tags.remove(tag);
     }
 }

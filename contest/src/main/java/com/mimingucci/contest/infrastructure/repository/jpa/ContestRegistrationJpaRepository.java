@@ -47,4 +47,6 @@ public interface ContestRegistrationJpaRepository extends JpaRepository<ContestR
             "GROUP BY cr.user " +
             "HAVING COUNT(cr.contest) > 1")
     List<Object[]> findUsersWithMultipleRegistrations();
+
+    List<ContestRegistrationEntity> findByContest(Long contest);
 }

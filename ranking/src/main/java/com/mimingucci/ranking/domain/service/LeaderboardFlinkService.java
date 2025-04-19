@@ -1,11 +1,9 @@
 package com.mimingucci.ranking.domain.service;
 
 import com.mimingucci.ranking.common.constant.KafkaTopicConstants;
-import com.mimingucci.ranking.common.deserializer.ContestMetadataDeserializationSchema;
 import com.mimingucci.ranking.common.deserializer.SubmissionResultEventDeserializationSchema;
 import com.mimingucci.ranking.common.deserializer.VirtualContestMetadataDeserializationSchema;
 import com.mimingucci.ranking.domain.event.SubmissionResultEvent;
-import com.mimingucci.ranking.domain.model.ContestMetadata;
 import com.mimingucci.ranking.domain.model.LeaderboardUpdateSerializable;
 import com.mimingucci.ranking.domain.model.VirtualContestMetadata;
 import com.mimingucci.ranking.domain.model.VirtualLeaderboardUpdateSerializable;
@@ -44,26 +42,7 @@ public class LeaderboardFlinkService {
     public void startJob() throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        // Regular contest processing
-        KafkaSource<ContestMetadata> contestMetadataSource = KafkaSource.<ContestMetadata>builder()
-                .setBootstrapServers("localhost:9092")
-                .setGroupId("leaderboard-consumer")
-                .setTopics(KafkaTopicConstants.CONTEST_ACTION) // topic for start/over events
-                .setValueOnlyDeserializer(new ContestMetadataDeserializationSchema())
-                .setStartingOffsets(OffsetsInitializer.earliest())
-                .build();
-
-        DataStream<ContestMetadata> contestMetadataStream = env
-                .fromSource(contestMetadataSource, WatermarkStrategy.noWatermarks(), "Contest Metadata Source");
-
-        // Define broadcast state descriptor
-        MapStateDescriptor<Long, ContestMetadata> metadataDescriptor =
-                new MapStateDescriptor<>("contestMetadata", Long.class, ContestMetadata.class);
-
-        // Broadcast it
-        BroadcastStream<ContestMetadata> broadcastMetadata = contestMetadataStream.broadcast(metadataDescriptor);
-
-
+        // Regular contest processing - now with a single source
         KafkaSource<SubmissionResultEvent> kafkaSource = KafkaSource.<SubmissionResultEvent>builder()
                 .setBootstrapServers("localhost:9092")
                 .setGroupId("leaderboard-consumer")
@@ -75,8 +54,7 @@ public class LeaderboardFlinkService {
         DataStream<LeaderboardUpdateSerializable> leaderboardStream = env
                 .fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "Kafka Source")
                 .keyBy(SubmissionResultEvent::getContest)
-                .connect(broadcastMetadata)
-                .process(new LeaderboardProcessFunction(metadataDescriptor, leaderboardEntryRepository, submissionResultRepository))
+                .process(new LeaderboardProcessFunction())
                 .name("Leaderboard Processor");
 
         // Add Redis sink

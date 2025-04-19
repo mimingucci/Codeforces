@@ -11,4 +11,6 @@ public interface RankingController {
     BaseResponse<List<LeaderboardEntry>> getLeaderboardByContestId(Long contestId);
 
     BaseResponse<VirtualContestMetadata> startVirtualContest(VirtualContestRequest request);
+
+    BaseResponse<Boolean> persistSubmissionHistory(Long contestId);
 }

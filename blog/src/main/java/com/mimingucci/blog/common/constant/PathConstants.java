@@ -6,4 +6,5 @@ public class PathConstants {
     public static final String BLOG = "/blog";
     public static final String BLOG_ID = "/{blogId}";
     public static final String API_V1_BLOG = API_V1 + BLOG;
+    public static final String ALL = "/all";
 }

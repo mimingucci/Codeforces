@@ -3,40 +3,33 @@ package com.mimingucci.ranking.domain.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.mimingucci.ranking.common.enums.SubmissionType;
 import com.mimingucci.ranking.common.enums.SubmissionVerdict;
+import com.mimingucci.ranking.common.util.ContestantsConverter;
+import com.mimingucci.ranking.common.util.LeaderboardFileHandler;
+import com.mimingucci.ranking.common.util.SubmissionHistoryFileHandler;
+import com.mimingucci.ranking.domain.client.response.ContestRegistrationResponse;
 import com.mimingucci.ranking.domain.event.SubmissionResultEvent;
-import com.mimingucci.ranking.domain.model.ContestMetadata;
 import com.mimingucci.ranking.domain.model.LeaderboardEntry;
 import com.mimingucci.ranking.domain.model.LeaderboardUpdate;
 import com.mimingucci.ranking.domain.model.LeaderboardUpdateSerializable;
-import com.mimingucci.ranking.domain.repository.LeaderboardEntryRepository;
-import com.mimingucci.ranking.domain.repository.SubmissionResultRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.state.*;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.functions.co.KeyedBroadcastProcessFunction;
+import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 
-public class LeaderboardProcessFunction extends KeyedBroadcastProcessFunction<Long, SubmissionResultEvent, ContestMetadata, LeaderboardUpdateSerializable> {
+@Slf4j
+public class LeaderboardProcessFunction extends KeyedProcessFunction<Long, SubmissionResultEvent, LeaderboardUpdateSerializable> {
 
     private transient MapState<Long, LeaderboardEntry> leaderboard;
 
     private transient ListState<SubmissionResultEvent> submissionHistory;
 
-    private final MapStateDescriptor<Long, ContestMetadata> metadataDescriptor;
-
-    private transient LeaderboardEntryRepository leaderboardEntryRepository;
-
-    private transient SubmissionResultRepository submissionResultRepository;
-
-    public LeaderboardProcessFunction(MapStateDescriptor<Long, ContestMetadata> metadataDescriptor, LeaderboardEntryRepository leaderboardEntryRepository, SubmissionResultRepository submissionResultRepository) {
-        this.metadataDescriptor = metadataDescriptor;
-        this.leaderboardEntryRepository = leaderboardEntryRepository;
-        this.submissionResultRepository = submissionResultRepository;
-    }
+    public LeaderboardProcessFunction() {}
 
     @Override
     public void open(Configuration parameters) {
@@ -77,17 +70,51 @@ public class LeaderboardProcessFunction extends KeyedBroadcastProcessFunction<Lo
     }
 
     @Override
-    public void processElement(SubmissionResultEvent event, ReadOnlyContext ctx, Collector<LeaderboardUpdateSerializable> out) throws Exception {
-        ReadOnlyBroadcastState<Long, ContestMetadata> metadataState = ctx.getBroadcastState(metadataDescriptor);
-        ContestMetadata metadata = metadataState.get(event.getContest());
+    public void processElement(SubmissionResultEvent event, Context ctx, Collector<LeaderboardUpdateSerializable> out) throws Exception {
+        if (event.getEventType().equals(SubmissionType.CONTEST_STARTED) || event.getEventType().equals(SubmissionType.CONTEST_ENDED)) {
+            if (event.getEventType().equals(SubmissionType.CONTEST_STARTED)) {
+                log.info("Contest has started");
+                List<ContestRegistrationResponse> contestants = ContestantsConverter.fromJsonString(event.getContestants());
+                for (var contestant : contestants) {
+                    LeaderboardEntry entry = new LeaderboardEntry();
+                    entry.setUserId(contestant.getUser());
+                    entry.setContestId(event.getContest());
 
-        if (metadata == null) {
-            // Metadata not available yet, skip or buffer if needed
+                    leaderboard.put(contestant.getUser(), entry);
+                }
+                List<LeaderboardEntry> sortedEntries = recalculate_ranks();
+
+                ObjectMapper mapper = new ObjectMapper()
+                        .registerModule(new JavaTimeModule())
+                        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+                String json = mapper.writeValueAsString(new LeaderboardUpdate(event.getContest(), sortedEntries));
+                out.collect(new LeaderboardUpdateSerializable(event.getContest(), json));
+            } else {
+                log.info("Contest ended");
+                List<LeaderboardEntry> sortedEntries = recalculate_ranks();
+
+                ObjectMapper mapper = new ObjectMapper()
+                        .registerModule(new JavaTimeModule())
+                        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+                String json = mapper.writeValueAsString(new LeaderboardUpdate(event.getContest(), sortedEntries));
+                out.collect(new LeaderboardUpdateSerializable(event.getContest(), json));
+
+                // Write submission history to file before clearing
+                List<SubmissionResultEvent> events = new ArrayList<>();
+                submissionHistory.get().forEach(events::add);
+                SubmissionHistoryFileHandler.writeSubmissionHistory(event.getContest(), events);
+                LeaderboardFileHandler.writeLeaderboard(event.getContest(), sortedEntries);
+
+                submissionHistory.clear();
+                leaderboard.clear();
+            }
             return;
         }
 
-        if (metadata.getStartTime() != null && event.getJudged_on().isBefore(metadata.getStartTime())) return;
-        if (metadata.getEndTime() != null && event.getJudged_on().isAfter(metadata.getEndTime())) return;
+        if (event.getSent_on().isBefore(event.getStartTime())) return;
+        if (event.getSent_on().isAfter(event.getEndTime())) return;
 
         submissionHistory.add(event);
 
@@ -112,7 +139,7 @@ public class LeaderboardProcessFunction extends KeyedBroadcastProcessFunction<Lo
         entry.getProblemAttempts().compute(event.getProblem(), (k, attemp) -> attemp + 1);
 
         if (event.getVerdict().equals(SubmissionVerdict.ACCEPT)) {
-            int solve_time = (int) Duration.between(event.getJudged_on(), metadata.getStartTime()).toMinutes();
+            int solve_time = (int) Duration.between(event.getSent_on(), event.getStartTime()).toMinutes();
             entry.getProblemSolveTimes().put(event.getProblem(), solve_time);
 
             entry.setTotalScore(event.getScore());
@@ -136,36 +163,5 @@ public class LeaderboardProcessFunction extends KeyedBroadcastProcessFunction<Lo
         out.collect(new LeaderboardUpdateSerializable(event.getContest(), json));
     }
 
-    @Override
-    public void processBroadcastElement(ContestMetadata metadata, Context ctx, Collector<LeaderboardUpdateSerializable> out) throws Exception {
-        BroadcastState<Long, ContestMetadata> state = ctx.getBroadcastState(metadataDescriptor);
-        state.put(metadata.getId(), metadata);
-        if (metadata.getEndTime() != null && Instant.now().isAfter(metadata.getEndTime())) {
-            // contest is over
-            List<LeaderboardEntry> sortedEntries = recalculate_ranks();
-
-            ObjectMapper mapper = new ObjectMapper()
-                    .registerModule(new JavaTimeModule())
-                    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-            String json = mapper.writeValueAsString(new LeaderboardUpdate(metadata.getId(), sortedEntries));
-            out.collect(new LeaderboardUpdateSerializable(metadata.getId(), json));
-
-            List<LeaderboardEntry> entries = new ArrayList<>();
-            for (var entry : this.leaderboard.values()) {
-                if (Objects.equals(entry.getContestId(), metadata.getId())) entries.add(entry);
-            }
-            this.leaderboardEntryRepository.saveLeaderboardEntriesDuringContest(entries);
-
-            List<SubmissionResultEvent> events = new ArrayList<>();
-            for (var event : this.submissionHistory.get()) {
-                if (Objects.equals(event.getContest(), metadata.getId())) events.add(event);
-            }
-            this.submissionResultRepository.saveSubmissionResultEventsDuringContest(events);
-
-            submissionHistory.clear();
-            leaderboard.clear();
-        }
-    }
 }
 

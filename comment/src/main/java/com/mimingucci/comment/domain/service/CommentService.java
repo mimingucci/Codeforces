@@ -12,4 +12,8 @@ public interface CommentService {
     List<Comment> findCommentsByUserId(Long userId);
 
     Comment updateComment(Comment comment);
+
+    Boolean deleteById(Long id);
+
+    Boolean deleteByBlogId(Long blogId);
 }

@@ -36,8 +36,8 @@ public class TestCaseApplicationServiceImpl implements TestCaseApplicationServic
 
     @Override
     public TestCaseResponse createTestCase(TestCaseRequest testCase, HttpServletRequest request) {
-        Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
         try {
+            Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
             Long author = claims.get("id", Long.class);
             return TestCaseAssembler.INSTANCE.toResponse(service.createTestCase(author, TestCaseAssembler.INSTANCE.toDomain(testCase)));
         } catch (Exception e) {

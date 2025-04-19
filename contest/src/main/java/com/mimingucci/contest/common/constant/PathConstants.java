@@ -11,4 +11,5 @@ public class PathConstants {
     public static final String CONTEST_ID = "/{contestId}";
     public static final String ALL = "/all";
     public static final String CHECK = "/check";
+    public static final String USER_ID = "/{userId}";
 }

@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import static com.mimingucci.submission.common.constant.PathConstants.*;
 
-@CircuitBreaker(name = CONTEST_SERVICE)
-@FeignClient(name = CONTEST_SERVICE, path = API_V1_CONTEST, configuration = FeignConfiguration.class)
+@CircuitBreaker(name = PROBLEM_SERVICE)
+@FeignClient(name = PROBLEM_SERVICE, path = API_V1_PROBLEM, configuration = FeignConfiguration.class)
 public interface ProblemClient {
     @GetMapping(path = PROBLEM_ID)
     BaseResponse<ProblemResponse> getProblemById(@PathVariable(name = "problemId") Long problemId);

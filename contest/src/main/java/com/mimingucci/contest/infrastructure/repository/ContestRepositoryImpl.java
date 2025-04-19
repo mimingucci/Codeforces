@@ -16,9 +16,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -83,5 +85,16 @@ public class ContestRepositoryImpl implements ContestRepository {
     @Override
     public Page<Contest> getListContests(String name, Pageable pageable) {
         return this.contestJpaRepository.findByNameContainingIgnoreCase(name, pageable).map(ContestConverter.INSTANCE::toDomain);
+    }
+
+    @Override
+    public List<Contest> getUpcomingSystemContests() {
+        Instant now = Instant.now();
+        Instant weekFromNow = now.plus(7, ChronoUnit.DAYS);
+
+        return contestJpaRepository.findUpcomingSystemContests(now, weekFromNow)
+                .stream()
+                .map(ContestConverter.INSTANCE::toDomain)
+                .collect(Collectors.toList());
     }
 }

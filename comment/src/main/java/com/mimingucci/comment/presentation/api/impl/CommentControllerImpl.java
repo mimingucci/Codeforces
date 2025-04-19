@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class CommentControllerImpl implements CommentController {
     private final CommentApplicationService commentApplicationService;
 
-
-
     @PostMapping
     @Override
     public BaseResponse<CommentResponse> createComment(@RequestBody @Validated CommentCreateRequest request, HttpServletRequest httpRequest) {
@@ -30,5 +28,17 @@ public class CommentControllerImpl implements CommentController {
     @Override
     public BaseResponse<CommentResponse> updateComment(@PathVariable(name = "commentId") Long id, @RequestBody @Validated CommentUpdateRequest request, HttpServletRequest httpRequest) {
         return BaseResponse.success(this.commentApplicationService.update(id, request, httpRequest));
+    }
+
+    @DeleteMapping(path = PathConstants.COMMENT_ID)
+    @Override
+    public BaseResponse<Boolean> deleteById(@PathVariable(name = "commentId") Long id) {
+        return null;
+    }
+
+    @DeleteMapping
+    @Override
+    public BaseResponse<Boolean> deleteByBlogId(Long blogId) {
+        return null;
     }
 }

@@ -11,4 +11,8 @@ public interface CommentController {
     BaseResponse<CommentResponse> createComment(CommentCreateRequest request, HttpServletRequest httpRequest);
 
     BaseResponse<CommentResponse> updateComment(Long id, CommentUpdateRequest request, HttpServletRequest httpRequest);
+
+    BaseResponse<Boolean> deleteById(Long id);
+
+    BaseResponse<Boolean> deleteByBlogId(Long blogId);
 }

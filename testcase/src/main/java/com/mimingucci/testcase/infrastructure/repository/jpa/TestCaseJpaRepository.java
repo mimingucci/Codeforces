@@ -10,7 +10,7 @@ import java.util.List;
 public interface TestCaseJpaRepository extends JpaRepository<TestCaseEntity, Long> {
     @Query("""
             SELECT testcase
-            FROM TestCase testcase
+            FROM TestCaseEntity testcase
             WHERE testcase.problem = :problemId
             """)
     List<TestCaseEntity> findAllByProblemId(@Param("problemId") Long problemId);

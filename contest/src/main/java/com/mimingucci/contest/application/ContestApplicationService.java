@@ -5,9 +5,11 @@ import com.mimingucci.contest.presentation.dto.request.ContestCreateRequest;
 import com.mimingucci.contest.presentation.dto.request.ContestRegistrationDto;
 import com.mimingucci.contest.presentation.dto.request.ContestUpdateRequest;
 import com.mimingucci.contest.presentation.dto.response.ContestResponse;
+import com.mimingucci.contest.presentation.dto.response.ContestantCheckResponse;
 import com.mimingucci.contest.presentation.dto.response.PageableResponse;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Set;
 
 public interface ContestApplicationService {
@@ -33,4 +35,8 @@ public interface ContestApplicationService {
     void cancelRegister(Long userId, Long contestId);
 
     Boolean checkUserCanSubmit(Long userId, Long contestId);
+
+    List<ContestRegistrationDto> getAll(Long contestId);
+
+    ContestantCheckResponse checkRegister(Long contestId, Long userId);
 }

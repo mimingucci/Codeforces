@@ -37,6 +37,10 @@ spring:
                     uri: lb://problem
                     predicates:
                         - Path=/api/v1/problem/**
+                -   id: testcase
+                    uri: lb://testcase
+                    predicates:
+                        - Path=/api/v1/testcase/**
                 -   id: user
                     uri: lb://user
                     predicates:

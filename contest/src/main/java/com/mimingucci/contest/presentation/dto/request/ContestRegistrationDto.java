@@ -1,17 +1,21 @@
 package com.mimingucci.contest.presentation.dto.request;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ContestRegistrationDto {
-    private Long user;
+    Long user;
 
-    private Long contest;
+    Long contest;
 
-    private Boolean rated;
+    Boolean rated;
 
-    private Boolean participated;
+    Boolean participated;
 }

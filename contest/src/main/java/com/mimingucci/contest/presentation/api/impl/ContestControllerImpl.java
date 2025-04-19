@@ -3,12 +3,14 @@ package com.mimingucci.contest.presentation.api.impl;
 import com.mimingucci.contest.application.ContestApplicationService;
 import com.mimingucci.contest.common.constant.PathConstants;
 import com.mimingucci.contest.common.enums.Role;
+import com.mimingucci.contest.domain.model.ContestRegistration;
 import com.mimingucci.contest.presentation.api.ContestController;
 import com.mimingucci.contest.presentation.dto.request.ContestCreateRequest;
 import com.mimingucci.contest.presentation.dto.request.ContestRegistrationDto;
 import com.mimingucci.contest.presentation.dto.request.ContestUpdateRequest;
 import com.mimingucci.contest.presentation.dto.response.BaseResponse;
 import com.mimingucci.contest.presentation.dto.response.ContestResponse;
+import com.mimingucci.contest.presentation.dto.response.ContestantCheckResponse;
 import com.mimingucci.contest.presentation.dto.response.PageableResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -23,6 +27,24 @@ import java.util.Set;
 @RequestMapping(path = PathConstants.API_V1_CONTEST)
 public class ContestControllerImpl implements ContestController {
     private final ContestApplicationService service;
+
+    @GetMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION + PathConstants.ALL)
+    @Override
+    public BaseResponse<PageableResponse<ContestRegistrationDto>> getListRegisters(@PathVariable(name = "contestId") Long contestId, Pageable pageable) {
+        return BaseResponse.success(service.getListRegisters(contestId, pageable));
+    }
+
+    @PostMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION + PathConstants.ALL)
+    @Override
+    public BaseResponse<List<ContestRegistrationDto>> getAll(@PathVariable(name = "contestId") Long contestId) {
+        return BaseResponse.success(service.getAll(contestId));
+    }
+
+    @GetMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION + PathConstants.USER_ID)
+    @Override
+    public BaseResponse<ContestantCheckResponse> checkRegistration(@PathVariable(name = "contestId") Long contestId, @PathVariable(name = "userId") Long userId) {
+        return BaseResponse.success(service.checkRegister(contestId, userId));
+    }
 
     @PostMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION)
     @Override
@@ -38,13 +60,7 @@ public class ContestControllerImpl implements ContestController {
         return BaseResponse.success(service.updateRegister((Long) request.getAttribute("userId"), dto));
     }
 
-    @GetMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION + PathConstants.ALL)
-    @Override
-    public BaseResponse<PageableResponse<ContestRegistrationDto>> getListRegisters(@PathVariable(name = "contestId") Long contestId, Pageable pageable) {
-        return BaseResponse.success(service.getListRegisters(contestId, pageable));
-    }
-
-    @PutMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION)
+    @DeleteMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION)
     @Override
     public BaseResponse<?> cancelRegister(HttpServletRequest request, @PathVariable(name = "contestId") Long contestId) {
         service.cancelRegister((Long) request.getAttribute("userId"), contestId);

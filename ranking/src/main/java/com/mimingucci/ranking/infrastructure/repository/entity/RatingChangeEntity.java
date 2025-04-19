@@ -1,9 +1,6 @@
 package com.mimingucci.ranking.infrastructure.repository.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,13 +20,18 @@ public class RatingChangeEntity {
     @Id
     private Long contest;
 
+    @Column(name = "solved_problem")
     private Integer solvedProblem;
 
+    @Column(name = "ranking")
     private Integer rank;
 
+    @Column(name = "old_rating")
     private Integer oldRating;
 
+    @Column(name = "new_rating")
     private Integer newRating;
 
+    @Column(name = "rating_change")
     private Integer ratingChange;
 }

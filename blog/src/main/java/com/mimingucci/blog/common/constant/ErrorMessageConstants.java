@@ -18,4 +18,5 @@ public class ErrorMessageConstants {
     public static final String NAME_NOT_VALID = "Please enter a valid name.";
 
     public static final String BLOG_NOT_FOUND = "Blog not found";
+    public static final String NOT_HAVE_PERMISSION = "You don't have permission to do so";
 }

@@ -5,6 +5,8 @@ import com.mimingucci.contest.domain.model.ContestRegistrationId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 
 public interface ContestRegistrationRepository {
     Boolean hasRegistered(ContestRegistrationId contestRegistrationId);
@@ -15,4 +17,6 @@ public interface ContestRegistrationRepository {
     Page<ContestRegistration> getAll(Long contestId, Pageable pageable);
 
     ContestRegistration getById(Long userId, Long contestId);
+
+    List<ContestRegistration> getAll(Long contestId);
 }

@@ -1,13 +1,16 @@
 package com.mimingucci.blog.domain.service.impl;
 
 import com.mimingucci.blog.domain.broker.producer.CreateBlogProducer;
-import com.mimingucci.blog.domain.event.BlogAddAuthorEvent;
-import com.mimingucci.blog.domain.event.BlogAddTagEvent;
 import com.mimingucci.blog.domain.model.Blog;
 import com.mimingucci.blog.domain.repository.BlogRepository;
 import com.mimingucci.blog.domain.service.BlogService;
+import com.mimingucci.blog.presentation.dto.response.BlogGetResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,15 +21,36 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public Blog createBlog(Blog domain) {
-        Blog blog = this.blogRepository.createBlog(domain);
-        // send events to broker
-//        this.blogProducer.sendUserAddBlogEvent(BlogAddAuthorEvent.builder().userId(domain.getAuthor()).blogId(domain.getId()).build());
-//        this.blogProducer.sendBlogAddTagEvent(BlogAddTagEvent.builder().tagIds(domain.getTags()).build());
-        return blog;
+        return this.blogRepository.createBlog(domain);
     }
 
     @Override
     public Blog findBlogById(Long id) {
         return this.blogRepository.findById(id);
+    }
+
+    @Override
+    public List<Blog> findByTag(String tagName) {
+        return this.blogRepository.findByTag(tagName);
+    }
+
+    @Override
+    public Boolean deleteById(Long id, Long author) {
+        return this.blogRepository.deleteBlog(id, author);
+    }
+
+    @Override
+    public Page<Blog> getAll(Pageable pageable) {
+        return this.blogRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Blog> getAllByUserId(Long userId, Pageable pageable) {
+        return this.blogRepository.findAllByUserId(userId, pageable);
+    }
+
+    @Override
+    public Blog updateById(Blog blog) {
+        return this.blogRepository.updateBlog(blog);
     }
 }

@@ -4,17 +4,21 @@ import com.mimingucci.contest.application.ContestApplicationService;
 import com.mimingucci.contest.application.assembler.ContestAssembler;
 import com.mimingucci.contest.application.assembler.ContestRegistrationAssembler;
 import com.mimingucci.contest.common.enums.Role;
+import com.mimingucci.contest.domain.model.Contest;
+import com.mimingucci.contest.domain.model.ContestRegistration;
 import com.mimingucci.contest.domain.service.ContestRegistrationService;
 import com.mimingucci.contest.domain.service.ContestService;
 import com.mimingucci.contest.presentation.dto.request.ContestCreateRequest;
 import com.mimingucci.contest.presentation.dto.request.ContestRegistrationDto;
 import com.mimingucci.contest.presentation.dto.request.ContestUpdateRequest;
 import com.mimingucci.contest.presentation.dto.response.ContestResponse;
+import com.mimingucci.contest.presentation.dto.response.ContestantCheckResponse;
 import com.mimingucci.contest.presentation.dto.response.PageableResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -80,5 +84,17 @@ public class ContestApplicationServiceImpl implements ContestApplicationService 
     @Override
     public Boolean checkUserCanSubmit(Long userId, Long contestId) {
         return registrationService.checkUserCanSubmit(userId, contestId);
+    }
+
+    @Override
+    public List<ContestRegistrationDto> getAll(Long contestId) {
+        return registrationService.getAll(contestId).stream().map(ContestRegistrationAssembler.INSTANCE::toResponse).toList();
+    }
+
+    @Override
+    public ContestantCheckResponse checkRegister(Long contestId, Long userId) {
+        Contest contest = service.getContest(contestId);
+        ContestRegistration registration = registrationService.getById(userId, contestId);
+        return new ContestantCheckResponse(contestId, contest.getStartTime(), contest.getEndTime(), registration.getUser(), registration.getRated(), registration.getParticipated(), contest.getType());
     }
 }

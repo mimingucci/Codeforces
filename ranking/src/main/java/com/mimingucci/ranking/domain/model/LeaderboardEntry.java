@@ -33,4 +33,8 @@ public class LeaderboardEntry {
     @JsonDeserialize(as = HashMap.class)
     private Map<Long, Integer> problemSolveTimes = new HashMap<>();
 
+    public LeaderboardEntry(Long userId, Long contestId) {
+        this.userId = userId;
+        this.contestId = contestId;
+    }
 }

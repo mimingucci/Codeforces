@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -22,4 +23,6 @@ public class BlogGetResponse {
     Instant createdAt;
 
     Instant updatedAt;
+
+    List<String> tags;
 }

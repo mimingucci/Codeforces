@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,11 @@ public class ContestRegistrationServiceImpl implements ContestRegistrationServic
     @Override
     public Page<ContestRegistration> getAll(Long contestId, Pageable pageable) {
         return repository.getAll(contestId, pageable);
+    }
+
+    @Override
+    public List<ContestRegistration> getAll(Long contestId) {
+        return repository.getAll(contestId);
     }
 
     @Override

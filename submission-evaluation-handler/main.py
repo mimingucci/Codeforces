@@ -13,12 +13,18 @@ from service.service_client import ServiceClient
 app = FastAPI()
 app.debug = 1
 
+# Convert Unix timestamp (seconds since epoch) to datetime
+def convert_timestamp(timestamp):
+    return datetime.fromtimestamp(timestamp).isoformat()
+
 
 class SubmissionHandler(KafkaConsumer):
     async def handle_message(self, message):
         # Implement your message handling logic here
         try:
             event = JudgeSubmissionEvent(**message.value)
+            print(convert_timestamp(event.startTime) + " - " + convert_timestamp(event.endTime))
+            return
             # Fetch test cases from test case service
             test_cases_response = await ServiceClient.get(
                 service_name="testcase", 

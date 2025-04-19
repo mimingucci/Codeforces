@@ -61,4 +61,10 @@ public class CommentRepositoryImpl implements CommentRepository {
         List<CommentEntity> entities = this.commentJpaRepository.findAllByUserId(userId);
         return entities.stream().map(CommentConverter.INSTANCE::toDomain).toList();
     }
+
+    @Override
+    public Boolean deleteByBlogId(Long blogId) {
+        this.commentJpaRepository.deleteAllByBlogId(blogId);
+        return true;
+    }
 }

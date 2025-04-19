@@ -1,10 +1,11 @@
 package com.mimingucci.contest.domain.event;
 
+import com.mimingucci.contest.common.enums.ContestEvent;
+import com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.Instant;
 
 @Data
@@ -12,9 +13,15 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContestActionEvent {
-    Long id;
+    Long contest;
 
     Instant startTime;
 
     Instant endTime;
+
+    String contestants;
+
+    ContestEvent eventType;
+
+    ContestType contestType;
 }

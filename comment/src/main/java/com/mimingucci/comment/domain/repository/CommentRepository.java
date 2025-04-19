@@ -16,4 +16,6 @@ public interface CommentRepository {
     List<Comment> findByBlogId(Long blogId);
 
     List<Comment> findByUserId(Long userId);
+
+    Boolean deleteByBlogId(Long blogId);
 }

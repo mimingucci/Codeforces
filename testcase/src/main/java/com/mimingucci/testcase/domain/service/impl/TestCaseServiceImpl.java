@@ -30,7 +30,7 @@ public class TestCaseServiceImpl implements TestCaseService {
         BaseResponse<ProblemResponse> problem = this.problemClient.getProblemById(testCase.getId());
         if (!problem.code().equals(BaseResponse.SUCCESS_CODE) || problem.data() == null) throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
         BaseResponse<ContestResponse> contest = this.contestClient.getContestById(problem.data().getContest());
-        if (!contest.code().equals(BaseResponse.SUCCESS_CODE) || contest.data() == null) throw  new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
+        if (!contest.code().equals(BaseResponse.SUCCESS_CODE) || contest.data() == null) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
         if (!contest.data().getTesters().contains(author) && !contest.data().getAuthors().contains(author)) throw new ApiRequestException(ErrorMessageConstants.NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
         return repository.createTestCase(testCase);
     }

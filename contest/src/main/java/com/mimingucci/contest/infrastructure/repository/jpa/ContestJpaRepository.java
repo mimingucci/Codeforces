@@ -34,4 +34,15 @@ public interface ContestJpaRepository extends JpaRepository<ContestEntity, Long>
     List<ContestEntity> findContestsRelevantForPeriod(
             @Param("currentTime") Instant currentTime,
             @Param("periodEnd") Instant periodEnd);
+
+    @Query("SELECT c FROM ContestEntity c " +
+            "WHERE c.type = com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType.SYSTEM " +
+            "AND c.enabled = true " +
+            "AND c.startTime > :now " +
+            "AND c.startTime <= :weekFromNow " +
+            "ORDER BY c.startTime ASC")
+    List<ContestEntity> findUpcomingSystemContests(
+            @Param("now") Instant now,
+            @Param("weekFromNow") Instant weekFromNow
+    );
 }

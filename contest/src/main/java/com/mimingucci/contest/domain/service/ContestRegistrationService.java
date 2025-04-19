@@ -4,10 +4,14 @@ import com.mimingucci.contest.domain.model.ContestRegistration;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface ContestRegistrationService {
     ContestRegistration register(ContestRegistration domain);
 
     Page<ContestRegistration> getAll(Long contestId, Pageable pageable);
+
+    List<ContestRegistration> getAll(Long contestId);
 
     void cancelRegistration(Long contestId, Long userId);
 

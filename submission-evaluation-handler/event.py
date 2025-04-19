@@ -15,6 +15,9 @@ class JudgeSubmissionEvent(BaseModel):
     memoryLimit: int
     language: Language
     rule: Rule = Rule.DEFAULT
+    sent_on: float
+    startTime: float
+    endTime: float
 
 class SubmissionJudgedEvent(BaseModel):
     id: int

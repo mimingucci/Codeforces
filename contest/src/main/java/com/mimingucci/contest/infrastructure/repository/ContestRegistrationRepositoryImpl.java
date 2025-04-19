@@ -5,6 +5,7 @@ import com.mimingucci.contest.common.exception.ApiRequestException;
 import com.mimingucci.contest.domain.model.ContestRegistration;
 import com.mimingucci.contest.domain.model.ContestRegistrationId;
 import com.mimingucci.contest.domain.repository.ContestRegistrationRepository;
+import com.mimingucci.contest.infrastructure.repository.converter.ContestConverter;
 import com.mimingucci.contest.infrastructure.repository.converter.ContestRegistrationConverter;
 import com.mimingucci.contest.infrastructure.repository.converter.ContestRegistrationIdConverter;
 import com.mimingucci.contest.infrastructure.repository.entity.ContestRegistrationEntity;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -67,5 +70,11 @@ public class ContestRegistrationRepositoryImpl implements ContestRegistrationRep
                 ));
 
         return ContestRegistrationConverter.INSTANCE.toDomain(entity);
+    }
+
+    @Override
+    public List<ContestRegistration> getAll(Long contestId) {
+        if (!contestJpaRepository.existsById(contestId)) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
+        return contestRegistrationJpaRepository.findByContest(contestId).stream().map(ContestRegistrationConverter.INSTANCE::toDomain).toList();
     }
 }

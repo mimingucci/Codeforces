@@ -14,4 +14,8 @@ public class UserRegisterRequest {
     @NotNull
     @NotBlank
     private String password;
+
+    @NotNull
+    @NotBlank
+    private String username;
 }

@@ -13,7 +13,7 @@ public class Blog {
 
     private String content;
 
-    private List<Integer> tags;
+    private List<String> tags;
 
     private Long author;
 
