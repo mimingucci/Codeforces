@@ -6,6 +6,8 @@ import com.mimingucci.comment.presentation.dto.response.BaseResponse;
 import com.mimingucci.comment.presentation.dto.response.CommentResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.List;
+
 public interface CommentController {
 
     BaseResponse<CommentResponse> createComment(CommentCreateRequest request, HttpServletRequest httpRequest);
@@ -15,4 +17,6 @@ public interface CommentController {
     BaseResponse<Boolean> deleteById(Long id);
 
     BaseResponse<Boolean> deleteByBlogId(Long blogId);
+
+    BaseResponse<List<CommentResponse>> getAllByBlog(Long blogId);
 }

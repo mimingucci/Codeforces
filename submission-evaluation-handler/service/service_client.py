@@ -31,7 +31,6 @@ class ServiceClient:
         try:
             res = await eureka_client.do_service_async(service_name,
                                                        endpoint,
-                                                       params,
                                                        headers=headers,
                                                        timeout=timeout,
                                                        method="GET")
@@ -65,7 +64,6 @@ class ServiceClient:
         try:
             res = await eureka_client.do_service_async(service_name,
                                                        endpoint,
-                                                       params,
                                                        data=json.dumps(json_data),
                                                        headers=headers,
                                                        timeout=timeout,

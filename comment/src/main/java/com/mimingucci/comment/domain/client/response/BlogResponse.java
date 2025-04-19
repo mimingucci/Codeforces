@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -21,4 +22,6 @@ public class BlogResponse {
     Instant createdAt;
 
     Instant updatedAt;
+
+    List<String> tags;
 }

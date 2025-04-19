@@ -7,11 +7,13 @@ import java.util.List;
 public interface TestCaseService {
     TestCase createTestCase(Long author, TestCase testCase);
 
-    TestCase getTestCase(Long id);
+    TestCase getTestCase(Long id, Long author);
 
     List<TestCase> getTestCasesByProblemId(Long problemId);
 
     void deleteTestCase(Long author, Long id);
 
     TestCase updateTestCase(Long author, Long id, TestCase testCase);
+
+    List<TestCase> getTestCasesByProblemIdTester(Long problemId, Long author);
 }

@@ -19,16 +19,30 @@ import java.util.List;
 public class TestCaseControllerImpl implements TestCaseController {
     private final TestCaseApplicationService applicationService;
 
-    @GetMapping(path = PathConstants.TEST_CASE_ID)
-    @Override
-    public BaseResponse<TestCaseResponse> getTestCaseById(@PathVariable(name = "testCaseId") Long testCaseId) {
-        return BaseResponse.success(applicationService.getTestCaseById(testCaseId));
-    }
-
     @GetMapping(path = PathConstants.PROBLEM + PathConstants.PROBLEM_ID)
     @Override
-    public BaseResponse<List<TestCaseResponse>> getTestCaseByProblemId(@PathVariable(name = "problemId") Long problemId) {
-        return BaseResponse.success(applicationService.getTestCaseByProblemId(problemId));
+    public BaseResponse<List<TestCaseResponse>> getTestCaseByProblemId(@PathVariable(name = "problemId") Long problemId, HttpServletRequest request) {
+        return BaseResponse.success(applicationService.getTestCaseByProblemId(problemId, request));
+    }
+
+
+    @GetMapping(path = PathConstants.TEST_CASE_ID)
+    @Override
+    public BaseResponse<TestCaseResponse> getTestCaseById(@PathVariable(name = "testCaseId") Long testCaseId, HttpServletRequest request) {
+        return BaseResponse.success(applicationService.getTestCaseById(testCaseId, request));
+    }
+
+    @PutMapping(path = PathConstants.TEST_CASE_ID)
+    @Override
+    public BaseResponse<TestCaseResponse> updateTestCase(@PathVariable(name = "testCaseId") Long testCaseId, @RequestBody @Validated TestCaseRequest testCase, HttpServletRequest request) {
+        return BaseResponse.success(applicationService.updateTestCase(testCaseId, testCase, request));
+    }
+
+    @DeleteMapping(path = PathConstants.TEST_CASE_ID)
+    @Override
+    public BaseResponse<?> deleteTestCase(@PathVariable(name = "testCaseId") Long testCaseId, HttpServletRequest request) {
+        applicationService.deleteTestCase(testCaseId, request);
+        return BaseResponse.success(true);
     }
 
     @PostMapping
@@ -37,14 +51,4 @@ public class TestCaseControllerImpl implements TestCaseController {
         return BaseResponse.success(applicationService.createTestCase(testCase, request));
     }
 
-    @Override
-    public BaseResponse<TestCaseResponse> updateTestCase(Long testCaseId, TestCaseRequest testCase, HttpServletRequest request) {
-        return BaseResponse.success(applicationService.updateTestCase(testCaseId, testCase, request));
-    }
-
-    @Override
-    public BaseResponse<?> deleteTestCase(Long testCaseId, HttpServletRequest request) {
-        applicationService.deleteTestCase(testCaseId, request);
-        return BaseResponse.success();
-    }
 }

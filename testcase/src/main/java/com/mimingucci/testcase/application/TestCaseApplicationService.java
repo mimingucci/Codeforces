@@ -7,9 +7,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface TestCaseApplicationService {
-    TestCaseResponse getTestCaseById(Long testCaseId);
+    TestCaseResponse getTestCaseById(Long testCaseId, HttpServletRequest request);
 
-    List<TestCaseResponse> getTestCaseByProblemId(Long problemId);
+    List<TestCaseResponse> getTestCaseByProblemId(Long problemId, HttpServletRequest request);
 
     TestCaseResponse createTestCase(TestCaseRequest testCase, HttpServletRequest request);
 

@@ -1,3 +1,4 @@
+import json
 from enum import Enum
 from pydantic import BaseModel
 from service.service_client import ServiceClient
@@ -58,12 +59,18 @@ class Judge(object):
             "Content-Type": "application/json"
         }
         )
+
+        # Convert string response to dictionary
+        if isinstance(response, str):
+            response = json.loads(response)
+
         return response
 
     async def run(self):
         results = []
         for i in range(len(self.inputs)):
-            results.append(await self._judge_one(input_date=self.inputs[i], output_date=self.outputs[i]))
-            if results[-1]["status"] != "Accepted" and self.rule == Rule.DEFAULT:
+            result = await self._judge_one(input_date=self.inputs[i], output_date=self.outputs[i])
+            results.append(result)
+            if isinstance(result, dict) and result.get('status') != 'Accepted' and self.rule == Rule.DEFAULT:
                 return results
         return results

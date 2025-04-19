@@ -59,4 +59,9 @@ public class CommentApplicationServiceImpl implements CommentApplicationService 
     public List<CommentResponse> getByUserId(Long userId) {
         return CommentAssembler.INSTANCE.listToResponse(this.service.findCommentsByUserId(userId));
     }
+
+    @Override
+    public Boolean deleteById(Long id) {
+        return this.service.deleteById(id);
+    }
 }

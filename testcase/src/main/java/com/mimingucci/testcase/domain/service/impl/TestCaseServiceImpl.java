@@ -11,11 +11,13 @@ import com.mimingucci.testcase.presentation.dto.response.BaseResponse;
 import com.mimingucci.testcase.presentation.dto.response.ContestResponse;
 import com.mimingucci.testcase.presentation.dto.response.ProblemResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TestCaseServiceImpl implements TestCaseService {
@@ -27,17 +29,35 @@ public class TestCaseServiceImpl implements TestCaseService {
 
     @Override
     public TestCase createTestCase(Long author, TestCase testCase) {
-        BaseResponse<ProblemResponse> problem = this.problemClient.getProblemById(testCase.getId());
-        if (!problem.code().equals(BaseResponse.SUCCESS_CODE) || problem.data() == null) throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
+        BaseResponse<ProblemResponse> problem = this.problemClient.getProblemById(testCase.getProblem());
+        if (!problem.code().equals(BaseResponse.SUCCESS_CODE) || problem.data() == null) {
+            throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
         BaseResponse<ContestResponse> contest = this.contestClient.getContestById(problem.data().getContest());
-        if (!contest.code().equals(BaseResponse.SUCCESS_CODE) || contest.data() == null) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
-        if (!contest.data().getTesters().contains(author) && !contest.data().getAuthors().contains(author)) throw new ApiRequestException(ErrorMessageConstants.NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
+        if (!contest.code().equals(BaseResponse.SUCCESS_CODE) || contest.data() == null) {
+            throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        if (!contest.data().getTesters().contains(author) && !contest.data().getAuthors().contains(author)) {
+            throw new ApiRequestException(ErrorMessageConstants.NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
+        }
         return repository.createTestCase(testCase);
     }
 
     @Override
-    public TestCase getTestCase(Long id) {
-        return repository.getTestCase(id);
+    public TestCase getTestCase(Long id, Long author) {
+        TestCase domain = repository.getTestCase(id);
+        BaseResponse<ProblemResponse> problem = this.problemClient.getProblemById(domain.getProblem());
+        if (!problem.code().equals(BaseResponse.SUCCESS_CODE) || problem.data() == null) {
+            throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        BaseResponse<ContestResponse> contest = this.contestClient.getContestById(problem.data().getContest());
+        if (!contest.code().equals(BaseResponse.SUCCESS_CODE) || contest.data() == null) {
+            throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        if (!contest.data().getTesters().contains(author) && !contest.data().getAuthors().contains(author)) {
+            throw new ApiRequestException(ErrorMessageConstants.NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
+        }
+        return domain;
     }
 
     @Override
@@ -48,7 +68,7 @@ public class TestCaseServiceImpl implements TestCaseService {
     @Override
     public void deleteTestCase(Long author, Long id) {
         TestCase testCase = repository.getTestCase(id);
-        BaseResponse<ProblemResponse> problem = this.problemClient.getProblemById(testCase.getId());
+        BaseResponse<ProblemResponse> problem = this.problemClient.getProblemById(testCase.getProblem());
         if (!problem.code().equals(BaseResponse.SUCCESS_CODE) || problem.data() == null) throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
         BaseResponse<ContestResponse> contest = this.contestClient.getContestById(problem.data().getContest());
         if (!contest.code().equals(BaseResponse.SUCCESS_CODE) || contest.data() == null) throw  new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -59,11 +79,27 @@ public class TestCaseServiceImpl implements TestCaseService {
     @Override
     public TestCase updateTestCase(Long author, Long id, TestCase testCase) {
         TestCase testcase = repository.getTestCase(id);
-        BaseResponse<ProblemResponse> problem = this.problemClient.getProblemById(testcase.getId());
+        BaseResponse<ProblemResponse> problem = this.problemClient.getProblemById(testcase.getProblem());
         if (!problem.code().equals(BaseResponse.SUCCESS_CODE) || problem.data() == null) throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
         BaseResponse<ContestResponse> contest = this.contestClient.getContestById(problem.data().getContest());
-        if (!contest.code().equals(BaseResponse.SUCCESS_CODE) || contest.data() == null) throw  new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
+        if (!contest.code().equals(BaseResponse.SUCCESS_CODE) || contest.data() == null) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
         if (!contest.data().getTesters().contains(author) && !contest.data().getAuthors().contains(author)) throw new ApiRequestException(ErrorMessageConstants.NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
         return repository.updateTestCase(id, testCase);
+    }
+
+    @Override
+    public List<TestCase> getTestCasesByProblemIdTester(Long problemId, Long author) {
+        BaseResponse<ProblemResponse> problem = this.problemClient.getProblemById(problemId);
+        if (!problem.code().equals(BaseResponse.SUCCESS_CODE) || problem.data() == null) {
+            throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        BaseResponse<ContestResponse> contest = this.contestClient.getContestById(problem.data().getContest());
+        if (!contest.code().equals(BaseResponse.SUCCESS_CODE) || contest.data() == null) {
+            throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        if (!contest.data().getTesters().contains(author) && !contest.data().getAuthors().contains(author)) {
+            throw new ApiRequestException(ErrorMessageConstants.NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
+        }
+        return repository.getTestCasesByProblemId(problemId);
     }
 }

@@ -24,5 +24,6 @@ services:
       SERVICE_URL: "http://judge-server:12358"
       TOKEN: "toivaban12345"
       DEBUG_MODE: "1"
+      INSTANCE_HOST: ${INSTANCE_HOST:-host.docker.internal}
     ports:
       - "8090:8090"

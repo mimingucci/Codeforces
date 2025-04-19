@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = PathConstants.API_V1_COMMENT)
@@ -33,12 +35,18 @@ public class CommentControllerImpl implements CommentController {
     @DeleteMapping(path = PathConstants.COMMENT_ID)
     @Override
     public BaseResponse<Boolean> deleteById(@PathVariable(name = "commentId") Long id) {
-        return null;
+        return BaseResponse.success(this.commentApplicationService.deleteById(id));
     }
 
     @DeleteMapping
     @Override
-    public BaseResponse<Boolean> deleteByBlogId(Long blogId) {
+    public BaseResponse<Boolean> deleteByBlogId(@PathVariable("blogId") Long blogId) {
         return null;
+    }
+
+    @GetMapping(path = PathConstants.BLOG + PathConstants.BLOG_ID)
+    @Override
+    public BaseResponse<List<CommentResponse>> getAllByBlog(@PathVariable("blogId") Long blogId) {
+        return BaseResponse.success(this.commentApplicationService.getByBlogId(blogId));
     }
 }

@@ -15,4 +15,6 @@ public interface CommentApplicationService {
     List<CommentResponse> getByBlogId(Long blogId);
 
     List<CommentResponse> getByUserId(Long userId);
+
+    Boolean deleteById(Long id);
 }

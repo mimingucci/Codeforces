@@ -9,6 +9,7 @@ import logging
 import uuid
 import shlex
 import shutil
+import socket
 # import uvicorn
 # coding=utf-8
 from enum import Enum
@@ -318,14 +319,32 @@ async def check_token_middleware(request: Request, call_next):
 
 @app.on_event("startup")
 async def startup_event():
+    # Get container's IP address
+    def get_container_ip():
+        try:
+            # Try to get container IP using hostname first
+            ip = socket.gethostbyname(socket.gethostname())
+            if ip.startswith("127."):
+                # If we got localhost, try getting the non-localhost IP
+                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                s.connect(("8.8.8.8", 80))
+                ip = s.getsockname()[0]
+                s.close()
+            return ip
+        except Exception as e:
+            logging.warning(f"Failed to get container IP: {e}")
+            return os.environ.get('INSTANCE_HOST', 'host.docker.internal')
+
+    instance_host = get_container_ip()
+    logging.info(f"Using instance host: {instance_host}")
+
     # Initialize eureka client first
-    # await eureka_client.init_async(
-    #     eureka_server="http://192.168.0.106:8761/eureka",
-    #     app_name="judger",
-    #     instance_port=8090,
-    #     # instance_host="172.19.0.2"
-    # )
-    pass
+    await eureka_client.init_async(
+        eureka_server="http://192.168.100.7:8761/eureka",
+        app_name="judger",
+        instance_port=8090,
+        instance_host=instance_host,
+    )
 
 
 if DEBUG:

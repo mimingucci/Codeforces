@@ -22,19 +22,13 @@ public class BlogControllerImpl implements BlogController {
 
     private final BlogApplicationService applicationService;
 
-    @PostMapping
-    @Override
-    public BaseResponse<BlogCreateResponse> createBlog(@RequestBody @Validated BlogCreateRequest request, HttpServletRequest httpRequest) {
-        return BaseResponse.success(this.applicationService.createBlog(request, httpRequest));
-    }
-
     @GetMapping(path = PathConstants.ALL)
     @Override
     public BaseResponse<PageableResponse<BlogGetResponse>> getAll(Pageable pageable) {
         return BaseResponse.success(this.applicationService.getAll(pageable));
     }
 
-    @GetMapping(path = PathConstants.BLOG_ID)
+    @DeleteMapping(path = PathConstants.BLOG_ID)
     @Override
     public BaseResponse<Boolean> deleteById(@PathVariable("blogId") Long id, HttpServletRequest request) {
         return BaseResponse.success(this.applicationService.deleteById(id, request));
@@ -51,5 +45,11 @@ public class BlogControllerImpl implements BlogController {
     @Override
     public BaseResponse<BlogGetResponse> getBlogById(@PathVariable("blogId") Long id) {
         return BaseResponse.success(this.applicationService.findBlogById(id));
+    }
+
+    @PostMapping
+    @Override
+    public BaseResponse<BlogCreateResponse> createBlog(@RequestBody @Validated BlogCreateRequest request, HttpServletRequest httpRequest) {
+        return BaseResponse.success(this.applicationService.createBlog(request, httpRequest));
     }
 }
