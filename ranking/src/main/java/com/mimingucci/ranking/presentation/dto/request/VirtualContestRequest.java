@@ -21,4 +21,8 @@ public class VirtualContestRequest {
     Instant startTime;
 
     Instant endTime;
+
+    String problemset;
+
+    String contestants;
 }

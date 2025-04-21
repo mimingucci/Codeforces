@@ -24,4 +24,6 @@ public class ContestActionEvent {
     ContestEvent eventType;
 
     ContestType contestType;
+    
+    String problemset;
 }

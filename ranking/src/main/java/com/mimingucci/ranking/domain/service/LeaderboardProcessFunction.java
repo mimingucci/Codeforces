@@ -75,11 +75,17 @@ public class LeaderboardProcessFunction extends KeyedProcessFunction<Long, Submi
             if (event.getEventType().equals(SubmissionType.CONTEST_STARTED)) {
                 log.info("Contest has started");
                 List<ContestRegistrationResponse> contestants = ContestantsConverter.fromJsonString(event.getContestants());
+                List<Long> problemset = Arrays.stream(event.getProblemset().split(","))
+                        .map(Long::parseLong)
+                        .toList();
                 for (var contestant : contestants) {
                     LeaderboardEntry entry = new LeaderboardEntry();
                     entry.setUserId(contestant.getUser());
                     entry.setContestId(event.getContest());
-
+                    entry.setRated(contestant.getRated());
+                    for (long problem : problemset) {
+                        entry.getProblemAttempts().put(problem, 0);
+                    }
                     leaderboard.put(contestant.getUser(), entry);
                 }
                 List<LeaderboardEntry> sortedEntries = recalculate_ranks();
@@ -139,9 +145,9 @@ public class LeaderboardProcessFunction extends KeyedProcessFunction<Long, Submi
         entry.getProblemAttempts().compute(event.getProblem(), (k, attemp) -> attemp + 1);
 
         if (event.getVerdict().equals(SubmissionVerdict.ACCEPT)) {
-            int solve_time = (int) Duration.between(event.getSent_on(), event.getStartTime()).toMinutes();
+            int solve_time = (int) Duration.between(event.getStartTime(), event.getSent_on()).toMinutes();
             entry.getProblemSolveTimes().put(event.getProblem(), solve_time);
-
+            entry.getSolvedProblems().add(event.getProblem());
             entry.setTotalScore(event.getScore());
             int attemps = entry.getProblemAttempts().get(event.getProblem());
             penalty += attemps * 10 + solve_time;

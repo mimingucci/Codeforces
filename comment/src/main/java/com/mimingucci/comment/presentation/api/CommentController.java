@@ -19,4 +19,8 @@ public interface CommentController {
     BaseResponse<Boolean> deleteByBlogId(Long blogId);
 
     BaseResponse<List<CommentResponse>> getAllByBlog(Long blogId);
+
+    BaseResponse<CommentResponse> likeComment(Long id, HttpServletRequest request);
+
+    BaseResponse<CommentResponse> dislikeComment(Long id, HttpServletRequest request);
 }

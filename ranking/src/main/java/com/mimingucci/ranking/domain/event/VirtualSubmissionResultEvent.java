@@ -1,5 +1,7 @@
 package com.mimingucci.ranking.domain.event;
 
+import com.mimingucci.ranking.common.enums.ContestType;
+import com.mimingucci.ranking.common.enums.SubmissionType;
 import com.mimingucci.ranking.common.enums.SubmissionVerdict;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +15,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VirtualSubmissionResultEvent {
+    Long id;
+
     SubmissionVerdict verdict;
 
     Long author;
@@ -27,5 +31,21 @@ public class VirtualSubmissionResultEvent {
 
     Integer score;
 
+    Instant sent_on;
+
     Instant judged_on;
+
+    Instant startTime;
+
+    Instant endTime;
+
+    SubmissionType eventType;
+
+    ContestType contestType;
+
+    String contestants;
+
+    String problemset;
+
+    Long user;
 }

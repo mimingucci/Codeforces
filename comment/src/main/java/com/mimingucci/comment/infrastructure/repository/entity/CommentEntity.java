@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "comment")
@@ -25,6 +27,10 @@ public class CommentEntity {
 
     private Long blog;
 
+    private Set<Long> likes = new HashSet<>();
+
+    private Set<Long> dislikes = new HashSet<>();
+
     @Column(nullable = false, updatable = false, name = "created_at")
     private Instant createdAt; // UTC timestamp
 
@@ -39,5 +45,15 @@ public class CommentEntity {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = Instant.now();
+    }
+
+    public void addLike(Long user) {
+        this.likes.add(user);
+        if (this.dislikes.contains(user)) dislikes.remove(user);
+    }
+
+    public void addDislike(Long user) {
+        this.dislikes.add(user);
+        if (this.likes.contains(user)) likes.remove(user);
     }
 }

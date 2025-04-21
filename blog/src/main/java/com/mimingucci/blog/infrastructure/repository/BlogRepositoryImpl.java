@@ -146,6 +146,32 @@ public class BlogRepositoryImpl implements BlogRepository {
         return this.blogJpaRepository.findNewestBlogsByAuthor(userId, pageable).map(BlogConverter.INSTANCE::toDomain);
     }
 
+    @Override
+    public Blog likeBlog(Long blogId, Long userId) {
+        // Validate blog exists
+        BlogEntity blogEntity = this.blogJpaRepository.findById(blogId)
+                .orElseThrow(() -> new ApiRequestException(
+                        ErrorMessageConstants.BLOG_NOT_FOUND,
+                        HttpStatus.NOT_FOUND
+                ));
+
+        blogEntity.addLike(userId);
+        return BlogConverter.INSTANCE.toDomain(this.blogJpaRepository.save(blogEntity));
+    }
+
+    @Override
+    public Blog dislikeBlog(Long blogId, Long userId) {
+        // Validate blog exists
+        BlogEntity blogEntity = this.blogJpaRepository.findById(blogId)
+                .orElseThrow(() -> new ApiRequestException(
+                        ErrorMessageConstants.BLOG_NOT_FOUND,
+                        HttpStatus.NOT_FOUND
+                ));
+
+        blogEntity.addDislike(userId);
+        return BlogConverter.INSTANCE.toDomain(this.blogJpaRepository.save(blogEntity));
+    }
+
     private TagEntity getOrCreateTag(String tagName) {
         return tagJpaRepository.findByNameIgnoreCase(tagName.toLowerCase().trim())
                 .orElseGet(() -> {

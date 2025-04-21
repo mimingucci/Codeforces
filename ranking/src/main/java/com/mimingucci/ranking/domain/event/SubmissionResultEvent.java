@@ -43,4 +43,6 @@ public class SubmissionResultEvent {
     ContestType contestType;
 
     String contestants;
+
+    String problemset;
 }

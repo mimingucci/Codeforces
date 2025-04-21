@@ -1,13 +1,20 @@
 package com.mimingucci.ranking.domain.service;
 
+import com.mimingucci.ranking.common.constant.ErrorMessageConstants;
 import com.mimingucci.ranking.common.enums.ContestType;
-import com.mimingucci.ranking.domain.client.UserClient;
-import com.mimingucci.ranking.domain.client.response.UserResponse;
+import com.mimingucci.ranking.common.exception.ApiRequestException;
+import com.mimingucci.ranking.common.util.LeaderboardFileHandler;
+import com.mimingucci.ranking.common.util.SubmissionHistoryFileHandler;
+import com.mimingucci.ranking.domain.client.ContestClient;
+import com.mimingucci.ranking.domain.client.response.ContestResponse;
 import com.mimingucci.ranking.domain.model.LeaderboardEntry;
 import com.mimingucci.ranking.domain.model.RatingChange;
+import com.mimingucci.ranking.domain.repository.LeaderboardEntryRepository;
+import com.mimingucci.ranking.domain.repository.RatingChangeRepository;
+import com.mimingucci.ranking.domain.repository.SubmissionResultRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,23 +22,61 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RatingCalculator {
 
-    private final UserClient userClient;
+    private final RatingChangeRepository ratingChangeRepository;
+
+    private final LeaderboardEntryRepository leaderboardEntryRepository;
+
+    private final SubmissionResultRepository submissionResultRepository;
+
+    private final ContestClient contestClient;
+
+    public Boolean completeContest(Long contestId, Long userId) {
+        ContestResponse contest = this.contestClient.getContest(contestId).data();
+        if (!contest.getAuthors().contains(userId)) {
+            throw new ApiRequestException(ErrorMessageConstants.NOT_PERMISSION, HttpStatus.BAD_REQUEST);
+        }
+        if (!SubmissionHistoryFileHandler.submissionHistoryFileExists(contestId) || !LeaderboardFileHandler.leaderboardFileExists(contestId)) {
+            throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_FIND_DATA, HttpStatus.NOT_FOUND);
+        }
+        List<LeaderboardEntry> entries = LeaderboardFileHandler.readLeaderboard(contestId);
+
+        submissionResultRepository.saveSubmissionResultEventsDuringContest(SubmissionHistoryFileHandler.readSubmissionHistory(contestId));
+        leaderboardEntryRepository.saveLeaderboardEntriesDuringContest(entries);
+
+        Boolean result = calculateRatingChanges(contestId, entries, contest.getType());
+
+        // clear
+        SubmissionHistoryFileHandler.deleteSubmissionHistory(contestId);
+        LeaderboardFileHandler.deleteLeaderboardByContestId(contestId);
+
+        return result;
+    }
 
     /**
      * Calculates rating changes for all participants based on contest results
      * Using an algorithm similar to Codeforces' Elo rating system
      */
-    public List<RatingChange> calculateRatingChanges(Long contestId, List<LeaderboardEntry> entries, ContestType contestType) {
+    public Boolean calculateRatingChanges(Long contestId, List<LeaderboardEntry> entries, ContestType contestType) {
+        if (!contestType.equals(ContestType.SYSTEM)) return true;
+
         // Get all participants by ID
         List<Long> userIds = entries.stream()
                 .map(LeaderboardEntry::getUserId)
-                .collect(Collectors.toList());
+                .toList();
 
         // Get current ratings of all participants
         Map<Long, Integer> currentRatings = new HashMap<>();
-        for (Long i : userIds) {
-            UserResponse userResponse = userClient.getUserById(i).data();
-            if (userResponse != null) currentRatings.put(i, userResponse.getRating());
+        List<RatingChange> changes = ratingChangeRepository.getNewestChangesInUserIds(userIds);
+
+        for (var i : changes) {
+            currentRatings.put(i.getUser(), i.getNewRating());
+        }
+
+        Set<Long> setChanges = changes.stream().map(RatingChange::getUser).collect(Collectors.toSet());
+        for (var i : userIds) {
+            if (!setChanges.contains(i)) {
+                currentRatings.put(i, 0);
+            }
         }
 
         // Calculate seed values (expected performance)
@@ -47,7 +92,7 @@ public class RatingCalculator {
 
         for (LeaderboardEntry entry : entries) {
             Long userId = entry.getUserId();
-            int oldRating = currentRatings.getOrDefault(userId, 1500);
+            int oldRating = currentRatings.getOrDefault(userId, 0);
 
             // Expected performance minus actual performance
             double expectedPerformance = seedValues.get(userId);
@@ -56,13 +101,12 @@ public class RatingCalculator {
             // Calculate rating change based on the difference between actual and expected performance
             int ratingChange = (int) Math.round((performance - expectedPerformance) * weight);
 
-            // Apply maximum change constraints
-            ratingChange = Math.max(-100, Math.min(100, ratingChange));
+            if (entry.getRated() == null || entry.getRated().equals(Boolean.FALSE)) ratingChange = 0;
 
             int newRating = oldRating + ratingChange;
 
-            // Ensure minimum rating is 1
-            newRating = Math.max(1, newRating);
+            // Ensure minimum rating is 0
+            newRating = Math.max(0, newRating);
 
             ratingChanges.add(new RatingChange(
                     userId,
@@ -75,7 +119,7 @@ public class RatingCalculator {
             ));
         }
 
-        return ratingChanges;
+        return ratingChangeRepository.persistBatch(ratingChanges);
     }
 
     /**
@@ -88,7 +132,7 @@ public class RatingCalculator {
         for (int i = 0; i < n; i++) {
             LeaderboardEntry participant1 = entries.get(i);
             Long id1 = participant1.getUserId();
-            int rating1 = ratings.getOrDefault(id1, 1500);
+            int rating1 = ratings.getOrDefault(id1, 0);
 
             double seed = 1.0;
 
@@ -96,7 +140,7 @@ public class RatingCalculator {
                 if (i != j) {
                     LeaderboardEntry participant2 = entries.get(j);
                     Long id2 = participant2.getUserId();
-                    int rating2 = ratings.getOrDefault(id2, 1500);
+                    int rating2 = ratings.getOrDefault(id2, 0);
 
                     // Probability of participant1 winning against participant2
                     seed += 1.0 / (1.0 + Math.pow(10.0, (rating2 - rating1) / 400.0));

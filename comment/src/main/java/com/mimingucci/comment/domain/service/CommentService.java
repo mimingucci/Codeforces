@@ -16,4 +16,8 @@ public interface CommentService {
     Boolean deleteById(Long id);
 
     Boolean deleteByBlogId(Long blogId);
+
+    Comment likeComment(Long id, Long user);
+
+    Comment dislikeComment(Long id, Long user);
 }

@@ -69,4 +69,28 @@ public class BlogApplicationServiceImpl implements BlogApplicationService {
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
     }
+
+    @Override
+    public BlogGetResponse like(Long blogId, HttpServletRequest request) {
+        Long userId = null;
+        try {
+            Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
+            userId = claims.get("id", Long.class);
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+        return BlogAssembler.INSTANCE.domainToGetResponse(this.service.likeBlog(blogId, userId));
+    }
+
+    @Override
+    public BlogGetResponse dislike(Long blogId, HttpServletRequest request) {
+        Long userId = null;
+        try {
+            Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
+            userId = claims.get("id", Long.class);
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+        return BlogAssembler.INSTANCE.domainToGetResponse(this.service.dislikeBlog(blogId, userId));
+    }
 }

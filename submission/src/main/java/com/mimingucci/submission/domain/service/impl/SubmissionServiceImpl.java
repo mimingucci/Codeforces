@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Objects;
 
 @Service
@@ -39,6 +40,7 @@ public class SubmissionServiceImpl implements SubmissionService {
 
         ContestantCheckResponse contestant = contestClient.checkRegistration(problemResponse.getContest(), submission.getAuthor()).data();
         if (contestant == null) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
+        if (Instant.now().isBefore(contestant.getStartTime())) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
 
         if (!Objects.equals(problemResponse.getContest(), submission.getContest())) throw new ApiRequestException(ErrorMessageConstants.CONFLICT_DATA, HttpStatus.CONFLICT);
         Submission domain = repository.save(submission);

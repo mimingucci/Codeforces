@@ -51,7 +51,7 @@ public class SubmissionRepositoryImpl implements SubmissionRepository {
     @Override
     public Submission update(Long id, Submission submission) {
         SubmissionEntity entity = jpaRepository.findById(id).orElseThrow(() -> new ApiRequestException(ErrorMessageConstants.SUBMISSION_NOT_FOUND, HttpStatus.NOT_FOUND));
-        if (submission.getVerdict() != null && entity.getVerdict() == null) {
+        if (submission.getVerdict() != null) {
             entity.setJudged(Instant.now());
             entity.setVerdict(submission.getVerdict());
         }

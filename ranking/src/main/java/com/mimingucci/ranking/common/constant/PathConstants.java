@@ -12,6 +12,7 @@ public class PathConstants {
     public static final String INVITATION = "/invitation";
     public static final String CONTEST_ID = "/{contestId}";
     public static final String CHECK = "/check";
+    public static final String VIRTUAL_CONTEST = "/virtual";
 
     public static final String PROBLEM = "/problem";
     public static final String API_V1_PROBLEM = API_V1 + PROBLEM;

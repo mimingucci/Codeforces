@@ -64,4 +64,28 @@ public class CommentApplicationServiceImpl implements CommentApplicationService 
     public Boolean deleteById(Long id) {
         return this.service.deleteById(id);
     }
+
+    @Override
+    public CommentResponse likeComment(Long id, HttpServletRequest request) {
+        Long user = null;
+        try {
+            Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
+            user = claims.get("id", Long.class);
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+        return CommentAssembler.INSTANCE.domainToResponse(this.service.likeComment(id, user));
+    }
+
+    @Override
+    public CommentResponse dislikeComment(Long id, HttpServletRequest request) {
+        Long user = null;
+        try {
+            Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
+            user = claims.get("id", Long.class);
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+        return CommentAssembler.INSTANCE.domainToResponse(this.service.dislikeComment(id, user));
+    }
 }

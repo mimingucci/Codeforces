@@ -16,4 +16,6 @@ public interface UserService {
     Page<User> getUsersByRating(Pageable pageable);
 
     User getUserById(Long userId);
+
+    User getUserByUsername(String username);
 }

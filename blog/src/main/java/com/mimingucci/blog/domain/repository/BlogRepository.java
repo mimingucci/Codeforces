@@ -29,4 +29,8 @@ public interface BlogRepository {
     Page<Blog> findAll(Pageable pageable);
 
     Page<Blog> findAllByUserId(Long userId, Pageable pageable);
+
+    Blog likeBlog(Long blogId, Long userId);
+
+    Blog dislikeBlog(Long blogId, Long userId);
 }

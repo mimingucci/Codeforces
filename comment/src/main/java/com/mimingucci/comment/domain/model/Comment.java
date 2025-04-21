@@ -3,6 +3,7 @@ package com.mimingucci.comment.domain.model;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.Set;
 
 @Data
 public class Comment {
@@ -17,4 +18,8 @@ public class Comment {
     Instant createdAt;
 
     Instant updatedAt;
+
+    Set<Long> likes;
+
+    Set<Long> dislikes;
 }

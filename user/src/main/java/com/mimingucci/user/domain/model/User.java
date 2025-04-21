@@ -16,6 +16,8 @@ public class User {
 
     private String password;
 
+    private String username;
+
     private Set<Role> roles = new HashSet<>();
 
     private Boolean enabled;
@@ -39,6 +41,8 @@ public class User {
     private Country country;
 
     private State state;
+
+    private Instant createdAt;
 
     public boolean hasRole(Role role) {
         return this.roles.contains(role);

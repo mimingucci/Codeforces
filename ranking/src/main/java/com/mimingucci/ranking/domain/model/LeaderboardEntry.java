@@ -24,6 +24,8 @@ public class LeaderboardEntry {
 
     private Integer penalty = 0;
 
+    private Boolean rated = false;
+
     @JsonDeserialize(as = HashSet.class)
     private Set<Long> solvedProblems = new HashSet<>();
 

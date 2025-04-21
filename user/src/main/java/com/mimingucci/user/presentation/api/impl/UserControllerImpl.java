@@ -17,6 +17,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserControllerImpl implements UserController {
     private final UserApplicationService userApplicationService;
 
+    @GetMapping(path = PathConstants.USERNAME + PathConstants.USER_USERNAME)
+    @Override
+    public BaseResponse<UserGetResponse> getUserByUsername(@PathVariable("userName") String username) {
+        return BaseResponse.success(this.userApplicationService.getUserByUsername(username));
+    }
+
     @PutMapping(path = PathConstants.UPDATE)
     @Override
     public BaseResponse<UserUpdateResponse> updateProfile(@RequestBody @Validated UserUpdateRequest request) {

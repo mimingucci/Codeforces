@@ -22,4 +22,6 @@ public class SubmissionResponse {
     SubmissionLanguage language;
     Instant sent;
     Instant judged;
+    Long execution_time_ms;
+    Long memory_used_bytes;
 }

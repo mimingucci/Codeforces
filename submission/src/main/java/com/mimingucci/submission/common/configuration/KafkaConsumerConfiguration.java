@@ -15,6 +15,7 @@ import org.springframework.kafka.support.converter.RecordMessageConverter;
 import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 import org.springframework.kafka.support.mapping.DefaultJackson2JavaTypeMapper;
 import org.springframework.kafka.support.mapping.Jackson2JavaTypeMapper;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
@@ -36,16 +37,8 @@ public class KafkaConsumerConfiguration {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         return props;
-    }
-
-    @Bean
-    public ConsumerFactory<String, SubmissionJudgedEvent> submissionConsumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(
-                consumerConfigs(),
-                new StringDeserializer(),
-                new JsonDeserializer<>(SubmissionJudgedEvent.class)
-        );
     }
 
     @Bean
@@ -54,5 +47,19 @@ public class KafkaConsumerConfiguration {
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(submissionConsumerFactory());
         return factory;
+    }
+
+    @Bean
+    public ConsumerFactory<String, SubmissionJudgedEvent> submissionConsumerFactory() {
+        JsonDeserializer<SubmissionJudgedEvent> jsonDeserializer = new JsonDeserializer<>(SubmissionJudgedEvent.class);
+
+        ErrorHandlingDeserializer<SubmissionJudgedEvent> errorHandlingDeserializer
+                = new ErrorHandlingDeserializer<>(jsonDeserializer);
+
+        return new DefaultKafkaConsumerFactory<>(
+                consumerConfigs(),
+                new ErrorHandlingDeserializer<>(new StringDeserializer()),
+                errorHandlingDeserializer
+        );
     }
 }

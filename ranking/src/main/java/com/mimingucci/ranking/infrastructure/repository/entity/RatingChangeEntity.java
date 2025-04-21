@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
+
 @Entity
 @Table(name = "rating_change")
 @Getter
@@ -34,4 +36,20 @@ public class RatingChangeEntity {
 
     @Column(name = "rating_change")
     private Integer ratingChange;
+
+    @Column(nullable = false, updatable = false, name = "created_at")
+    private Instant createdAt; // UTC timestamp
+
+    @Column(name = "updated_at")
+    private Instant updatedAt; // UTC timestamp
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Instant.now(); // Set to current UTC time
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = Instant.now(); // Set to current UTC time
+    }
 }

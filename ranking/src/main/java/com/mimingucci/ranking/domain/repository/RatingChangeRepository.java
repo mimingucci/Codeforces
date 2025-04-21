@@ -9,7 +9,7 @@ import java.util.List;
 public interface RatingChangeRepository {
     RatingChange persistOne(RatingChange domain);
 
-    List<RatingChange> persistBatch(List<RatingChange> domains);
+    Boolean persistBatch(List<RatingChange> domains);
 
     List<RatingChange> getAll(Long contestId);
 
@@ -20,4 +20,8 @@ public interface RatingChangeRepository {
     List<RatingChange> getByUser(Long userId);
 
     void deleteById(Long userId, Long contestId);
+
+    RatingChange getNewestOne(Long userId);
+
+    List<RatingChange> getNewestChangesInUserIds(List<Long> userIds);
 }

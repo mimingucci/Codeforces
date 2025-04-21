@@ -17,4 +17,8 @@ public interface CommentApplicationService {
     List<CommentResponse> getByUserId(Long userId);
 
     Boolean deleteById(Long id);
+
+    CommentResponse likeComment(Long id, HttpServletRequest request);
+
+    CommentResponse dislikeComment(Long id, HttpServletRequest request);
 }

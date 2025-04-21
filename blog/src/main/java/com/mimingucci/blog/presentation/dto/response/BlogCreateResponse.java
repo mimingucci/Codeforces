@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -25,4 +26,8 @@ public class BlogCreateResponse {
     Instant updatedAt;
 
     List<String> tags;
+
+    Set<Long> likes;
+
+    Set<Long> dislikes;
 }

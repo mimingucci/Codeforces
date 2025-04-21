@@ -20,6 +20,7 @@ public class SubmissionConsumer {
         submission.setId(event.getId());
         submission.setExecution_time_ms(event.getExecution_time_ms());
         submission.setMemory_used_bytes(event.getMemory_used_bytes());
+        submission.setJudged(event.getJudged_on());
         service.updateSubmission(event.getId(), submission);
     }
 }

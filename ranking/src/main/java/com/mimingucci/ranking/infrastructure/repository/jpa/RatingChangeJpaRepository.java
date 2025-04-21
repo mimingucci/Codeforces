@@ -35,4 +35,14 @@ public interface RatingChangeJpaRepository extends JpaRepository<RatingChangeEnt
     // Find users within a rating range after a contest
     List<RatingChangeEntity> findByContestAndNewRatingBetweenOrderByNewRatingDesc(
             Long contestId, Integer minRating, Integer maxRating);
+
+    Optional<RatingChangeEntity> findFirstByUserOrderByCreatedAtDesc(Long userId);
+
+    // Find newest rating changes for multiple users
+    @Query("SELECT rc FROM RatingChangeEntity rc " +
+            "WHERE rc.user IN :userIds AND rc.createdAt IN (" +
+            "    SELECT MAX(rc2.createdAt) FROM RatingChangeEntity rc2 " +
+            "    WHERE rc2.user = rc.user" +
+            ")")
+    List<RatingChangeEntity> findNewestByUserIn(List<Long> userIds);
 }

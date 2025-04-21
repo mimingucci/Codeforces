@@ -28,6 +28,18 @@ public class BlogControllerImpl implements BlogController {
         return BaseResponse.success(this.applicationService.getAll(pageable));
     }
 
+    @PutMapping(path = PathConstants.BLOG_ID + PathConstants.LIKE)
+    @Override
+    public BaseResponse<BlogGetResponse> likeBlog(@PathVariable("blogId") Long blogId, HttpServletRequest request) {
+        return BaseResponse.success(this.applicationService.like(blogId, request));
+    }
+
+    @PutMapping(path = PathConstants.BLOG_ID + PathConstants.DISLIKE)
+    @Override
+    public BaseResponse<BlogGetResponse> dislikeBlog(@PathVariable("blogId") Long blogId, HttpServletRequest request) {
+        return BaseResponse.success(this.applicationService.dislike(blogId, request));
+    }
+
     @DeleteMapping(path = PathConstants.BLOG_ID)
     @Override
     public BaseResponse<Boolean> deleteById(@PathVariable("blogId") Long id, HttpServletRequest request) {

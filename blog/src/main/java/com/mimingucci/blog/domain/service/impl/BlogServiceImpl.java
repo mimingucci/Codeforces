@@ -53,4 +53,14 @@ public class BlogServiceImpl implements BlogService {
     public Blog updateById(Blog blog) {
         return this.blogRepository.updateBlog(blog);
     }
+
+    @Override
+    public Blog likeBlog(Long blogId, Long userId) {
+        return this.blogRepository.likeBlog(blogId, userId);
+    }
+
+    @Override
+    public Blog dislikeBlog(Long blogId, Long userId) {
+        return this.blogRepository.dislikeBlog(blogId, userId);
+    }
 }

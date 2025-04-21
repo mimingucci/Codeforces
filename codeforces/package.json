@@ -2,26 +2,67 @@
   "name": "codeforces",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
   "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "next": "15.2.1"
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@fullcalendar/core": "^6.1.10",
+    "@fullcalendar/daygrid": "^6.1.10",
+    "@fullcalendar/react": "^6.1.10",
+    "@grammarly/editor-sdk-react": "^2.5.5",
+    "@monaco-editor/react": "^4.6.0",
+    "@mui/icons-material": "^5.15.2",
+    "@mui/material": "^5.15.2",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@tinymce/tinymce-react": "^4.3.2",
+    "@uiw/react-monacoeditor": "^3.6.0",
+    "@vaadin/split-layout": "^24.3.13",
+    "axios": "^1.6.2",
+    "clsx": "^2.0.0",
+    "cors": "^2.8.5",
+    "http-proxy-middleware": "^2.0.6",
+    "monaco-themes": "^0.4.4",
+    "react": "^18.2.0",
+    "react-calendar-heatmap": "^1.9.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.12.0",
+    "react-quill": "^2.0.0",
+    "react-router-dom": "^6.20.0",
+    "react-scripts": "5.0.1",
+    "react-select": "^5.8.0",
+    "react-toastify": "^10.0.5",
+    "socket.io-client": "^4.7.5",
+    "tippy.js": "^6.3.7",
+    "tw-elements-react": "^1.0.0-alpha2",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
-    "eslint": "^9",
-    "eslint-config-next": "15.2.1",
-    "@eslint/eslintrc": "^3"
+    "html-loader": "^5.0.0",
+    "tailwindcss": "^3.3.5"
   }
 }

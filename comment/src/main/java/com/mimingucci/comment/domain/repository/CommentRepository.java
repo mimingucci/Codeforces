@@ -18,4 +18,8 @@ public interface CommentRepository {
     List<Comment> findByUserId(Long userId);
 
     Boolean deleteByBlogId(Long blogId);
+
+    Comment likeComment(Long id, Long user);
+
+    Comment dislikeComment(Long id, Long user);
 }

@@ -8,4 +8,6 @@ public interface UserApplicationService {
     UserUpdateResponse updateProfile(UserUpdateRequest request);
 
     UserGetResponse getUserById(Long userId);
+
+    UserGetResponse getUserByUsername(String username);
 }

@@ -20,10 +20,22 @@ import java.util.List;
 public class CommentControllerImpl implements CommentController {
     private final CommentApplicationService commentApplicationService;
 
-    @PostMapping
+    @GetMapping(path = PathConstants.BLOG + PathConstants.BLOG_ID)
     @Override
-    public BaseResponse<CommentResponse> createComment(@RequestBody @Validated CommentCreateRequest request, HttpServletRequest httpRequest) {
-        return BaseResponse.success(this.commentApplicationService.create(request, httpRequest));
+    public BaseResponse<List<CommentResponse>> getAllByBlog(@PathVariable("blogId") Long blogId) {
+        return BaseResponse.success(this.commentApplicationService.getByBlogId(blogId));
+    }
+
+    @PutMapping(path = PathConstants.COMMENT_ID + PathConstants.LIKE)
+    @Override
+    public BaseResponse<CommentResponse> likeComment(@PathVariable(name = "commentId") Long id, HttpServletRequest request) {
+        return BaseResponse.success(this.commentApplicationService.likeComment(id, request));
+    }
+
+    @PutMapping(path = PathConstants.COMMENT_ID + PathConstants.DISLIKE)
+    @Override
+    public BaseResponse<CommentResponse> dislikeComment(@PathVariable(name = "commentId") Long id, HttpServletRequest request) {
+        return BaseResponse.success(this.commentApplicationService.dislikeComment(id, request));
     }
 
     @PutMapping(path = PathConstants.COMMENT_ID)
@@ -38,15 +50,15 @@ public class CommentControllerImpl implements CommentController {
         return BaseResponse.success(this.commentApplicationService.deleteById(id));
     }
 
+    @PostMapping
+    @Override
+    public BaseResponse<CommentResponse> createComment(@RequestBody @Validated CommentCreateRequest request, HttpServletRequest httpRequest) {
+        return BaseResponse.success(this.commentApplicationService.create(request, httpRequest));
+    }
+
     @DeleteMapping
     @Override
     public BaseResponse<Boolean> deleteByBlogId(@PathVariable("blogId") Long blogId) {
         return null;
-    }
-
-    @GetMapping(path = PathConstants.BLOG + PathConstants.BLOG_ID)
-    @Override
-    public BaseResponse<List<CommentResponse>> getAllByBlog(@PathVariable("blogId") Long blogId) {
-        return BaseResponse.success(this.commentApplicationService.getByBlogId(blogId));
     }
 }

@@ -9,4 +9,6 @@ public interface UserController {
     BaseResponse<UserUpdateResponse> updateProfile(UserUpdateRequest request);
 
     BaseResponse<UserGetResponse> getUserById(Long userId);
+
+    BaseResponse<UserGetResponse> getUserByUsername(String username);
 }

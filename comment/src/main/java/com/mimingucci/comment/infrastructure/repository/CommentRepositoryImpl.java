@@ -67,4 +67,28 @@ public class CommentRepositoryImpl implements CommentRepository {
         this.commentJpaRepository.deleteAllByBlogId(blogId);
         return true;
     }
+
+    @Override
+    public Comment likeComment(Long id, Long user) {
+        CommentEntity entity = this.commentJpaRepository.findById(id)
+                .orElseThrow(() -> new ApiRequestException(
+                        ErrorMessageConstants.BLOG_NOT_FOUND,
+                        HttpStatus.NOT_FOUND
+                ));
+
+        entity.addLike(user);
+        return CommentConverter.INSTANCE.toDomain(this.commentJpaRepository.save(entity));
+    }
+
+    @Override
+    public Comment dislikeComment(Long id, Long user) {
+        CommentEntity entity = this.commentJpaRepository.findById(id)
+                .orElseThrow(() -> new ApiRequestException(
+                        ErrorMessageConstants.BLOG_NOT_FOUND,
+                        HttpStatus.NOT_FOUND
+                ));
+
+        entity.addDislike(user);
+        return CommentConverter.INSTANCE.toDomain(this.commentJpaRepository.save(entity));
+    }
 }

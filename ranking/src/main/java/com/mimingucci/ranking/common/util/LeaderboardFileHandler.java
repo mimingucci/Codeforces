@@ -56,6 +56,31 @@ public class LeaderboardFileHandler {
         }
     }
 
+    /**
+     * Check if leaderboard file exists for a given contest
+     * @param contestId the contest ID to check
+     * @return true if file exists, false otherwise
+     */
+    public static boolean leaderboardFileExists(Long contestId) {
+        try {
+            Path filePath = Paths.get(getFileName(contestId));
+            return Files.exists(filePath);
+        } catch (Exception e) {
+            log.error("Error checking leaderboard file existence for contest {}", contestId, e);
+            return false;
+        }
+    }
+
+    public static boolean deleteLeaderboardByContestId(Long contestId) {
+        try {
+            Path filePath = Paths.get(getFileName(contestId));
+            return Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            log.error("Failed to delete leaderboard entries for contest " + contestId, e);
+            return false;
+        }
+    }
+
     private static String getFileName(Long contestId) {
         return BASE_DIR + "contest_" + contestId + "_leaderboard.json";
     }

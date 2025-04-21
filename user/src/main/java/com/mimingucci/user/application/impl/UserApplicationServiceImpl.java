@@ -28,4 +28,9 @@ public class UserApplicationServiceImpl implements UserApplicationService {
         User user = this.userService.getUserById(userId);
         return UserAssembler.INSTANCE.toGetResponse(user);
     }
+
+    @Override
+    public UserGetResponse getUserByUsername(String username) {
+        return UserAssembler.INSTANCE.toGetResponse(this.userService.getUserByUsername(username));
+    }
 }

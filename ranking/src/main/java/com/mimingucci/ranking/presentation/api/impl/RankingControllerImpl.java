@@ -8,7 +8,9 @@ import com.mimingucci.ranking.domain.model.VirtualContestMetadata;
 import com.mimingucci.ranking.presentation.api.RankingController;
 import com.mimingucci.ranking.presentation.dto.request.VirtualContestRequest;
 import com.mimingucci.ranking.presentation.dto.response.BaseResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +21,13 @@ import java.util.List;
 public class RankingControllerImpl implements RankingController {
     private final RankingApplicationService service;
 
+    @PostMapping(path = PathConstants.VIRTUAL_CONTEST)
+    @Override
+    public BaseResponse<VirtualContestMetadata> startVirtualContest(@RequestBody @Validated VirtualContestRequest request,
+                                                                    @RequestHeader(value = "Authorization", required = true) String authToken) {
+        return BaseResponse.success(service.startVirtual(request, authToken));
+    }
+
     @GetMapping(path = PathConstants.CONTEST_ID)
     @Override
     public BaseResponse<List<LeaderboardEntry>> getLeaderboardByContestId(@PathVariable("contestId") Long contestId) {
@@ -27,15 +36,8 @@ public class RankingControllerImpl implements RankingController {
 
     @PostMapping(path = PathConstants.CONTEST_ID)
     @Override
-    public BaseResponse<Boolean> persistSubmissionHistory(@PathVariable("contestId") Long contestId) {
-        SubmissionHistoryFileHandler.readSubmissionHistory(contestId);
-        return BaseResponse.success(true);
-    }
-
-    @PostMapping
-    @Override
-    public BaseResponse<VirtualContestMetadata> startVirtualContest(VirtualContestRequest request) {
-        return BaseResponse.success(service.startVirtual(request));
+    public BaseResponse<Boolean> completeContest(@PathVariable("contestId") Long contestId, HttpServletRequest request) {
+        return BaseResponse.success(service.completeContest(contestId, request));
     }
 
 }

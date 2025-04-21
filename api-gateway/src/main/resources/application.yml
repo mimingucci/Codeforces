@@ -8,6 +8,19 @@ spring:
         name: api-gateway
     cloud:
         gateway:
+            globalcors:
+                corsConfigurations:
+                    '[/api/v1/**]':
+                        allowedOrigins: "http://localhost:3000"
+                        allowedHeaders: "*"
+                        allowedMethods:
+                            - GET
+                            - POST
+                            - PUT
+                            - DELETE
+                            - PATCH
+                            - OPTIONS
+                            - HEAD
             discovery:
                 locator:
                     enabled: true
@@ -45,6 +58,10 @@ spring:
                     uri: lb://user
                     predicates:
                         - Path=/api/v1/user/**
+                -   id: ranking
+                    uri: lb://ranking
+                    predicates:
+                        - Path=/api/v1/ranking/**
                 -   id: chat
                     uri: lb:ws://user
                     predicates:

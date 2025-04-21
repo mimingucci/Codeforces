@@ -69,6 +69,21 @@ public class SubmissionHistoryFileHandler {
         }
     }
 
+    /**
+     * Check if submission history file exists for a given contest
+     * @param contestId the contest ID to check
+     * @return true if file exists, false otherwise
+     */
+    public static boolean submissionHistoryFileExists(Long contestId) {
+        try {
+            Path filePath = Paths.get(getFileName(contestId));
+            return Files.exists(filePath);
+        } catch (Exception e) {
+            log.error("Error checking submission history file existence for contest {}", contestId, e);
+            return false;
+        }
+    }
+
     private static String getFileName(Long contestId) {
         return BASE_DIR + "contest_" + contestId + "_history.json";
     }

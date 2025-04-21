@@ -50,4 +50,14 @@ public class CommentServiceImpl implements CommentService {
         return this.commentRepository.deleteByBlogId(blogId);
     }
 
+    @Override
+    public Comment likeComment(Long id, Long user) {
+        return this.commentRepository.likeComment(id, user);
+    }
+
+    @Override
+    public Comment dislikeComment(Long id, Long user) {
+        return this.commentRepository.dislikeComment(id, user);
+    }
+
 }

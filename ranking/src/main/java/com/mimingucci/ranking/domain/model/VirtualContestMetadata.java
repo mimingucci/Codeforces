@@ -14,10 +14,6 @@ public class VirtualContestMetadata {
 
     private Long userId;
 
-    private Instant actualStartTime;
-
-    private Instant actualEndTime;
-
     private Instant startTime;
 
     private Instant endTime;

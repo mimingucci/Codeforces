@@ -1,7 +1,6 @@
 package com.mimingucci.blog.domain.service;
 
 import com.mimingucci.blog.domain.model.Blog;
-import com.mimingucci.blog.presentation.dto.response.BlogGetResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,4 +20,8 @@ public interface BlogService {
     Page<Blog> getAllByUserId(Long userId, Pageable pageable);
 
     Blog updateById(Blog blog);
+
+    Blog likeBlog(Long blogId, Long userId);
+
+    Blog dislikeBlog(Long blogId, Long userId);
 }

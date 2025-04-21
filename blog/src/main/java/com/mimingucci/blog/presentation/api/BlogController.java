@@ -21,4 +21,8 @@ public interface BlogController {
 
     BaseResponse<BlogGetResponse> updateById(Long id, BlogUpdateRequest request, HttpServletRequest servletRequest);
 
+    BaseResponse<BlogGetResponse> likeBlog(Long blogId, HttpServletRequest request);
+
+    BaseResponse<BlogGetResponse> dislikeBlog(Long blogId, HttpServletRequest request);
+
 }

@@ -1,5 +1,6 @@
 package com.mimingucci.ranking.infrastructure.repository;
 
+import com.mimingucci.ranking.common.constant.ErrorMessageConstants;
 import com.mimingucci.ranking.common.exception.ApiRequestException;
 import com.mimingucci.ranking.domain.model.RatingChange;
 import com.mimingucci.ranking.domain.repository.RatingChangeRepository;
@@ -7,6 +8,7 @@ import com.mimingucci.ranking.infrastructure.repository.converter.RatingChangeCo
 import com.mimingucci.ranking.infrastructure.repository.entity.RatingChangeEntity;
 import com.mimingucci.ranking.infrastructure.repository.entity.RatingChangeId;
 import com.mimingucci.ranking.infrastructure.repository.jpa.RatingChangeJpaRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -30,15 +33,14 @@ public class RatingChangeRepositoryImpl implements RatingChangeRepository {
         return converter.toDomain(savedEntity);
     }
 
+    @Transactional
     @Override
-    public List<RatingChange> persistBatch(List<RatingChange> domains) {
+    public Boolean persistBatch(List<RatingChange> domains) {
         List<RatingChangeEntity> entities = domains.stream()
                 .map(converter::toEntity)
                 .collect(Collectors.toList());
-        List<RatingChangeEntity> savedEntities = ratingChangeJpaRepository.saveAll(entities);
-        return savedEntities.stream()
-                .map(converter::toDomain)
-                .collect(Collectors.toList());
+        ratingChangeJpaRepository.saveAll(entities);
+        return true;
     }
 
     @Override
@@ -75,5 +77,17 @@ public class RatingChangeRepositoryImpl implements RatingChangeRepository {
     public void deleteById(Long userId, Long contestId) {
         RatingChangeId id = new RatingChangeId(userId, contestId);
         ratingChangeJpaRepository.deleteById(id);
+    }
+
+    @Override
+    public RatingChange getNewestOne(Long userId) {
+        Optional<RatingChangeEntity> entity = ratingChangeJpaRepository.findFirstByUserOrderByCreatedAtDesc(userId);
+        if (entity.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.RATING_CHANGE_NOT_FOUND, HttpStatus.NOT_FOUND);
+        return converter.toDomain(entity.get());
+    }
+
+    @Override
+    public List<RatingChange> getNewestChangesInUserIds(List<Long> userIds) {
+        return ratingChangeJpaRepository.findNewestByUserIn(userIds).stream().map(converter::toDomain).toList();
     }
 }

@@ -12,4 +12,7 @@ public class PathConstants {
     public static final String PROFILE = API_V1_USER + "/profile";
     public static final String UPDATE = PROFILE + "/update";
     public static final String USER_ID = "/{userId}";
+    public static final String USERNAME = "/username";
+    public static final String USER_USERNAME = "/{userName}";
+
 }

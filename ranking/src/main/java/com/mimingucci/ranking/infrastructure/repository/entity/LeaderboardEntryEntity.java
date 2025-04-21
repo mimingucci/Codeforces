@@ -37,6 +37,8 @@ public class LeaderboardEntryEntity {
 
     private Integer penalty = 0;
 
+    private Boolean rated = false;
+
     @Convert(converter = LongSetConverter.class)
     @Column(name = "solved_problems")
     private Set<Long> solvedProblems = new HashSet<>();

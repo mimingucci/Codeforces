@@ -2,6 +2,8 @@ package com.mimingucci.contest.domain.cron;
 
 import com.mimingucci.contest.common.enums.ContestEvent;
 import com.mimingucci.contest.common.util.ContestantsConverter;
+import com.mimingucci.contest.domain.client.ProblemClient;
+import com.mimingucci.contest.domain.client.response.ProblemResponse;
 import com.mimingucci.contest.domain.event.ContestActionEvent;
 import com.mimingucci.contest.domain.event.ContestCreatedEvent;
 import com.mimingucci.contest.domain.event.ContestDeletedEvent;
@@ -28,16 +30,10 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
+import java.util.stream.Collectors;
 
 @Component
 public class ContestEventScheduler {
@@ -48,6 +44,7 @@ public class ContestEventScheduler {
     private final TaskScheduler taskScheduler;
     private final ContestEventSchedulerProperties properties;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final ProblemClient problemClient;
 
     // In-memory collections to store contests and scheduled tasks
     private final Map<Long, Contest> contestsById = new ConcurrentHashMap<>();
@@ -68,12 +65,14 @@ public class ContestEventScheduler {
             ApplicationEventPublisher eventPublisher,
             TaskScheduler taskScheduler,
             ContestEventSchedulerProperties properties,
-            KafkaTemplate<String, Object> kafkaTemplate) {
+            KafkaTemplate<String, Object> kafkaTemplate,
+            ProblemClient problemClient) {
         this.contestRepository = contestRepository;
         this.eventPublisher = eventPublisher;
         this.taskScheduler = taskScheduler;
         this.properties = properties;
         this.kafkaTemplate = kafkaTemplate;
+        this.problemClient = problemClient;
     }
 
     @PostConstruct
@@ -340,7 +339,10 @@ public class ContestEventScheduler {
             x.add(new ContestRegistration(1L, 1L, true, true));
             x.add(new ContestRegistration(2L, 1L, true, true));
             x.add(new ContestRegistration(3L, 1L, true, true));
-            kafkaTemplate.send("submission.result", contest.getId().toString(), new ContestActionEvent(contest.getId(), contest.getStartTime(), contest.getEndTime(), ContestantsConverter.toJsonString(x), ContestEvent.CONTEST_STARTED, ContestType.SYSTEM));
+            // get problem set
+            String problemset = this.problemClient.getAllProblemsByContestId(contest.getId()).data().stream().map(ProblemResponse::getId).toList().stream().map(Objects::toString).collect(Collectors.joining(","));
+
+            kafkaTemplate.send("submission.result", contest.getId().toString(), new ContestActionEvent(contest.getId(), contest.getStartTime(), contest.getEndTime(), ContestantsConverter.toJsonString(x), ContestEvent.CONTEST_STARTED, ContestType.SYSTEM, problemset));
             logger.info("Published contest start event to Kafka: {}", contest.getId());
         } catch (Exception e) {
             logger.error("Failed to publish contest start event to Kafka: {}", contest.getId(), e);
@@ -349,7 +351,7 @@ public class ContestEventScheduler {
 
     private void publishContestEndedToKafka(Contest contest) {
         try {
-            kafkaTemplate.send("submission.result", contest.getId().toString(), new ContestActionEvent(contest.getId(), contest.getStartTime(), contest.getEndTime(), null, ContestEvent.CONTEST_ENDED, ContestType.SYSTEM));
+            kafkaTemplate.send("submission.result", contest.getId().toString(), new ContestActionEvent(contest.getId(), contest.getStartTime(), contest.getEndTime(), null, ContestEvent.CONTEST_ENDED, ContestType.SYSTEM, null));
             logger.info("Published contest end event to Kafka: {}", contest.getId());
         } catch (Exception e) {
             logger.error("Failed to publish contest end event to Kafka: {}", contest.getId(), e);

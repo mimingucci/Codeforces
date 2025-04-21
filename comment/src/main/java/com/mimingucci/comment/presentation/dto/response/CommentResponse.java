@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -22,4 +23,8 @@ public class CommentResponse {
     Instant createdAt;
 
     Instant updatedAt;
+
+    Set<Long> likes;
+
+    Set<Long> dislikes;
 }

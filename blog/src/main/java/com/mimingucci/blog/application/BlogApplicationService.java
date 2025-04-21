@@ -19,4 +19,8 @@ public interface BlogApplicationService {
     Boolean deleteById(Long id, HttpServletRequest request);
 
     BlogGetResponse updateById(BlogUpdateRequest request, HttpServletRequest servletRequest);
+
+    BlogGetResponse like(Long blogId, HttpServletRequest request);
+
+    BlogGetResponse dislike(Long blogId, HttpServletRequest request);
 }

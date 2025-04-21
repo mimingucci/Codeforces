@@ -16,7 +16,7 @@ app.debug = 1
 
 # Convert Unix timestamp (seconds since epoch) to datetime
 def convert_timestamp(timestamp):
-    return datetime.fromtimestamp(timestamp).isoformat()
+    return datetime.fromtimestamp(timestamp, timezone.utc).isoformat()
 
 
 class SubmissionHandler(KafkaConsumer):
@@ -44,7 +44,9 @@ class SubmissionHandler(KafkaConsumer):
             rep = await judger.run()
             if event.rule == Rule.ICPC:
                 ac = 0
-                max_time_limit, max_memory_limit, verdict = 0, 0, Verdict.ACCEPT
+                max_time_limit = 0
+                max_memory_limit = 0
+                verdict = Verdict.ACCEPT
                 for tc in rep:
                     max_time_limit = max(max_time_limit, tc.get("real_time_ms", 0))
                     max_memory_limit = max(max_memory_limit, tc.get("memory_bytes", 0))
@@ -65,7 +67,7 @@ class SubmissionHandler(KafkaConsumer):
                         ac += 1
                 message = {
                     "id": event.id, 
-                    "verdict": verdict,
+                    "verdict": verdict.name,
                     "author": event.author,
                     "contest": event.contest,
                     "problem": event.problem,
@@ -79,12 +81,15 @@ class SubmissionHandler(KafkaConsumer):
                     "eventType": "SUBMISSION"
                 }
                 await publish_event("submission.update", message)
-
+                print(event.startTime, event.sent_on, event.endTime)
                 if event.startTime <= event.sent_on and event.sent_on <= event.endTime:
+                    print("Here...")
                     await publish_event("submission.result", message)
                 print(message)
             else:
-                max_time_limit, max_memory_limit, verdict = 0, 0, Verdict.ACCEPT
+                max_time_limit = 0
+                max_memory_limit = 0
+                verdict = Verdict.ACCEPT
                 for tc in rep:
                     max_time_limit = max(max_time_limit, tc.get("real_time_ms", 0))
                     max_memory_limit = max(max_memory_limit, tc.get("memory_bytes", 0))
@@ -102,7 +107,7 @@ class SubmissionHandler(KafkaConsumer):
                         break
                 message = {
                     "id": event.id, 
-                    "verdict": verdict,
+                    "verdict": verdict.name,
                     "author": event.author,
                     "contest": event.contest,
                     "problem": event.problem,
@@ -118,6 +123,7 @@ class SubmissionHandler(KafkaConsumer):
                 await publish_event("submission.update", message)
 
                 if event.startTime <= event.sent_on and event.sent_on <= event.endTime:
+                    print("Here...")
                     await publish_event("submission.result", message)
                 print(message)
         except Exception as e: 

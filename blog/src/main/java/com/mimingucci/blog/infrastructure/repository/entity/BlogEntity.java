@@ -40,6 +40,10 @@ public class BlogEntity {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    private Set<Long> likes = new HashSet<>();
+
+    private Set<Long> dislikes = new HashSet<>();
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now(); // Set to current UTC time
@@ -56,5 +60,15 @@ public class BlogEntity {
 
     public void removeTag(TagEntity tag) {
         this.tags.remove(tag);
+    }
+
+    public void addLike(Long user) {
+        this.likes.add(user);
+        if (this.dislikes.contains(user)) dislikes.remove(user);
+    }
+
+    public void addDislike(Long user) {
+        this.dislikes.add(user);
+        if (this.likes.contains(user)) likes.remove(user);
     }
 }

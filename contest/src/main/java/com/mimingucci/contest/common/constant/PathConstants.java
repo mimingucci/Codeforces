@@ -12,4 +12,14 @@ public class PathConstants {
     public static final String ALL = "/all";
     public static final String CHECK = "/check";
     public static final String USER_ID = "/{userId}";
+
+    public static final String PROBLEM_SERVICE = "problem";
+    public static final String PROBLEM = "/problem";
+    public static final String API_V1_PROBLEM = API_V1 + PROBLEM;
+    public static final String PROBLEM_ID = "/{problemId}";
+
+    public static final String RANKING_SERVICE = "ranking";
+    public static final String RANKING = "/ranking";
+    public static final String API_V1_RANKING = API_V1 + RANKING;
+    public static final String VIRTUAL_CONTEST = "/virtual";
 }
