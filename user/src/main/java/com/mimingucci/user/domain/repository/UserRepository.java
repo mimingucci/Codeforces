@@ -1,11 +1,13 @@
 package com.mimingucci.user.domain.repository;
 
 import com.mimingucci.user.domain.model.User;
+import com.mimingucci.user.presentation.dto.request.UserParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface UserRepository {
     User findByEmail(String email);
@@ -22,15 +24,7 @@ public interface UserRepository {
 
     Page<User> findByCountry(Long countryId, Pageable pageable);
 
-    List<User> findByState(Long stateId);
-
-    Page<User> findByState(Long stateId, Pageable pageable);
-
-    List<User> findByCountryAndState(Long countryId, Long stateId);
-
     long getCountryUserCount(Long countryId);
-
-    long getStateUserCount(Long stateId);
 
     /**
      * Check if a user exists by their ID
@@ -45,4 +39,8 @@ public interface UserRepository {
      * @return List of found users
      */
     List<User> findByIds(Collection<Long> userIds);
+
+    Page<User> findAll(UserParam param, Pageable pageable);
+
+    void batchUpdateRatings(Map<Long, Integer> userRatings);
 }

@@ -1,113 +1,54 @@
 import React from "react";
-import { classnames } from "../general";
 
 const OutputWindow = ({
-  outputDetails,
-  sampleoutput = null,
-  setEnableSubmit,
+  verdict = null,
+  message = null,
+  time_limit = null, 
+  memoty_limit = null,
+  title = null,
 }) => {
   const getOutput = () => {
-    let statusId = outputDetails?.status?.id;
-
-    if (statusId === 6) {
-      // compilation error
-      return (
-        <pre className="px-2 py-1 font-normal text-xs text-red-500 text-left">
-          {atob(outputDetails?.compile_output)}
+    // If there's no verdict, just show the message (if exists)
+    if (!verdict) {
+      return message ? (
+        <pre className="px-2 py-1 font-normal text-xs text-left text-white">
+          {message}
         </pre>
-      );
-    } else if (statusId === 3) {
-      if (
-        !sampleoutput ||
-        !sampleoutput?.length ||
-        atob(outputDetails.stdout) === null
-      )
-        return (
-          <pre className="px-2 py-1 font-normal text-xs text-green-500 text-left">
-            {atob(outputDetails.stdout) !== null
-              ? `Verdict: ${outputDetails?.status?.description} \nTime: ${
-                  outputDetails?.time * 1000
-                } ms \nMemory: ${outputDetails?.memory} KB\n${atob(
-                  outputDetails.stdout
-                )}`
-              : null}
-          </pre>
-        );
-      const answer = sampleoutput
-        .trim()
-        .split(" ")
-        .filter((syntax) => syntax !== "");
-      const participant = atob(outputDetails.stdout)
-        .trim()
-        .split(" ")
-        .filter((syntax) => syntax !== "");
-      if (answer.length !== participant.length) {
-        return (
-          <pre className="px-2 py-1 font-normal text-xs text-red-500 text-left">
-            {`Verdict: Wrong Answer \nTime ${
-              outputDetails?.time * 1000
-            } ms \nMemory: ${outputDetails?.memory} KB \nUser's Output: ${atob(
-              outputDetails.stdout
-            )}Expected Answer: ${sampleoutput}`}
-          </pre>
-        );
-      }
-      let isCorrect = true;
-      for (let i = 0; i < answer.length && isCorrect; i++) {
-        if (answer[i] !== participant[i]) {
-          isCorrect = false;
-        }
-      }
-      if (!isCorrect) {
-        setEnableSubmit(false);
-        return (
-          <pre className="px-2 py-1 font-normal text-xs text-red-500 text-left">
-            {`Verdict: Wrong Answer \nTime ${
-              outputDetails?.time * 1000
-            } ms \nMemory: ${outputDetails?.memory} KB \nUser's Output: ${atob(
-              outputDetails.stdout
-            )}Expected Answer: ${sampleoutput}`}
-          </pre>
-        );
-      } else {
-        setEnableSubmit(true);
-        return (
-          <pre className="px-2 py-1 font-normal text-xs text-green-500 text-left">
-            {atob(outputDetails.stdout) !== null
-              ? `Verdict: ${outputDetails?.status?.description} \nTime: ${
-                  outputDetails?.time * 1000
-                } ms \nMemory: ${outputDetails?.memory} KB\n${atob(
-                  outputDetails.stdout
-                )}`
-              : null}
-          </pre>
-        );
-      }
-    } else if (statusId === 5) {
-      setEnableSubmit(false);
-
-      return (
-        <pre className="px-2 py-1 font-normal text-xs text-red-500 text-left">
-          {`Time Limit Exceeded`}
-        </pre>
-      );
-    } else {
-      setEnableSubmit(false);
-
-      return (
-        <pre className="px-2 py-1 font-normal text-xs text-red-500 text-left">
-          {atob(outputDetails?.stderr)}
-        </pre>
-      );
+      ) : null;
     }
+
+    // Determine color based on verdict
+    const verdictColor = verdict === "ACCEPT" ? "text-green-500" : "text-red-500";
+    
+    // Build output lines only for fields that exist
+    const outputLines = [];
+    
+    // Always show verdict if it exists
+    outputLines.push(`Verdict: ${verdict}`);
+    
+    // Add time if available
+    if (time_limit) {
+      outputLines.push(`Time: ${time_limit} ms`);
+    }
+
+    // Add memory if available
+    if (memoty_limit) {
+      outputLines.push(`Memory: ${memoty_limit} bytes`);
+    }
+
+    return (
+      <pre className={`px-2 py-1 font-normal text-xs ${verdictColor} text-left`}>
+        {outputLines.join('\n')}
+      </pre>
+    );
   };
   return (
     <>
       <h1 className="mt-3 text-left font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 mb-2">
-        Output
+        {title || 'Output'}
       </h1>
       <div className="w-full border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 bg-[#1e293b] mt-2 h-full overflow-hidden">
-        {outputDetails ? <>{getOutput()}</> : null}
+        {(verdict || message) ? getOutput() : null}
       </div>
     </>
   );

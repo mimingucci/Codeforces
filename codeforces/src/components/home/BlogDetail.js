@@ -1,3 +1,16 @@
+import {
+  Box,
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  IconButton,
+  TextField,
+  Button,
+  Divider,
+  Stack
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import BlogApi from "../../getApi/BlogApi";
@@ -11,6 +24,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { relativeTime } from "../../utils/timeManufacture";
 import Ranking from "./Ranking";
+import { ThumbUp, ThumbDown } from '@mui/icons-material';
+
 const {
   RiAttachment2,
   BiSolidUpArrow,
@@ -19,27 +34,69 @@ const {
   BsCalendar2DateFill,
 } = icons;
 
+const StatsContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing(2),
+  padding: theme.spacing(1),
+  border: `2px solid ${theme.palette.grey[300]}`,
+  borderRadius: theme.shape.borderRadius,
+  marginTop: theme.spacing(2)
+}));
+
+const VoteButton = styled(IconButton)(({ theme, active }) => ({
+  color: active ? theme.palette.primary.main : theme.palette.grey[400],
+  padding: '4px 8px',
+  borderRadius: '4px',
+  '&:hover': {
+    backgroundColor: theme.palette.grey[100],
+    color: active ? theme.palette.primary.dark : theme.palette.grey[600],
+  }
+}));
+
 const BlogDetail = () => {
   const ref = useRef();
   const [p, setP] = useState();
+  const [comments, setComments] = useState();
   const [forceupdate, setForceupdate] = useState(false);
   const [text, setText] = useState("");
   let { blog } = useParams();
+
   useEffect(() => {
-    BlogApi.getBlogById(blog)
-      .then((res) => {
+    // Fetch blog details
+    const fetchBlog = async () => {
+      try {
+        const res = await BlogApi.getBlogById(blog);
         setP(res?.data?.data);
-      })
-      .catch((err) => console.log("error"));
-  }, [forceupdate]);
+      } catch (err) {
+        console.log("Error fetching blog:", err);
+        showErrorToast("Failed to load blog");
+      }
+    };
+
+    // Fetch comments separately
+    const fetchComments = async () => {
+      try {
+        const res = await CommentApi.getCommentByBlogId(blog);
+        setComments(res?.data?.data || []);
+      } catch (err) {
+        console.log("Error fetching comments:", err);
+        showErrorToast("Failed to load comments");
+      }
+    };
+
+    fetchBlog();
+    fetchComments();
+  }, [blog, forceupdate]);
+  
   const handleLike = async () => {
-    const accessToken = HandleCookies.getCookie("accessToken");
+    const accessToken = HandleCookies.getCookie("token");
     if (!accessToken) {
       alert("Please login to continue...");
       return;
     }
     try {
-      const res = await BlogApi.updateLike({ blog: p._id, accessToken });
+      const res = await BlogApi.updateLike({ blog: p.id, accessToken });
       showSuccessToast("Update like successfully");
       setP(res?.data?.data);
     } catch (error) {
@@ -47,13 +104,13 @@ const BlogDetail = () => {
     }
   };
   const handleDislike = async () => {
-    const accessToken = HandleCookies.getCookie("accessToken");
+    const accessToken = HandleCookies.getCookie("token");
     if (!accessToken) {
       alert("Please login to continue...");
       return;
     }
     try {
-      const res = await BlogApi.updateDislike({ blog: p._id, accessToken });
+      const res = await BlogApi.updateDislike({ blog: p.id, accessToken });
       showSuccessToast("Update dislike successfully");
       setP(res?.data?.data);
     } catch (error) {
@@ -62,14 +119,14 @@ const BlogDetail = () => {
   };
 
   const handleSubmit = async () => {
-    const accessToken = HandleCookies.getCookie("accessToken");
+    const accessToken = HandleCookies.getCookie("token");
     if (!accessToken) {
       alert("Please login to write comment");
       return;
     }
     try {
       const res = await CommentApi.createComment({
-        blogId: p._id,
+        blogId: p.id,
         accessToken,
         content: text,
       });
@@ -107,7 +164,7 @@ const BlogDetail = () => {
   };
 
   return (
-    <div>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
       <ToastContainer
         position="top-center"
         autoClose={2000}
@@ -146,67 +203,103 @@ const BlogDetail = () => {
             {p?.tags?.map((tag) => tag.name).join(", ")}
           </span>
         </div>
-        <div className="border-[2px] rounded-md border-solid h-[50px] mt-3 mr-5 border-gray-300 text-center">
-          <div className="inline-flex items-center h-full">
-            <BiSolidUpArrow
-              size={20}
-              className="text-green-300 mx-[5px] hover:cursor-pointer"
-              onClick={handleLike}
-            />
-            <span
-              className={
-                p?.likes?.length - p?.dislikes.length >= 0
-                  ? "text-green-700 text-[16px] font-bold"
-                  : "text-red-500 text-[16px] font-bold"
-              }
+        {/* Stats */}
+        <StatsContainer>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <VoteButton 
+                onClick={handleLike}
+                active={true}
+                size="small"
+              >
+                <ThumbUp fontSize="small" />
+                <Typography 
+                  variant="caption" 
+                  sx={{ ml: 0.5 }}
+                >
+                  {p?.likes?.length || 0}
+                </Typography>
+              </VoteButton>
+      
+              <VoteButton 
+                onClick={handleDislike}
+                // active={hasDisliked}
+                size="small"
+              >
+                <ThumbDown fontSize="small" />
+                <Typography 
+                  variant="caption" 
+                  sx={{ ml: 0.5 }}
+                >
+                  {p?.dislikes?.length || 0}
+                </Typography>
+              </VoteButton>
+            </Box>
+
+            <Divider orientation="vertical" flexItem />
+
+            <Stack 
+              direction="row" 
+              spacing={2}
+              sx={{ ml: 'auto' }}
             >
-              {p?.likes?.length - p?.dislikes.length || 0}
-            </span>
-            <BiSolidDownArrow
-              size={20}
-              className="text-red-300 mx-[5px] hover:cursor-pointer"
-              onClick={handleDislike}
-            />
-          </div>
-          <div className="h-full inline-flex">
-            <div className="flex h-full items-center pl-[470px] mx-[10px]">
-              <FaUser className="mx-[5px]" />
-              <span className="underline">
-                <a href={"/profile/" + p?.author?.username}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <FaUser />
+                <Typography 
+                  component="a" 
+                  href={`/profile/${p?.author?.username}`}
+                  sx={{ textDecoration: 'underline' }}
+                >
                   {p?.author?.username}
-                </a>
-              </span>
-            </div>
-            <div className="flex h-full items-center mx-[10px]">
-              <BsCalendar2DateFill className="mx-[5px]" />
-              <span className="underline">{p?.createdAt?.slice(0, 10)}</span>
-            </div>
-          </div>
-        </div>
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <BsCalendar2DateFill />
+                <Typography sx={{ textDecoration: 'underline' }}>
+                  {p?.createdAt?.slice(0, 10)}
+                </Typography>
+              </Box>
+            </Stack>
+          </StatsContainer>
       </div>
 
-      <div className="w-full">
-        <div className="border-[2px] rounded-md border-solid mt-[15px] mr-5 border-gray-300 text-left p-3 flex items-center">
-          <textarea
-            type="text"
+      {/* Comment Input */}
+      <Card sx={{ mb: 2, boxShadow: 'none' }}>
+        <CardContent sx={{ 
+          display: 'flex',
+          gap: 2,
+          alignItems: 'flex-start'
+        }}>
+          <TextField
+            fullWidth
+            multiline
+            minRows={2}
             placeholder="Write something..."
-            className="focus:outline-none w-full"
             onChange={(e) => setText(e.target.value)}
-            ref={ref}
+            inputRef={ref}
           />
-          <button onClick={handleSubmit}>
-            <GrSend className="text-[30px]" />
-          </button>
-        </div>
-      </div>
-      <div className="w-full">
-        <div className="border-[2px] rounded-md border-solid mt-[15px] mr-5 border-gray-300 text-left p-3">
-          {p?.comments?.map((comment) => (
-            <Comment id={comment} />
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            sx={{ minWidth: 'auto', p: 1 }}
+          >
+            <GrSend size={24} />
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Comments List */}
+      <Card sx={{ boxShadow: 'none' }}>
+        <CardContent>
+          {comments?.map((comment) => (
+            <Comment 
+              key={comment.id} 
+              id={comment.id}
+              comment={comment} // Pass the full comment object
+            />
           ))}
-        </div>
-      </div>
-    </div>
+        </CardContent>
+      </Card>
+    </Container>
   );
 };
 export default BlogDetail;

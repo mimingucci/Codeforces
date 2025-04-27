@@ -7,14 +7,19 @@ import com.mimingucci.user.domain.repository.UserRepository;
 import com.mimingucci.user.infrastructure.repository.converter.UserConverter;
 import com.mimingucci.user.infrastructure.repository.entity.UserEntity;
 import com.mimingucci.user.infrastructure.repository.jpa.UserJpaRepository;
+import com.mimingucci.user.infrastructure.repository.specification.UserSpecification;
+import com.mimingucci.user.presentation.dto.request.UserParam;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -23,18 +28,20 @@ import java.util.stream.Collectors;
 public class UserRepositoryImpl implements UserRepository {
     private final UserJpaRepository userJpaRepository;
 
+    private final UserConverter converter;
+
     @Override
     public User findByEmail(String email) {
         Optional<UserEntity> optionalEntity = this.userJpaRepository.findByEmail(email);
         if (optionalEntity.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-        return UserConverter.INSTANCE.toDomain(optionalEntity.get());
+        return converter.toDomain(optionalEntity.get());
     }
 
     @Override
     public User findByUsername(String username) {
         Optional<UserEntity> optionalEntity = this.userJpaRepository.findByUsername(username);
         if (optionalEntity.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-        return UserConverter.INSTANCE.toDomain(optionalEntity.get());
+        return converter.toDomain(optionalEntity.get());
     }
 
     @Override
@@ -49,7 +56,7 @@ public class UserRepositoryImpl implements UserRepository {
         if (domain.getRoles() != null) entity.setRoles(domain.getRoles());
         if (domain.getContribute() != null) entity.setContribute(domain.getContribute());
         UserEntity updatedEntity = this.userJpaRepository.save(entity);
-        return UserConverter.INSTANCE.toDomain(updatedEntity);
+        return converter.toDomain(updatedEntity);
     }
 
     @Override
@@ -62,41 +69,21 @@ public class UserRepositoryImpl implements UserRepository {
         Optional<UserEntity> optionalEntity = this.userJpaRepository.findById(userId);
         if (optionalEntity.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         System.out.println(optionalEntity.get().getId() + " - " + optionalEntity.get().getRoles().toString());
-        return UserConverter.INSTANCE.toDomain(optionalEntity.get());
+        return converter.toDomain(optionalEntity.get());
     }
 
     @Override
     public List<User> findByCountry(Long countryId) {
-        return this.userJpaRepository.findByCountryId(countryId).stream().map(UserConverter.INSTANCE::toDomain).toList();
+        return this.userJpaRepository.findByCountryId(countryId).stream().map(converter::toDomain).toList();
     }
 
     @Override
     public Page<User> findByCountry(Long countryId, Pageable pageable) {
-        return this.userJpaRepository.findByCountryId(countryId, pageable).map(UserConverter.INSTANCE::toDomain);
-    }
-
-    @Override
-    public List<User> findByState(Long stateId) {
-        return this.userJpaRepository.findByStateId(stateId).stream().map(UserConverter.INSTANCE::toDomain).toList();
-    }
-
-    @Override
-    public Page<User> findByState(Long stateId, Pageable pageable) {
-        return this.userJpaRepository.findByStateId(stateId, pageable).map(UserConverter.INSTANCE::toDomain);
-    }
-
-    @Override
-    public List<User> findByCountryAndState(Long countryId, Long stateId) {
-        return List.of();
+        return this.userJpaRepository.findByCountryId(countryId, pageable).map(converter::toDomain);
     }
 
     @Override
     public long getCountryUserCount(Long countryId) {
-        return 0;
-    }
-
-    @Override
-    public long getStateUserCount(Long stateId) {
         return 0;
     }
 
@@ -112,7 +99,28 @@ public class UserRepositoryImpl implements UserRepository {
         }
         return userJpaRepository.findByIdIn(userIds)
                 .stream()
-                .map(UserConverter.INSTANCE::toDomain)
+                .map(converter::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<User> findAll(UserParam param, Pageable pageable) {
+        Specification<UserEntity> spec = UserSpecification.withParams(param);
+        Page<UserEntity> userEntities = userJpaRepository.findAll(spec, pageable);
+        return userEntities.map(converter::toDomain);
+    }
+
+    @Override
+    @Transactional
+    public void batchUpdateRatings(Map<Long, Integer> userRatings) {
+        if (userRatings == null || userRatings.isEmpty()) {
+            return;
+        }
+
+        // Execute batch update
+        userJpaRepository.batchUpdateRatings(
+                userRatings,
+                userRatings.keySet()
+        );
     }
 }

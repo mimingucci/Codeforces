@@ -38,6 +38,9 @@ public class ProblemEntity {
     @NotNull
     private Long contest;
 
+    @Column(name = "is_published")
+    private Boolean isPublished = false;
+
     @NotNull
     @Column(name = "time_limit", nullable = false)
     private Long timeLimit = 1000L;

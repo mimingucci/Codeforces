@@ -20,4 +20,6 @@ public interface CommentService {
     Comment likeComment(Long id, Long user);
 
     Comment dislikeComment(Long id, Long user);
+
+    Comment getById(Long id);
 }

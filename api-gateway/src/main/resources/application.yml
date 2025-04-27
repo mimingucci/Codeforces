@@ -8,6 +8,8 @@ spring:
         name: api-gateway
     cloud:
         gateway:
+            default-filters:
+                - PreserveHostHeader
             globalcors:
                 corsConfigurations:
                     '[/api/v1/**]':
@@ -68,6 +70,14 @@ spring:
                         - Path=/api/v1/chat/**
                     metadata:
                         protocol: ws
+                -   id: submission-ws
+                    uri: ws://localhost:8088
+                    predicates:
+                        - Path=/api/ws/submissions/**
+                    metadata:
+                        protocol: ws
+                        # Add this to preserve the original path
+                        strip-prefix: false
 
 
 eureka:

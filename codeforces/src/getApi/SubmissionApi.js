@@ -1,39 +1,64 @@
-import axios from "axios";
-const BASE_URL = "http://localhost:1234/api/submission";
+import axios from 'axios';
+import { API_BASE_URL } from '../config';
+import JSONbig from 'json-bigint';
 
-class SubmissionApi {
-  submit({ language, code, problem, token, accessToken }) {
-    return axios.post(
-      BASE_URL + "/submit",
-      { language, code, problem, token },
-      { headers: { Authorization: "Bearer " + accessToken } }
-    );
-  }
-  update({
-    status,
-    time,
-    memory,
-    token,
-    accessToken,
-    stdin = "",
-    stdout = "",
-    stderr = "",
-  }) {
-    return axios.put(
-      BASE_URL + "/update",
-      { status, time, memory, token, stdin, stdout, stderr },
-      { headers: { Authorization: "Bearer " + accessToken } }
-    );
-  }
-  getByAuthor(author) {
-    return axios.get(BASE_URL + "/get/author/" + author);
-  }
-  paging({ author, page }) {
-    return axios.get(BASE_URL + "/paging?author=" + author + "&page=" + page);
-  }
-  getById(id) {
-    return axios.get(BASE_URL + "/get/id?id=" + id);
-  }
-}
+// Create a custom axios instance with JSONbig
+const axiosInstance = axios.create({
+  transformResponse: [data => JSONbig.parse(data)]
+});
 
-export default new SubmissionApi();
+const SubmissionApi = {
+  /**
+   * Submit code for evaluation
+   * @param {Object} data - Submission data
+   * @returns {Promise<Object>} - Submission result with ID
+   */
+  submit: async (data) => {
+    try {
+      const response = await axiosInstance.post(
+        `${API_BASE_URL}/api/v1/submission`,
+        {
+          language: data.language,
+          sourceCode: data.sourceCode,
+          problem: data.problem.toString()
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+            'Content-Type': 'application/json'
+          },
+          transformRequest: [(data) => JSONbig.stringify(data)]
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error submitting code:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get details of a submission
+   * @param {string} id - Submission ID
+   * @param {string} accessToken - JWT access token
+   * @returns {Promise<Object>} - Submission details
+   */
+  getDetails: async (id, accessToken) => {
+    try {
+      const response = await axiosInstance.get(
+        `${API_BASE_URL}/api/v1/submission/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error getting submission details:', error);
+      throw error;
+    }
+  }
+};
+
+export default SubmissionApi;

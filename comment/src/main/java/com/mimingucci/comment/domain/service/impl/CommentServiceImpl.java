@@ -60,4 +60,9 @@ public class CommentServiceImpl implements CommentService {
         return this.commentRepository.dislikeComment(id, user);
     }
 
+    @Override
+    public Comment getById(Long id) {
+        return this.commentRepository.findById(id);
+    }
+
 }

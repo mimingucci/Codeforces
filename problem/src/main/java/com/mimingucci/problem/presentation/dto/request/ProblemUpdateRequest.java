@@ -19,6 +19,8 @@ public class ProblemUpdateRequest {
 
     Long contest;
 
+    Boolean isPublished;
+
     Integer rating;
 
     Integer score;

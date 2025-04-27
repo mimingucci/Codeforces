@@ -1,4 +1,3 @@
-import { Route, Routes, useLocation } from "react-router-dom";
 import { Navbar, Main } from "../../components/home/index";
 const Home = () => {
   return (

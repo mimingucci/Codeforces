@@ -18,6 +18,8 @@ public interface CommentController {
 
     BaseResponse<Boolean> deleteByBlogId(Long blogId);
 
+    BaseResponse<CommentResponse> getById(Long id);
+
     BaseResponse<List<CommentResponse>> getAllByBlog(Long blogId);
 
     BaseResponse<CommentResponse> likeComment(Long id, HttpServletRequest request);

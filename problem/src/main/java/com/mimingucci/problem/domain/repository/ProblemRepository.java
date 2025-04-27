@@ -18,4 +18,8 @@ public interface ProblemRepository {
     Problem updateProblem(Long id, Problem domain);
 
     List<Problem> findAllProblemsByContest(Long contest);
+
+    void updateProblemStatus(Long contestId, Boolean status);
+
+    List<Problem> findAllProblemsByContestDev(Long contestId);
 }

@@ -63,10 +63,6 @@ public class UserEntity {
     private Instant lastActive;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "state_id")
-    private StateEntity state;
-
-    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "country_id")
     private CountryEntity country;
 

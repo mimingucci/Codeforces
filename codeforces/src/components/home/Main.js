@@ -4,7 +4,7 @@ import Profile from "./Profile";
 import Calendar from "./Calendar";
 import path from "../../utils/path";
 import Login from "./Login";
-import { CreateProblem, SearchList } from ".";
+import { CreateProblem, Rating, SearchList } from ".";
 import { useLocation } from "react-router-dom";
 import SignUp from "./SignUp";
 import Setting from "./Setting";
@@ -20,20 +20,13 @@ import ErrorPage from "../ErrorPage";
 import Submission from "./Submission";
 import SubmitDetail from "./SubmitDetail";
 import UserBlog from "./UserBlog";
-import io from "socket.io-client";
-import Home from "../Chat/Home/home";
-import Chat from "../Chat/Chat/Room";
-import { useState } from "react";
-import IndividualChat from "../Chat/Home/IndividualChat";
-import LoginGoogle from "./LoginGoogle";
 import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPassword";
-
-const socket = io.connect("http://localhost:8000");
+import ChatPage from "../Chat/ChatPage";
+import ContestPage from "../contest/ContestPage";
+import ContestDetail from '../contest/ContestDetail';
 
 const Main = () => {
-  const [username, setUsername] = useState("");
-  const [room, setRoom] = useState("");
   const location = useLocation();
   let inLoginPage = false;
   if (
@@ -53,12 +46,14 @@ const Main = () => {
           <Route path={path.HOME} element={<Blogs />} />
         </Route>
         <Route path={path.SEARCH} element={<SearchList />} />
-        <Route path={path.RATING} element={<Problems userPage={true} />} />
+        <Route path={path.RATING} element={<Rating />} />
         <Route path={path.USER} element={<Profile />} />
         <Route path={path.CALENDAR} element={<Calendar />} />
         <Route path={path.LOGIN} element={<Login />} />
         <Route path={path.WRITEBLOG} element={<RichTextInput />} />
         <Route path={path.SIGNUP} element={<SignUp />} />
+        <Route path={path.CONTEST} element={<ContestPage />} />
+        <Route path={path.CONTESTDETAIL} element={<ContestDetail />} />
         <Route path={path.SETTING} element={<Setting />} />
         <Route path={path.BLOG} element={<BlogDetail />} />
         <Route path={path.MESSAGE} element={<Message />} />
@@ -73,34 +68,7 @@ const Main = () => {
         <Route path={path.USERBLOG} element={<UserBlog />} />
         <Route path={path.FORGOTPASSWORD} element={<ForgotPassword />} />
         <Route path={path.RESETPASSWORD} element={<ResetPassword />} />
-        <Route
-          path="/usertalk"
-          element={
-            <Home
-              username={username}
-              setUsername={setUsername}
-              room={room}
-              setRoom={setRoom}
-              socket={socket}
-            />
-          }
-        />
-        <Route
-          path="/chat"
-          element={<Chat username={username} room={room} socket={socket} />}
-        />
-        <Route
-          path="/message"
-          element={
-            <IndividualChat
-              username={username}
-              setUsername={setUsername}
-              room={room}
-              setRoom={setRoom}
-              socket={socket}
-            />
-          }
-        />
+        <Route path={path.CHAT} element={<ChatPage />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </div>

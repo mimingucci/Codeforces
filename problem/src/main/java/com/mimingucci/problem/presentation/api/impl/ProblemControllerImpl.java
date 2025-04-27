@@ -23,10 +23,16 @@ import java.util.List;
 public class ProblemControllerImpl implements ProblemController {
     private final ProblemApplicationService problemApplicationService;
 
-    @PostMapping
+    @GetMapping(path = PathConstants.DEV + PathConstants.CONTEST + PathConstants.CONTEST_ID)
     @Override
-    public BaseResponse<ProblemResponse> createProblem(@RequestBody @Validated ProblemCreateRequest request, HttpServletRequest httpServletRequest) {
-        return BaseResponse.success(this.problemApplicationService.createProblem(request, httpServletRequest));
+    public BaseResponse<List<ProblemResponse>> getAllProblemsByContestIdDev(@PathVariable(name = "contestId") Long contestId, HttpServletRequest request) {
+        return BaseResponse.success(this.problemApplicationService.getAllProblemsByContestIdDev(contestId, request));
+    }
+
+    @GetMapping(path = PathConstants.DEV + PathConstants.PROBLEM_ID)
+    @Override
+    public BaseResponse<ProblemResponse> getProblemByIdDev(@PathVariable(name = "problemId") Long problemId, HttpServletRequest request) {
+        return BaseResponse.success(this.problemApplicationService.getProblemByIdDev(problemId, request));
     }
 
     @GetMapping(path = PathConstants.ALL)
@@ -42,6 +48,12 @@ public class ProblemControllerImpl implements ProblemController {
         return BaseResponse.success(this.problemApplicationService.getAllProblemsByContestId(contestId));
     }
 
+    @PutMapping(path = PathConstants.CONTEST + PathConstants.CONTEST_ID)
+    @Override
+    public BaseResponse<Boolean> updateProblemStatus(@PathVariable(name = "contestId") Long contestId, @RequestHeader(value = "Authorization", required = true) String token, @RequestBody @Validated ProblemUpdateRequest request) {
+        return BaseResponse.success(this.problemApplicationService.updateProblemStatus(contestId, request.getIsPublished(), token));
+    }
+
     @GetMapping(path = PathConstants.PROBLEM_ID)
     @Override
     public BaseResponse<ProblemResponse> getProblemById(@PathVariable(name = "problemId") Long problemId) {
@@ -52,5 +64,11 @@ public class ProblemControllerImpl implements ProblemController {
     @Override
     public BaseResponse<ProblemResponse> updateProblem(@PathVariable(name = "problemId") Long id, @RequestBody @Validated ProblemUpdateRequest request, HttpServletRequest httpServletRequest) {
         return BaseResponse.success(this.problemApplicationService.updateProblem(id, request, httpServletRequest));
+    }
+
+    @PostMapping
+    @Override
+    public BaseResponse<ProblemResponse> createProblem(@RequestBody @Validated ProblemCreateRequest request, HttpServletRequest httpServletRequest) {
+        return BaseResponse.success(this.problemApplicationService.createProblem(request, httpServletRequest));
     }
 }

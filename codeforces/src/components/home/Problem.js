@@ -56,8 +56,8 @@ const Problem = () => {
       )}
       <div>
         <Landing
-          sampleinput={problem?.testcases[0]?.input}
-          sampleoutput={problem?.testcases[0]?.output}
+          sampleinput={'1 2 3'}
+          sampleoutput={'2'}
           problem={problem?.id}
         />
       </div>

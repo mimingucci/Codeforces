@@ -1,3 +1,16 @@
+import { 
+  Box,
+  Paper,
+  Typography,
+  Grid,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Link,
+  Chip
+} from '@mui/material';
 import icons from "../../utils/icons";
 import { useEffect, useState } from "react";
 import UserApi from "../../getApi/UserApi";
@@ -7,6 +20,9 @@ import ImageUploader from "./ImageUploader";
 import CommitGrid from "./CommitGrid";
 import NavProfile from "./NavProfile";
 import Ranking from "./Ranking";
+import RatingChart from './RatingChart';
+import { mockRatingHistory } from '../../data/mockRatingHistory';
+
 const {
   IoIosChatboxes,
   IoIosSettings,
@@ -37,87 +53,216 @@ const Profile = () => {
   }, [params?.username]);
 
   return (
-    <div className="w-full">
+    <Box sx={{ width: '100%' }}>
       <NavProfile username={user?.username} />
-      <div className="border-[2px] rounded-md border-solid mr-5 border-gray-300 text-left p-3 flex">
-        <div className="w-[65%]">
-          <Ranking
-            username={user?.username}
-            rating={user?.rating}
-            title={true}
-          />
-          <p
-            className={
-              user?.firstname || user?.lastname ? "text-gray-600" : "hidden"
-            }
+      
+      {/* User Info Card */}
+      <Paper 
+        elevation={1}
+        sx={{ 
+          p: 3,
+          mr: 3,
+          mb: 2,
+          borderRadius: 1,
+          '& .MuiBox-root': { // Target all Box components inside Paper
+            textAlign: 'left'
+          },
+          '& .MuiTypography-root': { // Target all Typography components
+            textAlign: 'left'
+          }
+        }}
+      >
+        <Grid 
+          container 
+          spacing={3}
+          sx={{
+            alignItems: 'flex-start', // Align items to the start
+            justifyContent: 'flex-start' // Justify content to the start
+          }}
+        >
+          {/* Left Column - User Details */}
+          <Grid 
+            item 
+            xs={12} 
+            md={8}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start' // Align items to the start
+            }}
           >
-            {`${user?.firstname} ${user?.lastname}`}
-          </p>
-          <div className="flex items-center">
-            <FaChartLine className="mr-[5px]" />
-            <span>Rating: {user?.rating || 0}</span>
-          </div>
-          <div className="flex items-center">
-            <FaLocationDot className="mr-[5px]" />
-            Location:{" "}
-            <span className="ml-[5px] underline hover:cursor-pointer">
-              Hanoi
-            </span>
-            ,{" "}
-            <span className="ml-[5px] underline hover:cursor-pointer">
-              Vietnam
-            </span>
-          </div>
-          <div className="flex items-center">
-            <FaStar className="mr-[5px]" />
-            Contribution:{" "}
-            <span className="ml-[5px] text-green-600 font-bold">
-              {user?.contribution || 0}
-            </span>
-          </div>
-          <div className={isHome == false ? "hidden" : "flex items-center"}>
-            <IoIosSettings className="mr-[5px]" />
-            <span className=" underline hover:cursor-pointer">
-              <a href={`/setting/${user?.username}`}>Change settings</a>
-            </span>
-          </div>
-          <div className="flex items-center">
-            <MdEmail className="mr-[5px]" />
-            <span>{user?.email || "email"}</span>
-          </div>
-          <div className="flex items-center">
-            <BsCalendar2DateFill className="mr-[5px]" />
-            <span>Registered: {user?.createdAt || "time"}</span>
-          </div>
-          <div className={isHome == false ? "hidden" : "flex items-center"}>
-            <IoDocumentText className="mr-[5px]" />
-            <span className="underline hover:cursor-pointer">
-              <a href="/writeblog">Write Blog</a>
-            </span>
-          </div>
-          <div className={"flex items-center"}>
-            <IoIosChatboxes className="mr-[5px]" />
-            <span className="underline hover:cursor-pointer">
-              <a
-                href={
-                  isHome
-                    ? "/usertalk"
-                    : `/message?username=${params.username}&id=${id}`
-                }
+            {/* Username and Rating */}
+            <Box sx={{ 
+              mb: 2,
+              width: '100%',
+              textAlign: 'left'
+            }}>
+              <Ranking
+                username={user?.username}
+                rating={user?.rating}
+                title={true}
+              />
+            </Box>
+
+            {/* Full Name */}
+            {(user?.firstname || user?.lastname) && (
+              <Typography 
+                color="text.secondary"
+                sx={{ mb: 2 }}
               >
-                Message
-              </a>
-            </span>
-          </div>
-        </div>
-        <div className="w-[35%]">
-          <ImageUploader user={user} isHome={isHome} />
-        </div>
-      </div>
-      <div className="border-[2px] rounded-md border-solid mt-[15px] mr-5 border-gray-300 text-left p-3 flex">
+                {`${user?.firstname} ${user?.lastname}`}
+              </Typography>
+            )}
+
+            {/* User Details List */}
+            <List dense disablePadding>
+              {/* Rating */}
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 32 }}>
+                  <FaChartLine color="#1976d2" />
+                </ListItemIcon>
+                <ListItemText 
+                  primary={
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      Rating: 
+                      <Chip 
+                        label={user?.rating || 0}
+                        size="small"
+                        sx={{ ml: 1 }}
+                      />
+                    </Box>
+                  }
+                />
+              </ListItem>
+
+              {/* Location */}
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 32 }}>
+                  <FaLocationDot color="#1976d2" />
+                </ListItemIcon>
+                <ListItemText 
+                  primary={
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      Location: 
+                      <Link href="#" sx={{ ml: 1 }}>Hanoi</Link>,
+                      <Link href="#" sx={{ ml: 1 }}>Vietnam</Link>
+                    </Box>
+                  }
+                />
+              </ListItem>
+
+              {/* Contribution */}
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 32 }}>
+                  <FaStar color="#1976d2" />
+                </ListItemIcon>
+                <ListItemText 
+                  primary={
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      Contribution: 
+                      <Typography 
+                        component="span"
+                        sx={{ 
+                          ml: 1,
+                          color: 'success.main',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {user?.contribution || 0}
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </ListItem>
+
+              {/* Settings - Conditional Rendering */}
+              {isHome && (
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <IoIosSettings color="#1976d2" />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary={
+                      <Link href={`/setting/${user?.username}`}>
+                        Change settings
+                      </Link>
+                    }
+                  />
+                </ListItem>
+              )}
+
+              {/* Email */}
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 32 }}>
+                  <MdEmail color="#1976d2" />
+                </ListItemIcon>
+                <ListItemText primary={user?.email || "email"} />
+              </ListItem>
+
+              {/* Registration Date */}
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 32 }}>
+                  <BsCalendar2DateFill color="#1976d2" />
+                </ListItemIcon>
+                <ListItemText primary={`Registered: ${user?.createdAt || "time"}`} />
+              </ListItem>
+
+              {/* Write Blog - Conditional Rendering */}
+              {isHome && (
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <IoDocumentText color="#1976d2" />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary={
+                      <Link href="/writeblog">
+                        Write Blog
+                      </Link>
+                    }
+                  />
+                </ListItem>
+              )}
+
+              {/* Message */}
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 32 }}>
+                  <IoIosChatboxes color="#1976d2" />
+                </ListItemIcon>
+                <ListItemText 
+                  primary={
+                    <Link 
+                      href={isHome ? "/usertalk" : `/message?username=${params.username}&id=${id}`}
+                    >
+                      Message
+                    </Link>
+                  }
+                />
+              </ListItem>
+            </List>
+          </Grid>
+
+          {/* Right Column - Avatar */}
+          <Grid item xs={12} md={4}>
+            <ImageUploader user={user} isHome={isHome} />
+          </Grid>
+        </Grid>
+      </Paper>
+
+      {/* Rating Chart */}
+      <RatingChart data={mockRatingHistory} />
+
+      {/* Commit Grid */}
+      <Paper 
+        elevation={1}
+        sx={{ 
+          p: 3,
+          mr: 3,
+          borderRadius: 1
+        }}
+      >
         <CommitGrid author={user?._id} day_of_register={user?.createdAt} />
-      </div>
-    </div>
+      </Paper>
+    </Box>
   );
 };
 export default Profile;

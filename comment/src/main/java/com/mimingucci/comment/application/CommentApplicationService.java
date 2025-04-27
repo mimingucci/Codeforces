@@ -21,4 +21,6 @@ public interface CommentApplicationService {
     CommentResponse likeComment(Long id, HttpServletRequest request);
 
     CommentResponse dislikeComment(Long id, HttpServletRequest request);
+
+    CommentResponse getById(Long id);
 }

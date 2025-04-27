@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import CodeEditorWindow from "./CodeEditorWindow";
-import axios from "axios";
 import { classnames } from "../general";
 import { languageOptions } from "../languageOptions";
 
@@ -10,8 +9,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { defineTheme } from "../defineTheme";
 import useKeyPress from "../useKeyPress";
 import OutputWindow from "./OutputWindow";
-import Input from "./Input";
-import OutputDetails from "./OutputDetails";
 import ThemeDropdown from "./ThemeDropdown";
 import LanguagesDropdown from "./LanguagesDropdown";
 import HandleCookies from "../../../utils/HandleCookies";
@@ -30,28 +27,20 @@ let tcip = "";
 let tcop = "";
 const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
   const [code, setCode] = useState(cppSource);
-  const [customInput, setCustomInput] = useState(sampleinput.trim());
-  const [outputDetails, setOutputDetails] = useState(null);
-  const [processing, setProcessing] = useState(null);
+  const [verdict, setVerdict] = useState(null);
   const [theme, setTheme] = useState("cobalt");
   const [language, setLanguage] = useState(languageOptions[0]);
-  const [enableSubmit, setEnableSubmit] = useState(false);
+
   tcip = sampleinput.trim();
   tcop = sampleoutput.trim();
   const enterPress = useKeyPress("Enter");
   const ctrlPress = useKeyPress("Control");
 
   const onSelectChange = (sl) => {
-    console.log("selected Option...", sl);
     setLanguage(sl);
   };
 
   useEffect(() => {
-    if (enterPress && ctrlPress) {
-      console.log("enterPress", enterPress);
-      console.log("ctrlPress", ctrlPress);
-      handleCompile();
-    }
   }, [ctrlPress, enterPress]);
   const onChange = (action, data) => {
     switch (action) {
@@ -64,153 +53,76 @@ const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
       }
     }
   };
-  const handleCompile = () => {
-    setProcessing(true);
-    const formData = {
-      language_id: language.id,
-      // encode source code in base64
-      source_code: btoa(code),
-      stdin: btoa(customInput),
-    };
-    const options = {
-      method: "POST",
-      url: "https://judge0-ce.p.rapidapi.com/submissions",
-      params: { base64_encoded: "true", fields: "*" },
-      headers: {
-        "Content-Type": "application/json",
-        // "X-RapidAPI-Host": process.env.REACT_APP_RAPID_API_HOST,
-        "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
-      },
-      data: formData,
-    };
-
-    axios
-      .request(options)
-      .then(function (response) {
-        // console.log("res.data", response.data);
-        const token = response.data.token;
-        checkStatus(token, false);
-      })
-      .catch((err) => {
-        let error = err.response ? err.response.data : err;
-        // get error status
-        let status = err.response.status;
-        // console.log("status", status);
-        if (status === 429) {
-          console.log("too many requests", status);
-
-          showErrorToast(
-            `Quota of 100 requests exceeded for the Day! Please read the blog on freeCodeCamp to learn how to setup your own RAPID API Judge0!`,
-            10000
-          );
-        }
-        setProcessing(false);
-        // console.log("catch block...", error);
-      });
-  };
 
   const handleSubmit = async () => {
-    const accessToken = HandleCookies.getCookie("accessToken");
-    if (!accessToken) showErrorToast("Please login to submit your code");
-    const formData = {
-      language_id: language.id,
-      // encode source code in base64
-      source_code: btoa(code),
-      stdin: btoa(tcip),
-    };
-    const options = {
-      method: "POST",
-      url: "https://judge0-ce.p.rapidapi.com/submissions",
-      params: { base64_encoded: "true", fields: "*" },
-      headers: {
-        "Content-Type": "application/json",
-        // "X-RapidAPI-Host": process.env.REACT_APP_RAPID_API_HOST,
-        "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
-      },
-      data: formData,
-    };
-
-    axios
-      .request(options)
-      .then(async function (response) {
-        // console.log("res.data", response.data);
-        const token = response.data.token;
-        await SubmissionApi.submit({
-          language: language.name,
-          code,
-          token,
-          problem,
-          accessToken,
-        });
-        const rs = await checkStatus(token, true);
-        const result = await SubmissionApi.update({
-          status: rs?.status?.description,
-          time: rs?.time,
-          accessToken,
-          stdin: rs?.stdin,
-          stdout: rs?.stdout,
-          stderr: rs?.stderr,
-          token,
-          memory: rs?.memory,
-        });
-        showSuccessToast("Submit success");
-      })
-      .catch((err) => {
-        let error = err.response ? err.response.data : err;
-        // get error status
-        let status = err.response.status;
-        // console.log("status", status);
-        if (status === 429) {
-          // console.log("too many requests", status);
-
-          showErrorToast(
-            `Quota of 100 requests exceeded for the Day! Please read the blog on freeCodeCamp to learn how to setup your own RAPID API Judge0!`,
-            10000
-          );
-        }
-        // console.log("catch block...", error);
-      });
-  };
-
-  const checkStatus = async (token, submit = false) => {
-    const options = {
-      method: "GET",
-      url: "https://judge0-ce.p.rapidapi.com/submissions/" + token,
-      params: { base64_encoded: "true", fields: "*" },
-      headers: {
-        // "X-RapidAPI-Host": process.env.REACT_APP_RAPID_API_HOST,
-        "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
-      },
-    };
+    const accessToken = HandleCookies.getCookie("token");
+    if (!accessToken) {
+      showErrorToast("Please login to submit your code");
+      return;
+    }
+    
     try {
-      let response = await axios.request(options);
-      let statusId = response.data.status?.id;
+      // Submit code to backend and get submission ID
+      const submission = await SubmissionApi.submit({
+        language: "CPP",
+        sourceCode: code,
+        problem: "1913822452007993344",
+        token: accessToken,
+      });
+      
+      if (!submission || submission.code != "200") {
+        showErrorToast("Failed to create submission");
+        return;
+      }
+      
+      // Establish WebSocket connection to track judging progress
+      const submissionId = submission.data.id.toString();
+      const wsProtocol = 'ws:';
+      const wsHost = "localhost:8080";
 
-      // Processed - we have a result
-      if (statusId === 1 || statusId === 2) {
-        // still processing
-        setTimeout(() => {
-          checkStatus(token);
-        }, 2000);
-        return null;
-      } else {
-        if (!submit) setProcessing(false);
-        setOutputDetails(response.data);
-        if (!submit) showSuccessToast(`Compiled Successfully!`);
-        return response.data;
-      }
+      const ws = new WebSocket(`${wsProtocol}//${wsHost}/api/ws/submissions/${submissionId}`);
+      
+      // Set up websocket event handlers
+      ws.onopen = () => {
+        showSuccessToast("Connected to judge service");
+      };
+      
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        switch(data.type) {
+          case "test_case_update":
+            // Update progress UI
+            setVerdict({
+              message: `Running on testcase ${data.test_number}`
+            });
+            break;
+            
+          case "test_case_completion":
+            ws.close();
+            setVerdict({
+              status: data?.status, 
+              execution_time_ms: data?.execution_time_ms,
+              memory_used_bytes: data?.memory_used_bytes
+            });
+            break;
+        }
+      };
+      
+      ws.onerror = (error) => {
+        showErrorToast("WebSocket error occurred");
+      };
+      
+      ws.onclose = () => {
+        console.log("WebSocket connection closed");
+      };
+      
     } catch (err) {
-      if (!submit) {
-        setProcessing(false);
-        showErrorToast();
-      }
-      return null;
+      showErrorToast(err.message || "Error submitting code");
     }
   };
 
   function handleThemeChange(th) {
     const theme = th;
-    console.log("theme...", theme);
 
     if (["light", "vs-dark"].includes(theme.value)) {
       setTheme(theme);
@@ -270,24 +182,9 @@ const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
         </div>
         <div className="px-4 py-2">
           <button
-            onClick={handleCompile}
-            disabled={!code}
-            className={classnames(
-              "border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 bg-white flex-shrink-0",
-              !code ? "opacity-50" : ""
-            )}
-          >
-            {processing ? "Processing..." : "Compile and Execute"}
-          </button>
-        </div>
-        <div className="px-4 py-2">
-          <button
             onClick={handleSubmit}
-            disabled={!enableSubmit}
             className={classnames(
-              `border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 flex-shrink-0 ${
-                enableSubmit ? "bg-green-500" : "bg-red-600"
-              }`
+              `border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 flex-shrink-0 bg-green-500`
             )}
           >
             Submit
@@ -305,11 +202,12 @@ const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
         </div>
 
         <div className="right-container flex flex-shrink-0 w-[30%] flex-col h-[500px]">
-          <Input customInput={tcip} setCustomInput={setCustomInput} />
           <OutputWindow
-            outputDetails={outputDetails}
-            sampleoutput={tcop}
-            setEnableSubmit={setEnableSubmit}
+            verdict={verdict?.status}
+            message={verdict?.message}
+            time_limit={verdict?.execution_time_ms}
+            memoty_limit={verdict?.memory_used_bytes}
+            title={"Verdict"}
           />
         </div>
       </div>

@@ -56,4 +56,34 @@ public class ProblemServiceImpl implements ProblemService {
     public List<Problem> findAllByContest(Long contest) {
         return this.repository.findAllProblemsByContest(contest);
     }
+
+    @Override
+    public void updateProblemStatus(Long contestId, Boolean status) {
+        this.repository.updateProblemStatus(contestId, status);
+    }
+
+    @Override
+    public Problem findByIdDev(Long problemId, Long userId) {
+        Problem problem = this.repository.findById(problemId);
+        try {
+            BaseResponse<ContestResponse> contest = this.contestClient.getContestById(problem.getContest());
+            if (contest.data().getAuthors().contains(userId) || contest.data().getCoordinators().contains(userId) || contest.data().getTesters().contains(userId) || contest.data().getStartTime().isBefore(Instant.now())) {
+                return problem;
+            } else {
+                throw new ApiRequestException(ErrorMessageConstants.NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public List<Problem> findAllByContestDev(Long contestId, Long userId) {
+        BaseResponse<ContestResponse> contest = this.contestClient.getContestById(contestId);
+        if (contest.data().getAuthors().contains(userId) || contest.data().getCoordinators().contains(userId) || contest.data().getTesters().contains(userId) || contest.data().getStartTime().isBefore(Instant.now())) {
+            return this.repository.findAllProblemsByContestDev(contestId);
+        } else {
+            throw new ApiRequestException(ErrorMessageConstants.NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

@@ -40,8 +40,6 @@ public class User {
 
     private Country country;
 
-    private State state;
-
     private Instant createdAt;
 
     public boolean hasRole(Role role) {

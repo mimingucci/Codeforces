@@ -15,6 +15,8 @@ public class ProblemResponse {
 
     String statement;
 
+    Boolean isPublished;
+
     Long author;
 
     String solution;

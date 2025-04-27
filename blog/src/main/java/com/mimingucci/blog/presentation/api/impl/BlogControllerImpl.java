@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +27,12 @@ public class BlogControllerImpl implements BlogController {
     @Override
     public BaseResponse<PageableResponse<BlogGetResponse>> getAll(Pageable pageable) {
         return BaseResponse.success(this.applicationService.getAll(pageable));
+    }
+
+    @PostMapping(path = PathConstants.UPLOAD)
+    @Override
+    public BaseResponse<String> uploadImage(@RequestParam("image") MultipartFile file, HttpServletRequest request) {
+        return BaseResponse.success(applicationService.uploadImage(file, request));
     }
 
     @PutMapping(path = PathConstants.BLOG_ID + PathConstants.LIKE)

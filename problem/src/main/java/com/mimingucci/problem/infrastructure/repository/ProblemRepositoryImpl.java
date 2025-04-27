@@ -66,4 +66,14 @@ public class ProblemRepositoryImpl implements ProblemRepository {
     public List<Problem> findAllProblemsByContest(Long contest) {
         return this.jpaRepository.findAllProblemsByContest(contest).stream().map(ProblemConverter.INSTANCE::toDomain).toList();
     }
+
+    @Override
+    public void updateProblemStatus(Long contestId, Boolean status) {
+        this.jpaRepository.updateProblemStatusByContest(contestId, status);
+    }
+
+    @Override
+    public List<Problem> findAllProblemsByContestDev(Long contestId) {
+        return this.jpaRepository.findAllProblemsByContestDev(contestId).stream().map(ProblemConverter.INSTANCE::toDomain).toList();
+    }
 }

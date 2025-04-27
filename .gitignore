@@ -24,7 +24,9 @@ log/
 logs/
 spring.log
 hs_err_pid*
-!src/main/resources/application*.yml
+src/main/resources/application*.yml
+src/main/resources/application*.properties
+
 
 # ========================
 # Python - FastAPI

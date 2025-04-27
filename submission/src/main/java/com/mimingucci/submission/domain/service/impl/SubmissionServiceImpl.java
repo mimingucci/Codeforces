@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 @Service
@@ -35,29 +36,37 @@ public class SubmissionServiceImpl implements SubmissionService {
 
     @Override
     public Submission createSubmission(Submission submission) {
-        ProblemResponse problemResponse = problemClient.getProblemById(submission.getProblem()).data();
-        if (problemResponse == null) throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
+//        ProblemResponse problemResponse = problemClient.getProblemById(submission.getProblem()).data();
+//        if (problemResponse == null) throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
 
-        ContestantCheckResponse contestant = contestClient.checkRegistration(problemResponse.getContest(), submission.getAuthor()).data();
-        if (contestant == null) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
-        if (Instant.now().isBefore(contestant.getStartTime())) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
+//        if (!problemResponse.getIsPublished()) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
+//        ContestantCheckResponse contestant = contestClient.checkRegistration(problemResponse.getContest(), submission.getAuthor()).data();
+//        if (contestant == null) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
+//        if (Instant.now().isBefore(contestant.getStartTime())) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
 
-        if (!Objects.equals(problemResponse.getContest(), submission.getContest())) throw new ApiRequestException(ErrorMessageConstants.CONFLICT_DATA, HttpStatus.CONFLICT);
+//        if (!Objects.equals(problemResponse.getContest(), submission.getContest())) throw new ApiRequestException(ErrorMessageConstants.CONFLICT_DATA, HttpStatus.CONFLICT);
         Submission domain = repository.save(submission);
 
         JudgeSubmissionEvent message = new JudgeSubmissionEvent();
         message.setAuthor(domain.getAuthor());
         message.setId(domain.getId());
-        message.setContest(domain.getContest());
+//        message.setContest(domain.getContest());
+        message.setContest(1L);
         message.setLanguage(this.convertLanguage(domain.getLanguage()));
-        message.setRule(contestant.getType().equals(ContestType.ICPC) ? "ICPC" : "DEFAULT");
+//        message.setRule(contestant.getType().equals(ContestType.ICPC) ? "ICPC" : "DEFAULT");
+        message.setRule("DEFAULT");
         message.setSent_on(domain.getSent());
-        message.setStartTime(contestant.getStartTime());
-        message.setEndTime(contestant.getEndTime());
+//        message.setStartTime(contestant.getStartTime());
+//        message.setEndTime(contestant.getEndTime());
+        message.setStartTime(Instant.now().minus(7, ChronoUnit.DAYS));
+        message.setEndTime(Instant.now().minus(1, ChronoUnit.DAYS));
         message.setProblem(domain.getProblem());
-        message.setScore(problemResponse.getScore());
-        message.setTimeLimit(problemResponse.getTimeLimit());
-        message.setMemoryLimit(problemResponse.getMemoryLimit());
+//        message.setScore(problemResponse.getScore());
+//        message.setTimeLimit(problemResponse.getTimeLimit());
+//        message.setMemoryLimit(problemResponse.getMemoryLimit());
+        message.setScore(500);
+        message.setTimeLimit(1000L);
+        message.setMemoryLimit(512_000_000L);
         message.setSourceCode(domain.getSourceCode());
         producer.sendSubmissionToJudge(message);
         return domain;

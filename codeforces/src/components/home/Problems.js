@@ -5,104 +5,96 @@ import ProblemApi from "../../getApi/ProblemApi";
 import UserApi from "../../getApi/UserApi";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Ranking from "./Ranking";
+import DataTable from '../shared/DataTable';
 
 const Problems = ({ userPage = false }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const page = +searchParams.get("page");
+  const page = +searchParams.get("page") || 0;
   const [problems, setProblems] = useState([]);
   const [pages, setPages] = useState(0);
-  useEffect(() => {
-    if (!userPage) {
-      ProblemApi.getProblems({ page })
-        .then((rs) => {
-          setProblems(rs?.data?.data?.content);
-          setPages(rs?.data?.totalPages);
-        })
-        .catch((err) => console.err(err));
-    } else {
-      UserApi.getTopUsers({ field: "-rating" })
-        .then((rs) => {
-          setProblems(rs?.data?.data);
-        })
-        .catch((err) => console.err(err));
+  const [loading, setLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const columns = userPage ? [
+    { field: 'index', label: '#', sortable: false },
+    { 
+      field: 'username', 
+      label: 'User',
+      render: (row) => (
+        <a href={`/profile/${row.author}`}>
+          <Ranking
+            username={row?.username}
+            rating={row?.rating}
+            title={false}
+          />
+        </a>
+      )
+    },
+    { field: 'rating', label: 'Rating' }
+  ] : [
+    { field: 'index', label: '#', sortable: false },
+    { 
+      field: 'title', 
+      label: 'Problem',
+      render: (row) => (
+        <a href={`/problem/${row.id}`}>{row.title}</a>
+      )
+    },
+    { field: 'rating', label: 'Rating' },
+    { 
+      field: 'submissions', 
+      label: 'Tries',
+      render: (row) => row.submissions?.length
     }
+  ];
+
+  useEffect(() => {
+    fetchData();
   }, [page]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      if (!userPage) {
+        const response = await ProblemApi.getProblems({ page });
+        setProblems(response?.data?.data?.content);
+        setTotalPages(response?.data?.totalPages);
+      } else {
+        const response = await UserApi.getTopRatings({ limit: 100 });
+        setProblems(response?.data?.data?.content);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleChangePage = (e, p) => {
     let nxtPage = Math.max(0, p);
     nxtPage = Math.min(pages, nxtPage);
     navigate("/problems?page=" + nxtPage, { replace: true });
     page = nxtPage;
   };
+
+  const handlePageChange = (newPage) => {
+    navigate(`/problems?page=${newPage}`, { replace: true });
+  };
+  
   return (
-    <div
-      className={`w-auto border-[2px] rounded-t-md border-solid border-gray-400 mt-4 ${
-        userPage ? "mr-5" : ""
-      }`}
-    >
-      <div className="flex items-center bg-gray-200 h-5"></div>
-      <hr />
-      <div>
-        <table className="table-auto w-full border-collapse border border-slate-300">
-          <thead>
-            <tr>
-              <th className="border border-slate-300">#</th>
-              <th className="border border-slate-300">
-                {userPage ? "User" : "Problem"}
-              </th>
-              <th className="border border-slate-300">Rating</th>
-              {!userPage && <th className="border border-slate-300">Tries</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {problems &&
-              problems.map((problem, index) => {
-                return (
-                  <tr className="odd:bg-gray-100">
-                    <td className="border border-slate-300">{index + 1}</td>
-                    <td className="border border-slate-300">
-                      {!userPage && (
-                        <a href={"/problem/" + problem.id}>{problem.title}</a>
-                      )}
-                      {userPage && (
-                        <a href={"/profile/" + problem.author}>
-                          {/* {problem.username} */}
-                          <Ranking
-                            username={problem?.username}
-                            rating={problem?.rating}
-                            title={false}
-                          />
-                        </a>
-                      )}
-                    </td>
-                    <td className="border border-slate-300">
-                      {problem?.rating}
-                    </td>
-                    {!userPage && (
-                      <td className="border border-slate-300">
-                        {problem?.submissions?.length}
-                      </td>
-                    )}
-                  </tr>
-                );
-              })}
-          </tbody>
-        </table>
-        <div className="items-center bg-gray-200 text-blue-800">
-          {!userPage && (
-            <div className="w-full items-center flex justify-center">
-              <Stack spacing={2}>
-                <Pagination
-                  count={pages}
-                  page={page}
-                  onChange={handleChangePage}
-                />
-              </Stack>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    <DataTable
+      columns={columns}
+      data={problems.map((item, index) => ({
+        ...item,
+        index: index + 1
+      }))}
+      page={page}
+      totalRows={totalPages * 10}
+      loading={loading}
+      onPageChange={handlePageChange}
+      sortable={!userPage}
+    />
   );
 };
 

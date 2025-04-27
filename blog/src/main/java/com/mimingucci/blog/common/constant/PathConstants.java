@@ -9,4 +9,5 @@ public class PathConstants {
     public static final String ALL = "/all";
     public static final String LIKE = "/like";
     public static final String DISLIKE = "/dislike";
+    public static final String UPLOAD = "/upload";
 }

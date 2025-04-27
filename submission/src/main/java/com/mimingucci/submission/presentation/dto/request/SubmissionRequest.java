@@ -16,7 +16,6 @@ public class SubmissionRequest {
     @NotNull
     private Long problem;
 
-    @NotNull
     private Long contest;
 
     private Long author;

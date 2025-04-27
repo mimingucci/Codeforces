@@ -18,6 +18,8 @@ public class ProblemResponse {
 
     String solution;
 
+    Boolean isPublished;
+
     Long contest;
 
     Long timeLimit = 1000L;

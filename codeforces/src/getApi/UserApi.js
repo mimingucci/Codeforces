@@ -1,21 +1,50 @@
 import axios from "axios";
+const JSONbig = require('json-bigint')({ storeAsString: true });
 const BASE_URL = "http://localhost:8080/api/v1/user";
 const AUTH_URL = "http://localhost:8080/api/v1/auth";
+
 class UserApi {
   getAllUsers() {
-    return axios.get(BASE_URL + "/all");
+    return axios.get(BASE_URL + "/all", {
+      transformResponse: (data) => {
+        const res = JSONbig.parse(data);
+        return res;
+      },
+    });
   }
-  getTopUsers({ field = "-rating" }) {
-    return axios.get(BASE_URL + `/fetch?sort=${field}&page=1&enabled=true`);
+  getTopRatings({limit = 100}) {
+    return axios.get(BASE_URL + `/all?ratingDir=DESC&page=0&pageSize=${limit}`, {
+      transformResponse: (data) => {
+        const res = JSONbig.parse(data);
+        return res;
+      },
+    });
   }
-  search({ page = 1, username, limit = 100 }) {
+  getTopContributors({limit = 100}) {
+    return axios.get(BASE_URL + `/all?contributionDir=DESC&page=0&pageSize=${limit}`, {
+      transformResponse: (data) => {
+        const res = JSONbig.parse(data);
+        return res;
+      },
+    });
+  }
+  search({ page = 0, username, limit = 100 }) {
     return axios.get(
-      BASE_URL +
-        `/search?page=${page}&enabled=true&username=${username}&limit=${limit}`
+      BASE_URL + `/all?page=${page}&username=${username}&pageSize=${limit}`, {
+        transformResponse: (data) => {
+          const res = JSONbig.parse(data);
+          return res;
+        },
+      }
     );
   }
   getUserById(id) {
-    return axios.get(BASE_URL + id);
+    return axios.get(BASE_URL + "/" + id, {
+      transformResponse: (data) => {
+        const res = JSONbig.parse(data);
+        return res;
+      },
+    });
   }
   getUserByEmail(email) {
     return axios.get(BASE_URL + "/email?email=" + email);
@@ -25,9 +54,6 @@ class UserApi {
   }
   getListUserByRating(page) {
     return axios.get(BASE_URL + "/rating/" + page);
-  }
-  getTopContributors() {
-    return axios.get(BASE_URL + "/topcontributors");
   }
   getResultBySearch(keyword) {
     return axios.get(BASE_URL + "/search", { params: { query: keyword } });
@@ -52,6 +78,11 @@ class UserApi {
     return axios.post(AUTH_URL + "/login", {
       email,
       password,
+    }, {
+      transformResponse: (data) => {
+        const res = JSONbig.parse(data);
+        return res;
+      },
     });
   }
   logout(accessToken) {
@@ -78,6 +109,11 @@ class UserApi {
   getUserInfo(accessToken) {
     return axios.get(BASE_URL + "/info", {
       headers: { Authorization: "Bearer " + accessToken },
+    }, {
+      transformResponse: (data) => {
+        const res = JSONbig.parse(data);
+        return res;
+      },
     });
   }
   allow({ accessToken, username, id }) {

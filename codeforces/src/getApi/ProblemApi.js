@@ -1,4 +1,6 @@
 import axios from "axios";
+const JSONbig = require('json-bigint')({ storeAsString: true });
+
 const BASE_URL = "http://localhost:8080/api/v1/problem";
 
 class ProblemApi {
@@ -25,10 +27,19 @@ class ProblemApi {
     );
   }
   getProblem(id) {
-    return axios.get(BASE_URL + id);
+    return axios.get(BASE_URL + '/' + id, {
+      transformResponse: (data) => {
+        const res = JSONbig.parse(data);
+        return res;
+      },
+    });
   }
   getProblems({ page }) {
-    return axios.get(BASE_URL + "/all?page=" + page);
+    return axios.get(BASE_URL + "/all?page=" + page, {
+      transformResponse: (data) => {
+        return JSONbig.parse(data);
+      },
+    });
   }
   update({
     statement,

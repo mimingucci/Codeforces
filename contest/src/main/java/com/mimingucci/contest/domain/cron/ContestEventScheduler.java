@@ -1,8 +1,11 @@
 package com.mimingucci.contest.domain.cron;
 
+import com.mimingucci.contest.common.constant.ErrorMessageConstants;
 import com.mimingucci.contest.common.enums.ContestEvent;
+import com.mimingucci.contest.common.exception.ApiRequestException;
 import com.mimingucci.contest.common.util.ContestantsConverter;
 import com.mimingucci.contest.domain.client.ProblemClient;
+import com.mimingucci.contest.domain.client.request.ProblemUpdateRequest;
 import com.mimingucci.contest.domain.client.response.ProblemResponse;
 import com.mimingucci.contest.domain.event.ContestActionEvent;
 import com.mimingucci.contest.domain.event.ContestCreatedEvent;
@@ -18,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -232,8 +236,13 @@ public class ContestEventScheduler {
     private void emitContestStartedEvent(Contest contest) {
         logger.info("CONTEST STARTED: {} (ID: {})", contest.getName(), contest.getId());
 
+        // Update problems in contest to public
+        if (problemClient.updateProblemStatus(contest.getId(), "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", new ProblemUpdateRequest(true)).code() != "200") {
+            throw new ApiRequestException(ErrorMessageConstants.CONTEST_HAS_NOT_STARTED, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         // Publish Spring application event
-//        eventPublisher.publishEvent(new ContestActionEvent(contest.getId(), contest.getStartTime(), contest.getEndTime()));
+        // eventPublisher.publishEvent(new ContestActionEvent(contest.getId(), contest.getStartTime(), contest.getEndTime()));
 
         // Publish to Kafka
         publishContestStartedToKafka(contest);
@@ -246,7 +255,7 @@ public class ContestEventScheduler {
         logger.info("CONTEST ENDED: {} (ID: {})", contest.getName(), contest.getId());
 
         // Publish Spring application event
-//        eventPublisher.publishEvent(new ContestActionEvent(contest.getId(), contest.getStartTime(), contest.getEndTime()));
+        // eventPublisher.publishEvent(new ContestActionEvent(contest.getId(), contest.getStartTime(), contest.getEndTime()));
 
         // Publish to Kafka
         publishContestEndedToKafka(contest);

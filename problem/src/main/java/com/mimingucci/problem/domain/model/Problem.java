@@ -14,6 +14,8 @@ public class Problem {
 
     private Long author;
 
+    private Boolean isPublished;
+
     private String solution;
 
     private Long contest;

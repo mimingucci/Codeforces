@@ -1,5 +1,7 @@
 import axios from "axios";
-const BASE_URL = "http://localhost:1234/api/comment";
+const JSONbig = require('json-bigint')({ storeAsString: true });
+const BASE_URL = "http://localhost:8080/api/v1/comment";
+
 class CommentApi {
   updateLike({ comment, accessToken }) {
     return axios.put(
@@ -22,13 +24,29 @@ class CommentApi {
     );
   }
   getCommentById(id) {
-    return axios.get(BASE_URL + "/get/" + id);
+    return axios.get(BASE_URL + "/" + id.toString(), {
+    transformResponse: (data) => {
+      return JSONbig.parse(data);
+    },
+  });
+  }
+  getCommentByBlogId(id) {
+    return axios.get(BASE_URL + "/blog/" + id.toString(), {
+      transformResponse: (data) => {
+        return JSONbig.parse(data);
+      },
+    });
   }
   createComment({ content, accessToken, blogId }) {
     return axios.post(
-      BASE_URL + "/create",
-      { content, blogId },
-      { headers: { Authorization: "Bearer " + accessToken } }
+      BASE_URL,
+      { content, blog: blogId },
+      { headers: { Authorization: "Bearer " + accessToken } }, 
+      {
+        transformResponse: (data) => {
+          return JSONbig.parse(data);
+        },
+      }
     );
   }
 }

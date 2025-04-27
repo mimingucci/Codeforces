@@ -88,4 +88,9 @@ public class CommentApplicationServiceImpl implements CommentApplicationService 
         }
         return CommentAssembler.INSTANCE.domainToResponse(this.service.dislikeComment(id, user));
     }
+
+    @Override
+    public CommentResponse getById(Long id) {
+        return CommentAssembler.INSTANCE.domainToResponse(this.service.getById(id));
+    }
 }

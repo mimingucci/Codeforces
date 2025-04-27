@@ -3,6 +3,7 @@ package com.mimingucci.blog.domain.service;
 import com.mimingucci.blog.domain.model.Blog;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,4 +25,6 @@ public interface BlogService {
     Blog likeBlog(Long blogId, Long userId);
 
     Blog dislikeBlog(Long blogId, Long userId);
+
+    String uploadFile(MultipartFile file);
 }

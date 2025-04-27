@@ -50,6 +50,12 @@ public class CommentControllerImpl implements CommentController {
         return BaseResponse.success(this.commentApplicationService.deleteById(id));
     }
 
+    @GetMapping(path = PathConstants.COMMENT_ID)
+    @Override
+    public BaseResponse<CommentResponse> getById(@PathVariable(name = "commentId") Long id) {
+        return BaseResponse.success(this.commentApplicationService.getById(id));
+    }
+
     @PostMapping
     @Override
     public BaseResponse<CommentResponse> createComment(@RequestBody @Validated CommentCreateRequest request, HttpServletRequest httpRequest) {

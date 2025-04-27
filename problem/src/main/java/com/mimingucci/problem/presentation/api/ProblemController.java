@@ -22,4 +22,11 @@ public interface ProblemController {
     BaseResponse<PageableResponse<ProblemResponse>> getAllProblems(@RequestParam(name = "rating", required = false) @ValidProblemRating Integer rating, Pageable pageable);
 
     BaseResponse<List<ProblemResponse>> getAllProblemsByContestId(Long contestId);
+
+    BaseResponse<Boolean> updateProblemStatus(Long contestId, String token, ProblemUpdateRequest request);
+
+    BaseResponse<ProblemResponse> getProblemByIdDev(Long id, HttpServletRequest request);
+
+    BaseResponse<List<ProblemResponse>> getAllProblemsByContestIdDev(Long contestId, HttpServletRequest request);
+
 }

@@ -2,6 +2,8 @@ import json
 from enum import Enum
 from pydantic import BaseModel
 from service.service_client import ServiceClient
+from ws_handler import notify_test_case_status
+
 
 class Language(Enum):
     C = "C"
@@ -34,7 +36,8 @@ class CodeExecutionRequest(BaseModel):
     language: Language
 
 class Judge(object):
-    def __init__(self, src: str, inputs: list[str], outputs: list[str], time_limit: int = 2000, memory_limit: int = 512000000, language: Language = Language.C, rule: Rule = Rule.DEFAULT) -> None:
+    def __init__(self, id: int, src: str, inputs: list[str], outputs: list[str], time_limit: int = 2000, memory_limit: int = 512000000, language: Language = Language.C, rule: Rule = Rule.DEFAULT) -> None:
+        self.id = id
         self.src = src
         self.inputs = inputs
         self.outputs = outputs
@@ -68,9 +71,19 @@ class Judge(object):
 
     async def run(self):
         results = []
-        for i in range(len(self.inputs)):
-            result = await self._judge_one(input_date=self.inputs[i], output_date=self.outputs[i])
-            results.append(result)
-            if isinstance(result, dict) and result.get('status') != 'Accepted' and self.rule == Rule.DEFAULT:
-                return results
-        return results
+        try:
+            for i in range(len(self.inputs)):
+                # Send update about which test case is being processed
+                await notify_test_case_status(
+                    submission_id=str(self.id),
+                    test_number=i + 1
+                )
+                result = await self._judge_one(input_date=self.inputs[i], output_date=self.outputs[i])
+                results.append(result)
+
+                # For DEFAULT rule, stop at the first non-Accepted test case
+                if self.rule == Rule.DEFAULT and isinstance(result, dict) and result.get('status') != 'Accepted':
+                    return results
+            return results
+        except Exception as e:
+            raise e

@@ -1,6 +1,5 @@
 package com.mimingucci.user.infrastructure.repository.converter;
 
-import com.mimingucci.user.common.enums.Role;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

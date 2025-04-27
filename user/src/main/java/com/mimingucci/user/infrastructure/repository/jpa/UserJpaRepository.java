@@ -5,6 +5,7 @@ import com.mimingucci.user.infrastructure.repository.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,10 +14,11 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
-public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
+public interface UserJpaRepository extends JpaRepository<UserEntity, Long>, JpaSpecificationExecutor<UserEntity> {
     Optional<UserEntity> findByUsername(String username);
 
     Optional<UserEntity> findByEmail(String email);
@@ -43,24 +45,12 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
     // Find users by country with pagination
     Page<UserEntity> findByCountryId(Long countryId, Pageable pageable);
 
-    // Find users by state
-    List<UserEntity> findByStateId(Long stateId);
-
-    // Find users by state with pagination
-    Page<UserEntity> findByStateId(Long stateId, Pageable pageable);
-
-    // Find users by country and state
-    List<UserEntity> findByCountryIdAndStateId(Long countryId, Long stateId);
-
     // Custom query with JPQL
     @Query("SELECT u FROM UserEntity u WHERE u.country.name = :countryName")
     List<UserEntity> findByCountryName(@Param("countryName") String countryName);
 
     // Count users by country
     long countByCountryId(Long countryId);
-
-    // Count users by state
-    long countByStateId(Long stateId);
 
     boolean existsByUsername(String username);
 
@@ -84,4 +74,12 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
 
     // Check if user exists by ID
     boolean existsById(Long userId);
+
+    @Modifying
+    @Query(value = "UPDATE user SET rating = CASE id " +
+            "#{#ratings.entrySet().stream()" +
+            ".map(entry -> 'WHEN ' + entry.getKey() + ' THEN ' + entry.getValue())" +
+            ".collect(java.util.stream.Collectors.joining(' ')} " +
+            "END WHERE id IN :ids", nativeQuery = true)
+    void batchUpdateRatings(@Param("ratings") Map<Long, Integer> userRatings, @Param("ids") Collection<Long> userIds);
 }

@@ -5,7 +5,37 @@ import UserApi from "../getApi/UserApi";
 import HandleCookies from "../utils/HandleCookies";
 import SearchResults from "./home/SearchResults";
 import { useNavigate } from "react-router-dom";
+import { 
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  IconButton,
+  Button,
+  InputBase,
+  Paper,
+  Badge,
+} from '@mui/material';
+import { styled, alpha } from '@mui/material/styles';
+
 const { IoIosNotifications, IoMdSearch } = icons;
+
+// Styled components
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(1),
+    width: 'auto',
+  },
+}));
+
 const Header = () => {
   let user = "";
   const [value, setValue] = useState("");
@@ -16,6 +46,7 @@ const Header = () => {
     setValue("");
     navigate(`/search?query=${query}`);
   };
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       let query = value;
@@ -23,6 +54,7 @@ const Header = () => {
       navigate(`/search?query=${query}`);
     }
   };
+
   const checkLogin = () => {
     if (HandleCookies.getCookie("username")?.length > 0) {
       user = HandleCookies.getCookie("username");
@@ -31,6 +63,7 @@ const Header = () => {
       return false;
     }
   };
+
   const handleLogout = async () => {
     user = "";
     const rs = await UserApi.logout(HandleCookies.getCookie("refreshToken"));
@@ -43,87 +76,105 @@ const Header = () => {
   useEffect(() => {
     checkLogin();
   }, [user]);
+
   return (
-    <div>
-      <div className="upper_header flex justify-between mb-3">
-        <div className="w-[300px]">
-          <a href="http://localhost:3000/">
-            <img src={logo} className="w-full" />
-          </a>
-        </div>
-        <div className="text-center">
-          <div className="relative block">
-            <IoIosNotifications
-              size={20}
-              className="mx-auto absolute right-0"
-            />
-          </div>
-          <div className="underline mt-[15px]">
-            {checkLogin() && (
-              <a href={"http://localhost:3000/profile/" + user} className="">
-                {user}
-              </a>
-            )}
-            {checkLogin() && (
-              <span onClick={handleLogout} className="hover:cursor-pointer">
-                | Logout
-              </span>
-            )}
-            {!checkLogin() && <a href="http://localhost:3000/login">Login</a>}
-          </div>
-        </div>
-      </div>
-      <div className="downer_header border-r-[50%] rounded-md border-2 w-full h-[50px] border-gray-400 border-solid justify-between flex">
-        <div className="w-full h-full flex space-x-4 content-center py-[10px] pl-[10px]">
-          <div className="hover:cursor-pointer">
-            <a href="http://localhost:3000/home">HOME</a>
-          </div>
-          <div className="hover:cursor-pointer">
-            <a href="http://localhost:3000/ide">IDE</a>
-          </div>
-          <div className="hover:cursor-pointer">
-            <a href="http://localhost:3000/problems?page=1">PROBLEMSET</a>
-          </div>
-          <div className="hover:cursor-pointer">
-            <a href="http://localhost:3000/rating">TOP USER</a>
-          </div>
-          <div className="hover:cursor-pointer">
-            <a href="http://localhost:3000/calendar">CALENDAR</a>
-          </div>
-          <div className="hover:cursor-pointer">
-            <a href="http://localhost:3000/createproblem">CREATEPROBLEM</a>
-          </div>
-          <div className="hover:cursor-pointer">HELP</div>
-          <div className="hover:cursor-pointer">CATALOG</div>
-        </div>
-        <div className="relative">
-          <div className="py-1 flex px-3">
-            <IoMdSearch
-              size={20}
-              className="my-auto hover:cursor-pointer"
-              onClick={handleClick}
-            />
-            <input
-              onKeyDown={handleKeyDown}
-              type={"text"}
-              placeholder="Search"
-              className="flex-1 bg-gray-200 outline-none w-auto h-fit"
-              onChange={(e) => setValue(e.target.value)}
-              value={value}
-            />
-          </div>
-          <div
-            className={`absolute bg-white w-full border-solid border-gray-500 border-[1px] rounded-md ${
-              !deferredQuery ? "hidden" : ""
-            }`}
-          >
-            <Suspense fallback={<h2>Loading...</h2>}>
-              <SearchResults query={deferredQuery} />
-            </Suspense>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static" color="default" elevation={1}>
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
+          {/* Logo */}
+          <Box sx={{ width: 300 }}>
+            <a href="http://localhost:3000/">
+              <img src={logo} alt="Codeforces" style={{ width: '100%' }} />
+            </a>
+          </Box>
+
+          {/* User Section */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <IconButton>
+              <Badge badgeContent={4} color="primary">
+                <IoIosNotifications />
+              </Badge>
+            </IconButton>
+            {checkLogin() ? (
+              <>
+                <Button 
+                  href={`http://localhost:3000/profile/${user}`}
+                  color="inherit"
+                >
+                  {user}
+                </Button>
+                <Button 
+                  color="inherit"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              </>
+              ) : (
+                <Button 
+                  href="http://localhost:3000/login"
+                  color="inherit"
+                >
+                  Login
+                </Button>
+              )}
+            </Box>
+          </Toolbar>
+  
+          {/* Navigation Bar */}
+          <Paper elevation={0} sx={{ borderRadius: 0 }}>
+            <Toolbar>
+              <Box sx={{ display: 'flex', gap: 2, flexGrow: 1 }}>
+                <Button href="http://localhost:3000/home" color="inherit">HOME</Button>
+                <Button href="http://localhost:3000/ide" color="inherit">IDE</Button>
+                <Button href="http://localhost:3000/problems?page=0" color="inherit">PROBLEMSET</Button>
+                <Button href="http://localhost:3000/rating" color="inherit">TOP USER</Button>
+                <Button href="http://localhost:3000/calendar" color="inherit">CALENDAR</Button>
+                <Button href="http://localhost:3000/createproblem" color="inherit">CREATE PROBLEM</Button>
+                <Button color="inherit">HELP</Button>
+                <Button color="inherit">CATALOG</Button>
+              </Box>
+          {/* Search Bar */}
+          <Search>
+              <Paper
+                component="form"
+                sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400 }}
+              >
+                <InputBase
+                  sx={{ ml: 1, flex: 1 }}
+                  placeholder="Search"
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+                <IconButton onClick={handleClick}>
+                  <IoMdSearch />
+                </IconButton>
+              </Paper>
+              {/* Search Results */}
+              {deferredQuery && (
+                <Paper
+                  sx={{
+                    position: 'absolute',
+                    width: '100%',
+                    zIndex: 1000,
+                    mt: 0.5
+                  }}
+                >
+                  <Suspense fallback={
+                    <Box sx={{ p: 2, textAlign: 'center' }}>
+                      <Typography>Loading...</Typography>
+                    </Box>
+                  }>
+                    <SearchResults query={deferredQuery} />
+                  </Suspense>
+                </Paper>
+              )}
+            </Search>
+          </Toolbar>
+          </Paper>
+      </AppBar>
+    </Box>
   );
 };
 export default Header;

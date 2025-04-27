@@ -8,6 +8,7 @@ import com.mimingucci.blog.presentation.dto.response.BlogGetResponse;
 import com.mimingucci.blog.presentation.dto.response.PageableResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 
 public interface BlogController {
@@ -25,4 +26,5 @@ public interface BlogController {
 
     BaseResponse<BlogGetResponse> dislikeBlog(Long blogId, HttpServletRequest request);
 
+    BaseResponse<String> uploadImage(MultipartFile file, HttpServletRequest request);
 }

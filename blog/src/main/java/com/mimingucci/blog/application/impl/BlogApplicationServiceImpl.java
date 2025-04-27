@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -92,5 +93,18 @@ public class BlogApplicationServiceImpl implements BlogApplicationService {
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
         return BlogAssembler.INSTANCE.domainToGetResponse(this.service.dislikeBlog(blogId, userId));
+    }
+
+    @Override
+    public String uploadImage(MultipartFile file, HttpServletRequest request) {
+        Long userId = null;
+        try {
+            Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
+            userId = claims.get("id", Long.class);
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+        if (userId == null) throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        return this.service.uploadFile(file);
     }
 }

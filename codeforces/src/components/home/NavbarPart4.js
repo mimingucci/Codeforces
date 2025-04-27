@@ -1,41 +1,148 @@
+import { 
+  Paper,
+  Typography,
+  Box,
+  List,
+  ListItem,
+  ListItemText,
+  Link,
+  Divider,
+  Skeleton
+} from '@mui/material';
 import { useEffect, useState } from "react";
 import icons from "../../utils/icons";
 import BlogApi from "../../getApi/BlogApi";
 import Ranking from "./Ranking";
+
 const { FaArrowRightLong } = icons;
+
 const NavbarPart4 = () => {
   const [blogs, setBlogs] = useState();
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    BlogApi.recentlyActive({ page: 1 }).then((res) => setBlogs(res.data.data));
+    BlogApi.recentlyActive({ page: 1 })
+      .then((res) => {
+        setBlogs(res.data.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   }, []);
+
   return (
-    <div className="w-full border-[2px] rounded-t-md border-solid border-gray-400 mt-4">
-      <div className="flex items-center text-blue-800">
-        <FaArrowRightLong size={20} className="mx-[5px] " />
-        Recent actions
-      </div>
-      <hr />
-      <div>
-        <div>
-          {blogs &&
-            blogs.map((blog) => (
-              <div className="flex mx-[5px] items-center" key={blog?._id}>
-                <a href={`/profile/${blog?.author?.username}`}>
-                  {/* {blog?.author?.username} */}
+    <Paper 
+      elevation={1}
+      sx={{ 
+        mt: 2,
+        borderRadius: 1,
+        overflow: 'hidden'
+      }}
+    >
+      {/* Header */}
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        p: 1.5,
+        bgcolor: 'action.hover'
+      }}>
+        <FaArrowRightLong style={{ color: '#1976d2', marginRight: 8 }} />
+        <Typography color="primary" variant="subtitle1">
+          Recent actions
+        </Typography>
+      </Box>
+
+      <Divider />
+
+      {/* Content */}
+      <List sx={{ py: 0 }}>
+        {loading ? (
+          // Loading skeleton
+          Array.from(new Array(5)).map((_, index) => (
+            <ListItem key={index} divider>
+              <ListItemText>
+                <Skeleton />
+              </ListItemText>
+            </ListItem>
+          ))
+        ) : (
+          blogs?.map((blog) => (
+            <ListItem 
+              key={blog?._id}
+              divider
+              sx={{ 
+                py: 1,
+                '&:hover': { 
+                  bgcolor: 'action.hover',
+                  transition: 'background-color 0.2s'
+                }
+              }}
+            >
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                gap: 1,
+                width: '100%',
+                flexWrap: 'wrap'
+              }}>
+                <Link 
+                  href={`/profile/${blog?.author?.username}`}
+                  underline="hover"
+                  color="inherit"
+                  sx={{ display: 'flex', alignItems: 'center' }}
+                >
                   <Ranking
                     username={blog?.author?.username}
                     rating={blog?.author?.rating}
                     title={false}
                   />
-                </a>
-                <FaArrowRightLong size={15} className="mx-[5px]" />{" "}
-                <a href={`/blog/${blog?._id}`}>{blog?.title}</a>
-              </div>
-            ))}
-        </div>
-        <div className="flex items-center bg-gray-100 text-blue-800 flex-row-reverse"></div>
-      </div>
-    </div>
+                </Link>
+                
+                <FaArrowRightLong size={12} style={{ color: '#1976d2' }} />
+                
+                <Link
+                  href={`/blog/${blog?._id}`}
+                  underline="hover"
+                  color="inherit"
+                  sx={{ 
+                    flexGrow: 1,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {blog?.title}
+                </Link>
+              </Box>
+            </ListItem>
+          ))
+        )}
+      </List>
+
+      {/* Footer */}
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'flex-end',
+        p: 1,
+        bgcolor: 'action.hover'
+      }}>
+        <Link 
+          href="/recent-actions"
+          underline="hover"
+          color="primary"
+          sx={{ 
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1
+          }}
+        >
+          View all actions
+          <FaArrowRightLong size={12} />
+        </Link>
+      </Box>
+    </Paper>
   );
 };
 export default NavbarPart4;

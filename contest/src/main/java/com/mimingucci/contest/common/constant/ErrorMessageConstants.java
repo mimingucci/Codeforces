@@ -25,4 +25,5 @@ public class ErrorMessageConstants {
 
     public static final String CONTEST_REGISTRATION_NOT_FOUND = "Contest registration not found";
 
+    public static final String CONTEST_HAS_NOT_STARTED = "Contest has not started yet";
 }

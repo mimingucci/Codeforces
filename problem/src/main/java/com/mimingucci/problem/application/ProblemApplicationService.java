@@ -21,4 +21,10 @@ public interface ProblemApplicationService {
     PageableResponse<ProblemResponse> getAllProblemsByRating(Integer rating, Pageable pageable);
 
     List<ProblemResponse> getAllProblemsByContestId(Long contestId);
+
+    Boolean updateProblemStatus(Long contestId, Boolean status, String token);
+
+    ProblemResponse getProblemByIdDev(Long problemId, HttpServletRequest request);
+
+    List<ProblemResponse> getAllProblemsByContestIdDev(Long contestId, HttpServletRequest request);
 }
