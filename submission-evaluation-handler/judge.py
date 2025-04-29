@@ -2,7 +2,6 @@ import json
 from enum import Enum
 from pydantic import BaseModel
 from service.service_client import ServiceClient
-from ws_handler import notify_test_case_status
 
 
 class Language(Enum):
@@ -73,11 +72,6 @@ class Judge(object):
         results = []
         try:
             for i in range(len(self.inputs)):
-                # Send update about which test case is being processed
-                await notify_test_case_status(
-                    submission_id=str(self.id),
-                    test_number=i + 1
-                )
                 result = await self._judge_one(input_date=self.inputs[i], output_date=self.outputs[i])
                 results.append(result)
 

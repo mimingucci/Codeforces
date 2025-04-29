@@ -34,6 +34,14 @@ class ProblemApi {
       },
     });
   }
+  getProblemsByContestId(id) {
+    return axios.get(BASE_URL + '/contest/' + id, {
+      transformResponse: (data) => {
+        const res = JSONbig.parse(data);
+        return res;
+      },
+    });
+  }
   getProblems({ page }) {
     return axios.get(BASE_URL + "/all?page=" + page, {
       transformResponse: (data) => {

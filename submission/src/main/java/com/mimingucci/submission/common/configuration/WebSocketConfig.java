@@ -1,4 +1,4 @@
-package com.mimingucci.user.common.configuration;
+package com.mimingucci.submission.common.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -11,14 +11,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/api/v1/chat")
-                .setAllowedOriginPatterns("*");
+        registry.addEndpoint("/api/v1/submissions")
+                .setAllowedOrigins("http://localhost:3000");
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app");
-        registry.enableSimpleBroker("/user", "/topic", "/queue");
-        registry.setUserDestinationPrefix("/user");
+        registry.enableSimpleBroker("/topic");
     }
 }

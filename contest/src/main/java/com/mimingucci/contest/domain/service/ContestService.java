@@ -2,9 +2,12 @@ package com.mimingucci.contest.domain.service;
 
 import com.mimingucci.contest.common.enums.Role;
 import com.mimingucci.contest.domain.model.Contest;
+import com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 public interface ContestService {
@@ -17,4 +20,10 @@ public interface ContestService {
     Contest getContest(Long id);
 
     Page<Contest> getListContests(String name, Pageable pageable);
+
+    List<Contest> getUpcomingContests(ContestType type, Integer next);
+
+    Page<Contest> getPastContests(ContestType type, Pageable pageable);
+
+    List<Contest> getRunningContests(ContestType type);
 }

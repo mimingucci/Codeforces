@@ -17,17 +17,17 @@ public class Contest {
 
     private Instant endTime;
 
-    private Set<Long> authors = new HashSet<>();
+    private Set<Long> authors;
 
-    private Set<Long> testers = new HashSet<>();
+    private Set<Long> testers;
 
-    private Set<Long> coordinators = new HashSet<>();
+    private Set<Long> coordinators;
 
-    private Boolean enabled = true;
+    private Boolean enabled;
 
-    private ContestType type = ContestType.NORMAL;
+    private ContestType type;
 
-    private Boolean isPublic = true;
+    private Boolean isPublic;
 
     public boolean hasPermission(Long userId) {
         return this.getAuthors().contains(userId) || this.getCoordinators().contains(userId) || this.getTesters().contains(userId);

@@ -22,9 +22,9 @@ public class ContestUpdateRequest {
 
     private ContestType type;
 
-    private Long[] authors = new Long[0];
+    private Long[] authors;
 
-    private Long[] testers = new Long[0];
+    private Long[] testers;
 
-    private Long[] coordinators = new Long[0];
+    private Long[] coordinators;
 }

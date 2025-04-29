@@ -9,12 +9,12 @@ import {
   Box
 } from '@mui/material';
 import { formatDistanceToNow } from 'date-fns';
-// import ContestApi from '../../getApi/ContestApi';
+import ContestApi from '../../getApi/ContestApi';
 import HandleCookies from '../../utils/HandleCookies';
-import { upcomingContests as mockContests } from '../../data/mockContests';
 import Loading from '../shared/Loading';
 import RegisterModal from './RegisterModal';
 import CancelRegistrationModal from './CancelRegistrationModal';
+import { formatContestDurationHours } from '../../utils/dateUtils';
 
 const UpcomingContests = ({ contestType }) => {
   const [contests, setContests] = useState([]);
@@ -72,31 +72,18 @@ const UpcomingContests = ({ contestType }) => {
   };
 
   useEffect(() => {
-    // const fetchUpcomingContests = async () => {
-    //   try {
-    //     const response = await ContestApi.getUpcomingContests(contestType);
-    //     setContests(response.data.data);
-    //   } catch (error) {
-    //     console.error('Failed to fetch upcoming contests:', error);
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
+    const fetchUpcomingContests = async () => {
+      try {
+        const response = await ContestApi.getUpcomingContests({ type: contestType?.toUpperCase(), days: 7 });
+        setContests(response.data?.data || []);
+      } catch (error) {
+        console.error('Failed to fetch upcoming contests:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // fetchUpcomingContests();
-
-    // Simulate API call
-    const fetchContests = () => {
-        setTimeout(() => {
-          const filteredContests = contestType === 'all' 
-            ? mockContests 
-            : mockContests.filter(contest => contest.type.toLowerCase() === contestType);
-          setContests(filteredContests);
-          setLoading(false);
-        }, 1000); // Simulate 1s loading time
-      };
-  
-      fetchContests();
+    fetchUpcomingContests();
   }, [contestType]);
 
   const handleRegister = async (contestId) => {
@@ -149,29 +136,29 @@ const UpcomingContests = ({ contestType }) => {
               </Box>
 
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                Duration: {contest.durationHours} hours
+                Duration: {formatContestDurationHours(contest.startTime, contest.endTime)}
               </Typography>
 
               <Box sx={{ display: 'flex', gap: 1 }}>
                   <Button 
-                    variant={contest.registered ? "outlined" : "contained"}
-                    onClick={() => contest.registered 
+                    variant={contest?.registered ? "outlined" : "contained"}
+                    onClick={() => contest?.registered 
                       ? handleCancelClick(contest)
                       : handleRegisterClick(contest)
                     }
                     fullWidth
-                    color={contest.registered ? "error" : "primary"}
+                    color={contest?.registered ? "error" : "primary"}
                   >
-                    {contest.registered ? 'Cancel Registration' : 'Register'}
+                    {contest?.registered ? 'Cancel Registration' : 'Register'}
                   </Button>
                 </Box>
-                {contest.registered && contest.type === 'SYSTEM' && (
+                {contest?.registered && contest.type === 'SYSTEM' && (
                   <Typography 
                     variant="caption" 
                     color="text.secondary"
                     sx={{ display: 'block', mt: 1, textAlign: 'center' }}
                   >
-                    Registered as {contest.isRated ? 'rated' : 'unrated'} participant
+                    Registered as {contest?.isRated ? 'rated' : 'unrated'} participant
                   </Typography>
                 )}
             </CardContent>

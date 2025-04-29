@@ -1,6 +1,7 @@
 package com.mimingucci.contest.application;
 
 import com.mimingucci.contest.common.enums.Role;
+import com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType;
 import com.mimingucci.contest.presentation.dto.request.ContestCreateRequest;
 import com.mimingucci.contest.presentation.dto.request.ContestRegistrationDto;
 import com.mimingucci.contest.presentation.dto.request.ContestUpdateRequest;
@@ -39,4 +40,10 @@ public interface ContestApplicationService {
     List<ContestRegistrationDto> getAll(Long contestId);
 
     ContestantCheckResponse checkRegister(Long contestId, Long userId);
+
+    List<ContestResponse> getUpcomingContests(ContestType type, Integer next);
+
+    PageableResponse<ContestResponse> getPastContests(ContestType type, Pageable pageable);
+
+    List<ContestResponse> getRunningContests(ContestType type);
 }

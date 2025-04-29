@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import CodeEditorWindow from "./CodeEditorWindow";
 import { classnames } from "../general";
 import { languageOptions } from "../languageOptions";
+import { Stomp } from '@stomp/stompjs';
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -30,6 +31,19 @@ const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
   const [verdict, setVerdict] = useState(null);
   const [theme, setTheme] = useState("cobalt");
   const [language, setLanguage] = useState(languageOptions[0]);
+  const stompClient = useRef(null);
+  const wsClient = useRef(null);
+
+  useEffect(() => {
+    return () => {
+        if (stompClient.current) {
+            stompClient.current.disconnect();
+        }
+        if (wsClient.current) {
+            wsClient.current.close();
+        }
+    };
+  }, []);
 
   tcip = sampleinput.trim();
   tcop = sampleoutput.trim();
@@ -62,6 +76,7 @@ const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
     }
     
     try {
+      setVerdict({message: "Pending"});
       // Submit code to backend and get submission ID
       const submission = await SubmissionApi.submit({
         language: "CPP",
@@ -77,44 +92,27 @@ const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
       
       // Establish WebSocket connection to track judging progress
       const submissionId = submission.data.id.toString();
-      const wsProtocol = 'ws:';
-      const wsHost = "localhost:8080";
+      setVerdict({message: "Running..."});
+      // Connect to WebSocket
+      wsClient.current = new WebSocket('ws://localhost:8080/api/v1/submissions');
+      stompClient.current = Stomp.over(wsClient.current);
 
-      const ws = new WebSocket(`${wsProtocol}//${wsHost}/api/ws/submissions/${submissionId}`);
-      
-      // Set up websocket event handlers
-      ws.onopen = () => {
-        showSuccessToast("Connected to judge service");
-      };
-      
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        switch(data.type) {
-          case "test_case_update":
-            // Update progress UI
-            setVerdict({
-              message: `Running on testcase ${data.test_number}`
-            });
-            break;
-            
-          case "test_case_completion":
-            ws.close();
-            setVerdict({
-              status: data?.status, 
-              execution_time_ms: data?.execution_time_ms,
-              memory_used_bytes: data?.memory_used_bytes
-            });
-            break;
-        }
-      };
-      
-      ws.onerror = (error) => {
-        showErrorToast("WebSocket error occurred");
-      };
-      
-      ws.onclose = () => {
-        console.log("WebSocket connection closed");
-      };
+      stompClient.current.connect({}, () => {
+        // Subscribe to submission updates
+        stompClient.current.subscribe(
+            `/topic/submission/${submissionId}`,
+            (message) => {
+                const update = JSON.parse(message.body);
+                if (stompClient.current) {
+                  stompClient.current.disconnect();
+                }
+                if (wsClient.current) {
+                  wsClient.current.close();
+                }
+                setVerdict(update);
+            }
+        );
+    });
       
     } catch (err) {
       showErrorToast(err.message || "Error submitting code");
@@ -203,10 +201,10 @@ const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
 
         <div className="right-container flex flex-shrink-0 w-[30%] flex-col h-[500px]">
           <OutputWindow
-            verdict={verdict?.status}
+            verdict={verdict?.verdict}
             message={verdict?.message}
-            time_limit={verdict?.execution_time_ms}
-            memoty_limit={verdict?.memory_used_bytes}
+            time_limit={verdict?.executionTimeMs}
+            memoty_limit={verdict?.memoryUsedBytes}
             title={"Verdict"}
           />
         </div>

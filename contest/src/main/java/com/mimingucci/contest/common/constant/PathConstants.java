@@ -22,4 +22,9 @@ public class PathConstants {
     public static final String RANKING = "/ranking";
     public static final String API_V1_RANKING = API_V1 + RANKING;
     public static final String VIRTUAL_CONTEST = "/virtual";
+    public static final String UP_COMING = "/coming";
+    public static final String PAST = "/past";
+
+    public static final String PAGEABLE = "/pageable";
+    public static final String RUNNING = "/running";
 }

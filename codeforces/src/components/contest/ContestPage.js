@@ -5,17 +5,19 @@ import {
   Tabs, 
   Tab, 
   Typography,
-  useTheme
+  useTheme,
+  Divider
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import UpcomingContests from './UpcomingContests';
 import PastContests from './PastContests';
+import RunningContests from './RunningContests';
 
 const ContestPage = () => {
   const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
-  const [contestType, setContestType] = useState('all');
+  const [contestType, setContestType] = useState('system');
   const [activeTab, setActiveTab] = useState(0);
 
   // Get contest type from URL hash
@@ -27,7 +29,7 @@ const ContestPage = () => {
   }, [location]);
 
   const handleContestTypeChange = (event, newValue) => {
-    const types = ['all', 'system', 'icpc/ioi', 'custom'];
+    const types = ['system', 'icpc', 'gym', 'normal'];
     setContestType(types[newValue]);
     navigate(`#${types[newValue]}`);
   };
@@ -38,21 +40,32 @@ const ContestPage = () => {
       
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs 
-          value={['all', 'icpc/ioi', 'custom'].indexOf(contestType)}
+          value={['system', 'icpc', 'gym', 'normal'].indexOf(contestType)}
           onChange={handleContestTypeChange}
           aria-label="contest types"
         >
-          <Tab label="All Contests" />
           <Tab label="System" />
           <Tab label="ICPC/IOI" />
-          <Tab label="Custom" />
+          <Tab label="Gym" />
+          <Tab label="Normal" />
         </Tabs>
       </Box>
+
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h5" sx={{ mb: 2, color: 'error.main' }}>
+          Running Contests
+        </Typography>
+        <RunningContests contestType={contestType} />
+      </Box>
+
+      <Divider sx={{ my: 4 }} />
 
       <Box sx={{ mb: 4 }}>
         <Typography variant="h5" sx={{ mb: 2 }}>Upcoming Contests</Typography>
         <UpcomingContests contestType={contestType} />
       </Box>
+
+      <Divider sx={{ my: 4 }} />
 
       <Box>
         <Typography variant="h5" sx={{ mb: 2 }}>Past Contests</Typography>

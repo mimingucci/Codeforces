@@ -6,3 +6,4 @@ export * from "./MessageApi";
 export * from "./ProblemApi";
 export * from "./TestCaseApi";
 export * from "./SubmissionApi";
+export * from "./ContestApi";

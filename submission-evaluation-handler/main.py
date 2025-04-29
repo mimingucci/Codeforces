@@ -96,9 +96,7 @@ class SubmissionHandler(KafkaConsumer):
                     "endTime": convert_timestamp(event.endTime),
                     "eventType": "SUBMISSION"
                 }
-                print(message)
-                await notify_completion(submission_id=str(event.id), status=verdict.name, execution_time_ms=max_time_limit, memory_used_bytes=max_memory_limit)
-                # await publish_event("submission.update", message)
+                await publish_event("submission.update", message)
                 # if event.startTime <= event.sent_on and event.sent_on <= event.endTime:
                     # await publish_event("submission.result", message)
             else:
@@ -135,27 +133,12 @@ class SubmissionHandler(KafkaConsumer):
                     "endTime": convert_timestamp(event.endTime),
                     "eventType": "SUBMISSION"
                 }
-                print(message)
-                await notify_completion(submission_id=str(event.id), status=verdict.name, execution_time_ms=max_time_limit, memory_used_bytes=max_memory_limit)
-                # await publish_event("submission.update", message)
+                await publish_event("submission.update", message)
 
                 # if event.startTime <= event.sent_on and event.sent_on <= event.endTime:
                     # await publish_event("submission.result", message)
         except Exception as e: 
             print(f"Invalid message format: {e}")
-            
-
-@app.websocket("/api/ws/submissions/{submission_id}")
-async def subscribe_to_submission(websocket: WebSocket, submission_id: str):
-    await websocket.accept()
-    await notifier.subscribe(submission_id, websocket)
-    try:
-        while True:
-            # This loop keeps the connection alive
-            await websocket.receive_text()
-    finally:
-        await notifier.unsubscribe(submission_id, websocket)
-
 
 @app.on_event("startup")
 async def startup_event():

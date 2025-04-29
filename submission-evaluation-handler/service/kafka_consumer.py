@@ -9,7 +9,8 @@ class KafkaConsumer:
             bootstrap_servers=settings.kafka_bootstrap_servers,
             group_id=settings.kafka_consumer_group_id,
             value_deserializer=lambda v: json.loads(v.decode('utf-8')),
-            enable_auto_commit=False
+            enable_auto_commit=False,
+            auto_offset_reset='latest'
         )
         self.is_running = False
 

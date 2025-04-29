@@ -66,11 +66,12 @@ const Header = () => {
 
   const handleLogout = async () => {
     user = "";
-    const rs = await UserApi.logout(HandleCookies.getCookie("refreshToken"));
+    const rs = await UserApi.logout(HandleCookies.getCookie("token"));
     console.log(rs);
-    HandleCookies.setCookie("accessToken", "", 0);
-    HandleCookies.setCookie("refreshToken", "", 0);
+    HandleCookies.setCookie("token", "", 0);
     HandleCookies.setCookie("username", "", 0);
+    HandleCookies.setCookie("id", "", 0);
+    HandleCookies.setCookie("email", "", 0);
     window.location.replace("/");
   };
   useEffect(() => {
@@ -126,6 +127,7 @@ const Header = () => {
             <Toolbar>
               <Box sx={{ display: 'flex', gap: 2, flexGrow: 1 }}>
                 <Button href="http://localhost:3000/home" color="inherit">HOME</Button>
+                <Button href="http://localhost:3000/contests" color="inherit">CONTEST</Button>
                 <Button href="http://localhost:3000/ide" color="inherit">IDE</Button>
                 <Button href="http://localhost:3000/problems?page=0" color="inherit">PROBLEMSET</Button>
                 <Button href="http://localhost:3000/rating" color="inherit">TOP USER</Button>

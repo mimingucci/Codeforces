@@ -1,6 +1,7 @@
 package com.mimingucci.contest.infrastructure.repository.jpa;
 
 import com.mimingucci.contest.infrastructure.repository.entity.ContestEntity;
+import com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -44,5 +45,39 @@ public interface ContestJpaRepository extends JpaRepository<ContestEntity, Long>
     List<ContestEntity> findUpcomingSystemContests(
             @Param("now") Instant now,
             @Param("weekFromNow") Instant weekFromNow
+    );
+
+    @Query("SELECT c FROM ContestEntity c " +
+            "WHERE c.enabled = true " +
+            "AND c.startTime > :now " +
+            "AND c.startTime <= :endDate " +
+            "AND c.type = :type " +
+            "ORDER BY c.startTime ASC")
+    List<ContestEntity> findUpcomingContests(
+            @Param("now") Instant now,
+            @Param("endDate") Instant endDate,
+            @Param("type") ContestType type
+    );
+
+    @Query("SELECT c FROM ContestEntity c " +
+            "WHERE c.enabled = true " +
+            "AND c.endTime < :now " +
+            "AND (:type IS NULL OR c.type = :type) " +
+            "ORDER BY c.startTime DESC")
+    Page<ContestEntity> findPastContests(
+            @Param("now") Instant now,
+            @Param("type") ContestType type,
+            Pageable pageable
+    );
+
+    @Query("SELECT c FROM ContestEntity c " +
+            "WHERE c.enabled = true " +
+            "AND c.startTime <= :now " +
+            "AND c.endTime > :now " +
+            "AND (:type IS NULL OR c.type = :type) " +
+            "ORDER BY c.endTime ASC")
+    List<ContestEntity> findRunningContests(
+            @Param("now") Instant now,
+            @Param("type") ContestType type
     );
 }

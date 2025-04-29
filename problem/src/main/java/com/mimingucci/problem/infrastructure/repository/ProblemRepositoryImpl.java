@@ -24,6 +24,13 @@ public class ProblemRepositoryImpl implements ProblemRepository {
 
     @Override
     public Problem findById(Long id) {
+        Optional<ProblemEntity> optional = this.jpaRepository.findByIdAndIsPublishedTrue(id);
+        if (optional.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
+        return ProblemConverter.INSTANCE.toDomain(optional.get());
+    }
+
+    @Override
+    public Problem findByIdDev(Long id) {
         Optional<ProblemEntity> optional = this.jpaRepository.findById(id);
         if (optional.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
         return ProblemConverter.INSTANCE.toDomain(optional.get());

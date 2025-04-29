@@ -4,6 +4,7 @@ import com.mimingucci.contest.application.ContestApplicationService;
 import com.mimingucci.contest.common.constant.PathConstants;
 import com.mimingucci.contest.common.enums.Role;
 import com.mimingucci.contest.domain.model.ContestRegistration;
+import com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType;
 import com.mimingucci.contest.presentation.api.ContestController;
 import com.mimingucci.contest.presentation.dto.request.ContestCreateRequest;
 import com.mimingucci.contest.presentation.dto.request.ContestRegistrationDto;
@@ -28,13 +29,31 @@ import java.util.Set;
 public class ContestControllerImpl implements ContestController {
     private final ContestApplicationService service;
 
-    @GetMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION + PathConstants.ALL)
+    @GetMapping(path = PathConstants.UP_COMING)
+    @Override
+    public BaseResponse<List<ContestResponse>> getUpcomingContest(@RequestParam(name = "type", defaultValue = "SYSTEM") ContestType type,@RequestParam(name = "next", defaultValue = "7") Integer next) {
+        return BaseResponse.success(service.getUpcomingContests(type, next));
+    }
+
+    @GetMapping(path = PathConstants.PAST)
+    @Override
+    public BaseResponse<PageableResponse<ContestResponse>> getPastContest(@RequestParam(name = "type", defaultValue = "SYSTEM") ContestType type, Pageable pageable) {
+        return BaseResponse.success(service.getPastContests(type, pageable));
+    }
+
+    @GetMapping(path = PathConstants.RUNNING)
+    @Override
+    public BaseResponse<List<ContestResponse>> getRunningContest(@RequestParam(name = "type", defaultValue = "SYSTEM") ContestType type) {
+        return BaseResponse.success(service.getRunningContests(type));
+    }
+
+    @GetMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION + PathConstants.PAGEABLE)
     @Override
     public BaseResponse<PageableResponse<ContestRegistrationDto>> getListRegisters(@PathVariable(name = "contestId") Long contestId, Pageable pageable) {
         return BaseResponse.success(service.getListRegisters(contestId, pageable));
     }
 
-    @PostMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION + PathConstants.ALL)
+    @GetMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION + PathConstants.ALL)
     @Override
     public BaseResponse<List<ContestRegistrationDto>> getAll(@PathVariable(name = "contestId") Long contestId) {
         return BaseResponse.success(service.getAll(contestId));
@@ -48,14 +67,14 @@ public class ContestControllerImpl implements ContestController {
 
     @PostMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION)
     @Override
-    public BaseResponse<ContestRegistrationDto> register(@PathVariable(name = "contestId") Long contestId, HttpServletRequest request, ContestRegistrationDto dto) {
+    public BaseResponse<ContestRegistrationDto> register(@PathVariable(name = "contestId") Long contestId, HttpServletRequest request, @RequestBody @Validated ContestRegistrationDto dto) {
         dto.setContest(contestId);
         return BaseResponse.success(service.registerContest((Long) request.getAttribute("userId"), dto));
     }
 
     @PutMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION)
     @Override
-    public BaseResponse<ContestRegistrationDto> updateRegister(@PathVariable(name = "contestId") Long contestId, HttpServletRequest request, ContestRegistrationDto dto) {
+    public BaseResponse<ContestRegistrationDto> updateRegister(@PathVariable(name = "contestId") Long contestId, HttpServletRequest request, @RequestBody @Validated ContestRegistrationDto dto) {
         dto.setContest(contestId);
         return BaseResponse.success(service.updateRegister((Long) request.getAttribute("userId"), dto));
     }

@@ -10,7 +10,7 @@ import {
   Chip
 } from '@mui/material';
 
-const ContestProblems = ({ contest }) => {
+const ContestProblems = ({ problems }) => {
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -22,14 +22,14 @@ const ContestProblems = ({ contest }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {contest?.problems?.map((problem, index) => (
-            <TableRow key={problem.id}>
+          {problems?.map((problem, index) => (
+            <TableRow key={problem?.id}>
               <TableCell>{String.fromCharCode(65 + index)}</TableCell>
               <TableCell>
-                <Link href={`/contest/${contest.id}/problem/${problem.id}`}>
-                  {problem.name}
+                <Link href={`/problem/${problem?.id}`}>
+                  {problem.title}
                 </Link>
-                {problem.tags?.map(tag => (
+                {problem?.tags?.map(tag => (
                   <Chip
                     key={tag}
                     label={tag}
@@ -38,7 +38,7 @@ const ContestProblems = ({ contest }) => {
                   />
                 ))}
               </TableCell>
-              <TableCell align="center">{problem.solvedBy}</TableCell>
+              <TableCell align="center">{problem?.solvedBy}</TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -1,0 +1,38 @@
+import axios from "axios";
+const JSONbig = require('json-bigint')({ storeAsString: true });
+
+const BASE_URL = "http://localhost:8080/api/v1/contest";
+
+class ContestApi {
+  getContestById(id) {
+    return axios.get(BASE_URL + '/' + id, {
+      transformResponse: (data) => {
+        const res = JSONbig.parse(data);
+        return res;
+      },
+    });
+  }
+  getUpcomingContests({ days = 7, type = "SYSTEM" }) {
+    return axios.get(BASE_URL + `/coming?next=${days}&type=${type}`, {
+      transformResponse: (data) => {
+        return JSONbig.parse(data);
+      },
+    });
+  }
+  getPastContests({ page = 0, type = "SYSTEM", size = 20 }) {
+    return axios.get(BASE_URL + `/past?page=${page}&type=${type}&size=${size}`, {
+      transformResponse: (data) => {
+        return JSONbig.parse(data);
+      },
+    });
+  }
+  getRunningContests({ type = "SYSTEM" }) {
+    return axios.get(BASE_URL + `/running?type=${type}`, {
+      transformResponse: (data) => {
+        return JSONbig.parse(data);
+      },
+    });
+  }
+}
+
+export default new ContestApi();

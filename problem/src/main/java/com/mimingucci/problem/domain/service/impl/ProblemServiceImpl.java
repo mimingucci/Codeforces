@@ -64,7 +64,7 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public Problem findByIdDev(Long problemId, Long userId) {
-        Problem problem = this.repository.findById(problemId);
+        Problem problem = this.repository.findByIdDev(problemId);
         try {
             BaseResponse<ContestResponse> contest = this.contestClient.getContestById(problem.getContest());
             if (contest.data().getAuthors().contains(userId) || contest.data().getCoordinators().contains(userId) || contest.data().getTesters().contains(userId) || contest.data().getStartTime().isBefore(Instant.now())) {

@@ -9,6 +9,8 @@ import java.util.List;
 public interface ProblemRepository {
     Problem findById(Long id);
 
+    Problem findByIdDev(Long id);
+
     Problem createProblem(Problem domain);
 
     Page<Problem> findProblems(Pageable pageable);

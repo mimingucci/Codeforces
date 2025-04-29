@@ -8,6 +8,7 @@ import com.mimingucci.contest.domain.model.Contest;
 import com.mimingucci.contest.domain.model.ContestRegistration;
 import com.mimingucci.contest.domain.service.ContestRegistrationService;
 import com.mimingucci.contest.domain.service.ContestService;
+import com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType;
 import com.mimingucci.contest.presentation.dto.request.ContestCreateRequest;
 import com.mimingucci.contest.presentation.dto.request.ContestRegistrationDto;
 import com.mimingucci.contest.presentation.dto.request.ContestUpdateRequest;
@@ -96,5 +97,20 @@ public class ContestApplicationServiceImpl implements ContestApplicationService 
         Contest contest = service.getContest(contestId);
         ContestRegistration registration = registrationService.getById(userId, contestId);
         return new ContestantCheckResponse(contestId, contest.getStartTime(), contest.getEndTime(), registration.getUser(), registration.getRated(), registration.getParticipated(), contest.getType());
+    }
+
+    @Override
+    public List<ContestResponse> getUpcomingContests(ContestType type, Integer next) {
+        return service.getUpcomingContests(type, next).stream().map(ContestAssembler.INSTANCE::domainToResponse).toList();
+    }
+
+    @Override
+    public PageableResponse<ContestResponse> getPastContests(ContestType type, Pageable pageable) {
+        return ContestAssembler.INSTANCE.pageToResponse(service.getPastContests(type, pageable));
+    }
+
+    @Override
+    public List<ContestResponse> getRunningContests(ContestType type) {
+        return service.getRunningContests(type).stream().map(ContestAssembler.INSTANCE::domainToResponse).toList();
     }
 }
