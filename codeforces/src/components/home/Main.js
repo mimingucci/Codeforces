@@ -19,7 +19,6 @@ import EditBlog from "./EditBlog";
 import ErrorPage from "../ErrorPage";
 import Submission from "./Submission";
 import SubmitDetail from "./SubmitDetail";
-import UserBlog from "./UserBlog";
 import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPassword";
 import ChatPage from "../Chat/ChatPage";
@@ -65,7 +64,6 @@ const Main = () => {
         <Route path={path.EDITBLOG} element={<EditBlog />} />
         <Route path={path.SUBMIT} element={<Submission />} />
         <Route path={path.SUBMITDETAIL} element={<SubmitDetail />} />
-        <Route path={path.USERBLOG} element={<UserBlog />} />
         <Route path={path.FORGOTPASSWORD} element={<ForgotPassword />} />
         <Route path={path.RESETPASSWORD} element={<ResetPassword />} />
         <Route path={path.CHAT} element={<ChatPage />} />

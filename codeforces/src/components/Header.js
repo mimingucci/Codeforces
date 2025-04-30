@@ -56,8 +56,8 @@ const Header = () => {
   };
 
   const checkLogin = () => {
-    if (HandleCookies.getCookie("username")?.length > 0) {
-      user = HandleCookies.getCookie("username");
+    if (HandleCookies.getCookie("id")?.length > 0) {
+      user = HandleCookies.getCookie("id");
       return true;
     } else {
       return false;
@@ -66,8 +66,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     user = "";
-    const rs = await UserApi.logout(HandleCookies.getCookie("token"));
-    console.log(rs);
+    await UserApi.logout(HandleCookies.getCookie("token"));
     HandleCookies.setCookie("token", "", 0);
     HandleCookies.setCookie("username", "", 0);
     HandleCookies.setCookie("id", "", 0);
@@ -102,7 +101,7 @@ const Header = () => {
                   href={`http://localhost:3000/profile/${user}`}
                   color="inherit"
                 >
-                  {user}
+                  Profile
                 </Button>
                 <Button 
                   color="inherit"

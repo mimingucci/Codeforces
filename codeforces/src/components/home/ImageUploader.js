@@ -1,90 +1,325 @@
 import { useState, useRef } from "react";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Typography,
+  CircularProgress,
+  Alert,
+  Avatar,
+} from "@mui/material";
+import {
+  PhotoCamera,
+  Clear,
+  Upload,
+  AccountCircle,
+} from "@mui/icons-material";
+import { DeleteOutline } from '@mui/icons-material';
+import Cropper from "react-easy-crop";
 import HandleCookies from "../../utils/HandleCookies";
 import UserApi from "../../getApi/UserApi";
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif"];
+
 export default function ImageUploader({ user, isHome = false }) {
-  // FIles States
   const [imagePreview, setImagePreview] = useState(null);
   const [avatar, setAvatar] = useState(null);
-  // FIle Picker Ref because we are not useing the standard File picker input
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [cropDialogOpen, setCropDialogOpen] = useState(false);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [confirmUnsetOpen, setConfirmUnsetOpen] = useState(false);
+
+
   const filePicekerRef = useRef(null);
 
-  function previewFile(e) {
-    // Reading New File (open file Picker Box)
-    const reader = new FileReader();
+  const validateFile = (file) => {
+    if (!file) return "No file selected";
+    if (!ALLOWED_TYPES.includes(file.type)) return "Invalid file type";
+    if (file.size > MAX_FILE_SIZE) return "File size too large (max 5MB)";
+    return null;
+  };
 
-    // Gettting Selected File (user can select multiple but we are choosing only one)
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      reader.readAsDataURL(selectedFile);
-      setAvatar(selectedFile);
+  const getCurrentAvatar = () => {
+    if (imagePreview) return imagePreview;
+    return user?.avatar || null;
+  };
+
+  const previewFile = async (e) => {
+    try {
+      const file = e.target.files[0];
+      const errorMessage = validateFile(file);
+      if (errorMessage) {
+        setError(errorMessage);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        setImagePreview(reader.result);
+        setAvatar(file);
+        setCropDialogOpen(true);
+        setError("");
+      };
+    } catch (err) {
+      setError("Error reading file");
     }
+  };
 
-    // As the File loaded then set the stage as per the file type
-    reader.onload = (readerEvent) => {
-      setImagePreview(readerEvent.target.result);
-    };
-  }
+  const onCropComplete = (croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  };
 
-  function clearFiles() {
-    setImagePreview(null);
-    setAvatar(null);
-  }
+  const getCroppedImage = async () => {
+    try {
+      const canvas = document.createElement("canvas");
+      const image = new Image();
+      image.src = imagePreview;
+      
+      await new Promise((resolve) => {
+        image.onload = resolve;
+      });
 
-  function handleUploadAvatar() {
-    UserApi.unsetImage(HandleCookies.getCookie("accessToken"))
-      .then(() =>
-        UserApi.uploadImage({
-          file: avatar,
-          accessToken: HandleCookies.getCookie("accessToken"),
-        })
-      )
-      .then(() => window.location.replace("/profile/" + user?.username))
-      .catch((err) => alert("Something went wrong!!!"));
-  }
+      canvas.width = croppedAreaPixels.width;
+      canvas.height = croppedAreaPixels.height;
+      const ctx = canvas.getContext("2d");
+
+      ctx.drawImage(
+        image,
+        croppedAreaPixels.x,
+        croppedAreaPixels.y,
+        croppedAreaPixels.width,
+        croppedAreaPixels.height,
+        0,
+        0,
+        croppedAreaPixels.width,
+        croppedAreaPixels.height
+      );
+
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => {
+          resolve(blob);
+        }, "image/jpeg");
+      });
+    } catch (err) {
+      console.error(err);
+      setError("Error cropping image");
+      return null;
+    }
+  };
+
+  const handleUploadAvatar = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const croppedImage = await getCroppedImage();
+      if (!croppedImage) return;
+
+      await UserApi.unsetImage(HandleCookies.getCookie("token"));
+      await UserApi.uploadImage({
+        file: croppedImage,
+        accessToken: HandleCookies.getCookie("token"),
+      });
+
+      window.location.replace("/profile/" + user?.username);
+    } catch (err) {
+      setError("Failed to upload image");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUnsetAvatar = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      
+      await UserApi.unsetImage(HandleCookies.getCookie("token"));
+      window.location.replace("/profile/" + user?.username);
+    } catch (err) {
+      setError("Failed to remove avatar");
+    } finally {
+      setLoading(false);
+      setConfirmUnsetOpen(false);
+    }
+  };
 
   return (
-    <div>
-      <div className="btn-container">
-        <input
-          ref={filePicekerRef}
-          accept="image/*"
-          onChange={previewFile}
-          type="file"
-          hidden
-        />
-        {isHome && (
-          <button
-            className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
-            onClick={() => filePicekerRef.current.click()}
-          >
-            Change
-          </button>
-        )}
-        {imagePreview && (
-          <button
-            className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 mx-3 border-b-4 border-blue-700 hover:border-blue-500 rounded"
-            onClick={clearFiles}
-          >
-            Cancer
-          </button>
-        )}
-        {imagePreview && (
-          <button
-            className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded"
-            onClick={handleUploadAvatar}
-          >
-            Upload
-          </button>
-        )}
-      </div>
+    <Box sx={{ textAlign: "center" }}>
+      <input
+        ref={filePicekerRef}
+        accept="image/*"
+        onChange={previewFile}
+        type="file"
+        hidden
+      />
+      
+      <Box sx={{ mb: 2 }}>
+        {error && <Alert severity="error">{error}</Alert>}
+      </Box>
 
-      <div className="preview">
-        {imagePreview != null ? (
-          <img src={imagePreview} alt="" />
+      <Box sx={{ position: "relative", width: 200, height: 200, margin: "auto", mb: 2 }}>
+      {getCurrentAvatar() ? (
+          <Box
+            component="img"
+            src={getCurrentAvatar()}
+            alt="Profile"
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              borderRadius: "50%",
+            }}
+          />
         ) : (
-          <img src={user?.avatar} />
+          <Avatar
+            sx={{
+              width: "100%",
+              height: "100%",
+              '&:hover': {
+                opacity: 0.8,
+                transition: 'opacity 0.2s'
+              }
+            }}
+          >
+            <AccountCircle sx={{ width: "60%", height: "60%" }} />
+          </Avatar>
         )}
-      </div>
-    </div>
+        {isHome && (
+          <Box sx={{ 
+            position: 'absolute', 
+            bottom: 0, 
+            right: 0, 
+            display: 'flex', 
+            gap: 1 
+          }}>
+            <IconButton
+              sx={{
+                backgroundColor: "error.main",
+                "&:hover": { backgroundColor: "error.dark" },
+                color: "white",
+              }}
+              onClick={() => setConfirmUnsetOpen(true)}
+              disabled={loading}
+            >
+              <DeleteOutline />
+            </IconButton>
+            <IconButton
+              sx={{
+                backgroundColor: "primary.main",
+                "&:hover": { backgroundColor: "primary.dark" },
+                color: "white",
+              }}
+              onClick={() => filePicekerRef.current.click()}
+              disabled={loading}
+            >
+              <PhotoCamera />
+            </IconButton>
+          </Box>
+        )}
+      </Box>
+
+      {imagePreview && (
+        <Box sx={{ display: "flex", gap: 2, justifyContent: "center" }}>
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<Clear />}
+            onClick={() => {
+              setImagePreview(null);
+              setAvatar(null);
+              setError("");
+              if (filePicekerRef.current) {
+                filePicekerRef.current.value = '';
+              }
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<Upload />}
+            onClick={handleUploadAvatar}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} /> : "Upload"}
+          </Button>
+        </Box>
+      )}
+
+      <Dialog
+        open={cropDialogOpen}
+        maxWidth="md"
+        fullWidth
+        onClose={() => setCropDialogOpen(false)}
+      >
+        <DialogTitle>Crop Image</DialogTitle>
+        <DialogContent>
+          <Box sx={{ position: "relative", height: 400 }}>
+            <Cropper
+              image={imagePreview}
+              crop={crop}
+              zoom={zoom}
+              aspect={1}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={onCropComplete}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCropDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={() => {
+              setCropDialogOpen(false);
+            }}
+            variant="contained"
+          >
+            Apply
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+      open={confirmUnsetOpen}
+      onClose={() => setConfirmUnsetOpen(false)}
+      aria-labelledby="unset-avatar-dialog"
+    >
+      <DialogTitle id="unset-avatar-dialog">
+        Remove Profile Picture
+      </DialogTitle>
+      <DialogContent>
+        <Typography>
+          Are you sure you want to remove your profile picture? This action cannot be undone.
+        </Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button 
+          onClick={() => setConfirmUnsetOpen(false)}
+          disabled={loading}
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={handleUnsetAvatar}
+          color="error"
+          variant="contained"
+          disabled={loading}
+          startIcon={loading ? <CircularProgress size={20} /> : <DeleteOutline />}
+        >
+          {loading ? "Removing..." : "Remove"}
+        </Button>
+      </DialogActions>
+    </Dialog>
+    </Box>
   );
 }

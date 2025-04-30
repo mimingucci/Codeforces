@@ -41,8 +41,7 @@ class UserApi {
   getUserById(id) {
     return axios.get(BASE_URL + "/" + id, {
       transformResponse: (data) => {
-        const res = JSONbig.parse(data);
-        return res;
+        return JSONbig.parse(data);
       },
     });
   }
@@ -93,14 +92,14 @@ class UserApi {
   uploadImage({ file, accessToken }) {
     const formData = new FormData();
     formData.append("avatar", file);
-    return axios.put(BASE_URL + "/avatar", formData, {
+    return axios.post(BASE_URL + "/avatar", formData, {
       headers: {
         Authorization: "Bearer " + accessToken,
       },
     });
   }
   unsetImage(accessToken) {
-    return axios.delete(BASE_URL + "/unset-avatar", {
+    return axios.delete(BASE_URL + "/avatar", {
       headers: {
         Authorization: "Bearer " + accessToken,
       },

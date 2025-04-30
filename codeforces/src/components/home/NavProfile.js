@@ -1,31 +1,49 @@
-import { useNavigate } from "react-router-dom";
+import { Box, Tabs, Tab } from '@mui/material';
+import { useState } from 'react';
 
-const NavProfile = ({ username }) => {
-  const navigate = useNavigate();
-  const handleNavigate = (url) => {
-    navigate(url);
+const NavProfile = ({ id, onTabChange }) => {
+  const [activeTab, setActiveTab] = useState(0);
+
+  const tabs = [
+    { label: 'Overview' },
+    { label: 'Blog' },
+    { label: 'Submissions' }
+  ];
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+    onTabChange?.(newValue); // Call parent handler to update content
   };
+
   return (
-    <div class="navbar" className="text-left gap-3 flex items-center h-10">
-      <div>
-        <button onClick={() => handleNavigate(`/profile/${username}`)}>
-          Home
-        </button>
-      </div>
-      <div>
-        {" "}
-        <button onClick={() => handleNavigate(`/userblog/${username}`)}>
-          Blog
-        </button>
-      </div>
-      <div>
-        <button
-          onClick={() => handleNavigate(`/profile/submissions/${username}/1`)}
-        >
-          Submissions
-        </button>
-      </div>
-    </div>
+    <Box sx={{ 
+      borderBottom: 1, 
+      borderColor: 'divider',
+      mb: 3,
+      mt: 2
+    }}>
+      <Tabs 
+        value={activeTab} 
+        onChange={handleTabChange}
+        indicatorColor="primary"
+        textColor="primary"
+        sx={{
+          '& .MuiTab-root': {
+            textTransform: 'none',
+            minWidth: 100,
+            fontWeight: 'medium',
+          }
+        }}
+      >
+        {tabs.map((tab, index) => (
+          <Tab 
+            key={index} 
+            label={tab.label}
+            sx={{ '&:hover': { color: 'primary.main' } }}
+          />
+        ))}
+      </Tabs>
+    </Box>
   );
 };
 

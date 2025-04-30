@@ -4,7 +4,7 @@ const path = {
   LOGIN: "/login",
   STAR: "*",
   API_SEARCH_ALL: "/search",
-  USER: "/profile/:username",
+  USER: "/profile/:id",
   IDE: "/ide",
   SETTING: "/setting/:username",
   SIGNUP: "/signup",
@@ -24,7 +24,6 @@ const path = {
   CONTEST: "/contests",
   CONTESTDETAIL: "/contest/:id",
   SUBMITDETAIL: "/submission/:id",
-  USERBLOG: "/userblog/:author",
   FORGOTPASSWORD: "/forgot-password",
   RESETPASSWORD: "/api/auth/reset-password/:token/:email",
 };

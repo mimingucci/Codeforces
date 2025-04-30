@@ -14,22 +14,22 @@ import {
   Divider,
   Link
 } from '@mui/material';
-
 const { FaArrowRightLong, FaStar, GoDotFill } = icons;
-let user = "";
+
+let userId = HandleCookies.getCookie("id") || "";
 const NavbarPart1 = () => {
   const [detain, setDetain] = useState();
 
   const checkLogin = () => {
-    if (HandleCookies.getCookie("username")?.length > 0) {
-      user = HandleCookies.getCookie("username");
+    if (HandleCookies.getCookie("id")?.length > 0) {
+      userId = HandleCookies.getCookie("id") || ""
       return true;
     }
     return false;
   };
 
   const getDetainUser = () => {
-    UserApi.getUserByUsername(user).then((res) => setDetain(res?.data?.data));
+    UserApi.getUserById(userId).then((res) => setDetain(res?.data?.data));
   };
 
   useEffect(() => {
@@ -114,7 +114,7 @@ const NavbarPart1 = () => {
           justifyContent: 'center',
           alignItems: 'flex-start'
         }}>
-          <Link href={`/profile/${detain?.username}`}>
+          <Link href={`/profile/${detain?.id}`}>
             <Avatar
               src={detain?.avatar}
               alt={detain?.username}
