@@ -46,7 +46,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User update(User domain) {
-        Optional<UserEntity> optional = this.userJpaRepository.findByEmail(domain.getEmail());
+        Optional<UserEntity> optional = this.userJpaRepository.findById(domain.getId());
         if (optional.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         UserEntity entity = optional.get();
         if (domain.getFirstname() != null) entity.setFirstname(domain.getFirstname());
@@ -57,6 +57,16 @@ public class UserRepositoryImpl implements UserRepository {
         if (domain.getContribute() != null) entity.setContribute(domain.getContribute());
         UserEntity updatedEntity = this.userJpaRepository.save(entity);
         return converter.toDomain(updatedEntity);
+    }
+
+    @Override
+    public Boolean unsetAvatar(Long userId) {
+        Optional<UserEntity> optional = this.userJpaRepository.findById(userId);
+        if (optional.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        UserEntity entity = optional.get();
+        entity.setAvatar(null);
+        this.userJpaRepository.save(entity);
+        return true;
     }
 
     @Override

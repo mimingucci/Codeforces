@@ -89,7 +89,7 @@ public class ContestControllerImpl implements ContestController {
     @GetMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION)
     @Override
     public BaseResponse<ContestRegistrationDto> getRegisterById(@PathVariable(name = "contestId") Long contestId, HttpServletRequest request) {
-        return BaseResponse.success(service.getRegisterById((Long) request.getAttribute("userId"), contestId));
+        return BaseResponse.success(service.getRegisterById(contestId, request));
     }
 
     @GetMapping(path = PathConstants.CONTEST_ID + PathConstants.CHECK)

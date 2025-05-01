@@ -35,6 +35,12 @@ public class BlogControllerImpl implements BlogController {
         return BaseResponse.success(applicationService.uploadImage(file, request));
     }
 
+    @GetMapping(path = PathConstants.USER + PathConstants.USER_ID)
+    @Override
+    public BaseResponse<PageableResponse<BlogGetResponse>> getBlogsByAuthor(@PathVariable(name = "userId") Long id, Pageable pageable) {
+        return BaseResponse.success(applicationService.getByAuthor(id, pageable));
+    }
+
     @PutMapping(path = PathConstants.BLOG_ID + PathConstants.LIKE)
     @Override
     public BaseResponse<BlogGetResponse> likeBlog(@PathVariable("blogId") Long blogId, HttpServletRequest request) {

@@ -26,4 +26,6 @@ public interface BlogApplicationService {
     BlogGetResponse dislike(Long blogId, HttpServletRequest request);
 
     String uploadImage(MultipartFile file, HttpServletRequest request);
+
+    PageableResponse<BlogGetResponse> getByAuthor(Long id, Pageable pageable);
 }

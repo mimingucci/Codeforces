@@ -1,5 +1,7 @@
 package com.mimingucci.user.domain.service.impl;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.mimingucci.user.common.constant.ErrorMessageConstants;
 import com.mimingucci.user.common.enums.Role;
 import com.mimingucci.user.common.exception.ApiRequestException;
@@ -13,7 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +27,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+
+    private final Cloudinary cloudinary;
 
     @Override
     public User updateUserInfo(User domain) {
@@ -117,5 +123,44 @@ public class UserServiceImpl implements UserService {
         else user.getRoles().add(Role.ADMIN);
         this.userRepository.update(user);
         return true;
+    }
+
+    @Override
+    public String uploadAvatar(MultipartFile file, Long userId) {
+        try {
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            String url = uploadResult.get("url").toString();
+            this.userRepository.update(User.builder().id(userId).avatar(url).build());
+            return url;
+        } catch (IOException e) {
+            throw new ApiRequestException(ErrorMessageConstants.UPLOAD_IMAGE_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean unsetAvatar(Long userId) {
+        User user = this.userRepository.findById(userId);
+        if (user == null) {
+            throw new ApiRequestException(ErrorMessageConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+
+        try {
+            // If user has an avatar URL and it's from Cloudinary, delete it
+            if (user.getAvatar() != null) {
+                // Extract public_id from the URL (you might need to adjust this based on your URL format)
+                String publicId = user.getAvatar().substring(user.getAvatar().lastIndexOf("/") + 1,
+                        user.getAvatar().lastIndexOf("."));
+                // Delete from Cloudinary
+                cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+            }
+
+            // Update user with null avatar
+            this.userRepository.unsetAvatar(userId);
+
+            return true;
+        } catch (IOException e) {
+            throw new ApiRequestException(ErrorMessageConstants.UPLOAD_IMAGE_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

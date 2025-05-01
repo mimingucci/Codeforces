@@ -107,4 +107,9 @@ public class BlogApplicationServiceImpl implements BlogApplicationService {
         if (userId == null) throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         return this.service.uploadFile(file);
     }
+
+    @Override
+    public PageableResponse<BlogGetResponse> getByAuthor(Long id, Pageable pageable) {
+        return BlogAssembler.INSTANCE.pageToResponse(this.service.getAllByUserId(id, pageable));
+    }
 }

@@ -5,8 +5,8 @@ const BASE_URL = "http://localhost:8080/api/v1/blog";
 const COMMENT_URL = "http://localhost:8080/api/v1/comment";
 
 class BlogApi {
-  getAllBlogs() {
-    return axios.get(BASE_URL + "/all", {
+  getAllBlogs(page = 0) {
+    return axios.get(BASE_URL + `/all?page=${page}`, {
       transformResponse: (data) => {
         return JSONbig.parse(data);
       },
@@ -14,6 +14,13 @@ class BlogApi {
   }
   getBlogById(id) {
     return axios.get(BASE_URL + "/" + id, {
+      transformResponse: (data) => {
+        return JSONbig.parse(data);
+      },
+    });
+  }
+  getBlogByAuthor(id, page) {
+    return axios.get(BASE_URL + `/user/${id}?page=${page}`, {
       transformResponse: (data) => {
         return JSONbig.parse(data);
       },
@@ -42,22 +49,22 @@ class BlogApi {
   updateLike({ blog, accessToken }) {
     return axios.put(
       BASE_URL + `/${blog}/like`,
-      { blog },
-      { headers: { Authorization: "Bearer " + accessToken }}, 
-      { transformResponse: (data) => {
+      null,
+      { headers: { Authorization: "Bearer " + accessToken }, 
+        transformResponse: (data) => {
           return JSONbig.parse(data);
-        },
+        }
       }
     );
   }
   updateDislike({ blog, accessToken }) {
     return axios.put(
       BASE_URL + `/${blog}/dislike`,
-      { blog },
-      { headers: { Authorization: "Bearer " + accessToken } },
-      { transformResponse: (data) => {
+      null,
+      { headers: { Authorization: "Bearer " + accessToken }, 
+        transformResponse: (data) => {
           return JSONbig.parse(data);
-        },
+        }
       }
     );
   }

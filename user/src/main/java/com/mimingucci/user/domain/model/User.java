@@ -2,6 +2,7 @@ package com.mimingucci.user.domain.model;
 
 import com.mimingucci.user.common.enums.Role;
 import com.mimingucci.user.domain.model.chat.UserStatus;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.Instant;
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@Builder
 public class User {
     private Long id;
 

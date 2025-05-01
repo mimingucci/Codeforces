@@ -8,6 +8,7 @@ import com.mimingucci.contest.presentation.dto.request.ContestUpdateRequest;
 import com.mimingucci.contest.presentation.dto.response.ContestResponse;
 import com.mimingucci.contest.presentation.dto.response.ContestantCheckResponse;
 import com.mimingucci.contest.presentation.dto.response.PageableResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public interface ContestApplicationService {
 
     PageableResponse<ContestRegistrationDto> getListRegisters(Long contestId, Pageable pageable);
 
-    ContestRegistrationDto getRegisterById(Long userId, Long contestId);
+    ContestRegistrationDto getRegisterById(Long contestId, HttpServletRequest request);
 
     ContestRegistrationDto updateRegister(Long userId, ContestRegistrationDto request);
 

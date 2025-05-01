@@ -5,10 +5,18 @@ import {
   Card, 
   CardContent, 
   IconButton, 
-  Chip,
   Stack,
-  Divider
+  Divider,
+  ButtonGroup,
+  Badge,
+  Tooltip
 } from '@mui/material';
+import {
+  ThumbUpAlt,
+  ThumbUpOffAlt,
+  ThumbDownAlt,
+  ThumbDownOffAlt
+} from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { useState } from "react";
 import icons from "../../utils/icons";
@@ -22,10 +30,7 @@ import Ranking from "./Ranking";
 import Overlay from "./Overlay";
 
 const {
-  FaAnglesRight,
   RiAttachment2,
-  BiSolidUpArrow,
-  BiSolidDownArrow,
   FaUser,
   BsCalendar2DateFill,
   IoIosChatboxes,
@@ -50,10 +55,15 @@ const StatsContainer = styled(Box)(({ theme }) => ({
 }));
 
 const Blog = ({ blog }) => {
-  const [like, setLike] = useState(blog?.likes.length - blog?.dislikes.length);
+  const [likes, setLikes] = useState(blog?.likes || []);
+  const [dislikes, setDislikes] = useState(blog?.dislikes || []);  
   const [show, setShow] = useState(false);
   const [deleted, setDeleted] = useState(false);
   const navigate = useNavigate();
+
+  const userId = HandleCookies.getCookie("id");
+  const hasLiked = userId && likes.includes(userId);
+  const hasDisliked = userId && dislikes.includes(userId);
 
   const handleLike = async () => {
     const accessToken = HandleCookies.getCookie("token");
@@ -64,10 +74,13 @@ const Blog = ({ blog }) => {
     const id = blog?.id;
     try {
       const res = await BlogApi.updateLike({ blog: id, accessToken });
-      showSuccessToast("Update like successfully");
-      setLike(res?.data?.data?.likes.length - res?.data?.data?.dislikes.length);
+      if (res?.data?.code === "200") {
+        setLikes(res.data.data.likes);
+        setDislikes(res.data.data.dislikes);
+        showSuccessToast("Like updated successfully");
+      }
     } catch (error) {
-      showErrorToast("Update like failed");
+      showErrorToast("Failed to update like");
     }
   };
 
@@ -80,10 +93,13 @@ const Blog = ({ blog }) => {
     const id = blog?.id;
     try {
       const res = await BlogApi.updateDislike({ blog: id, accessToken });
-      showSuccessToast("Update dislike successfully");
-      setLike(res?.data?.data?.likes.length - res?.data?.data?.dislikes.length);
+      if (res?.data?.code === "200") {
+        setLikes(res.data.data.likes);
+        setDislikes(res.data.data.dislikes);
+        showSuccessToast("Dislike updated successfully");
+      }
     } catch (error) {
-      showErrorToast("Update dislike failed");
+      showErrorToast("Failed to update dislike");
     }
   };
 
@@ -246,23 +262,54 @@ const Blog = ({ blog }) => {
         {/* Stats */}
         <StatsContainer>
           {/* Voting */}
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton onClick={handleLike} size="small">
-              <BiSolidUpArrow color={like >= 0 ? '#4caf50' : undefined} />
-            </IconButton>
-            <Typography 
-              variant="subtitle1" 
-              sx={{ 
-                fontWeight: 'bold',
-                color: like >= 0 ? 'success.main' : 'error.main',
-                mx: 1
-              }}
-            >
-              {like}
-            </Typography>
-            <IconButton onClick={handleDislike} size="small">
-              <BiSolidDownArrow color="#f44336" />
-            </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Tooltip title={hasLiked ? "Unlike" : "Like"}>
+                <IconButton 
+                  onClick={handleLike}
+                  sx={{ 
+                    color: hasLiked ? 'primary.main' : 'action.disabled',
+                    '&:hover': { 
+                      bgcolor: 'transparent',
+                      color: 'primary.main' 
+                    }
+                  }}
+                >
+                  <ThumbUpAlt />
+                </IconButton>
+              </Tooltip>
+              <Typography 
+                variant="body2" 
+                color={hasLiked ? "primary" : "text.secondary"}
+                sx={{ minWidth: 20 }}
+              >
+                {likes.length > 0 ? likes.length : '0'}
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Tooltip title={hasDisliked ? "Remove dislike" : "Dislike"}>
+                <IconButton
+                  onClick={handleDislike}
+                  sx={{ 
+                    color: hasDisliked ? 'primary.main' : 'action.disabled',
+                    '&:hover': { 
+                      bgcolor: 'transparent',
+                      color: 'primary.main' 
+                    }
+                  }}
+                >
+                  <ThumbDownAlt />
+                </IconButton>
+              </Tooltip>
+              <Typography 
+                variant="body2" 
+                color={hasDisliked ? "primary" : "text.secondary"}
+                sx={{ minWidth: 20 }}
+              >
+                {dislikes.length > 0 ? dislikes.length : '0'}
+              </Typography>
+            </Box>
           </Box>
 
           <Divider orientation="vertical" flexItem />

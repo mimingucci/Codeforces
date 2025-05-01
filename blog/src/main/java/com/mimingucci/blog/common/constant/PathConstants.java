@@ -10,4 +10,6 @@ public class PathConstants {
     public static final String LIKE = "/like";
     public static final String DISLIKE = "/dislike";
     public static final String UPLOAD = "/upload";
+    public static final String USER = "/user";
+    public static final String USER_ID = "/{userId}";
 }

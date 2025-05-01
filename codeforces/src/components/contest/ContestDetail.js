@@ -9,7 +9,9 @@ import {
   Chip,
   LinearProgress
 } from '@mui/material';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { AccessTime } from '@mui/icons-material';
+
+import { useParams } from 'react-router-dom';
 import ContestTimer from './ContestTimer';
 import ContestProblems from './ContestProblems';
 import ContestApi from '../../getApi/ContestApi';
@@ -18,18 +20,15 @@ import ContestLeaderboard from './ContestLeaderboard';
 
 const ContestDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
   const [activeTab, setActiveTab] = useState(0);
   const [contest, setContest] = useState(null);
   const [problems, setProblems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [shouldRefresh, setShouldRefresh] = useState(false);
 
   useEffect(() => {
-    // Simulate API call
     const fetchContestDetails = async () => {
       try {
-        console.log(id);
         const response = await ContestApi.getContestById(id);
         setContest(response.data.data);
         setLoading(false);
@@ -39,22 +38,73 @@ const ContestDetail = () => {
       }
     }
 
-    const fetchProblems = async () => {
-      try {
-        const response = await ProblemApi.getProblemsByContestId(id);
-        setProblems(response.data.data);
-      } catch (error) {
-        console.error('Failed to fetch problems:', error);
-      }
-    }
     fetchContestDetails();
-    fetchProblems();  
-  }, [id]);
+
+    if (shouldRefresh) {
+      const fetchProblems = async () => {
+        try {
+          const response = await ProblemApi.getProblemsByContestId(id);
+          setProblems(response.data.data);
+        } catch (error) {
+          console.error('Failed to fetch problems:', error);
+        }
+      }
+      fetchProblems(); 
+      setShouldRefresh(false);
+    }
+  }, [id, shouldRefresh]);
+
+  const handleContestStart = () => {
+    setShouldRefresh(true);
+  };
 
   const handleTabChange = (event, newValue) => {
     const tabs = ['problems', 'leaderboard'];
     setActiveTab(newValue);
   };
+
+  const isContestStarted = () => {
+    if (!contest?.startTime) return false;
+    return new Date(contest.startTime) <= new Date();
+  };
+
+  const renderContestContent = () => {
+    if (!isContestStarted()) {
+      return (
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '50vh',
+            gap: 2
+          }}
+        >
+          <AccessTime sx={{ fontSize: 60, color: 'primary.main' }} />
+          <Typography variant="h5" color="primary">
+            Contest hasn't started yet
+          </Typography>
+          <ContestTimer 
+            startTime={contest?.startTime}
+            endTime={contest?.endTime}
+            name={contest?.name}
+          />
+        </Box>
+      );
+    }
+
+    return (
+      <>
+        <Tabs value={activeTab} onChange={handleTabChange}>
+          <Tab label="Problems" />
+          <Tab label="Leaderboard" />
+        </Tabs>
+        {activeTab === 0 && <ContestProblems problems={problems} />}
+        {activeTab === 1 && <ContestLeaderboard contest={contest} />}
+      </>
+    );
+  };    
 
   if (loading) {
     return <LinearProgress />;
@@ -86,24 +136,17 @@ const ContestDetail = () => {
                   startTime={contest?.startTime}
                   endTime={contest?.endTime}
                   name={contest?.name}
+                  onContestStart={handleContestStart}
                 />
               </Box>
             </Box>
-
-            <Tabs 
-              value={activeTab} 
-              onChange={handleTabChange}
-            >
-              <Tab label="Problems" />
-              <Tab label="Leaderboard" />
-            </Tabs>
+            {isContestStarted() && renderContestContent()}
           </Box>
         </Container>
       </Paper>
 
       <Container maxWidth="lg" sx={{ py: 3 }}>
-        {activeTab === 0 && <ContestProblems problems={problems} />}
-        {activeTab === 1 && <ContestLeaderboard contest={contest} />}
+        {!isContestStarted() && renderContestContent()}
       </Container>
     </>
   );

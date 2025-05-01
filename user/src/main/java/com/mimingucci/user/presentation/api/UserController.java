@@ -9,6 +9,7 @@ import com.mimingucci.user.presentation.dto.response.UserUpdateResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserController {
     BaseResponse<UserUpdateResponse> updateProfile(UserUpdateRequest request);
@@ -22,4 +23,8 @@ public interface UserController {
     BaseResponse<Boolean> banAccount(Long userId, HttpServletRequest request);
 
     BaseResponse<Boolean> addAdmin(Long userId, HttpServletRequest request);
+
+    BaseResponse<String> uploadAvatar(MultipartFile file, HttpServletRequest request);
+
+    BaseResponse<Boolean> unsetAvatar(HttpServletRequest request);
 }

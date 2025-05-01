@@ -30,4 +30,5 @@ public class ErrorMessageConstants {
 
     public static final String NOT_PERMISSION = "User can not have permission to do";
 
+    public static final String UPLOAD_IMAGE_ERROR = "Something wrong happens when uploading image";
 }

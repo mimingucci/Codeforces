@@ -16,6 +16,8 @@ public interface BlogController {
 
     BaseResponse<BlogGetResponse> getBlogById(Long blogId);
 
+    BaseResponse<PageableResponse<BlogGetResponse>> getBlogsByAuthor(Long id, Pageable pageable);
+
     BaseResponse<PageableResponse<BlogGetResponse>> getAll(Pageable pageable);
 
     BaseResponse<Boolean> deleteById(Long id, HttpServletRequest request);

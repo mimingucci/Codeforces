@@ -8,6 +8,9 @@ import {
   Chip,
   Box
 } from '@mui/material';
+
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { formatDistanceToNow } from 'date-fns';
 import ContestApi from '../../getApi/ContestApi';
 import HandleCookies from '../../utils/HandleCookies';
@@ -26,7 +29,7 @@ const UpcomingContests = ({ contestType }) => {
   const handleRegisterClick = (contest) => {
     const token = HandleCookies.getCookie('token');
     if (!token) {
-    //   toast.error('Please login to register for contests');
+      showErrorToast('Please login to register for contests');
       return;
     }
     setSelectedContest(contest);
@@ -35,22 +38,24 @@ const UpcomingContests = ({ contestType }) => {
 
   const handleRegisterConfirm = async ({ contestId, isRated }) => {
     try {
-      // Simulate API call
-      setContests(prev => prev.map(contest => 
-        contest.id === contestId 
-          ? { ...contest, registered: true, isRated }
-          : contest
-      ));
-    //   toast.success('Successfully registered for contest!');
+      const res = await ContestApi.registerContest({ contestId, accessToken: HandleCookies.getCookie('token'), isRated });
+      if (res?.data?.code === "200") {
+        setContests(prev => prev.map(contest => 
+          contest.id === contestId 
+            ? { ...contest, registered: true, isRated }
+            : contest
+        ));
+      }  
+      showSuccessToast('Successfully registered for contest!');
     } catch (error) {
-    //   toast.error('Failed to register for contest');
+      showErrorToast('Failed to register for contest');
     }
   };
 
   const handleCancelClick = (contest) => {
     const token = HandleCookies.getCookie('token');
     if (!token) {
-      // toast.error('Please login to manage registrations');
+      showErrorToast('Please login to manage registrations');
       return;
     }
     setSelectedContest(contest);
@@ -59,25 +64,71 @@ const UpcomingContests = ({ contestType }) => {
 
   const handleCancelConfirm = async (contestId) => {
     try {
-      // Simulate API call
-      setContests(prev => prev.map(contest => 
-        contest.id === contestId 
-          ? { ...contest, registered: false, isRated: undefined }
-          : contest
-      ));
-      // toast.success('Registration cancelled successfully');
+      const res = await ContestApi.cancelRegistration({ contestId, accessToken: HandleCookies.getCookie('token') });
+      if (res?.data?.code === "200") {
+        setContests(prev => prev.map(contest => 
+          contest.id === contestId 
+            ? { ...contest, registered: false }
+            : contest
+        ));
+        showSuccessToast('Registration cancelled successfully');
+      } else {
+        showErrorToast('Failed to cancel registration');
+      } 
     } catch (error) {
-      // toast.error('Failed to cancel registration');
+      showErrorToast('Failed to cancel registration');
     }
+  };
+
+  const isContestStaff = (contest) => {
+    const userId = HandleCookies.getCookie('id');
+    if (!userId) return false;
+    
+    return [
+      ...(contest.authors || []),
+      ...(contest.coordinators || []),
+      ...(contest.testers || [])
+    ].includes(userId);
   };
 
   useEffect(() => {
     const fetchUpcomingContests = async () => {
       try {
         const response = await ContestApi.getUpcomingContests({ type: contestType?.toUpperCase(), days: 7 });
-        setContests(response.data?.data || []);
+        
+        const contestsData = response.data?.data || [];
+        const token = HandleCookies.getCookie('token');
+
+        if (token) {
+          // Check registration status for each contest
+          const contestsWithRegistration = await Promise.all(
+            contestsData.map(async (contest) => {
+              try {
+                const regResponse = await ContestApi.getUserRegistration({
+                  contestId: contest.id,
+                  accessToken: token
+                });
+                
+                if (regResponse?.data?.code === "200" && regResponse?.data?.data) {
+                  return {
+                    ...contest,
+                    registered: true,
+                    isRated: regResponse.data.data?.rated
+                  };
+                }
+                return contest;
+              } catch (error) {
+                // If registration not found, contest is not registered
+                return contest;
+              }
+            })
+          );
+          setContests(contestsWithRegistration);
+        } else {
+          setContests(contestsData);
+        }
       } catch (error) {
-        console.error('Failed to fetch upcoming contests:', error);
+        showErrorToast('Failed to fetch contests');
       } finally {
         setLoading(false);
       }
@@ -86,24 +137,28 @@ const UpcomingContests = ({ contestType }) => {
     fetchUpcomingContests();
   }, [contestType]);
 
-  const handleRegister = async (contestId) => {
-    const token = HandleCookies.getCookie('token');
-    if (!token) {
-    //   toast.error('Please login to register for contests');
-      return;
-    }
+  const showSuccessToast = (msg) => {
+    toast.success(msg || `Compiled Successfully!`, {
+      position: "top-center",
+      autoClose: 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
 
-    try {
-      // Simulate API call
-      setContests(prev => prev.map(contest => 
-        contest.id === contestId 
-          ? { ...contest, registered: true }
-          : contest
-      ));
-    //   toast.success('Successfully registered for contest!');
-    } catch (error) {
-    //   toast.error('Failed to register for contest');
-    }
+  const showErrorToast = (msg, timer) => {
+    toast.error(msg || `Something went wrong! Please try again.`, {
+      position: "top-center",
+      autoClose: timer ? timer : 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   };
 
   if (loading) {
@@ -112,6 +167,17 @@ const UpcomingContests = ({ contestType }) => {
 
   return (
     <>
+    <ToastContainer
+      position="top-center"
+      autoClose={2000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+    />
     <Grid container spacing={3}>
       {contests.map(contest => (
         <Grid item xs={12} md={6} key={contest.id}>
@@ -140,6 +206,16 @@ const UpcomingContests = ({ contestType }) => {
               </Typography>
 
               <Box sx={{ display: 'flex', gap: 1 }}>
+                {isContestStaff(contest) ? (
+                  <Button 
+                    variant="outlined"
+                    disabled
+                    fullWidth
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    Contest Staff
+                  </Button>
+                ) : (
                   <Button 
                     variant={contest?.registered ? "outlined" : "contained"}
                     onClick={() => contest?.registered 
@@ -151,16 +227,17 @@ const UpcomingContests = ({ contestType }) => {
                   >
                     {contest?.registered ? 'Cancel Registration' : 'Register'}
                   </Button>
-                </Box>
-                {contest?.registered && contest.type === 'SYSTEM' && (
-                  <Typography 
-                    variant="caption" 
-                    color="text.secondary"
-                    sx={{ display: 'block', mt: 1, textAlign: 'center' }}
-                  >
-                    Registered as {contest?.isRated ? 'rated' : 'unrated'} participant
-                  </Typography>
                 )}
+              </Box>
+              {contest?.registered && contest.type === 'SYSTEM' && (
+                <Typography 
+                  variant="caption" 
+                  color="text.secondary"
+                  sx={{ display: 'block', mt: 1, textAlign: 'center' }}
+                >
+                  Registered as {contest?.isRated ? 'rated' : 'unrated'} participant
+                </Typography>
+              )}
             </CardContent>
           </Card>
         </Grid>

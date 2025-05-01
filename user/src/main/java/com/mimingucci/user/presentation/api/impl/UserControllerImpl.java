@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,6 +44,18 @@ public class UserControllerImpl implements UserController {
     @Override
     public BaseResponse<Boolean> addAdmin(@PathVariable("userId") Long userId, HttpServletRequest request) {
         return BaseResponse.success(this.userApplicationService.changeRole(userId, request));
+    }
+
+    @PostMapping(path = PathConstants.AVATAR)
+    @Override
+    public BaseResponse<String> uploadAvatar(@RequestParam("avatar") MultipartFile file, HttpServletRequest request) {
+        return BaseResponse.success(this.userApplicationService.uploadAvatar(file, request));
+    }
+
+    @DeleteMapping(path = PathConstants.AVATAR)
+    @Override
+    public BaseResponse<Boolean> unsetAvatar(HttpServletRequest request) {
+        return BaseResponse.success(this.userApplicationService.unsetAvatar(request));
     }
 
     @PutMapping(path = PathConstants.UPDATE)

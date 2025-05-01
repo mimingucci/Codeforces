@@ -7,7 +7,6 @@ import com.mimingucci.user.common.enums.Role;
 import com.mimingucci.user.common.exception.ApiRequestException;
 import com.mimingucci.user.domain.model.User;
 import com.mimingucci.user.domain.service.UserService;
-import com.mimingucci.user.infrastructure.repository.converter.UserConverter;
 import com.mimingucci.user.presentation.dto.request.UserParam;
 import com.mimingucci.user.presentation.dto.request.UserUpdateRequest;
 import com.mimingucci.user.presentation.dto.response.PageableResponse;
@@ -19,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 
@@ -62,5 +62,29 @@ public class UserApplicationServiceImpl implements UserApplicationService {
         Set<Role> roles = (Set<Role>) request.getAttribute("userRoles");
         if (!roles.contains(Role.SUPER_ADMIN)) throw new ApiRequestException(ErrorMessageConstants.NOT_PERMISSION, HttpStatus.BAD_REQUEST);
         return this.userService.changeRole(userId);
+    }
+
+    @Override
+    public String uploadAvatar(MultipartFile file, HttpServletRequest request) {
+        Long userId = null;
+        try {
+            userId = (Long) request.getAttribute("userId");
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+        if (userId == null) throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        return this.userService.uploadAvatar(file, userId);
+    }
+
+    @Override
+    public Boolean unsetAvatar(HttpServletRequest request) {
+        Long userId = null;
+        try {
+            userId = (Long) request.getAttribute("userId");
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+        if (userId == null) throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        return this.userService.unsetAvatar(userId);
     }
 }

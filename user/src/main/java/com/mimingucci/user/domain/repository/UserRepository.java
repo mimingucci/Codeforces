@@ -16,6 +16,8 @@ public interface UserRepository {
 
     User update(User domain);
 
+    Boolean unsetAvatar(Long userId);
+
     Boolean existsByEmail(String email);
 
     User findById(Long userId);

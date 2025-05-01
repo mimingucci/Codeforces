@@ -33,6 +33,38 @@ class ContestApi {
       },
     });
   }
+  registerContest({ contestId, accessToken, isRated }) {
+    return axios.post(
+      BASE_URL + `/${contestId}/registration`,
+      {
+        rated: isRated,
+        contest: contestId
+      },
+      { headers: { Authorization: "Bearer " + accessToken } }
+    );
+  }
+  cancelRegistration({ contestId, accessToken }) {
+    return axios.delete(
+      BASE_URL + `/${contestId}/registration`,
+      { headers: { Authorization: "Bearer " + accessToken } }
+    );
+  }
+  updateRegistration({ contestId, accessToken, isRated }) { 
+    return axios.put(
+      BASE_URL + `/${contestId}/registration`,
+      {
+        rated: isRated,
+        contest: contestId
+      },
+      { headers: { Authorization: "Bearer " + accessToken } }
+    );
+  }  
+  getUserRegistration({contestId, accessToken}) {
+    return axios.get(
+      BASE_URL + `/${contestId}/registration`,
+      { headers: { Authorization: "Bearer " + accessToken } }
+    );
+  }
 }
 
 export default new ContestApi();

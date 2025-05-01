@@ -3,7 +3,10 @@ package com.mimingucci.contest.application.impl;
 import com.mimingucci.contest.application.ContestApplicationService;
 import com.mimingucci.contest.application.assembler.ContestAssembler;
 import com.mimingucci.contest.application.assembler.ContestRegistrationAssembler;
+import com.mimingucci.contest.common.constant.ErrorMessageConstants;
 import com.mimingucci.contest.common.enums.Role;
+import com.mimingucci.contest.common.exception.ApiRequestException;
+import com.mimingucci.contest.common.util.JwtUtil;
 import com.mimingucci.contest.domain.model.Contest;
 import com.mimingucci.contest.domain.model.ContestRegistration;
 import com.mimingucci.contest.domain.service.ContestRegistrationService;
@@ -15,8 +18,11 @@ import com.mimingucci.contest.presentation.dto.request.ContestUpdateRequest;
 import com.mimingucci.contest.presentation.dto.response.ContestResponse;
 import com.mimingucci.contest.presentation.dto.response.ContestantCheckResponse;
 import com.mimingucci.contest.presentation.dto.response.PageableResponse;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +31,8 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class ContestApplicationServiceImpl implements ContestApplicationService {
+
+    private final JwtUtil jwtUtil;
 
     private final ContestService service;
 
@@ -67,7 +75,14 @@ public class ContestApplicationServiceImpl implements ContestApplicationService 
     }
 
     @Override
-    public ContestRegistrationDto getRegisterById(Long userId, Long contestId) {
+    public ContestRegistrationDto getRegisterById(Long contestId, HttpServletRequest request) {
+        Long userId = null;
+        try {
+            Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
+            userId = claims.get("id", Long.class);
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
         return ContestRegistrationAssembler.INSTANCE.toResponse(registrationService.getById(userId, contestId));
     }
 

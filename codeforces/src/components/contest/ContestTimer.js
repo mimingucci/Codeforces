@@ -3,7 +3,7 @@ import { Box, Typography, Chip } from '@mui/material';
 import { differenceInSeconds } from 'date-fns';
 import ContestAlert from '../common/ContestAlert';
 
-const ContestTimer = ({ startTime, endTime, name = '' }) => {
+const ContestTimer = ({ startTime, endTime, name = '', onContestStart }) => {
   const [timeLeft, setTimeLeft] = useState('');
   const [status, setStatus] = useState('');
   const [alertOpen, setAlertOpen] = useState(false);
@@ -31,6 +31,10 @@ const ContestTimer = ({ startTime, endTime, name = '' }) => {
         setStatus('Running');
         const diff = differenceInSeconds(end, now);
         setTimeLeft(formatTime(diff));
+        if (previousStatusValue === 'Before') {
+          setAlertOpen(true);
+          onContestStart?.();
+        }
       }
 
       previousStatus.current = status;
@@ -40,7 +44,7 @@ const ContestTimer = ({ startTime, endTime, name = '' }) => {
     const timer = setInterval(calculateTime, 1000);
 
     return () => clearInterval(timer);
-  }, [startTime, endTime, status]);
+  }, [startTime, endTime, status, onContestStart]);
 
   const formatTime = (seconds) => {
     const h = Math.floor(seconds / 3600);
@@ -73,9 +77,13 @@ const ContestTimer = ({ startTime, endTime, name = '' }) => {
       <ContestAlert
         open={alertOpen}
         onClose={() => setAlertOpen(false)}
-        title="Contest Ended"
-        message={`The contest "${name}" has ended. You can now view the final standings.`}
-        severity="info"
+        title={status === 'Running' ? "Contest Started" : "Contest Ended"}
+        message={
+          status === 'Running' 
+            ? `The contest "${name}" has started. Good luck!`
+            : `The contest "${name}" has ended. You can now view the final standings.`
+        }
+        severity={status === 'Running' ? "success" : "info"}
         actionText="Close"
       />
     </>

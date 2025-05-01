@@ -155,7 +155,8 @@ public class BlogRepositoryImpl implements BlogRepository {
                         HttpStatus.NOT_FOUND
                 ));
 
-        blogEntity.addLike(userId);
+        if (!blogEntity.getLikes().contains(userId)) blogEntity.addLike(userId);
+        else blogEntity.getLikes().remove(userId);
         return BlogConverter.INSTANCE.toDomain(this.blogJpaRepository.save(blogEntity));
     }
 
@@ -168,7 +169,8 @@ public class BlogRepositoryImpl implements BlogRepository {
                         HttpStatus.NOT_FOUND
                 ));
 
-        blogEntity.addDislike(userId);
+        if (!blogEntity.getDislikes().contains(userId)) blogEntity.addDislike(userId);
+        else blogEntity.getDislikes().remove(userId);
         return BlogConverter.INSTANCE.toDomain(this.blogJpaRepository.save(blogEntity));
     }
 

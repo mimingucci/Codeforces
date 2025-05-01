@@ -58,6 +58,26 @@ const SubmissionApi = {
       console.error('Error getting submission details:', error);
       throw error;
     }
+  },
+  /**
+   * Get all submissions for a user
+   * @param {string} accessToken - JWT access token
+   * @param {number} page - Page number for pagination
+   * @returns {Promise<Object>} - List of submissions
+   */
+  getAllSubmissions: async (id, page = 0, size = 50) => {
+    try {
+      const response = await axiosInstance.get(
+        `${API_BASE_URL}/api/v1/submission/user/${id}?page=${page}&size=${size}`,
+        {
+          transformResponse: (data) => JSONbig.parse(data)
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error getting submission details:', error);
+      throw error;
+    }
   }
 };
 

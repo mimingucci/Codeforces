@@ -18,4 +18,5 @@ public class PathConstants {
     public static final String ALL = "/all";
     public static final String BAN = "/ban";
     public static final String ROLE = "/role";
+    public static final String AVATAR = "/avatar";
 }

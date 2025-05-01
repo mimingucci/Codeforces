@@ -7,6 +7,7 @@ import com.mimingucci.user.presentation.dto.response.UserGetResponse;
 import com.mimingucci.user.presentation.dto.response.UserUpdateResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserApplicationService {
     UserUpdateResponse updateProfile(UserUpdateRequest request);
@@ -20,4 +21,8 @@ public interface UserApplicationService {
     Boolean ban(Long userId, HttpServletRequest request);
 
     Boolean changeRole(Long userId, HttpServletRequest request);
+
+    String uploadAvatar(MultipartFile file, HttpServletRequest request);
+
+    Boolean unsetAvatar(HttpServletRequest request);
 }

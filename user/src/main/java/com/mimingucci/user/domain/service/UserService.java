@@ -6,6 +6,7 @@ import com.mimingucci.user.presentation.dto.request.UserParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
@@ -32,4 +33,13 @@ public interface UserService {
     Boolean ban(Long userId, Set<Role> roles);
 
     Boolean changeRole(Long userId);
+
+    String uploadAvatar(MultipartFile file, Long userId);
+
+    /**
+     * Unsets the avatar for a given user
+     * @param userId the ID of the user
+     * @return true if successful, false otherwise
+     */
+    Boolean unsetAvatar(Long userId);
 }

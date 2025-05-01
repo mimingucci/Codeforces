@@ -2,10 +2,12 @@ import {
   Box,
 } from '@mui/material';
 import ProfileOverview from './ProfileOverview';
+import UserSubmissions from './UserSubmissions';
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import HandleCookies from "../../utils/HandleCookies";
 import NavProfile from "./NavProfile";
+import Blogs from './Blogs';
 
 const Profile = () => {
   const [isHome, setIsHome] = useState(false);
@@ -26,10 +28,10 @@ const Profile = () => {
     switch (currentTab) {
       case 0:
         return <ProfileOverview id={params?.id} isHome={isHome} />;
-      // case 1:
-      //   return <UserBlog id={id} />;
-      // case 2:
-      //   return <UserSubmissions userId={id} />;
+      case 1:
+        return <Blogs author={params?.id} />;
+      case 2:
+        return <UserSubmissions userId={params?.id} />;
       default:
         return <ProfileOverview id={params?.id} isHome={isHome} />;
     }
