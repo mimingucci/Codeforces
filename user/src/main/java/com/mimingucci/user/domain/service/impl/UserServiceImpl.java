@@ -10,6 +10,7 @@ import com.mimingucci.user.domain.repository.UserRepository;
 import com.mimingucci.user.domain.service.UserService;
 import com.mimingucci.user.presentation.dto.request.UserParam;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUserInfo(User domain) {
-        User user = this.userRepository.findByEmail(domain.getEmail());
+        User user = this.userRepository.findById(domain.getId());
         if (!user.getEnabled()) throw new ApiRequestException(ErrorMessageConstants.ACCOUNT_DISABLED, HttpStatus.LOCKED);
         return this.userRepository.update(domain);
     }
@@ -125,6 +126,7 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
+//    @CacheEvict(value = "users", key = "#userId")
     @Override
     public String uploadAvatar(MultipartFile file, Long userId) {
         try {
@@ -137,6 +139,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+//    @CacheEvict(value = "users", key = "#userId")
     @Override
     public Boolean unsetAvatar(Long userId) {
         User user = this.userRepository.findById(userId);

@@ -20,5 +20,5 @@ public interface ProblemClient {
     BaseResponse<List<ProblemResponse>> getAllProblemsByContestId(@PathVariable(name = "contestId") Long contestId);
 
     @PutMapping(path = CONTEST + CONTEST_ID)
-    BaseResponse<Boolean> updateProblemStatus(@PathVariable(name = "contestId") Long contestId, @RequestHeader(value = "Authorization", required = true) String token, @RequestBody @Validated ProblemUpdateRequest request);
+    BaseResponse<Boolean> updateProblemStatus(@PathVariable(name = "contestId") Long contestId, @RequestBody @Validated ProblemUpdateRequest request);
 }

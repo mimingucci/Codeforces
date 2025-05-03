@@ -39,18 +39,9 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long>, JpaS
     @Query("UPDATE UserEntity user SET user.rating = user.rating + :rating WHERE user.id = :userId")
     void updateRating(@Param("userId") Long id, @Param("rating") Integer rating);
 
-    // Find users by country
-    List<UserEntity> findByCountryId(Long countryId);
-
-    // Find users by country with pagination
-    Page<UserEntity> findByCountryId(Long countryId, Pageable pageable);
-
     // Custom query with JPQL
-    @Query("SELECT u FROM UserEntity u WHERE u.country.name = :countryName")
-    List<UserEntity> findByCountryName(@Param("countryName") String countryName);
-
-    // Count users by country
-    long countByCountryId(Long countryId);
+    @Query("SELECT u FROM UserEntity u WHERE u.country = :country")
+    List<UserEntity> findByCountry(@Param("country") String country);
 
     boolean existsByUsername(String username);
 
@@ -65,9 +56,6 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long>, JpaS
     @Modifying
     @Query("UPDATE UserEntity u SET u.lastActive = :lastActive WHERE u.id = :userId")
     int updateLastActive(@Param("userId") Long userId, @Param("lastActive") Instant lastActive);
-
-    @Query("SELECT u FROM UserEntity u WHERE u.country.id = :countryId ORDER BY u.rating DESC")
-    List<UserEntity> findTopUsersByCountry(@Param("countryId") Long countryId, Pageable pageable);
 
     // Find users by list of IDs
     List<UserEntity> findByIdIn(Collection<Long> userIds);

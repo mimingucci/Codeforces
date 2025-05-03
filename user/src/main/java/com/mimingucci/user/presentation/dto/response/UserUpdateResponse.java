@@ -1,5 +1,6 @@
 package com.mimingucci.user.presentation.dto.response;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateResponse {
+    private Long id;
+
     private String email;
 
     private Boolean enabled;
@@ -22,6 +25,8 @@ public class UserUpdateResponse {
     private Integer rating;
 
     private Integer contribute;
+
+    private String country;
 
     private String avatar;
 }

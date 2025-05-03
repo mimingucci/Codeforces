@@ -5,6 +5,7 @@ import com.mimingucci.contest.common.enums.ContestEvent;
 import com.mimingucci.contest.common.exception.ApiRequestException;
 import com.mimingucci.contest.common.util.ContestantsConverter;
 import com.mimingucci.contest.domain.client.ProblemClient;
+import com.mimingucci.contest.domain.client.RankingClient;
 import com.mimingucci.contest.domain.client.request.ProblemUpdateRequest;
 import com.mimingucci.contest.domain.client.response.ProblemResponse;
 import com.mimingucci.contest.domain.event.ContestActionEvent;
@@ -14,7 +15,9 @@ import com.mimingucci.contest.domain.event.ContestUpdatedEvent;
 import com.mimingucci.contest.domain.model.Contest;
 import com.mimingucci.contest.domain.model.ContestRegistration;
 import com.mimingucci.contest.domain.repository.ContestRepository;
+import com.mimingucci.contest.domain.service.ContestRegistrationService;
 import com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType;
+import com.mimingucci.contest.presentation.dto.response.BaseResponse;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +52,8 @@ public class ContestEventScheduler {
     private final ContestEventSchedulerProperties properties;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ProblemClient problemClient;
+    private final RankingClient rankingClient;
+    private final ContestRegistrationService registrationService;
 
     // In-memory collections to store contests and scheduled tasks
     private final Map<Long, Contest> contestsById = new ConcurrentHashMap<>();
@@ -70,13 +75,17 @@ public class ContestEventScheduler {
             TaskScheduler taskScheduler,
             ContestEventSchedulerProperties properties,
             KafkaTemplate<String, Object> kafkaTemplate,
-            ProblemClient problemClient) {
+            ProblemClient problemClient,
+            RankingClient rankingClient,
+            ContestRegistrationService registrationService) {
         this.contestRepository = contestRepository;
         this.eventPublisher = eventPublisher;
         this.taskScheduler = taskScheduler;
         this.properties = properties;
         this.kafkaTemplate = kafkaTemplate;
         this.problemClient = problemClient;
+        this.rankingClient = rankingClient;
+        this.registrationService = registrationService;
     }
 
     @PostConstruct
@@ -237,7 +246,7 @@ public class ContestEventScheduler {
         logger.info("CONTEST STARTED: {} (ID: {})", contest.getName(), contest.getId());
 
         // Update problems in contest to public
-        if (problemClient.updateProblemStatus(contest.getId(), "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", new ProblemUpdateRequest(true)).code() != "200") {
+        if (problemClient.updateProblemStatus(contest.getId(), new ProblemUpdateRequest(true)).code() != "200") {
             throw new ApiRequestException(ErrorMessageConstants.CONTEST_HAS_NOT_STARTED, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -259,6 +268,18 @@ public class ContestEventScheduler {
 
         // Publish to Kafka
         publishContestEndedToKafka(contest);
+
+        // Schedule ranking completion 10 minutes after contest end
+        Instant rankingCompletionTime = contest.getEndTime().plus(10, ChronoUnit.MINUTES);
+        ScheduledFuture<?> rankingTask = taskScheduler.schedule(
+                () -> completeContestRanking(contest),
+                Date.from(rankingCompletionTime)
+        );
+        scheduledTasks.add(rankingTask);
+        logger.info("Scheduled ranking completion for contest {} at {}",
+                contest.getId(),
+                rankingCompletionTime
+        );
 
         // Add to published set to avoid duplicate events
         publishedEndEvents.add(contest.getId());
@@ -344,14 +365,11 @@ public class ContestEventScheduler {
 
     private void publishContestStartedToKafka(Contest contest) {
         try {
-            List<ContestRegistration> x = new ArrayList<>();
-            x.add(new ContestRegistration(1L, 1L, true, true));
-            x.add(new ContestRegistration(2L, 1L, true, true));
-            x.add(new ContestRegistration(3L, 1L, true, true));
+            List<ContestRegistration> x = this.registrationService.getAll(contest.getId());
             // get problem set
             String problemset = this.problemClient.getAllProblemsByContestId(contest.getId()).data().stream().map(ProblemResponse::getId).toList().stream().map(Objects::toString).collect(Collectors.joining(","));
 
-            kafkaTemplate.send("submission.result", contest.getId().toString(), new ContestActionEvent(contest.getId(), contest.getStartTime(), contest.getEndTime(), ContestantsConverter.toJsonString(x), ContestEvent.CONTEST_STARTED, ContestType.SYSTEM, problemset));
+            kafkaTemplate.send("submission.result", contest.getId().toString(), new ContestActionEvent(contest.getId(), contest.getStartTime(), contest.getEndTime(), ContestantsConverter.toJsonString(x), ContestEvent.CONTEST_STARTED, contest.getType(), problemset));
             logger.info("Published contest start event to Kafka: {}", contest.getId());
         } catch (Exception e) {
             logger.error("Failed to publish contest start event to Kafka: {}", contest.getId(), e);
@@ -653,5 +671,37 @@ public class ContestEventScheduler {
         return (int) contestsById.values().stream()
                 .filter(c -> c.getEndTime().isAfter(start) && c.getEndTime().isBefore(end))
                 .count();
+    }
+
+    // Add new method for ranking completion
+    private void completeContestRanking(Contest contest) {
+        try {
+            logger.info("Starting ranking completion for contest: {} (ID: {})",
+                    contest.getName(),
+                    contest.getId()
+            );
+
+            BaseResponse<Boolean> response = rankingClient.completeContest(
+                    contest.getId()
+            );
+
+            if (!response.data()) {
+                logger.error("Failed to complete ranking for contest {}: Ranking service returned false",
+                        contest.getId()
+                );
+            } else {
+                logger.info("Successfully completed ranking for contest: {} (ID: {})",
+                        contest.getName(),
+                        contest.getId()
+                );
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete ranking for contest {}: {}",
+                    contest.getId(),
+                    e.getMessage(),
+                    e
+            );
+            // Optionally implement retry logic here
+        }
     }
 }

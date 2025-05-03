@@ -29,11 +29,11 @@ public class ContestCreateRequest {
 
     private ContestType type = ContestType.NORMAL;
 
-    @NotNull
-    @NotEmpty
     private Long[] authors = new Long[0];
 
     private Long[] testers = new Long[0];
 
     private Long[] coordinators = new Long[0];
+
+    private Long createdBy;
 }

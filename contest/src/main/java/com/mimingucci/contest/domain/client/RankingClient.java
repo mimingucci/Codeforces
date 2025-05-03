@@ -7,9 +7,9 @@ import com.mimingucci.contest.presentation.dto.response.BaseResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 import static com.mimingucci.contest.common.constant.PathConstants.*;
 
@@ -18,6 +18,8 @@ import static com.mimingucci.contest.common.constant.PathConstants.*;
 public interface RankingClient {
     @PostMapping(path = VIRTUAL_CONTEST)
     BaseResponse<VirtualContestResponse> startVirtualContest(
-            @RequestBody @Validated VirtualContestRequest request,
-            @RequestHeader(value = "Authorization", required = true) String authToken);
+            @RequestBody @Validated VirtualContestRequest request);
+
+    @PostMapping(path = CONTEST_ID)
+    BaseResponse<Boolean> completeContest(@PathVariable("contestId") Long contestId);
 }

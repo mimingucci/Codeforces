@@ -18,4 +18,9 @@ public class LeaderboardEntryRepositoryImpl implements LeaderboardEntryRepositor
     public void saveLeaderboardEntriesDuringContest(List<LeaderboardEntry> entries) {
         repository.saveAll(entries.stream().map(LeaderboardEntryConverter.INSTANCE::toEntity).toList());
     }
+
+    @Override
+    public List<LeaderboardEntry> getAllEntriesByContestId(Long id) {
+        return repository.findAllByContestIdOrderByRank(id).stream().map(LeaderboardEntryConverter.INSTANCE::toDomain).toList();
+    }
 }

@@ -6,6 +6,7 @@ import com.mimingucci.ranking.common.exception.ApiRequestException;
 import com.mimingucci.ranking.common.util.LeaderboardFileHandler;
 import com.mimingucci.ranking.common.util.SubmissionHistoryFileHandler;
 import com.mimingucci.ranking.domain.client.ContestClient;
+import com.mimingucci.ranking.domain.client.UserClient;
 import com.mimingucci.ranking.domain.client.response.ContestResponse;
 import com.mimingucci.ranking.domain.model.LeaderboardEntry;
 import com.mimingucci.ranking.domain.model.RatingChange;
@@ -13,6 +14,7 @@ import com.mimingucci.ranking.domain.repository.LeaderboardEntryRepository;
 import com.mimingucci.ranking.domain.repository.RatingChangeRepository;
 import com.mimingucci.ranking.domain.repository.SubmissionResultRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.util.*;
@@ -30,11 +32,10 @@ public class RatingCalculator {
 
     private final ContestClient contestClient;
 
-    public Boolean completeContest(Long contestId, Long userId) {
+    private final UserClient userClient;
+
+    public Boolean completeContest(Long contestId) {
         ContestResponse contest = this.contestClient.getContest(contestId).data();
-        if (!contest.getAuthors().contains(userId)) {
-            throw new ApiRequestException(ErrorMessageConstants.NOT_PERMISSION, HttpStatus.BAD_REQUEST);
-        }
         if (!SubmissionHistoryFileHandler.submissionHistoryFileExists(contestId) || !LeaderboardFileHandler.leaderboardFileExists(contestId)) {
             throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_FIND_DATA, HttpStatus.NOT_FOUND);
         }
@@ -43,21 +44,23 @@ public class RatingCalculator {
         submissionResultRepository.saveSubmissionResultEventsDuringContest(SubmissionHistoryFileHandler.readSubmissionHistory(contestId));
         leaderboardEntryRepository.saveLeaderboardEntriesDuringContest(entries);
 
-        Boolean result = calculateRatingChanges(contestId, entries, contest.getType());
+        List<Pair<Long, Integer>> result = calculateRatingChanges(contestId, entries, contest.getType());
 
         // clear
         SubmissionHistoryFileHandler.deleteSubmissionHistory(contestId);
         LeaderboardFileHandler.deleteLeaderboardByContestId(contestId);
 
-        return result;
+        this.userClient.updateUserRatings(result);
+
+        return true;
     }
 
     /**
      * Calculates rating changes for all participants based on contest results
      * Using an algorithm similar to Codeforces' Elo rating system
      */
-    public Boolean calculateRatingChanges(Long contestId, List<LeaderboardEntry> entries, ContestType contestType) {
-        if (!contestType.equals(ContestType.SYSTEM)) return true;
+    public List<Pair<Long, Integer>> calculateRatingChanges(Long contestId, List<LeaderboardEntry> entries, ContestType contestType) {
+        if (!contestType.equals(ContestType.SYSTEM)) return new ArrayList<>();
 
         // Get all participants by ID
         List<Long> userIds = entries.stream()
@@ -88,6 +91,8 @@ public class RatingCalculator {
         // Apply rating formula
         List<RatingChange> ratingChanges = new ArrayList<>();
 
+        List<Pair<Long, Integer>> response = new ArrayList<>();
+
         double weight = getContestWeight(contestType);
 
         for (LeaderboardEntry entry : entries) {
@@ -117,9 +122,12 @@ public class RatingCalculator {
                     newRating,
                     newRating - oldRating
             ));
+
+            response.add(Pair.of(userId, newRating));
         }
 
-        return ratingChangeRepository.persistBatch(ratingChanges);
+        ratingChangeRepository.persistBatch(ratingChanges);
+        return response;
     }
 
     /**

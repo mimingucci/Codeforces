@@ -27,6 +27,8 @@ public class Contest {
 
     private ContestType type;
 
+    private Long createdBy;
+
     private Boolean isPublic;
 
     public boolean hasPermission(Long userId) {

@@ -30,6 +30,8 @@ public class UserGetResponse {
 
     private Integer contribute;
 
+    private String country;
+
     private String avatar;
 
     private Instant createdAt;

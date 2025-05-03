@@ -55,6 +55,9 @@ public class ContestEntity {
     @Column(name = "updated_at")
     private Instant updatedAt; // UTC timestamp
 
+    @Column(nullable = false, updatable = false, name = "created_by")
+    private Long createdBy;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now(); // Set to current UTC time

@@ -146,11 +146,6 @@ export default function ContestPage() {
                         <ListItemText
                           primary={`${problem.id}. ${problem.name}`}
                         />
-                        <Chip
-                          label={problem.status}
-                          color={getProblemStatusColor(problem.status)}
-                          size="small"
-                        />
                       </ListItem>
                     ))}
               </List>

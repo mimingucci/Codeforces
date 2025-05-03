@@ -7,10 +7,13 @@ import com.mimingucci.user.presentation.dto.response.UserGetResponse;
 import com.mimingucci.user.presentation.dto.response.UserUpdateResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface UserApplicationService {
-    UserUpdateResponse updateProfile(UserUpdateRequest request);
+    UserGetResponse updateProfile(UserUpdateRequest request);
 
     UserGetResponse getUserById(Long userId);
 
@@ -25,4 +28,6 @@ public interface UserApplicationService {
     String uploadAvatar(MultipartFile file, HttpServletRequest request);
 
     Boolean unsetAvatar(HttpServletRequest request);
+
+    Boolean updateRatings(List<Pair<Long, Integer>> users, String authToken);
 }

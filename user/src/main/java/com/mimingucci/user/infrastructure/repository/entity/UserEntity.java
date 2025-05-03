@@ -62,9 +62,7 @@ public class UserEntity {
     @Column(name = "last_active")
     private Instant lastActive;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "country_id")
-    private CountryEntity country;
+    private String country;
 
     @PrePersist
     protected void onCreate() {

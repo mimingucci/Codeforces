@@ -26,5 +26,6 @@ const path = {
   SUBMITDETAIL: "/submission/:id",
   FORGOTPASSWORD: "/forgot-password",
   RESETPASSWORD: "/api/auth/reset-password/:token/:email",
+  POLYGON: "/polygon",
 };
 export default path;

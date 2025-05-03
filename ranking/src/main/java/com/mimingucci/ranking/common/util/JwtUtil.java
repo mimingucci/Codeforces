@@ -12,8 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
@@ -22,6 +24,11 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtUtil {
 
+    @Value("${jwt.private-key}")
+    private String privateKeyPath;
+
+    private PrivateKey privateKey;
+
     @Value("${jwt.public-key}")
     private String publicKeyPath;
 
@@ -29,6 +36,14 @@ public class JwtUtil {
 
     @PostConstruct
     public void init() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        // Load private key
+        String privateKeyContent = new String(Files.readAllBytes(Paths.get(privateKeyPath)))
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s", "");
+        byte[] privateKeyBytes = Base64.getDecoder().decode(privateKeyContent);
+        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+        privateKey = KeyFactory.getInstance("RSA").generatePrivate(privateKeySpec);
 
         // Load public key
         String publicKeyContent = new String(Files.readAllBytes(Paths.get(publicKeyPath)))
@@ -38,6 +53,15 @@ public class JwtUtil {
         byte[] publicKeyBytes = Base64.getDecoder().decode(publicKeyContent);
         X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
         publicKey = KeyFactory.getInstance("RSA").generatePublic(publicKeySpec);
+    }
+
+    public String generateToken() {
+        return Jwts.builder()
+                .setSubject("SYSTEM")
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60)) // 1 minutes
+                .signWith(privateKey, SignatureAlgorithm.RS256)
+                .compact();
     }
 
     /**

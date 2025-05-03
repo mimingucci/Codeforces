@@ -1,8 +1,10 @@
 package com.mimingucci.problem.presentation.api.impl;
 
 import com.mimingucci.problem.application.ProblemApplicationService;
+import com.mimingucci.problem.common.constant.ErrorMessageConstants;
 import com.mimingucci.problem.common.constant.PathConstants;
 import com.mimingucci.problem.common.constant.ValidProblemRating;
+import com.mimingucci.problem.common.exception.ApiRequestException;
 import com.mimingucci.problem.presentation.api.ProblemController;
 import com.mimingucci.problem.presentation.dto.request.ProblemCreateRequest;
 import com.mimingucci.problem.presentation.dto.request.ProblemUpdateRequest;
@@ -12,6 +14,7 @@ import com.mimingucci.problem.presentation.dto.response.ProblemResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +53,9 @@ public class ProblemControllerImpl implements ProblemController {
 
     @PutMapping(path = PathConstants.CONTEST + PathConstants.CONTEST_ID)
     @Override
-    public BaseResponse<Boolean> updateProblemStatus(@PathVariable(name = "contestId") Long contestId, @RequestHeader(value = "Authorization", required = true) String token, @RequestBody @Validated ProblemUpdateRequest request) {
+    public BaseResponse<Boolean> updateProblemStatus(@PathVariable(name = "contestId") Long contestId, @RequestBody @Validated ProblemUpdateRequest request, HttpServletRequest servletRequest) {
+        String token = servletRequest.getHeader("Authorization");
+        if (token == null) throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         return BaseResponse.success(this.problemApplicationService.updateProblemStatus(contestId, request.getIsPublished(), token));
     }
 

@@ -12,5 +12,5 @@ public interface RankingApplicationService {
 
     VirtualContestMetadata startVirtual(VirtualContestRequest request, String token);
 
-    Boolean completeContest(Long contestId, HttpServletRequest request);
+    Boolean completeContest(Long contestId, String token);
 }

@@ -3,7 +3,7 @@ package com.mimingucci.contest.presentation.api.impl;
 import com.mimingucci.contest.application.ContestApplicationService;
 import com.mimingucci.contest.common.constant.PathConstants;
 import com.mimingucci.contest.common.enums.Role;
-import com.mimingucci.contest.domain.model.ContestRegistration;
+import com.mimingucci.contest.domain.client.RankingClient;
 import com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType;
 import com.mimingucci.contest.presentation.api.ContestController;
 import com.mimingucci.contest.presentation.dto.request.ContestCreateRequest;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +27,8 @@ import java.util.Set;
 @RequestMapping(path = PathConstants.API_V1_CONTEST)
 public class ContestControllerImpl implements ContestController {
     private final ContestApplicationService service;
+
+    private final RankingClient rankingClient;
 
     @GetMapping(path = PathConstants.UP_COMING)
     @Override
@@ -101,6 +102,7 @@ public class ContestControllerImpl implements ContestController {
     @PostMapping
     @Override
     public BaseResponse<ContestResponse> createContest(HttpServletRequest request, @RequestBody @Validated ContestCreateRequest contest) {
+        contest.setCreatedBy((Long) request.getAttribute("userId"));
         return BaseResponse.success(service.createContest(contest));
     }
 
@@ -126,6 +128,8 @@ public class ContestControllerImpl implements ContestController {
     @GetMapping(path = PathConstants.ALL)
     @Override
     public BaseResponse<PageableResponse<ContestResponse>> getListContests(@RequestParam(name = "name", defaultValue = "") String name, Pageable pageable) {
-        return BaseResponse.success(service.getListContests(name, pageable));
+        rankingClient.completeContest(1L);
+        return BaseResponse.success();
+//        return BaseResponse.success(service.getListContests(name, pageable));
     }
 }

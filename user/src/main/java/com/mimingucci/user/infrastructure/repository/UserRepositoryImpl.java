@@ -52,6 +52,7 @@ public class UserRepositoryImpl implements UserRepository {
         if (domain.getFirstname() != null) entity.setFirstname(domain.getFirstname());
         if (domain.getLastname() != null) entity.setLastname(domain.getLastname());
         if (domain.getAvatar() != null) entity.setAvatar(domain.getAvatar());
+        if (domain.getCountry() != null) entity.setCountry(domain.getCountry());
         if (domain.getDescription() != null) entity.setDescription(domain.getDescription());
         if (domain.getRoles() != null) entity.setRoles(domain.getRoles());
         if (domain.getContribute() != null) entity.setContribute(domain.getContribute());
@@ -83,18 +84,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<User> findByCountry(Long countryId) {
-        return this.userJpaRepository.findByCountryId(countryId).stream().map(converter::toDomain).toList();
-    }
-
-    @Override
-    public Page<User> findByCountry(Long countryId, Pageable pageable) {
-        return this.userJpaRepository.findByCountryId(countryId, pageable).map(converter::toDomain);
-    }
-
-    @Override
-    public long getCountryUserCount(Long countryId) {
-        return 0;
+    public List<User> findByCountry(String country) {
+        return this.userJpaRepository.findByCountry(country).stream().map(converter::toDomain).toList();
     }
 
     @Override

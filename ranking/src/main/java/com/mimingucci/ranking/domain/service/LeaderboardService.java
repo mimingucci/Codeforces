@@ -1,12 +1,11 @@
-package com.mimingucci.leaderboard.domain.service.impl;
+package com.mimingucci.ranking.domain.service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.mimingucci.leaderboard.common.exception.ApiRequestException;
-import com.mimingucci.leaderboard.domain.model.LeaderboardEntry;
-import com.mimingucci.leaderboard.domain.model.LeaderboardUpdate;
-import com.mimingucci.leaderboard.domain.service.LeaderboardService;
+import com.mimingucci.ranking.common.exception.ApiRequestException;
+import com.mimingucci.ranking.domain.model.LeaderboardUpdate;
+import com.mimingucci.ranking.domain.repository.LeaderboardEntryRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,16 +13,18 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-import java.util.List;
-
 @Service
-public class LeaderboardServiceImpl implements LeaderboardService {
+public class LeaderboardService {
     private final JedisPool jedisPool;
 
-    public LeaderboardServiceImpl(
-            @Value("${redis.host}") String redisHost,
-            @Value("${redis.port}") int redisPort) {
+    private final LeaderboardEntryRepository repository;
 
+    public LeaderboardService(
+            @Value("${redis.host}") String redisHost,
+            @Value("${redis.port}") int redisPort,
+            LeaderboardEntryRepository repository
+            ) {
+        this.repository = repository;
         this.jedisPool = new JedisPool(buildPoolConfig(), redisHost, redisPort);
     }
 
@@ -42,12 +43,11 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return "leaderboard" + contestId;
     }
 
-    @Override
     public LeaderboardUpdate getLeaderboardByContestId(Long contestId) {
         try (Jedis jedis = jedisPool.getResource()) {
             String json = jedis.get(getKey(contestId));
             if (json == null) {
-                return null;
+                return new LeaderboardUpdate(contestId, repository.getAllEntriesByContestId(contestId));
             }
             ObjectMapper mapper = new ObjectMapper();
             mapper.registerModule(new JavaTimeModule());

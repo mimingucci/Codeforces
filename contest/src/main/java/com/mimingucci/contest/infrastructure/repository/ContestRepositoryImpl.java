@@ -41,7 +41,7 @@ public class ContestRepositoryImpl implements ContestRepository {
         Optional<ContestEntity> optional = this.contestJpaRepository.findById(id);
         if (optional.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
         ContestEntity entity = optional.get();
-        if (!entity.getAuthors().contains(userId) && !roles.contains(Role.ADMIN) && !roles.contains(Role.SUPER_ADMIN)) throw new ApiRequestException(ErrorMessageConstants.NOT_PERMISSION, HttpStatus.FORBIDDEN);
+        if (!entity.getCreatedBy().equals(userId) && !roles.contains(Role.ADMIN) && !roles.contains(Role.SUPER_ADMIN)) throw new ApiRequestException(ErrorMessageConstants.NOT_PERMISSION, HttpStatus.FORBIDDEN);
         if (contest.getStartTime() != null) entity.setStartTime(contest.getStartTime());
         if (contest.getEndTime() != null) entity.setEndTime(contest.getEndTime());
         if (contest.getName() != null) entity.setName(contest.getName());
@@ -59,7 +59,7 @@ public class ContestRepositoryImpl implements ContestRepository {
         Optional<ContestEntity> optional = this.contestJpaRepository.findById(id);
         if (optional.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
         ContestEntity entity = optional.get();
-        if (!entity.getAuthors().contains(userId) && !roles.contains(Role.ADMIN) && !roles.contains(Role.SUPER_ADMIN)) throw new ApiRequestException(ErrorMessageConstants.NOT_PERMISSION, HttpStatus.FORBIDDEN);
+        if (!entity.getCreatedBy().equals(userId) && !roles.contains(Role.ADMIN) && !roles.contains(Role.SUPER_ADMIN)) throw new ApiRequestException(ErrorMessageConstants.NOT_PERMISSION, HttpStatus.FORBIDDEN);
         this.contestJpaRepository.deleteById(id);
         return true;
     }

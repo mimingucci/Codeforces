@@ -11,10 +11,17 @@ import com.mimingucci.user.presentation.dto.response.UserGetResponse;
 import com.mimingucci.user.presentation.dto.response.UserUpdateResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,12 +41,18 @@ public class UserControllerImpl implements UserController {
         return BaseResponse.success(this.userApplicationService.getAll(param, pageable));
     }
 
+//    @Caching(evict = {
+//            @CacheEvict(value = "users", key = "#userId"),
+//    })
     @PutMapping(path = PathConstants.BAN + PathConstants.USER_ID)
     @Override
     public BaseResponse<Boolean> banAccount(@PathVariable("userId") Long userId, HttpServletRequest request) {
         return BaseResponse.success(this.userApplicationService.ban(userId, request));
     }
 
+//    @Caching(evict = {
+//            @CacheEvict(value = "users", key = "#userId"),
+//    })
     @PutMapping(path = PathConstants.ROLE + PathConstants.USER_ID)
     @Override
     public BaseResponse<Boolean> addAdmin(@PathVariable("userId") Long userId, HttpServletRequest request) {
@@ -58,12 +71,25 @@ public class UserControllerImpl implements UserController {
         return BaseResponse.success(this.userApplicationService.unsetAvatar(request));
     }
 
+//    @Caching(evict = {
+//            @CacheEvict(value = "users", allEntries = true),
+//    })
+    @PutMapping(path = PathConstants.RATING)
+    @Override
+    public BaseResponse<Boolean> updateUserRatings(@RequestBody @Validated List<Pair<Long, Integer>> users, @RequestHeader(value = "Authorization", required = true) String authToken) {
+        return BaseResponse.success(this.userApplicationService.updateRatings(users, authToken));
+    }
+
+//    @Caching(put = {
+//            @CachePut(value = "users", key = "#request.id"),
+//    })
     @PutMapping(path = PathConstants.UPDATE)
     @Override
-    public BaseResponse<UserUpdateResponse> updateProfile(@RequestBody @Validated UserUpdateRequest request) {
+    public BaseResponse<UserGetResponse> updateProfile(@RequestBody @Validated UserUpdateRequest request) {
         return BaseResponse.success(this.userApplicationService.updateProfile(request));
     }
 
+//    @Cacheable(value = "users", key = "#userId")
     @GetMapping(path = PathConstants.USER_ID)
     @Override
     public BaseResponse<UserGetResponse> getUserById(@PathVariable("userId") Long userId) {

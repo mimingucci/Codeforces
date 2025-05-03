@@ -31,13 +31,13 @@ public class RankingControllerImpl implements RankingController {
     @GetMapping(path = PathConstants.CONTEST_ID)
     @Override
     public BaseResponse<List<LeaderboardEntry>> getLeaderboardByContestId(@PathVariable("contestId") Long contestId) {
-        return null;
+        return BaseResponse.success(service.getLeaderboard(contestId));
     }
 
     @PostMapping(path = PathConstants.CONTEST_ID)
     @Override
-    public BaseResponse<Boolean> completeContest(@PathVariable("contestId") Long contestId, HttpServletRequest request) {
-        return BaseResponse.success(service.completeContest(contestId, request));
+    public BaseResponse<Boolean> completeContest(@PathVariable("contestId") Long contestId, @RequestHeader(value = "Authorization", required = true) String authToken) {
+        return BaseResponse.success(service.completeContest(contestId, authToken));
     }
 
 }

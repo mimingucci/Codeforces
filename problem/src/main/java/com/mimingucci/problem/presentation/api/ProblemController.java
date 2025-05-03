@@ -23,7 +23,7 @@ public interface ProblemController {
 
     BaseResponse<List<ProblemResponse>> getAllProblemsByContestId(Long contestId);
 
-    BaseResponse<Boolean> updateProblemStatus(Long contestId, String token, ProblemUpdateRequest request);
+    BaseResponse<Boolean> updateProblemStatus(Long contestId, ProblemUpdateRequest request, HttpServletRequest servletRequest);
 
     BaseResponse<ProblemResponse> getProblemByIdDev(Long id, HttpServletRequest request);
 

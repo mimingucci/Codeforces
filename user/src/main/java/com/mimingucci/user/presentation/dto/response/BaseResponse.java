@@ -2,6 +2,8 @@ package com.mimingucci.user.presentation.dto.response;
 
 import lombok.With;
 
+import java.io.Serializable;
+
 public record BaseResponse<T>(
         @With
         String code,
@@ -9,7 +11,7 @@ public record BaseResponse<T>(
         String message,
         @With
         T data
-) {
+) implements Serializable {
 
     public static final String SUCCESS_CODE = "200";
     public static final String SUCCESS_MESSAGE = "Success";

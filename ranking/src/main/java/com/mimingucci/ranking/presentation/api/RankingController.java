@@ -13,5 +13,5 @@ public interface RankingController {
 
     BaseResponse<VirtualContestMetadata> startVirtualContest(VirtualContestRequest request, String authToken);
 
-    BaseResponse<Boolean> completeContest(Long contestId, HttpServletRequest request);
+    BaseResponse<Boolean> completeContest(Long contestId, String authToken);
 }

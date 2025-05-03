@@ -7,11 +7,11 @@ import com.mimingucci.ranking.common.exception.ApiRequestException;
 import com.mimingucci.ranking.common.util.JwtUtil;
 import com.mimingucci.ranking.domain.model.LeaderboardEntry;
 import com.mimingucci.ranking.domain.model.VirtualContestMetadata;
+import com.mimingucci.ranking.domain.service.LeaderboardService;
 import com.mimingucci.ranking.domain.service.RatingCalculator;
 import com.mimingucci.ranking.domain.service.VirtualContestService;
 import com.mimingucci.ranking.presentation.dto.request.VirtualContestRequest;
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,11 +25,13 @@ public class RankingApplicationServiceImpl implements RankingApplicationService 
 
     private final RatingCalculator ratingCalculator;
 
+    private final LeaderboardService leaderboardService;
+
     private final JwtUtil jwtUtil;
 
     @Override
     public List<LeaderboardEntry> getLeaderboard(Long contestId) {
-        return List.of();
+        return leaderboardService.getLeaderboardByContestId(contestId).getEntries();
     }
 
     @Override
@@ -52,14 +54,15 @@ public class RankingApplicationServiceImpl implements RankingApplicationService 
     }
 
     @Override
-    public Boolean completeContest(Long contestId, HttpServletRequest request) {
-        Long author = null;
+    public Boolean completeContest(Long contestId, String token) {
+        if (token == null) throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         try {
-            Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
-            author = claims.get("id", Long.class);
+            Claims claims = this.jwtUtil.validateToken(token);
+            System.out.println(claims.getSubject());
+            if (!claims.getSubject().equals("SYSTEM")) return false;
         } catch (Exception e) {
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
-        return ratingCalculator.completeContest(contestId, author);
+        return ratingCalculator.completeContest(contestId);
     }
 }

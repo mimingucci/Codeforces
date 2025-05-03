@@ -5,21 +5,24 @@ import com.mimingucci.user.application.assembler.UserAssembler;
 import com.mimingucci.user.common.constant.ErrorMessageConstants;
 import com.mimingucci.user.common.enums.Role;
 import com.mimingucci.user.common.exception.ApiRequestException;
+import com.mimingucci.user.common.util.JwtUtil;
 import com.mimingucci.user.domain.model.User;
 import com.mimingucci.user.domain.service.UserService;
 import com.mimingucci.user.presentation.dto.request.UserParam;
 import com.mimingucci.user.presentation.dto.request.UserUpdateRequest;
 import com.mimingucci.user.presentation.dto.response.PageableResponse;
 import com.mimingucci.user.presentation.dto.response.UserGetResponse;
-import com.mimingucci.user.presentation.dto.response.UserUpdateResponse;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -29,10 +32,12 @@ public class UserApplicationServiceImpl implements UserApplicationService {
 
     private final UserService userService;
 
+    private final JwtUtil jwtUtil;
+
     @Override
-    public UserUpdateResponse updateProfile(UserUpdateRequest request) {
+    public UserGetResponse updateProfile(UserUpdateRequest request) {
         User updatedUser = this.userService.updateUserInfo(UserAssembler.INSTANCE.regToDomain(request));
-        return UserAssembler.INSTANCE.toUpdateResponse(updatedUser);
+        return UserAssembler.INSTANCE.toGetResponse(updatedUser);
     }
 
     @Override
@@ -86,5 +91,20 @@ public class UserApplicationServiceImpl implements UserApplicationService {
         }
         if (userId == null) throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         return this.userService.unsetAvatar(userId);
+    }
+
+    @Override
+    public Boolean updateRatings(List<Pair<Long, Integer>> users, String authToken) {
+        if (authToken == null) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+        try {
+            Claims claims = this.jwtUtil.validateToken(authToken);
+            if (!claims.getSubject().equals("SYSTEM")) return false;
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+        this.userService.updateContestRatings(users);
+        return true;
     }
 }

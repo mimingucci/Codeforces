@@ -22,11 +22,7 @@ public interface UserRepository {
 
     User findById(Long userId);
 
-    List<User> findByCountry(Long countryId);
-
-    Page<User> findByCountry(Long countryId, Pageable pageable);
-
-    long getCountryUserCount(Long countryId);
+    List<User> findByCountry(String country);
 
     /**
      * Check if a user exists by their ID

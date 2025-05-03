@@ -14,6 +14,8 @@ public interface LeaderboardEntryConverter {
 
     LeaderboardEntryEntity entryToEntity(LeaderboardEntry entry);
 
+    LeaderboardEntry toDomain(LeaderboardEntryEntity entity);
+
     default LeaderboardEntryEntity toEntity(LeaderboardEntry event) {
         LeaderboardEntryEntity entity = this.entryToEntity(event);
         entity.setId(IdGenerator.INSTANCE.nextId());

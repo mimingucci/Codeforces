@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface LeaderboardEntryRepository {
     void saveLeaderboardEntriesDuringContest(List<LeaderboardEntry> entries);
+
+    List<LeaderboardEntry> getAllEntriesByContestId(Long id);
 }

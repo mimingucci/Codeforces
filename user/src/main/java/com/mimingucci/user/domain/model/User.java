@@ -40,7 +40,7 @@ public class User {
 
     private Instant lastActive;
 
-    private Country country;
+    private String country;
 
     private Instant createdAt;
 
