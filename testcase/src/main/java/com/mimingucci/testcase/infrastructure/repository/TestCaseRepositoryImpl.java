@@ -25,9 +25,9 @@ public class TestCaseRepositoryImpl implements TestCaseRepository {
     }
 
     @Override
-    public void createTestCases(List<TestCase> testCases) {
+    public List<TestCase> createTestCases(List<TestCase> testCases) {
         List<TestCaseEntity> entities = testCases.stream().map(TestCaseConverter.INSTANCE::toEntity).toList();
-        testCaseJpaRepository.saveAll(entities);
+        return testCaseJpaRepository.saveAll(entities).stream().map(TestCaseConverter.INSTANCE::toModel).toList();
     }
 
     @Override

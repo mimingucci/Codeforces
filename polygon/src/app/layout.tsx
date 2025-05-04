@@ -1,6 +1,12 @@
-import type { Metadata } from 'next';
+'use client';
+
+// import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import { Provider as JotaiProvider } from 'jotai';
+import AuthProvider from '@/components/AuthProvider';
+import { SessionProvider } from 'next-auth/react';
+import { SnackbarProvider } from 'notistack';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -12,14 +18,6 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-export const metadata: Metadata = {
-  title: 'Polygon',
-  description: 'Codeforces sites for creating, managing contest.',
-  icons: {
-    icon: '/topcoder.ico',
-  },
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,10 +25,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <title>Polygon</title>
+        {/* Default favicon for SSR */}
+        <link rel="icon" href="/topcoder.ico" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <SessionProvider>
+          <JotaiProvider>
+            <AuthProvider>
+              <SnackbarProvider maxSnack={3}>{children}</SnackbarProvider>
+            </AuthProvider>
+          </JotaiProvider>
+        </SessionProvider>
       </body>
     </html>
   );

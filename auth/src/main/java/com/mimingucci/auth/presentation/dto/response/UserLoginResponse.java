@@ -1,9 +1,12 @@
 package com.mimingucci.auth.presentation.dto.response;
 
+import com.mimingucci.auth.common.enums.Role;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -16,4 +19,6 @@ public class UserLoginResponse {
     String email;
 
     String username;
+
+    List<Role> roles;
 }

@@ -1,3 +1,9 @@
+import Processing from '@/components/Processing';
+
 export default function ProblemManagement() {
-  return <div>Hi</div>;
+  return (
+    <>
+      <Processing />
+    </>
+  );
 }

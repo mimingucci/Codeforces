@@ -18,4 +18,5 @@ public class PathConstants {
     public static final String TEST_CASE_ID = "/{testCaseId}";
     public static final String API_V1_TEST_CASE = API_V1 + TEST_CASE;
     public static final String API_V1_TEST_CASE_PROBLEM = API_V1 + TEST_CASE + PROBLEM;
+    public static final String BATCH = "/batch";
 }

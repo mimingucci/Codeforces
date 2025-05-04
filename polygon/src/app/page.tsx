@@ -1,8 +1,35 @@
+'use client';
+
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Box, Container, Typography, Button, Stack } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import Loading from '@/components/Loading';
 
 export default function Page() {
+  const router = useRouter();
+  const { status } = useSession();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (status === 'loading') {
+      return;
+    }
+
+    if (status === 'unauthenticated') {
+      router.push('/login');
+      return;
+    }
+
+    setLoading(false);
+  }, [status, router]);
+
+  // Show loading animation while checking auth
+  if (loading || status === 'loading') {
+    return <Loading />;
+  }
   return (
     <Box
       sx={{

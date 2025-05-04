@@ -24,4 +24,5 @@ public class ContestResponse {
     Boolean enabled;
     Boolean isPublic;
     ContestType type;
+    Long createdBy;
 }

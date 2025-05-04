@@ -3,6 +3,7 @@ package com.mimingucci.testcase.presentation.api.impl;
 import com.mimingucci.testcase.application.TestCaseApplicationService;
 import com.mimingucci.testcase.common.constant.PathConstants;
 import com.mimingucci.testcase.presentation.api.TestCaseController;
+import com.mimingucci.testcase.presentation.dto.request.TestCaseCreateBatchRequest;
 import com.mimingucci.testcase.presentation.dto.request.TestCaseRequest;
 import com.mimingucci.testcase.presentation.dto.response.BaseResponse;
 import com.mimingucci.testcase.presentation.dto.response.TestCaseResponse;
@@ -25,6 +26,11 @@ public class TestCaseControllerImpl implements TestCaseController {
         return BaseResponse.success(applicationService.getTestCaseByProblemId(problemId, request));
     }
 
+    @PostMapping(path = PathConstants.BATCH)
+    @Override
+    public BaseResponse<List<TestCaseResponse>> createBatchTestCase(@RequestBody @Validated TestCaseCreateBatchRequest testcases, HttpServletRequest request) {
+        return BaseResponse.success(applicationService.createBatchTestCases(testcases, request));
+    }
 
     @GetMapping(path = PathConstants.TEST_CASE_ID)
     @Override

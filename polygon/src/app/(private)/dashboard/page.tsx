@@ -23,6 +23,7 @@ import {
   Send as SubmissionIcon,
   Dashboard as DashboardIcon,
 } from '@mui/icons-material';
+import Image from 'next/image';
 import UserManagement from '@/components/Dashboard/UserManagement';
 import ContestManagement from '@/components/Dashboard/ContestManagement';
 import ProblemManagement from '@/components/Dashboard/ProblemManagement';
@@ -71,9 +72,25 @@ export default function Dashboard() {
           <IconButton color="inherit" edge="start" onClick={handleDrawerToggle}>
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
-            Admin Dashboard
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 0 }}>
+            <Image
+              src="/images/topcoder4.svg"
+              alt="Polygon"
+              width={70}
+              height={70}
+              style={{ marginRight: '8px' }}
+            />
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{
+                fontWeight: 'bold',
+                display: { xs: 'none', sm: 'block' },
+              }}
+            >
+              Dashboard
+            </Typography>
+          </Box>
         </Toolbar>
       </AppBar>
 

@@ -3,7 +3,6 @@ package com.mimingucci.contest.presentation.api.impl;
 import com.mimingucci.contest.application.ContestApplicationService;
 import com.mimingucci.contest.common.constant.PathConstants;
 import com.mimingucci.contest.common.enums.Role;
-import com.mimingucci.contest.domain.client.RankingClient;
 import com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType;
 import com.mimingucci.contest.presentation.api.ContestController;
 import com.mimingucci.contest.presentation.dto.request.ContestCreateRequest;
@@ -27,8 +26,6 @@ import java.util.Set;
 @RequestMapping(path = PathConstants.API_V1_CONTEST)
 public class ContestControllerImpl implements ContestController {
     private final ContestApplicationService service;
-
-    private final RankingClient rankingClient;
 
     @GetMapping(path = PathConstants.UP_COMING)
     @Override
@@ -128,8 +125,6 @@ public class ContestControllerImpl implements ContestController {
     @GetMapping(path = PathConstants.ALL)
     @Override
     public BaseResponse<PageableResponse<ContestResponse>> getListContests(@RequestParam(name = "name", defaultValue = "") String name, Pageable pageable) {
-        rankingClient.completeContest(1L);
-        return BaseResponse.success();
-//        return BaseResponse.success(service.getListContests(name, pageable));
+        return BaseResponse.success(service.getListContests(name, pageable));
     }
 }

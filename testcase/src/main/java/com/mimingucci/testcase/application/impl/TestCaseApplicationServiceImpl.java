@@ -6,6 +6,7 @@ import com.mimingucci.testcase.common.constant.ErrorMessageConstants;
 import com.mimingucci.testcase.common.exception.ApiRequestException;
 import com.mimingucci.testcase.common.util.JwtUtil;
 import com.mimingucci.testcase.domain.service.TestCaseService;
+import com.mimingucci.testcase.presentation.dto.request.TestCaseCreateBatchRequest;
 import com.mimingucci.testcase.presentation.dto.request.TestCaseRequest;
 import com.mimingucci.testcase.presentation.dto.response.TestCaseResponse;
 import io.jsonwebtoken.Claims;
@@ -85,5 +86,20 @@ public class TestCaseApplicationServiceImpl implements TestCaseApplicationServic
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
         service.deleteTestCase(author, testCaseId);
+    }
+
+    @Override
+    public List<TestCaseResponse> createBatchTestCases(TestCaseCreateBatchRequest testcases, HttpServletRequest request) {
+        Long author = null;
+        try {
+            Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
+            author = claims.get("id", Long.class);
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+
+        List<TestCaseRequest> tc = testcases.getData();
+        for (var i : tc) i.setProblem(testcases.getProblem());
+        return service.createTestCases(tc.stream().map(TestCaseAssembler.INSTANCE::toDomain).toList(), testcases.getProblem(), author).stream().map(TestCaseAssembler.INSTANCE::toResponse).toList();
     }
 }

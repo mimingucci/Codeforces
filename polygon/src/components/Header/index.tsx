@@ -20,11 +20,20 @@ import {
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { userAtom } from 'app/lib/auth-store';
+import { signOut } from 'next-auth/react';
 
 export default function Header() {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const user = useAtomValue(userAtom);
+
+  const setUser = useSetAtom(userAtom);
+
+  const isAdmin =
+    user?.roles.includes('ADMIN') || user?.roles.includes('SUPER_ADMIN');
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -34,10 +43,20 @@ export default function Header() {
     setAnchorEl(null);
   };
 
-  const handleLogout = () => {
-    // Add logout logic here
-    handleClose();
-    router.push('/login');
+  const handleLogout = async () => {
+    try {
+      await signOut({
+        redirect: false,
+      });
+      // Clear user data from Jotai store
+      setUser(null);
+      // Close the menu
+      handleClose();
+      // Redirect to login page
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return (
@@ -66,13 +85,15 @@ export default function Header() {
 
         {/* Navigation Links */}
         <Box sx={{ flexGrow: 1, ml: 4, display: { xs: 'none', md: 'flex' } }}>
-          <Button
-            startIcon={<DashboardIcon />}
-            sx={{ mr: 2 }}
-            onClick={() => router.push('/dashboard')}
-          >
-            Dashboard
-          </Button>
+          {isAdmin && (
+            <Button
+              startIcon={<DashboardIcon />}
+              sx={{ mr: 2 }}
+              onClick={() => router.push('/dashboard')}
+            >
+              Dashboard
+            </Button>
+          )}
           <Button
             startIcon={<ContestIcon />}
             onClick={() => router.push('/contests')}
@@ -105,11 +126,8 @@ export default function Header() {
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           >
-            <MenuItem onClick={() => router.push('/profile')}>
+            <MenuItem onClick={() => router.push(`/profile/${user?.id}`)}>
               <PersonIcon sx={{ mr: 1 }} /> Profile
-            </MenuItem>
-            <MenuItem onClick={() => router.push('/dashboard')}>
-              <DashboardIcon sx={{ mr: 1 }} /> Dashboard
             </MenuItem>
             <Divider />
             <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>

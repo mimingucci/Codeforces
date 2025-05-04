@@ -1,3 +1,9 @@
+import Processing from '@/components/Processing';
+
 export default function SubmissionManagement() {
-  return <div>Hi</div>;
+  return (
+    <div>
+      <Processing />
+    </div>
+  );
 }

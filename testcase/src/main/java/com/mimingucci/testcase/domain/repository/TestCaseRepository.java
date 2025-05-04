@@ -7,7 +7,7 @@ import java.util.List;
 public interface TestCaseRepository {
     TestCase createTestCase(TestCase testCase);
 
-    void createTestCases(List<TestCase> testCases);
+    List<TestCase> createTestCases(List<TestCase> testCases);
 
     TestCase getTestCase(Long id);
 

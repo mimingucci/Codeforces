@@ -14,8 +14,12 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Image from 'next/image';
 import React, { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginForm() {
+  const router = useRouter();
+
   const [enableSubmit, setEnableSubmit] = useState<boolean>(false);
   const [email, setEmail] = useState<string>('');
   const [values, setValues] = useState<{
@@ -25,6 +29,9 @@ export default function LoginForm() {
     password: '',
     showPassword: false,
   });
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleClickShowPassword: () => void = () => {
     setValues({
@@ -64,8 +71,32 @@ export default function LoginForm() {
     setEmail(prop);
   };
 
-  const handleLogin = () => {
-    return true;
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const result = await signIn('credentials', {
+        email: email,
+        password: values.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError('Invalid email or password');
+        return;
+      }
+
+      if (result?.ok) {
+        router.push('/'); // Or wherever you want to redirect after login
+      }
+    } catch (error) {
+      setError('An unexpected error occurred');
+      console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -163,6 +194,21 @@ export default function LoginForm() {
                 Sign in to continue to Polygon
               </Typography>
 
+              {error && (
+                <Typography
+                  color="error"
+                  variant="body2"
+                  align="center"
+                  sx={{
+                    bgcolor: 'error.lighter',
+                    p: 1,
+                    borderRadius: 1,
+                  }}
+                >
+                  {error}
+                </Typography>
+              )}
+
               <form onSubmit={handleLogin}>
                 <Stack spacing={3}>
                   <TextField
@@ -171,6 +217,8 @@ export default function LoginForm() {
                     variant="outlined"
                     type="email"
                     onChange={(e) => handleEmailChange(e.target.value)}
+                    error={!!error}
+                    disabled={isLoading}
                   />
 
                   <TextField
@@ -180,6 +228,8 @@ export default function LoginForm() {
                     type={values.showPassword ? 'text' : 'password'}
                     value={values.password}
                     onChange={handlePasswordChange('password')}
+                    error={!!error}
+                    disabled={isLoading}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
@@ -187,6 +237,7 @@ export default function LoginForm() {
                             onClick={handleClickShowPassword}
                             onMouseDown={handleMouseDownPassword}
                             edge="end"
+                            disabled={isLoading}
                           >
                             {values.showPassword ? (
                               <VisibilityOff />
@@ -204,7 +255,7 @@ export default function LoginForm() {
                     size="large"
                     type="submit"
                     variant="contained"
-                    disabled={!enableSubmit}
+                    disabled={!enableSubmit || isLoading}
                     sx={{
                       py: 1.5,
                       mt: 2,
@@ -212,7 +263,7 @@ export default function LoginForm() {
                       fontSize: '1.1rem',
                     }}
                   >
-                    Sign in
+                    {isLoading ? 'Signing in...' : 'Sign in'}
                   </Button>
                 </Stack>
               </form>

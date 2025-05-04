@@ -25,6 +25,7 @@ import {
   Schedule as ScheduleIcon,
 } from '@mui/icons-material';
 import { format } from 'date-fns';
+import { ContestApi } from 'features/contest/api';
 
 interface Problem {
   id: string;
@@ -103,6 +104,8 @@ export default function ContestPage() {
       try {
         const data = await fetchContestDetails(contestId);
         setContest(data);
+        const rep = await ContestApi.getContest(contestId);
+        console.log(rep);
       } finally {
         setLoading(false);
       }

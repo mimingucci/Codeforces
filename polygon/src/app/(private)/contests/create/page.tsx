@@ -19,6 +19,9 @@ import {
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { ContestApi } from 'features/contest/api';
+import { useRouter } from 'next/navigation';
+import { useSnackbar } from 'notistack';
 
 interface StaffMember {
   id: string;
@@ -65,6 +68,9 @@ export default function CreateContest() {
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<User[]>(mockUsers);
+  // Add router and snackbar
+  const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
 
   // Initialize staff with current user as author
   const [staff, setStaff] = useState<StaffMember[]>([
@@ -107,21 +113,65 @@ export default function CreateContest() {
     setLoading(true);
     setError('');
 
+    // Validation
+    if (!name || !startTime || !endTime) {
+      setError('Please fill in all required fields');
+      setLoading(false);
+      return;
+    }
+
+    if (startTime >= endTime) {
+      setError('End time must be after start time');
+      setLoading(false);
+      return;
+    }
+
     try {
-      // Add your API call here
-      console.log({
+      const contestData = {
         name,
         startTime,
         endTime,
-        isEnabled,
-        staff,
+        enabled: isEnabled,
+        authors: staff
+          .filter((member) => member.role === 'AUTHOR')
+          .map((member) => member.id),
+        coodinators: staff
+          .filter((member) => member.role === 'COORDINATOR')
+          .map((member) => member.id),
+        testers: staff
+          .filter((member) => member.role === 'TESTER')
+          .map((member) => member.id),
+      };
+
+      const response = await ContestApi.createContest(contestData);
+
+      enqueueSnackbar('Contest created successfully!', {
+        variant: 'success',
+        autoHideDuration: 3000,
       });
-    } catch (err) {
-      setError('Failed to create contest');
+
+      // Redirect to contest page
+      router.push(`/contests/${response.id}`);
+    } catch (err: any) {
+      console.error('Create contest error:', err);
+      setError(err?.message || 'Failed to create contest');
+      enqueueSnackbar('Failed to create contest', {
+        variant: 'error',
+        autoHideDuration: 3000,
+      });
     } finally {
       setLoading(false);
     }
   };
+
+  // Add validation feedback
+  const isStartTimeValid = startTime && startTime > new Date();
+  const isEndTimeValid = endTime && startTime && endTime > startTime;
+  const isFormValid =
+    name &&
+    isStartTimeValid &&
+    isEndTimeValid &&
+    staff.some((member) => member.role === 'AUTHOR');
 
   return (
     <Container maxWidth="md">
@@ -141,6 +191,8 @@ export default function CreateContest() {
                 fullWidth
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                error={!name}
+                helperText={!name ? 'Contest name is required' : ''}
               />
 
               <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -150,12 +202,28 @@ export default function CreateContest() {
                     value={startTime}
                     onChange={setStartTime}
                     sx={{ flex: 1 }}
+                    minDateTime={new Date()}
+                    slotProps={{
+                      textField: {
+                        helperText: !isStartTimeValid
+                          ? 'Start time must be in the future'
+                          : '',
+                      },
+                    }}
                   />
                   <DateTimePicker
                     label="End Time"
                     value={endTime}
                     onChange={setEndTime}
                     sx={{ flex: 1 }}
+                    minDateTime={startTime || new Date()}
+                    slotProps={{
+                      textField: {
+                        helperText: !isEndTimeValid
+                          ? 'End time must be after start time'
+                          : '',
+                      },
+                    }}
                   />
                 </Stack>
               </LocalizationProvider>
@@ -259,7 +327,7 @@ export default function CreateContest() {
                 type="submit"
                 variant="contained"
                 size="large"
-                disabled={loading}
+                disabled={loading || !isFormValid}
                 sx={{ mt: 2 }}
               >
                 {loading ? <CircularProgress size={24} /> : 'Create Contest'}

@@ -16,4 +16,6 @@ public interface TestCaseService {
     TestCase updateTestCase(Long author, Long id, TestCase testCase);
 
     List<TestCase> getTestCasesByProblemIdTester(Long problemId, Long author);
+
+    List<TestCase> createTestCases(List<TestCase> testcases, Long problem, Long author);
 }

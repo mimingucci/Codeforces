@@ -7,9 +7,11 @@ import com.mimingucci.testcase.domain.client.ProblemClient;
 import com.mimingucci.testcase.domain.model.TestCase;
 import com.mimingucci.testcase.domain.repository.TestCaseRepository;
 import com.mimingucci.testcase.domain.service.TestCaseService;
+import com.mimingucci.testcase.presentation.dto.request.TestCaseCreateBatchRequest;
 import com.mimingucci.testcase.presentation.dto.response.BaseResponse;
 import com.mimingucci.testcase.presentation.dto.response.ContestResponse;
 import com.mimingucci.testcase.presentation.dto.response.ProblemResponse;
+import com.mimingucci.testcase.presentation.dto.response.TestCaseResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -101,5 +103,21 @@ public class TestCaseServiceImpl implements TestCaseService {
             throw new ApiRequestException(ErrorMessageConstants.NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
         }
         return repository.getTestCasesByProblemId(problemId);
+    }
+
+    @Override
+    public List<TestCase> createTestCases(List<TestCase> testcases, Long problem, Long author) {
+        BaseResponse<ProblemResponse> problems = this.problemClient.getProblemById(problem);
+        if (!problems.code().equals(BaseResponse.SUCCESS_CODE) || problems.data() == null) {
+            throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        BaseResponse<ContestResponse> contest = this.contestClient.getContestById(problems.data().getContest());
+        if (!contest.code().equals(BaseResponse.SUCCESS_CODE) || contest.data() == null) {
+            throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        if (!contest.data().getTesters().contains(author) && !contest.data().getAuthors().contains(author)) {
+            throw new ApiRequestException(ErrorMessageConstants.NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
+        }
+        return repository.createTestCases(testcases);
     }
 }
