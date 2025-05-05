@@ -11,6 +11,8 @@ import java.util.List;
 public interface TestCaseController {
     BaseResponse<List<TestCaseResponse>> createBatchTestCase(TestCaseCreateBatchRequest testcases, HttpServletRequest request);
 
+    BaseResponse<Boolean> deleteTestCaseByProblemId(Long problemId, HttpServletRequest request);
+
     BaseResponse<TestCaseResponse> getTestCaseById(Long testCaseId, HttpServletRequest request);
 
     BaseResponse<List<TestCaseResponse>> getTestCaseByProblemId(Long problemId, HttpServletRequest request);

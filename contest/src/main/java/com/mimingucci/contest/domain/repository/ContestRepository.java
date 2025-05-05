@@ -19,7 +19,9 @@ public interface ContestRepository {
 
     List<Contest> findContestsRelevantForPeriod(Instant startTime, Instant endTime);
 
-    Page<Contest> getListContests(String name, Pageable pageable);
+    List<Contest> findAllContestsByMemberStaff(Long userId);
+
+    Page<Contest> getListContests(String name, ContestType type, Instant start, Instant end, Pageable pageable);
 
     List<Contest> getUpcomingSystemContests();
 

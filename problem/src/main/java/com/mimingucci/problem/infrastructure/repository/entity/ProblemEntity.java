@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "problem")
@@ -47,12 +49,14 @@ public class ProblemEntity {
 
     @NotNull
     @Column(name = "memory_limit", nullable = false)
-    private Long memoryLimit = 512000L;
+    private Long memoryLimit = 512_000_000L;
 
     @ValidProblemRating
     private Integer rating;
 
     private Integer score = 0;
+
+    private List<String> tags = new ArrayList<>();
 
     @Column(nullable = false, updatable = false, name = "created_at")
     private Instant createdAt;

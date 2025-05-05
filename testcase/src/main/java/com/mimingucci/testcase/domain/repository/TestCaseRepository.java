@@ -15,5 +15,7 @@ public interface TestCaseRepository {
 
     void deleteTestCase(Long id);
 
+    void deleteTestCasesByProblemId(Long problemId);
+
     TestCase updateTestCase(Long id, TestCase testCase);
 }

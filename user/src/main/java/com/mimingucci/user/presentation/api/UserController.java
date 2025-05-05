@@ -19,6 +19,8 @@ public interface UserController {
 
     BaseResponse<UserGetResponse> getUserById(Long userId);
 
+    BaseResponse<List<UserGetResponse>> getUserByIds(List<Long> userIds);
+
     BaseResponse<UserGetResponse> getUserByUsername(String username);
 
     BaseResponse<PageableResponse<UserGetResponse>> getAll(@ModelAttribute UserParam param, Pageable pageable);
@@ -33,4 +35,5 @@ public interface UserController {
 
     BaseResponse<Boolean> updateUserRatings(List<Pair<Long, Integer>> users, String authToken);
 
+    BaseResponse<PageableResponse<UserGetResponse>> search(String query, Pageable pageable);
 }

@@ -26,6 +26,12 @@ public class TestCaseControllerImpl implements TestCaseController {
         return BaseResponse.success(applicationService.getTestCaseByProblemId(problemId, request));
     }
 
+    @DeleteMapping(path = PathConstants.PROBLEM + PathConstants.PROBLEM_ID)
+    @Override
+    public BaseResponse<Boolean> deleteTestCaseByProblemId(@PathVariable(name = "problemId") Long problemId, HttpServletRequest request) {
+        return BaseResponse.success(applicationService.deleteTestCaseByProblemId(problemId, request));
+    }
+
     @PostMapping(path = PathConstants.BATCH)
     @Override
     public BaseResponse<List<TestCaseResponse>> createBatchTestCase(@RequestBody @Validated TestCaseCreateBatchRequest testcases, HttpServletRequest request) {

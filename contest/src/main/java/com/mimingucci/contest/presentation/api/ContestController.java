@@ -11,6 +11,7 @@ import com.mimingucci.contest.presentation.dto.response.PageableResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface ContestController {
@@ -22,7 +23,7 @@ public interface ContestController {
 
     BaseResponse<?> deleteContest(HttpServletRequest request, Long contestId);
 
-    BaseResponse<PageableResponse<ContestResponse>> getListContests(String name, Pageable pageable);
+    BaseResponse<PageableResponse<ContestResponse>> getListContests(String name, String type, Instant start, Instant end, Pageable pageable);
 
     BaseResponse<ContestRegistrationDto> register(Long contestId, HttpServletRequest request, ContestRegistrationDto dto);
 
@@ -45,4 +46,6 @@ public interface ContestController {
     BaseResponse<PageableResponse<ContestResponse>> getPastContest(ContestType type, Pageable pageable);
 
     BaseResponse<List<ContestResponse>> getRunningContest(ContestType type);
+
+    BaseResponse<List<ContestResponse>> getAllContestsByMemberStaff(HttpServletRequest request);
 }

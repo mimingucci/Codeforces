@@ -4,7 +4,6 @@ import { useSession } from 'next-auth/react';
 import { useSetAtom } from 'jotai';
 import { userAtom } from 'app/lib/auth-store';
 import { useEffect } from 'react';
-import { setAuthToken } from 'app/lib/api';
 import { useRouter } from 'next/navigation';
 
 export default function AuthProvider({
@@ -19,7 +18,6 @@ export default function AuthProvider({
   useEffect(() => {
     if (session?.user) {
       setUser(session.user);
-      setAuthToken(session.user.token);
     } else if (status === 'unauthenticated') {
       setUser(null);
       router.push('/login');

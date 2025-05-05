@@ -30,4 +30,8 @@ public interface UserApplicationService {
     Boolean unsetAvatar(HttpServletRequest request);
 
     Boolean updateRatings(List<Pair<Long, Integer>> users, String authToken);
+
+    PageableResponse<UserGetResponse> search(String query, Pageable pageable);
+
+    List<UserGetResponse> getUserByIds(List<Long> userIds);
 }

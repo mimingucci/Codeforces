@@ -37,4 +37,10 @@ export const TestcaseApi = {
     const response = await apiClient.delete<boolean>(`/api/v1/testcase/${id}`);
     return response.data;
   },
+  deleteTestcases: async (problemId: string) => {
+    const response = await apiClient.delete<boolean>(
+      `/api/v1/testcase/problem/${problemId}`
+    );
+    return response.data;
+  },
 };

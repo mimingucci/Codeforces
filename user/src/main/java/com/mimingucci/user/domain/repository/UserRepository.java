@@ -41,4 +41,6 @@ public interface UserRepository {
     Page<User> findAll(UserParam param, Pageable pageable);
 
     void batchUpdateRatings(Map<Long, Integer> userRatings);
+
+    Page<User> search(String query, Pageable pageable);
 }

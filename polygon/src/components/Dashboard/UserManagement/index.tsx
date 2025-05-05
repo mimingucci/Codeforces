@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Paper,
@@ -14,75 +14,61 @@ import {
   Chip,
   IconButton,
   InputAdornment,
+  Menu,
+  MenuItem,
+  CircularProgress,
 } from '@mui/material';
-import { Search as SearchIcon } from '@mui/icons-material';
-import { blue, orange } from '@mui/material/colors';
-
-// Mock data interface
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  rating: number;
-  role: 'ADMIN' | 'USER';
-  enabled: boolean;
-}
-
-// Mock data
-const mockUsers: User[] = [
-  {
-    id: 1,
-    username: 'tourist',
-    email: 'tourist@example.com',
-    rating: 3800,
-    role: 'USER',
-    enabled: true,
-  },
-  {
-    id: 2,
-    username: 'Petr',
-    email: 'petr@example.com',
-    rating: 3500,
-    role: 'ADMIN',
-    enabled: true,
-  },
-  {
-    id: 3,
-    username: 'jiangly',
-    email: 'jiangly@example.com',
-    rating: 3300,
-    role: 'USER',
-    enabled: true,
-  },
-  {
-    id: 4,
-    username: 'ecnerwala',
-    email: 'ecnerwala@example.com',
-    rating: 3200,
-    role: 'USER',
-    enabled: false,
-  },
-  // Add more mock data as needed
-];
-
-const getRatingColor = (rating: number): string => {
-  if (rating >= 3000) return '#FF0000';
-  if (rating >= 2600) return orange[500];
-  if (rating >= 2200) return blue[500];
-  return '#808080';
-};
+import {
+  Search as SearchIcon,
+  MoreVert as MoreVertIcon,
+} from '@mui/icons-material';
+import { blue } from '@mui/material/colors';
+import { useSnackbar } from 'notistack';
+import { UserApi } from 'features/user/api';
+import { User } from 'features/user/type';
+import { useDebouncedValue } from 'hooks/useDebouncedValue';
+import { convertUnixFormatToDate } from 'utils/date';
 
 export default function UserManagement() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery] = useDebouncedValue(searchQuery, 300);
+  const [totalElements, setTotalElements] = useState(0);
 
-  // Filter users based on search query
-  const filteredUsers = mockUsers.filter(
-    (user) =>
-      user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase())
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [actionMenuAnchor, setActionMenuAnchor] = useState<null | HTMLElement>(
+    null
   );
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  // Fetch users with search and pagination
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const response = await UserApi.search(debouncedQuery);
+        setUsers(response.content);
+        setTotalElements(response.totalElements);
+      } catch (error) {
+        console.error('Failed to fetch users:', error);
+        setError('Failed to load users');
+        enqueueSnackbar('Failed to load users', {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [page, rowsPerPage, debouncedQuery, enqueueSnackbar]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -95,17 +81,43 @@ export default function UserManagement() {
     setPage(0);
   };
 
+  const handleToggleEnabled = async (user: User) => {
+    try {
+      // await UserApi.updateUser(user.id, { enabled: !user.enabled });
+      enqueueSnackbar('User status updated successfully', {
+        variant: 'success',
+        autoHideDuration: 3000,
+      });
+      // Refresh users
+      const response = await UserApi.search(debouncedQuery);
+      setUsers(response.content);
+      setTotalElements(response.totalElements);
+    } catch (error) {
+      console.error('Failed to update user status:', error);
+      enqueueSnackbar('Failed to update user status', {
+        variant: 'error',
+        autoHideDuration: 3000,
+      });
+    }
+  };
+
+  const getRatingColor = (rating: number): string => {
+    if (rating >= 3000) return '#FF0000';
+    if (rating >= 2600) return '#FFA500';
+    if (rating >= 2200) return '#FFFF00';
+    return '#808080';
+  };
+
   return (
     <Box sx={{ width: '100%', p: 3 }}>
       <Typography variant="h4" gutterBottom sx={{ color: blue[700] }}>
         User Management
       </Typography>
 
-      {/* Search Bar */}
       <TextField
         fullWidth
         variant="outlined"
-        placeholder="Search by username or email..."
+        placeholder="Search users..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         sx={{ mb: 3 }}
@@ -115,26 +127,38 @@ export default function UserManagement() {
               <SearchIcon />
             </InputAdornment>
           ),
+          endAdornment: loading && (
+            <InputAdornment position="end">
+              <CircularProgress size={20} />
+            </InputAdornment>
+          ),
         }}
       />
 
-      {/* Table */}
       <TableContainer component={Paper} elevation={2}>
-        <Table sx={{ minWidth: 650 }}>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: blue[50] }}>
-              <TableCell>Username</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Rating</TableCell>
-              <TableCell>Role</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredUsers
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((user) => (
+        {loading ? (
+          <Box sx={{ p: 3, textAlign: 'center' }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Box sx={{ p: 3, textAlign: 'center' }}>
+            <Typography color="error">{error}</Typography>
+          </Box>
+        ) : (
+          <Table sx={{ minWidth: 650 }}>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: blue[50] }}>
+                <TableCell>Username</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Rating</TableCell>
+                <TableCell>Contributions</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Created At</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users.map((user) => (
                 <TableRow
                   key={user.id}
                   sx={{ '&:hover': { backgroundColor: 'action.hover' } }}
@@ -152,13 +176,7 @@ export default function UserManagement() {
                       }}
                     />
                   </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={user.role}
-                      size="small"
-                      color={user.role === 'ADMIN' ? 'primary' : 'default'}
-                    />
-                  </TableCell>
+                  <TableCell>{user.contribute || 0}</TableCell>
                   <TableCell>
                     <Chip
                       label={user.enabled ? 'Active' : 'Disabled'}
@@ -166,28 +184,55 @@ export default function UserManagement() {
                       color={user.enabled ? 'success' : 'error'}
                     />
                   </TableCell>
+                  <TableCell>
+                    {convertUnixFormatToDate(
+                      user.createdAt
+                    ).toLocaleDateString()}
+                  </TableCell>
                   <TableCell align="right">
-                    {/* Add your action buttons here */}
-                    <IconButton size="small" color="primary">
-                      {/* Add icons for edit, delete, etc. */}
+                    <IconButton
+                      onClick={(e) => {
+                        setSelectedUser(user);
+                        setActionMenuAnchor(e.currentTarget);
+                      }}
+                    >
+                      <MoreVertIcon />
                     </IconButton>
                   </TableCell>
                 </TableRow>
               ))}
-          </TableBody>
-        </Table>
+            </TableBody>
+          </Table>
+        )}
 
-        {/* Pagination */}
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={filteredUsers.length}
+          count={totalElements}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
+
+      {/* Action Menu */}
+      <Menu
+        anchorEl={actionMenuAnchor}
+        open={Boolean(actionMenuAnchor)}
+        onClose={() => setActionMenuAnchor(null)}
+      >
+        <MenuItem
+          onClick={() => {
+            if (selectedUser) {
+              handleToggleEnabled(selectedUser);
+            }
+            setActionMenuAnchor(null);
+          }}
+        >
+          {selectedUser?.enabled ? 'Disable' : 'Enable'} User
+        </MenuItem>
+      </Menu>
     </Box>
   );
 }

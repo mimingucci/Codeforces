@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -42,4 +43,8 @@ public interface UserService {
      * @return true if successful, false otherwise
      */
     Boolean unsetAvatar(Long userId);
+
+    Page<User> search(String query, Pageable pageable);
+
+    List<User> getUserByIds(List<Long> userIds);
 }

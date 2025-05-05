@@ -14,6 +14,8 @@ public interface ProblemService {
 
     Problem updateProblem(Long id, Problem domain);
 
+    Problem getById(Long id);
+
     Page<Problem> findAll(Pageable pageable);
 
     Page<Problem> findAllByRating(Integer rating, Pageable pageable);

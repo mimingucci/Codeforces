@@ -6,6 +6,8 @@ import {
   Stack,
   Avatar,
   Chip,
+  Skeleton,
+  Alert,
 } from '@mui/material';
 import {
   People as PeopleIcon,
@@ -14,6 +16,12 @@ import {
   Assessment as AssessmentIcon,
 } from '@mui/icons-material';
 import { blue, green, orange, purple } from '@mui/material/colors';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { User } from 'features/user/type';
+import { UserApi } from 'features/user/api';
+import { format } from 'date-fns';
+import { convertUnixFormatToDate } from 'utils/date';
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -45,14 +53,29 @@ const StatCard = ({ icon, title, value, color }: StatCardProps) => (
 );
 
 export default function DashboardOverview() {
-  // Mock user data - replace with actual data from your auth system
-  const user = {
-    name: 'Jiangly',
-    role: 'ADMIN',
-    avatar: '/path/to/avatar.jpg',
-    rating: 3200,
-    lastActive: '2 hours ago',
-  };
+  const { data: session } = useSession();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!session?.user?.id) return;
+
+      try {
+        setLoading(true);
+        const userData = await UserApi.getUser(session.user.id);
+        setUser(userData);
+      } catch (err) {
+        console.error('Failed to fetch user data:', err);
+        setError('Failed to load user data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [session?.user?.id]);
 
   // Mock statistics - replace with actual data
   const stats = [
@@ -82,6 +105,39 @@ export default function DashboardOverview() {
     },
   ];
 
+  if (loading) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
+          <Grid container spacing={3} alignItems="center">
+            <Grid item>
+              <Skeleton variant="circular" width={80} height={80} />
+            </Grid>
+            <Grid item xs>
+              <Skeleton variant="text" width={300} height={40} />
+              <Skeleton variant="text" width={200} height={24} />
+            </Grid>
+          </Grid>
+        </Paper>
+        <Grid container spacing={3}>
+          {[1, 2, 3, 4].map((_, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index}>
+              <Skeleton variant="rectangular" height={120} />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ p: 3 }}>
       {/* Welcome Section */}
@@ -97,26 +153,27 @@ export default function DashboardOverview() {
         <Grid container spacing={3} alignItems="center">
           <Grid item>
             <Avatar
-              src={user.avatar}
+              src={user?.avatar}
               sx={{ width: 80, height: 80, border: '3px solid white' }}
             />
           </Grid>
           <Grid item>
             <Typography variant="h4" gutterBottom>
-              Welcome back, {user.name}!
+              Welcome back, {user?.username}!
             </Typography>
             <Stack direction="row" spacing={2} alignItems="center">
-              <Chip
-                label={user.role}
-                sx={{
-                  bgcolor: 'rgba(255,255,255,0.2)',
-                  color: 'white',
-                  fontWeight: 'bold',
-                }}
-              />
-              <Typography variant="subtitle1">Rating: {user.rating}</Typography>
+              <Typography variant="subtitle1">
+                Rating: {user?.rating || 0}
+              </Typography>
+              <Typography variant="subtitle1">
+                Contributions: {user?.contribute || 0}
+              </Typography>
               <Typography variant="subtitle2">
-                Last active: {user.lastActive}
+                Member since:{' '}
+                {format(
+                  convertUnixFormatToDate(user?.createdAt || ''),
+                  'MMMM yyyy'
+                )}
               </Typography>
             </Stack>
           </Grid>

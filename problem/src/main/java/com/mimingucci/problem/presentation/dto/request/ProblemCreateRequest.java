@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -23,11 +25,13 @@ public class ProblemCreateRequest {
 
     Long timeLimit = 1000L;
 
-    Long memoryLimit = 512000L;
+    Long memoryLimit = 512_000_000L;
 
     Long author;
 
     Integer rating;
+
+    List<String> tags;
 
     Integer score;
 

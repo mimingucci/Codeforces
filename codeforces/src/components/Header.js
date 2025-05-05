@@ -5,7 +5,7 @@ import UserApi from "../getApi/UserApi";
 import HandleCookies from "../utils/HandleCookies";
 import SearchResults from "./home/SearchResults";
 import { useNavigate } from "react-router-dom";
-import { 
+import {
   AppBar,
   Toolbar,
   Typography,
@@ -15,24 +15,24 @@ import {
   InputBase,
   Paper,
   Badge,
-} from '@mui/material';
-import { styled, alpha } from '@mui/material/styles';
+} from "@mui/material";
+import { styled, alpha } from "@mui/material/styles";
 
 const { IoIosNotifications, IoMdSearch } = icons;
 
 // Styled components
-const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
   borderRadius: theme.shape.borderRadius,
   backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
+  "&:hover": {
     backgroundColor: alpha(theme.palette.common.white, 0.25),
   },
   marginLeft: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
+  width: "100%",
+  [theme.breakpoints.up("sm")]: {
     marginLeft: theme.spacing(1),
-    width: 'auto',
+    width: "auto",
   },
 }));
 
@@ -80,16 +80,16 @@ const Header = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" color="default" elevation={1}>
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Toolbar sx={{ justifyContent: "space-between" }}>
           {/* Logo */}
           <Box sx={{ width: 300 }}>
             <a href="http://localhost:3000/">
-              <img src={logo} alt="Codeforces" style={{ width: '100%' }} />
+              <img src={logo} alt="Codeforces" style={{ width: "100%" }} />
             </a>
           </Box>
 
           {/* User Section */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <IconButton>
               <Badge badgeContent={4} color="primary">
                 <IoIosNotifications />
@@ -97,49 +97,60 @@ const Header = () => {
             </IconButton>
             {checkLogin() ? (
               <>
-                <Button 
+                <Button
                   href={`http://localhost:3000/profile/${user}`}
                   color="inherit"
                 >
                   Profile
                 </Button>
-                <Button 
-                  color="inherit"
-                  onClick={handleLogout}
-                >
+                <Button color="inherit" onClick={handleLogout}>
                   Logout
                 </Button>
               </>
-              ) : (
-                <Button 
-                  href="http://localhost:3000/login"
-                  color="inherit"
-                >
-                  Login
-                </Button>
-              )}
+            ) : (
+              <Button href="http://localhost:3000/login" color="inherit">
+                Login
+              </Button>
+            )}
+          </Box>
+        </Toolbar>
+
+        {/* Navigation Bar */}
+        <Paper elevation={0} sx={{ borderRadius: 0 }}>
+          <Toolbar>
+            <Box sx={{ display: "flex", gap: 2, flexGrow: 1 }}>
+              <Button href="http://localhost:3000/home" color="inherit">
+                HOME
+              </Button>
+              <Button href="http://localhost:3000/contests" color="inherit">
+                CONTEST
+              </Button>
+              <Button href="http://localhost:3000/ide" color="inherit">
+                IDE
+              </Button>
+              <Button
+                href="http://localhost:3000/problems?page=0"
+                color="inherit"
+              >
+                PROBLEMSET
+              </Button>
+              <Button href="http://localhost:3000/rating" color="inherit">
+                TOP USER
+              </Button>
+              <Button href="http://localhost:3000/calendar" color="inherit">
+                CALENDAR
+              </Button>
             </Box>
-          </Toolbar>
-  
-          {/* Navigation Bar */}
-          <Paper elevation={0} sx={{ borderRadius: 0 }}>
-            <Toolbar>
-              <Box sx={{ display: 'flex', gap: 2, flexGrow: 1 }}>
-                <Button href="http://localhost:3000/home" color="inherit">HOME</Button>
-                <Button href="http://localhost:3000/contests" color="inherit">CONTEST</Button>
-                <Button href="http://localhost:3000/ide" color="inherit">IDE</Button>
-                <Button href="http://localhost:3000/problems?page=0" color="inherit">PROBLEMSET</Button>
-                <Button href="http://localhost:3000/rating" color="inherit">TOP USER</Button>
-                <Button href="http://localhost:3000/calendar" color="inherit">CALENDAR</Button>
-                <Button href="http://localhost:3000/createproblem" color="inherit">CREATE PROBLEM</Button>
-                <Button color="inherit">HELP</Button>
-                <Button color="inherit">CATALOG</Button>
-              </Box>
-          {/* Search Bar */}
-          <Search>
+            {/* Search Bar */}
+            <Search>
               <Paper
                 component="form"
-                sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400 }}
+                sx={{
+                  p: "2px 4px",
+                  display: "flex",
+                  alignItems: "center",
+                  width: 400,
+                }}
               >
                 <InputBase
                   sx={{ ml: 1, flex: 1 }}
@@ -156,24 +167,26 @@ const Header = () => {
               {deferredQuery && (
                 <Paper
                   sx={{
-                    position: 'absolute',
-                    width: '100%',
+                    position: "absolute",
+                    width: "100%",
                     zIndex: 1000,
-                    mt: 0.5
+                    mt: 0.5,
                   }}
                 >
-                  <Suspense fallback={
-                    <Box sx={{ p: 2, textAlign: 'center' }}>
-                      <Typography>Loading...</Typography>
-                    </Box>
-                  }>
+                  <Suspense
+                    fallback={
+                      <Box sx={{ p: 2, textAlign: "center" }}>
+                        <Typography>Loading...</Typography>
+                      </Box>
+                    }
+                  >
                     <SearchResults query={deferredQuery} />
                   </Suspense>
                 </Paper>
               )}
             </Search>
           </Toolbar>
-          </Paper>
+        </Paper>
       </AppBar>
     </Box>
   );

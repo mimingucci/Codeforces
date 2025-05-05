@@ -43,6 +43,11 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
+    public Problem getById(Long id) {
+        return this.repository.findByIdDev(id);
+    }
+
+    @Override
     public Page<Problem> findAll(Pageable pageable) {
         return this.repository.findProblems(pageable);
     }

@@ -62,7 +62,9 @@ public class ProblemRepositoryImpl implements ProblemRepository {
         if (!entity.getAuthor().equals(domain.getAuthor())) throw new ApiRequestException(ErrorMessageConstants.NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
         if (domain.getScore() != null) entity.setScore(domain.getScore());
         if (domain.getSolution() != null) entity.setSolution(domain.getSolution());
+        if (domain.getRating() != null) entity.setRating(domain.getRating());
         if (domain.getStatement() != null) entity.setStatement(domain.getStatement());
+        if (domain.getTags() != null) entity.setTags(domain.getTags());
         if (domain.getTitle() != null) entity.setTitle(domain.getTitle());
         if (domain.getMemoryLimit() != null) entity.setMemoryLimit(domain.getMemoryLimit());
         if (domain.getTimeLimit() != null) entity.setTimeLimit(domain.getTimeLimit());

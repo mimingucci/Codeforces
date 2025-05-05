@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Container,
@@ -22,63 +22,80 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { ContestApi } from 'features/contest/api';
 import { useRouter } from 'next/navigation';
 import { useSnackbar } from 'notistack';
-
-interface StaffMember {
-  id: string;
-  username: string;
-  role: 'AUTHOR' | 'TESTER' | 'COORDINATOR';
-}
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  rating: number;
-}
-
-// Add this after your StaffMember interface
-const mockUsers: User[] = [
-  { id: '1', username: 'tourist', email: 'tourist@example.com', rating: 3000 },
-  { id: '2', username: 'Petr', email: 'petr@example.com', rating: 2800 },
-  { id: '3', username: 'scott_wu', email: 'scott@example.com', rating: 2700 },
-  {
-    id: '4',
-    username: 'ecnerwala',
-    email: 'ecnerwala@example.com',
-    rating: 2900,
-  },
-  { id: '5', username: 'Benq', email: 'benq@example.com', rating: 2850 },
-  { id: '6', username: 'Um_nik', email: 'umnik@example.com', rating: 2750 },
-];
-
-// Mock current user
-const currentUser: User = {
-  id: '7',
-  username: 'Jiangly',
-  email: 'jiangly@example.com',
-  rating: 3200,
-};
+import { useSession } from 'next-auth/react';
+import { ContestCreate, ContestStaffMember } from 'features/contest/type';
+import { UserApi } from 'features/user/api';
+import { useDebouncedValue } from 'hooks/useDebouncedValue';
+import { User } from 'features/user/type';
 
 export default function CreateContest() {
-  const [name, setName] = useState('');
+  const [name, setName] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [isEnabled, setIsEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredUsers, setFilteredUsers] = useState<User[]>(mockUsers);
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [searching, setSearching] = useState(false);
+
+  // Add debounced search query
+  const [debouncedQuery] = useDebouncedValue(searchQuery, 300);
+
+  const { data } = useSession();
+
+  const currentUser = data?.user;
   // Add router and snackbar
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
 
   // Initialize staff with current user as author
-  const [staff, setStaff] = useState<StaffMember[]>([
-    { ...currentUser, role: 'AUTHOR' },
-  ]);
+  const [staff, setStaff] = useState<ContestStaffMember[]>([]);
+
+  useEffect(() => {
+    const searchUsers = async () => {
+      if (debouncedQuery.length < 2) {
+        setSearchResults([]);
+        return;
+      }
+
+      try {
+        setSearching(true);
+        const response = await UserApi.search(debouncedQuery);
+        const filteredResults = response.content.filter(
+          (user) => user.id !== currentUser?.id // Don't show current user in results
+        );
+        setSearchResults(filteredResults);
+      } catch (error) {
+        console.error('Failed to search users:', error);
+        setSearchResults([]);
+      } finally {
+        setSearching(false);
+      }
+    };
+
+    searchUsers();
+  }, [debouncedQuery, currentUser?.id]);
+
+  useEffect(() => {
+    if (currentUser) {
+      setStaff([
+        {
+          ...currentUser,
+          role: 'AUTHOR',
+        },
+      ]);
+    }
+  }, [currentUser]);
+
+  // Update handleSearch
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
 
   const handleAddStaffMember =
-    (role: StaffMember['role']) => (event: any, value: any) => {
+    (role: ContestStaffMember['role']) => (event: any, value: any) => {
       if (value) {
         setStaff([...staff, { ...value, role }]);
         // Reset filtered users after selection
@@ -89,23 +106,12 @@ export default function CreateContest() {
   const handleRemoveStaffMember = (memberId: string) => {
     // Prevent removing current user as author
     if (
-      memberId === currentUser.id &&
+      memberId === currentUser?.id &&
       staff.find((m) => m.id === memberId)?.role === 'AUTHOR'
     ) {
       return;
     }
     setStaff(staff.filter((member) => !(member.id === memberId)));
-  };
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    const filtered = mockUsers.filter(
-      (user) =>
-        user.username.toLowerCase().includes(query.toLowerCase()) &&
-        // Allow adding same user in different roles
-        user.id !== currentUser.id // Don't show current user in search
-    );
-    setFilteredUsers(filtered);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -127,15 +133,15 @@ export default function CreateContest() {
     }
 
     try {
-      const contestData = {
+      const contestData: ContestCreate = {
         name,
-        startTime,
-        endTime,
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
         enabled: isEnabled,
         authors: staff
           .filter((member) => member.role === 'AUTHOR')
           .map((member) => member.id),
-        coodinators: staff
+        coordinators: staff
           .filter((member) => member.role === 'COORDINATOR')
           .map((member) => member.id),
         testers: staff
@@ -191,7 +197,7 @@ export default function CreateContest() {
                 fullWidth
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                error={!name}
+                error={!name && name !== null}
                 helperText={!name ? 'Contest name is required' : ''}
               />
 
@@ -246,13 +252,21 @@ export default function CreateContest() {
 
                       <Stack spacing={2}>
                         <Autocomplete
-                          options={filteredUsers}
-                          getOptionLabel={(option) =>
-                            `${option.username} (${option.rating})`
-                          }
+                          options={searchResults}
+                          getOptionLabel={(option) => option.username}
                           onChange={handleAddStaffMember(
-                            role as StaffMember['role']
+                            role as ContestStaffMember['role']
                           )}
+                          onInputChange={(_, value) => handleSearch(value)}
+                          loading={searching}
+                          filterOptions={(x) => x} // Use server-side filtering
+                          noOptionsText={
+                            searchQuery.length < 2
+                              ? 'Type to search users'
+                              : searching
+                                ? 'Searching...'
+                                : 'No users found'
+                          }
                           renderOption={(props, option) => (
                             <Box component="li" {...props}>
                               <Stack
@@ -279,12 +293,23 @@ export default function CreateContest() {
                             <TextField
                               {...params}
                               label={`Add ${role.toLowerCase()}`}
-                              onChange={(e) => handleSearch(e.target.value)}
                               size="small"
+                              InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                  <>
+                                    {searching && (
+                                      <CircularProgress
+                                        color="inherit"
+                                        size={20}
+                                      />
+                                    )}
+                                    {params.InputProps.endAdornment}
+                                  </>
+                                ),
+                              }}
                             />
                           )}
-                          filterOptions={(x) => x}
-                          noOptionsText="No users found"
                         />
 
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -293,14 +318,14 @@ export default function CreateContest() {
                             .map((member) => (
                               <Chip
                                 key={`${member.id}-${member.role}`}
-                                label={`${member.username} (${mockUsers.find((u) => u.id === member.id)?.rating || currentUser.rating})`}
+                                label={`${member.username}`}
                                 onDelete={
-                                  member.id === currentUser.id
+                                  member.id === currentUser?.id
                                     ? undefined
                                     : () => handleRemoveStaffMember(member.id)
                                 }
                                 color={
-                                  member.id === currentUser.id
+                                  member.id === currentUser?.id
                                     ? 'primary'
                                     : 'default'
                                 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Paper,
@@ -25,6 +25,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  CircularProgress,
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -32,50 +33,22 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import {
   Search as SearchIcon,
   MoreVert as MoreVertIcon,
-  FilterList as FilterListIcon,
 } from '@mui/icons-material';
 import { blue, orange } from '@mui/material/colors';
 import { format } from 'date-fns';
-
-type ContestType = 'SYSTEM' | 'ICPC' | 'GYM' | 'NORMAL';
-
-interface ContestStaff {
-  id: number;
-  username: string;
-  role: 'AUTHOR' | 'COORDINATOR' | 'TESTER';
-}
-
-interface Contest {
-  id: number;
-  name: string;
-  type: ContestType;
-  staff: ContestStaff[];
-  startTime: Date;
-  endTime: Date;
-  enabled: boolean;
-}
-
-// Mock data
-const mockContests: Contest[] = [
-  {
-    id: 1,
-    name: 'Educational Codeforces Round 100',
-    type: 'NORMAL',
-    staff: [
-      { id: 1, username: 'tourist', role: 'AUTHOR' },
-      { id: 2, username: 'Petr', role: 'COORDINATOR' },
-    ],
-    startTime: new Date('2025-05-01T14:00:00Z'),
-    endTime: new Date('2025-05-01T16:00:00Z'),
-    enabled: true,
-  },
-  // Add more mock contests...
-];
+import { useSnackbar } from 'notistack';
+import { ContestApi } from 'features/contest/api';
+import { Contest, ContestType } from 'features/contest/type';
+import { User } from 'features/user/type';
+import { UserApi } from 'features/user/api';
+import { useDebouncedValue } from 'hooks/useDebouncedValue';
 
 export default function ContestManagement() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery] = useDebouncedValue(searchQuery, 300);
+  const [totalElements, setTotalElements] = useState(0);
   const [typeFilter, setTypeFilter] = useState<ContestType | 'ALL'>('ALL');
   const [dateRange, setDateRange] = useState<{
     start: Date | null;
@@ -90,6 +63,110 @@ export default function ContestManagement() {
   );
   const [showTypeDialog, setShowTypeDialog] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [contests, setContests] = useState<Contest[]>([]);
+  const [contestAuthors, setContestAuthors] = useState<Record<string, User[]>>(
+    {}
+  );
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    const fetchContests = async () => {
+      try {
+        setLoading(true);
+        const response = await ContestApi.getAllContests(
+          debouncedQuery,
+          page,
+          rowsPerPage,
+          dateRange.start?.toISOString() || '',
+          dateRange.end?.toISOString() || '',
+          typeFilter === 'ALL' ? '' : typeFilter
+        );
+        setContests(response.content);
+        setTotalElements(response.totalElements);
+      } catch (error) {
+        console.error('Failed to fetch contests:', error);
+        setError('Failed to load contests');
+        enqueueSnackbar('Failed to load contests', {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContests();
+  }, [
+    page,
+    rowsPerPage,
+    debouncedQuery,
+    typeFilter,
+    dateRange,
+    enqueueSnackbar,
+  ]);
+
+  useEffect(() => {
+    const fetchContestAuthors = async () => {
+      try {
+        // Collect all unique author IDs
+        const authorIds = [...new Set(contests.flatMap((c) => c.authors))];
+        if (authorIds.length === 0) return;
+
+        // Fetch authors in batch
+        const authors = await UserApi.getUsers(authorIds);
+
+        // Group authors by contest
+        const authorsByContest: Record<string, User[]> = {};
+        contests.forEach((contest) => {
+          authorsByContest[contest.id] = authors.filter((author) =>
+            contest.authors.includes(author.id)
+          );
+        });
+
+        setContestAuthors(authorsByContest);
+      } catch (error) {
+        console.error('Failed to fetch contest authors:', error);
+      }
+    };
+
+    if (contests.length > 0) {
+      fetchContestAuthors();
+    }
+  }, [contests]);
+
+  const handleUpdateContestType = async (type: ContestType) => {
+    if (!selectedContest) return;
+
+    try {
+      await ContestApi.updateContest(selectedContest.id, { type });
+      enqueueSnackbar('Contest type updated successfully', {
+        variant: 'success',
+        autoHideDuration: 3000,
+      });
+      // Refresh contests
+      const updatedContests = await ContestApi.getAllContests(
+        searchQuery,
+        page,
+        rowsPerPage,
+        dateRange.start?.toISOString() || '',
+        dateRange.end?.toISOString() || '',
+        typeFilter === 'ALL' ? '' : typeFilter
+      );
+      setContests(updatedContests.content);
+    } catch (error) {
+      console.error('Failed to update contest type:', error);
+      enqueueSnackbar('Failed to update contest type', {
+        variant: 'error',
+        autoHideDuration: 3000,
+      });
+    } finally {
+      setShowTypeDialog(false);
+    }
+  };
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -101,17 +178,33 @@ export default function ContestManagement() {
     setPage(0);
   };
 
-  const filteredContests = mockContests.filter((contest) => {
-    const matchesSearch = contest.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchesType = typeFilter === 'ALL' || contest.type === typeFilter;
-    const matchesDateRange =
-      (!dateRange.start || contest.startTime >= dateRange.start) &&
-      (!dateRange.end || contest.endTime <= dateRange.end);
-
-    return matchesSearch && matchesType && matchesDateRange;
-  });
+  const handleToggleEnabled = async (contest: Contest) => {
+    try {
+      await ContestApi.updateContest(contest.id, {
+        enabled: !contest.enabled,
+      });
+      enqueueSnackbar('Contest status updated successfully', {
+        variant: 'success',
+        autoHideDuration: 3000,
+      });
+      // Refresh contests
+      const updatedContests = await ContestApi.getAllContests(
+        searchQuery,
+        page,
+        rowsPerPage,
+        dateRange.start?.toISOString() || '',
+        dateRange.end?.toISOString() || '',
+        typeFilter === 'ALL' ? '' : typeFilter
+      );
+      setContests(updatedContests.content);
+    } catch (error) {
+      console.error('Failed to update contest status:', error);
+      enqueueSnackbar('Failed to update contest status', {
+        variant: 'error',
+        autoHideDuration: 3000,
+      });
+    }
+  };
 
   return (
     <Box sx={{ width: '100%', p: 3 }}>
@@ -131,6 +224,11 @@ export default function ContestManagement() {
             startAdornment: (
               <InputAdornment position="start">
                 <SearchIcon />
+              </InputAdornment>
+            ),
+            endAdornment: loading && (
+              <InputAdornment position="end">
+                <CircularProgress size={20} />
               </InputAdornment>
             ),
           }}
@@ -175,22 +273,29 @@ export default function ContestManagement() {
 
       {/* Table */}
       <TableContainer component={Paper} elevation={2}>
-        <Table sx={{ minWidth: 650 }}>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: blue[50] }}>
-              <TableCell>Name</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Staff</TableCell>
-              <TableCell>Start Time</TableCell>
-              <TableCell>End Time</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredContests
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((contest) => (
+        {loading ? (
+          <Box sx={{ p: 3, textAlign: 'center' }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Box sx={{ p: 3, textAlign: 'center' }}>
+            <Typography color="error">{error}</Typography>
+          </Box>
+        ) : (
+          <Table sx={{ minWidth: 650 }}>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: blue[50] }}>
+                <TableCell>Name</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Staff</TableCell>
+                <TableCell>Start Time</TableCell>
+                <TableCell>End Time</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {contests.map((contest) => (
                 <TableRow
                   key={contest.id}
                   sx={{ '&:hover': { backgroundColor: 'action.hover' } }}
@@ -213,19 +318,13 @@ export default function ContestManagement() {
                   </TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={1}>
-                      {contest.staff.map((member) => (
+                      {contestAuthors[contest.id]?.map((author) => (
                         <Chip
-                          key={member.id}
-                          label={member.username}
+                          key={author.id}
+                          label={author.username}
                           size="small"
                           variant="outlined"
-                          color={
-                            member.role === 'AUTHOR'
-                              ? 'primary'
-                              : member.role === 'COORDINATOR'
-                                ? 'secondary'
-                                : 'default'
-                          }
+                          color="primary"
                         />
                       ))}
                     </Stack>
@@ -255,13 +354,14 @@ export default function ContestManagement() {
                   </TableCell>
                 </TableRow>
               ))}
-          </TableBody>
-        </Table>
+            </TableBody>
+          </Table>
+        )}
 
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={filteredContests.length}
+          count={totalElements}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -285,7 +385,9 @@ export default function ContestManagement() {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            // Handle toggle enabled status
+            if (selectedContest) {
+              handleToggleEnabled(selectedContest);
+            }
             setActionMenuAnchor(null);
           }}
         >
@@ -302,20 +404,26 @@ export default function ContestManagement() {
             <Select
               value={selectedContest?.type || ''}
               label="Contest Type"
-              onChange={(e) => {
-                // Handle type change
-              }}
+              onChange={(e) =>
+                handleUpdateContestType(e.target.value as ContestType)
+              }
             >
-              <MenuItem value="SYSTEM">System</MenuItem>
-              <MenuItem value="ICPC">ICPC</MenuItem>
-              <MenuItem value="GYM">Gym</MenuItem>
-              <MenuItem value="NORMAL">Normal</MenuItem>
+              {Object.values(ContestType).map((type) => (
+                <MenuItem key={type} value={type}>
+                  {type}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowTypeDialog(false)}>Cancel</Button>
-          <Button variant="contained" onClick={() => setShowTypeDialog(false)}>
+          <Button
+            variant="contained"
+            onClick={() =>
+              handleUpdateContestType(selectedContest?.type as ContestType)
+            }
+          >
             Save Changes
           </Button>
         </DialogActions>

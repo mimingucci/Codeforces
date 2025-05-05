@@ -18,4 +18,6 @@ public interface TestCaseService {
     List<TestCase> getTestCasesByProblemIdTester(Long problemId, Long author);
 
     List<TestCase> createTestCases(List<TestCase> testcases, Long problem, Long author);
+
+    Boolean deleteTestCaseByProblemId(Long author, Long problemId);
 }

@@ -3,6 +3,7 @@ package com.mimingucci.problem.domain.model;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.List;
 
 @Data
 public class Problem {
@@ -22,7 +23,9 @@ public class Problem {
 
     private Long timeLimit = 1000L;
 
-    private Long memoryLimit = 512000L;
+    private Long memoryLimit = 512_000_000L;
+
+    private List<String> tags;
 
     private Integer rating;
 

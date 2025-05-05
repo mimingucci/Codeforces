@@ -2,6 +2,7 @@
 import axios from 'axios';
 import JSONbig from 'json-bigint';
 import axiosRetry from 'axios-retry';
+import { getSession } from 'next-auth/react';
 
 // Configure JSONbig to handle Long values properly
 const JSONbigString = JSONbig({ storeAsString: true });
@@ -57,13 +58,26 @@ apiClient.interceptors.response.use(
   }
 );
 
-// Set auth token if it exists
-export const setAuthToken = (token: string | null) => {
-  if (token) {
-    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  } else {
-    delete apiClient.defaults.headers.common['Authorization'];
+apiClient.interceptors.request.use(
+  async (config) => {
+    try {
+      // Get current session
+      const session = await getSession();
+
+      // Add token if available
+      if (session?.user?.token && config.headers) {
+        config.headers.Authorization = `Bearer ${session.user.token}`;
+      }
+
+      return config;
+    } catch (error) {
+      console.error('Error setting auth token:', error);
+      return config;
+    }
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-};
+);
 
 export default apiClient;

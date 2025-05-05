@@ -19,7 +19,6 @@ public class SubmissionConsumer {
 
     @KafkaListener(topics = KafkaTopicConstants.UPDATE_SUBMISSION_VERDICT, groupId = "${spring.kafka.consumer.group-id}")
     public void submissionUpdateListener(SubmissionJudgedEvent event) {
-        System.out.println("Listening...");
         Submission submission = new Submission();
         submission.setVerdict(event.getVerdict());
         submission.setId(event.getId());

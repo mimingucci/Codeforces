@@ -11,6 +11,7 @@ import com.mimingucci.contest.presentation.dto.response.PageableResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +24,7 @@ public interface ContestApplicationService {
 
     void deleteContest(Long userId, Set<Role> roles, Long contestId);
 
-    PageableResponse<ContestResponse> getListContests(String name, Pageable pageable);
+    PageableResponse<ContestResponse> getListContests(String name, String type, Instant start, Instant end, Pageable pageable);
 
     // register
     ContestRegistrationDto registerContest(Long userId, ContestRegistrationDto request);
@@ -47,4 +48,6 @@ public interface ContestApplicationService {
     PageableResponse<ContestResponse> getPastContests(ContestType type, Pageable pageable);
 
     List<ContestResponse> getRunningContests(ContestType type);
+
+    List<ContestResponse> getAllContestsByMemberStaff(HttpServletRequest request);
 }

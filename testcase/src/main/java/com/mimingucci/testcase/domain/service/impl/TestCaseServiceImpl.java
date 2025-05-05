@@ -120,4 +120,21 @@ public class TestCaseServiceImpl implements TestCaseService {
         }
         return repository.createTestCases(testcases);
     }
+
+    @Override
+    public Boolean deleteTestCaseByProblemId(Long author, Long problemId) {
+        BaseResponse<ProblemResponse> problems = this.problemClient.getProblemById(problemId);
+        if (!problems.code().equals(BaseResponse.SUCCESS_CODE) || problems.data() == null) {
+            throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        BaseResponse<ContestResponse> contest = this.contestClient.getContestById(problems.data().getContest());
+        if (!contest.code().equals(BaseResponse.SUCCESS_CODE) || contest.data() == null) {
+            throw new ApiRequestException(ErrorMessageConstants.CONTEST_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        if (!contest.data().getTesters().contains(author) && !contest.data().getAuthors().contains(author)) {
+            throw new ApiRequestException(ErrorMessageConstants.NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
+        }
+        repository.deleteTestCasesByProblemId(problemId);
+        return true;
+    }
 }

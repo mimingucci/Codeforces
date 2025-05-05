@@ -55,8 +55,24 @@ public class ContestServiceImpl implements ContestService {
     }
 
     @Override
-    public Page<Contest> getListContests(String name, Pageable pageable) {
-        return contestRepository.getListContests(name, pageable);
+    public Page<Contest> getListContests(String name, String type, Instant start, Instant end, Pageable pageable) {
+        ContestType contestType = null;
+        switch (type) {
+            case "SYSTEM":
+                contestType = ContestType.SYSTEM;
+                break;
+            case "ICPC":
+                contestType = ContestType.ICPC;
+                break;
+            case "GYM":
+                contestType = ContestType.GYM;
+                break;
+            case "NORMAL":
+                contestType = ContestType.NORMAL;
+            default:
+                contestType = null;
+        }
+        return contestRepository.getListContests(name, contestType, start, end, pageable);
     }
 
     @Override
@@ -72,5 +88,10 @@ public class ContestServiceImpl implements ContestService {
     @Override
     public List<Contest> getRunningContests(ContestType type) {
         return contestRepository.getRunningContests(type);
+    }
+
+    @Override
+    public List<Contest> getAllContestsByMemberStaff(Long userId) {
+        return contestRepository.findAllContestsByMemberStaff(userId);
     }
 }

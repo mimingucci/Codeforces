@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 public interface ProblemController {
-    BaseResponse<ProblemResponse> getProblemById(Long id);
+    BaseResponse<ProblemResponse> getProblemById(Long id, HttpServletRequest request);
 
     BaseResponse<ProblemResponse> createProblem(ProblemCreateRequest request, HttpServletRequest httpServletRequest);
 

@@ -1,3 +1,5 @@
+import { User } from 'features/user/type';
+
 export enum ContestType {
   SYSTEM = 'SYSTEM',
   ICPC = 'ICPC',
@@ -7,33 +9,38 @@ export enum ContestType {
 
 export interface ContestCreate {
   name: string;
-  startTime: Date;
-  endTime: Date;
+  startTime: string;
+  endTime: string;
   enabled: boolean;
   authors: string[];
-  coodinators: string[];
+  coordinators: string[];
   testers: string[];
 }
 
 export interface ContestUpdate {
   name?: string;
-  startTime?: Date;
-  endTime?: Date;
+  startTime?: string;
+  endTime?: string;
   enabled?: boolean;
   authors?: string[];
-  coodinators?: string[];
+  coordinators?: string[];
   testers?: string[];
+  type?: ContestType;
 }
 
 export interface Contest {
   id: string;
   name: string;
-  startTime: Date;
-  endTime: Date;
+  startTime: string;
+  endTime: string;
   enabled: boolean;
   authors: string[];
-  coodinators: string[];
+  coordinators: string[];
   testers: string[];
   type: ContestType;
   createdBy: string;
+}
+
+export interface ContestStaffMember extends User {
+  role: 'AUTHOR' | 'COORDINATOR' | 'TESTER';
 }

@@ -48,6 +48,18 @@ class CodeExecutionRequest(BaseModel):
     memory_limit: int
     language: Language
 
+class TestCase(BaseModel): 
+    input: str
+    output: str
+
+class BatchCodeExecutionRequest(BaseModel):
+    code: str  
+    time_limit: int
+    memory_limit: int
+    language: Language
+    test_case: list[TestCase]
+    rule: str
+
 
 class InitSubmissionEnv(object):
     def __init__(self, judger_workspace, submission_id):
@@ -299,6 +311,175 @@ async def ping():
 @app.post("/judge")
 async def judge(request: CodeExecutionRequest):
     return JudgeServer.judge(request)
+
+@app.post("/judge-batch")
+async def judge(request: BatchCodeExecutionRequest):
+    compile_config = None
+    run_config = None
+    match request.language:
+        case Language.C:
+            compile_config = c_lang_config["compile"]
+            run_config = c_lang_config["run"]
+        case Language.CPP:
+            compile_config = cpp_lang_config["compile"]
+            run_config = cpp_lang_config["run"]
+        case Language.PY3:
+            compile_config = py3_lang_config["compile"]
+            run_config = py3_lang_config["run"]
+        case Language.JAVA:
+            compile_config = java_lang_config["compile"]
+            run_config = java_lang_config["run"]
+        case Language.PHP:
+            run_config = php_lang_config["run"]
+        case Language.GO:
+            compile_config = go_lang_config["compile"]
+            run_config = go_lang_config["run"]
+        case Language.JS:
+            run_config = js_lang_config["run"]
+        case _:
+            raise JudgeServerException("Unsupported language!")
+
+    seccomp_rule = run_config["seccomp_rule"]    
+    submission_id = uuid.uuid4().hex
+
+    with InitSubmissionEnv(JUDGER_WORKSPACE_BASE, submission_id) as tmpdir:
+        # Setup source code file
+        if compile_config is None:
+            src_name = run_config["exe_name"]
+            src_path = os.path.join(tmpdir, src_name)
+            exe_path = src_path
+            
+            with open(src_path, "w") as f:
+                f.write(request.code)
+            
+            os.chmod(src_path, 0o755)
+        else:
+            src_path = os.path.join(tmpdir, compile_config["src_name"])
+            exe_path = os.path.join(tmpdir, compile_config["exe_name"])
+
+            with open(src_path, "w") as f:
+                f.write(request.code)
+
+            compile_command = compile_config["compile_command"]
+            compile_command = compile_command.format(
+                src_path=src_path,
+                exe_dir=tmpdir,
+                exe_path=exe_path
+            )
+
+            # Compile
+            compile_process = subprocess.run(
+                shlex.split(compile_command),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+
+            if compile_process.returncode != 0:
+                return [{
+                    "status": "Compilation Error",
+                    "error": compile_process.stderr.decode()
+                }]
+
+            if os.path.exists(exe_path):
+                os.chmod(exe_path, 0o755)
+            else:
+                logging.warning(f"Executable {exe_path} not found after compilation")
+
+        results = []
+        # Process each test case
+        for test_case in request.test_case:
+            input_path = os.path.join(tmpdir, "input.txt")
+            output_path = os.path.join(tmpdir, "output.txt")
+            error_path = os.path.join(tmpdir, "error.txt")
+            
+            with open(input_path, "w") as f:
+                f.write(test_case.input)
+
+            run_command = run_config["command"].format(
+                exe_path=exe_path,
+                exe_dir=tmpdir,
+                max_memory=int(request.memory_limit / 1024),
+                src_path=src_path
+            )
+            run_args = shlex.split(run_command)
+
+            # Execute the program
+            result = _judger.run(
+                max_cpu_time=request.time_limit,
+                max_real_time=request.time_limit,
+                max_memory=request.memory_limit,
+                max_stack=128 * 1024 * 1024,
+                max_output_size=1024 * 1024 * 16,
+                max_process_number=_judger.UNLIMITED,
+                exe_path=run_args[0],
+                input_path=input_path,
+                output_path=output_path,
+                error_path=error_path,
+                args=run_args[1:],
+                env=run_config.get("env", []),
+                log_path=JUDGER_LOG_PATH,
+                seccomp_rule_name=seccomp_rule,
+                uid=RUN_USER_UID,
+                gid=RUN_GROUP_GID,
+                memory_limit_check_only=run_config.get("memory_limit_check_only", 0)
+            )
+
+            # Read output
+            actual_output = ""
+            if os.path.exists(output_path):
+                with open(output_path, "r") as f:
+                    actual_output = f.read().strip()
+
+            # Check result
+            if result["result"] != _judger.RESULT_SUCCESS:
+                error_message = ""
+                if os.path.exists(error_path):
+                    with open(error_path, "r") as f:
+                        error_message = f.read()
+                
+                error_reason = "Unknown Error"
+                if result["result"] == _judger.RESULT_CPU_TIME_LIMIT_EXCEEDED:
+                    error_reason = "Time Limit Exceeded"
+                elif result["result"] == _judger.RESULT_REAL_TIME_LIMIT_EXCEEDED:
+                    error_reason = "Time Limit Exceeded (Wall Time)"
+                elif result["result"] == _judger.RESULT_MEMORY_LIMIT_EXCEEDED:
+                    error_reason = "Memory Limit Exceeded"
+                elif result["result"] == _judger.RESULT_RUNTIME_ERROR:
+                    error_reason = f"Runtime Error (Exit Code: {result['exit_code']})"
+                
+                results.append({
+                    "real_time_ms": result.get('real_time', 0),
+                    "memory_bytes": result.get('memory', 0),
+                    "status": error_reason,
+                    "error": error_message
+                })
+
+                # If rule is "DEFAULT", stop at first error
+                if request.rule == "DEFAULT":
+                    return results
+                continue
+
+            # Compare output
+            if actual_output == test_case.output.strip():
+                results.append({
+                    "status": "Accepted",
+                    "output": actual_output,
+                    "real_time_ms": result.get('real_time', 0),
+                    "memory_bytes": result.get('memory', 0)
+                })
+            else:
+                results.append({
+                    "status": "Wrong Answer",
+                    "expected": test_case.output.strip(),
+                    "actual": actual_output,
+                    "real_time_ms": result.get('real_time', 0),
+                    "memory_bytes": result.get('memory', 0)
+                })
+                # If rule is "DEFAULT", stop at first wrong answer
+                if request.rule == "DEFAULT":
+                    return results
+
+        return results
 
 
 @app.middleware("http")

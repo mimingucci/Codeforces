@@ -27,4 +27,5 @@ public class PathConstants {
 
     public static final String PAGEABLE = "/pageable";
     public static final String RUNNING = "/running";
+    public static final String MEMBER = "/member";
 }

@@ -85,8 +85,13 @@ public class ContestRepositoryImpl implements ContestRepository {
     }
 
     @Override
-    public Page<Contest> getListContests(String name, Pageable pageable) {
-        return this.contestJpaRepository.findByNameContainingIgnoreCase(name, pageable).map(ContestConverter.INSTANCE::toDomain);
+    public List<Contest> findAllContestsByMemberStaff(Long userId) {
+        return contestJpaRepository.findAllContestsByStaffMember(userId).stream().map(ContestConverter.INSTANCE::toDomain).toList();
+    }
+
+    @Override
+    public Page<Contest> getListContests(String name, ContestType type, Instant start, Instant end, Pageable pageable) {
+        return this.contestJpaRepository.findContestsWithFilters(name, start, end, type, pageable).map(ContestConverter.INSTANCE::toDomain);
     }
 
     @Override

@@ -124,4 +124,9 @@ public class UserRepositoryImpl implements UserRepository {
                 userRatings.keySet()
         );
     }
+
+    @Override
+    public Page<User> search(String query, Pageable pageable) {
+        return this.userJpaRepository.quickSearch(query, pageable).map(converter::toDomain);
+    }
 }

@@ -80,4 +80,52 @@ public interface ContestJpaRepository extends JpaRepository<ContestEntity, Long>
             @Param("now") Instant now,
             @Param("type") ContestType type
     );
+
+    @Query("SELECT c FROM ContestEntity c " +
+            "WHERE :userId IN (SELECT coord FROM c.coordinators coord) " +
+            "OR :userId IN (SELECT auth FROM c.authors auth) " +
+            "OR :userId IN (SELECT test FROM c.testers test) " +
+            "ORDER BY c.startTime DESC")
+    Page<ContestEntity> findContestsByStaffMember(
+            @Param("userId") Long userId,
+            Pageable pageable
+    );
+
+    @Query("SELECT c FROM ContestEntity c " +
+            "WHERE :userId IN (SELECT coord FROM c.coordinators coord) " +
+            "OR :userId IN (SELECT auth FROM c.authors auth) " +
+            "OR :userId IN (SELECT test FROM c.testers test) " +
+            "ORDER BY c.startTime DESC")
+    List<ContestEntity> findAllContestsByStaffMember(
+            @Param("userId") Long userId
+    );
+
+    // Optional: Find contests by staff member with additional filters
+    @Query("SELECT c FROM ContestEntity c " +
+            "WHERE (c.enabled = :enabled) " +
+            "AND (:type IS NULL OR c.type = :type) " +
+            "AND (:userId IN (SELECT coord FROM c.coordinators coord) " +
+            "OR :userId IN (SELECT auth FROM c.authors auth) " +
+            "OR :userId IN (SELECT test FROM c.testers test)) " +
+            "ORDER BY c.startTime DESC")
+    Page<ContestEntity> findContestsByStaffMemberAndFilters(
+            @Param("userId") Long userId,
+            @Param("enabled") boolean enabled,
+            @Param("type") ContestType type,
+            Pageable pageable
+    );
+
+    @Query("SELECT c FROM ContestEntity c " +
+            "WHERE (:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
+            "AND (:startTime IS NULL OR c.startTime >= :startTime) " +
+            "AND (:endTime IS NULL OR c.endTime <= :endTime) " +
+            "AND (:type IS NULL OR c.type = :type) " +
+            "ORDER BY c.startTime DESC")
+    Page<ContestEntity> findContestsWithFilters(
+            @Param("name") String name,
+            @Param("startTime") Instant startTime,
+            @Param("endTime") Instant endTime,
+            @Param("type") ContestType type,
+            Pageable pageable
+    );
 }

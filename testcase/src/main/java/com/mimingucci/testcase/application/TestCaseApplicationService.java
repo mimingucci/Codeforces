@@ -19,4 +19,6 @@ public interface TestCaseApplicationService {
     void deleteTestCase(Long testCaseId, HttpServletRequest request);
 
     List<TestCaseResponse> createBatchTestCases(TestCaseCreateBatchRequest testcases, HttpServletRequest request);
+
+    Boolean deleteTestCaseByProblemId(Long problemId, HttpServletRequest request);
 }

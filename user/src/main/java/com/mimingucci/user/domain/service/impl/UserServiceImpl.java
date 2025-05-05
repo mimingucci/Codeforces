@@ -166,4 +166,14 @@ public class UserServiceImpl implements UserService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Override
+    public Page<User> search(String query, Pageable pageable) {
+        return this.userRepository.search(query, pageable);
+    }
+
+    @Override
+    public List<User> getUserByIds(List<Long> userIds) {
+        return this.userRepository.findByIds(userIds);
+    }
 }

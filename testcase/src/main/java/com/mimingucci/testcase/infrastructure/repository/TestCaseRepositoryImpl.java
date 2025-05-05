@@ -7,6 +7,7 @@ import com.mimingucci.testcase.domain.repository.TestCaseRepository;
 import com.mimingucci.testcase.infrastructure.repository.converter.TestCaseConverter;
 import com.mimingucci.testcase.infrastructure.repository.entity.TestCaseEntity;
 import com.mimingucci.testcase.infrastructure.repository.jpa.TestCaseJpaRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
@@ -48,6 +49,12 @@ public class TestCaseRepositoryImpl implements TestCaseRepository {
             throw new ApiRequestException(ErrorMessageConstants.TEST_CASE_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
         testCaseJpaRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteTestCasesByProblemId(Long problemId) {
+        testCaseJpaRepository.deleteAllByProblemId(problemId);
     }
 
     @Override

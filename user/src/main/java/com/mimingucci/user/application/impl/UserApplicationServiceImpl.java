@@ -107,4 +107,14 @@ public class UserApplicationServiceImpl implements UserApplicationService {
         this.userService.updateContestRatings(users);
         return true;
     }
+
+    @Override
+    public PageableResponse<UserGetResponse> search(String query, Pageable pageable) {
+        return UserAssembler.INSTANCE.pageToResponse(this.userService.search(query, pageable));
+    }
+
+    @Override
+    public List<UserGetResponse> getUserByIds(List<Long> userIds) {
+        return this.userService.getUserByIds(userIds).stream().map(UserAssembler.INSTANCE::toGetResponse).toList();
+    }
 }

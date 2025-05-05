@@ -81,3 +81,41 @@ class Judge(object):
             return results
         except Exception as e:
             raise e
+    
+    async def _judge_batch(self):
+        test_cases = [
+            {"input": input_data, "output": output_data} 
+            for input_data, output_data in zip(self.inputs, self.outputs)
+        ]
+
+        response = await ServiceClient.post(
+            json_data={
+                "code": self.src,
+                "time_limit": self.time_limit,
+                "memory_limit": self.memory_limit,
+                "language": self.language.value,
+                "test_case": test_cases,
+                "rule": self.rule.value
+            },
+            service_name="judger",
+            endpoint="judge-batch",
+            headers={
+                "X-Judge-Server-Token": "6c3d42616001c43de92e516b0175ccff4c62c83c9ea02e8f022e2ee7e299c53b",
+                "Content-Type": "application/json"
+            }
+        )
+
+        # Convert string response to dictionary if needed
+        if isinstance(response, str):
+            response = json.loads(response)
+
+        return response
+
+    async def run_batch(self):
+        try:
+            results = await self._judge_batch()
+            
+            return results
+
+        except Exception as e:
+            raise e

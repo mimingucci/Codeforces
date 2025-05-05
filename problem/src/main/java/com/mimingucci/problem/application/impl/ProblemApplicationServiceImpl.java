@@ -42,7 +42,18 @@ public class ProblemApplicationServiceImpl implements ProblemApplicationService 
     }
 
     @Override
-    public ProblemResponse getProblemById(Long id) {
+    public ProblemResponse getProblemById(Long id, HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null) {
+            try {
+                Claims claims = this.jwtUtil.validateToken(token);
+                String password = claims.getSubject();
+                if (Objects.equals(password, "SYSTEM")) return ProblemAssembler.INSTANCE.domainToResponse(this.service.getById(id));
+                else return ProblemAssembler.INSTANCE.domainToResponse(this.service.findById(id));
+            } catch (Exception e) {
+                return ProblemAssembler.INSTANCE.domainToResponse(this.service.findById(id));
+            }
+        }
         return ProblemAssembler.INSTANCE.domainToResponse(this.service.findById(id));
     }
 
@@ -94,6 +105,7 @@ public class ProblemApplicationServiceImpl implements ProblemApplicationService 
         Long userId = null;
         try {
             Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
+            if (claims.getSubject().equals("SYSTEM")) ProblemAssembler.INSTANCE.domainToResponse(this.service.getById(problemId));
             userId = claims.get("id", Long.class);
         } catch (Exception e) {
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);

@@ -17,7 +17,15 @@ import {
   Alert,
 } from '@mui/material';
 import { Editor } from '@tinymce/tinymce-react';
+import { alpha } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
+import { ProblemApi } from 'features/problem/api';
+import { TestcaseApi } from 'features/testcase/api';
+import { useRouter } from 'next/navigation';
+import { useSnackbar } from 'notistack';
+import { ContestApi } from 'features/contest/api';
+import { useSession } from 'next-auth/react';
+import Loading from '@/components/Loading';
 
 interface EditorProps {
   initialValue: string;
@@ -36,6 +44,8 @@ interface ProblemData {
   name: string;
   content: string;
   tags: string[];
+  rating?: number;
+  score?: number;
   timeLimit: number;
   memoryLimit: number;
   samples: {
@@ -44,12 +54,10 @@ interface ProblemData {
   }[];
 }
 
-type UserRole = 'AUTHOR' | 'COORDINATOR' | 'TESTER';
-
-// Mock current user
-const mockCurrentUser = {
-  id: '1',
-  role: 'COORDINATOR' as UserRole, // Change this to test different roles
+const hasContestStarted = (startTime: string): boolean => {
+  const contestStart = new Date(startTime);
+  const now = new Date();
+  return now >= contestStart;
 };
 
 // Mock available tags
@@ -65,22 +73,6 @@ const availableTags = [
   'dfs and similar',
   'trees',
 ];
-
-// Mock problem data for edit mode
-const mockProblem: ProblemData = {
-  id: '1',
-  name: 'Binary Search',
-  content: '# Problem Statement\nImplement binary search...',
-  tags: ['binary search', 'implementation'],
-  timeLimit: 1000,
-  memoryLimit: 256 * 1024 * 1024, // 256MB
-  samples: [
-    {
-      input: '5\n1 2 3 4 5\n3',
-      output: '2',
-    },
-  ],
-};
 
 const RichTextEditor = ({ initialValue, editorRef, disabled }: EditorProps) => {
   return (
@@ -145,18 +137,33 @@ const RichTextEditor = ({ initialValue, editorRef, disabled }: EditorProps) => {
 
 export default function ProblemForm() {
   const params = useParams();
-  const isEdit = params.action === 'edit';
+  const router = useRouter();
+
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [problemData, setProblemData] = useState<ProblemData>({
     name: '',
     content: '',
     tags: [],
     timeLimit: 1000,
+    score: 100,
+    rating: 500,
     memoryLimit: 256 * 1024 * 1024,
     samples: [{ input: '', output: '' }],
   });
   const editorRef = useRef<any>(null);
   const [errors, setErrors] = useState<FormErrors>({});
+  const { enqueueSnackbar } = useSnackbar();
+  const [userRole, setUserRole] = useState<{
+    isAuthor: boolean;
+    isCoordinator: boolean;
+    isTester: boolean;
+  }>({ isAuthor: false, isCoordinator: false, isTester: false });
+
+  const { data: session } = useSession();
+
+  const contestId = params.id as string;
+  const problemId = params.action !== 'new' ? (params.action as string) : null;
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -184,12 +191,123 @@ export default function ProblemForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  useEffect(() => {
-    if (isEdit) {
-      // In edit mode, load problem data
-      setProblemData(mockProblem);
+  const checkUserAccess = async (contestId: string, userId: string) => {
+    try {
+      const contest = await ContestApi.getContest(contestId);
+      if (
+        contest &&
+        contest.authors &&
+        contest.coordinators &&
+        contest.testers &&
+        !contest.authors.includes(userId) &&
+        !contest.coordinators.includes(userId) &&
+        !contest.testers.includes(userId)
+      ) {
+        router.push('/not-found');
+      }
+      return {
+        isAuthor: contest.authors?.includes(userId),
+        isCoordinator: contest.coordinators?.includes(userId),
+        isTester: contest.testers?.includes(userId),
+      };
+    } catch (error) {
+      console.error('Failed to check user access:', error);
+      return {
+        isAuthor: false,
+        isCoordinator: false,
+        isTester: false,
+      };
     }
-  }, [isEdit]);
+  };
+
+  useEffect(() => {
+    const validateAccess = async () => {
+      if (!session?.user?.id) {
+        return;
+      }
+
+      try {
+        const contest = await ContestApi.getContest(contestId);
+
+        // Check if contest has started
+        if (hasContestStarted(contest.startTime)) {
+          enqueueSnackbar('Cannot modify problems after contest has started', {
+            variant: 'error',
+            autoHideDuration: 3000,
+          });
+          router.push(`/contests/${contestId}`);
+          return;
+        }
+
+        const access = await checkUserAccess(contestId, session.user.id);
+        setUserRole(access);
+
+        // Redirect if user doesn't have proper access
+        if (!problemId && !access.isAuthor) {
+          enqueueSnackbar('Only authors can create new problems', {
+            variant: 'error',
+            autoHideDuration: 3000,
+          });
+          router.push(`/contests/${contestId}`);
+        }
+      } catch (error) {
+        console.error('Failed to validate access:', error);
+        router.push(`/contests/${contestId}`);
+      }
+    };
+
+    const validateAndFetchProblem = async () => {
+      try {
+        // If not new, validate problemId is numeric
+        if (problemId) {
+          if (!/^\d+$/.test(problemId)) {
+            router.push('/not-found');
+            return;
+          }
+
+          setInitialLoading(true);
+          // Fetch problem and testcases in parallel
+          const [problem, testcases] = await Promise.all([
+            ProblemApi.getProblem(problemId),
+            TestcaseApi.getTestcases(problemId),
+          ]);
+
+          // Validate problem belongs to current contest
+          if (problem.contest.toString() !== contestId) {
+            router.push('/not-found');
+            return;
+          }
+
+          // Update form data
+          setProblemData({
+            name: problem.title,
+            content: problem.statement,
+            tags: problem.tags,
+            timeLimit: problem.timeLimit,
+            score: problem.score,
+            rating: problem.rating,
+            memoryLimit: problem.memoryLimit,
+            samples: testcases.map((tc) => ({
+              input: tc.input,
+              output: tc.output,
+            })),
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch problem:', error);
+        enqueueSnackbar('Failed to load problem', {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+        // router.push(`/contests/${contestId}`);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    validateAccess();
+    validateAndFetchProblem();
+  }, [session, problemId, contestId, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,19 +318,81 @@ export default function ProblemForm() {
 
     setLoading(true);
     try {
-      // Get editor content when submitting
       const content = editorRef.current?.getContent() || '';
-      const dataToSubmit = {
-        ...problemData,
-        content,
+      const problemPayload = {
+        title: problemData.name,
+        statement: content,
+        solution: '', // Will be added later
+        timeLimit: problemData.timeLimit,
+        memoryLimit: problemData.memoryLimit,
+        rating: problemData.rating || 500,
+        score: problemData.score || 100,
+        contest: contestId,
+        tags: problemData.tags,
       };
 
-      // Add your API call here
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log(dataToSubmit);
+      if (problemId) {
+        // Update existing problem
+        await ProblemApi.updateProblem(problemId, problemPayload);
+        // Update testcases logic here if needed
+        // Delete all existing testcases and create new ones
+        await TestcaseApi.deleteTestcases(problemId);
+        await TestcaseApi.createBatchTestcase({
+          problem: problemId,
+          data: problemData.samples.map((sample) => ({
+            input: sample.input,
+            output: sample.output,
+            problem: problemId,
+          })),
+        });
+      } else {
+        // Create new problem
+        const problem = await ProblemApi.createProblem(problemPayload);
+        if (problem.id) {
+          await TestcaseApi.createBatchTestcase({
+            problem: problem.id,
+            data: problemData.samples.map((sample) => ({
+              input: sample.input,
+              output: sample.output,
+              problem: problem.id,
+            })),
+          });
+        }
+      }
+
+      enqueueSnackbar(
+        `Problem ${problemId ? 'updated' : 'created'} successfully!`,
+        { variant: 'success', autoHideDuration: 3000 }
+      );
+      router.push(`/contests/${contestId}`);
+    } catch (error: any) {
+      console.error('Failed to create problem:', error);
+      enqueueSnackbar(error?.message || 'Failed to create problem', {
+        variant: 'error',
+        autoHideDuration: 3000,
+      });
     } finally {
       setLoading(false);
     }
+  };
+
+  const generateScoreOptions = () => {
+    const scores = [500];
+    for (let i = 1000; i <= 3500; i += 100) {
+      scores.push(i);
+    }
+    return scores;
+  };
+
+  const scoreOptions = generateScoreOptions();
+
+  const getRatingColor = (rating: number): string => {
+    if (rating < 1000) return '#808080'; // gray
+    if (rating < 1500) return '#008000'; // green
+    if (rating < 2000) return '#03A89E'; // cyan
+    if (rating < 2500) return '#0000FF'; // blue
+    if (rating < 3000) return '#AA00AA'; // purple
+    return '#FF0000'; // red
   };
 
   const handleAddSample = () => {
@@ -231,30 +411,43 @@ export default function ProblemForm() {
 
   // Function to check if fields should be disabled based on role
   const isFieldDisabled = (fieldType: 'general' | 'testcase') => {
-    switch (mockCurrentUser.role) {
-      case 'AUTHOR':
-        return false; // Authors can edit everything
-      case 'COORDINATOR':
-        return true; // Coordinators can't edit anything
-      case 'TESTER':
-        return fieldType !== 'testcase'; // Testers can only edit test cases
-      default:
-        return true;
-    }
+    if (userRole.isAuthor) return false;
+    if (userRole.isCoordinator) return true;
+    if (userRole.isTester) return fieldType !== 'testcase';
+    return true;
   };
+
+  const getRoleAlert = () => {
+    if (userRole.isCoordinator) {
+      return (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          You are in view-only mode as a Coordinator.
+        </Alert>
+      );
+    }
+    if (userRole.isTester) {
+      return (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          As a Tester, you can only modify test cases.
+        </Alert>
+      );
+    }
+    return null;
+  };
+
+  // Show loading state while fetching initial data
+  if (initialLoading) {
+    return <Loading />;
+  }
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Paper elevation={1} sx={{ p: 4 }}>
         <Typography variant="h4" gutterBottom>
-          {isEdit ? 'Edit Problem' : 'Create New Problem'}
+          {problemId ? 'Edit Problem' : 'Create New Problem'}
         </Typography>
 
-        {mockCurrentUser.role === 'COORDINATOR' && (
-          <Alert severity="info" sx={{ mb: 3 }}>
-            You are in view-only mode as a Coordinator.
-          </Alert>
-        )}
+        {getRoleAlert()}
 
         <form onSubmit={handleSubmit}>
           <Stack spacing={4}>
@@ -364,11 +557,78 @@ export default function ProblemForm() {
                   }}
                 />
               </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Score"
+                  type="number"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">points</InputAdornment>
+                    ),
+                  }}
+                  required
+                  fullWidth
+                  disabled={isFieldDisabled('general')}
+                  value={problemData.score}
+                  onChange={(e) =>
+                    setProblemData((prev) => ({
+                      ...prev,
+                      score: parseInt(e.target.value),
+                    }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Problem Rating
+                </Typography>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 1,
+                    maxWidth: '100%',
+                    overflowX: 'auto',
+                    pb: 1,
+                  }}
+                >
+                  {scoreOptions.map((score) => (
+                    <Button
+                      key={score}
+                      variant={
+                        problemData.rating === score ? 'contained' : 'outlined'
+                      }
+                      size="small"
+                      onClick={() =>
+                        setProblemData((prev) => ({ ...prev, rating: score }))
+                      }
+                      disabled={isFieldDisabled('general')}
+                      sx={{
+                        minWidth: '70px',
+                        bgcolor:
+                          problemData.rating === score
+                            ? () => `${getRatingColor(score)} !important`
+                            : 'transparent',
+                        borderColor: getRatingColor(score),
+                        color:
+                          problemData.rating === score
+                            ? 'white'
+                            : getRatingColor(score),
+                        '&:hover': {
+                          bgcolor: () => alpha(getRatingColor(score), 0.1),
+                        },
+                      }}
+                    >
+                      {score}
+                    </Button>
+                  ))}
+                </Box>
+              </Grid>
             </Grid>
 
             <Typography variant="h6" gutterBottom>
               Test Cases
-              {mockCurrentUser.role === 'TESTER' && (
+              {userRole.isTester && (
                 <Typography variant="caption" color="primary" sx={{ ml: 2 }}>
                   (You can edit test cases as a Tester)
                 </Typography>
@@ -459,8 +719,9 @@ export default function ProblemForm() {
               variant="contained"
               size="large"
               loading={loading}
+              disabled={!userRole.isAuthor && !userRole.isTester}
             >
-              {isEdit ? 'Update Problem' : 'Create Problem'}
+              {problemId ? 'Update Problem' : 'Create Problem'}
             </LoadingButton>
           </Stack>
         </form>

@@ -70,4 +70,9 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long>, JpaS
             ".collect(java.util.stream.Collectors.joining(' ')} " +
             "END WHERE id IN :ids", nativeQuery = true)
     void batchUpdateRatings(@Param("ratings") Map<Long, Integer> userRatings, @Param("ids") Collection<Long> userIds);
+
+    @Query("SELECT u FROM UserEntity u WHERE " +
+            "LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%'))")
+    Page<UserEntity> quickSearch(@Param("query") String query, Pageable pageable);
 }

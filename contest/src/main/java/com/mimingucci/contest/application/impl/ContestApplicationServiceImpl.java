@@ -25,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -59,8 +60,8 @@ public class ContestApplicationServiceImpl implements ContestApplicationService 
     }
 
     @Override
-    public PageableResponse<ContestResponse> getListContests(String name, Pageable pageable) {
-        return ContestAssembler.INSTANCE.pageToResponse(this.service.getListContests(name, pageable));
+    public PageableResponse<ContestResponse> getListContests(String name, String type, Instant start, Instant end, Pageable pageable) {
+        return ContestAssembler.INSTANCE.pageToResponse(this.service.getListContests(name, type, start, end, pageable));
     }
 
     @Override
@@ -127,5 +128,17 @@ public class ContestApplicationServiceImpl implements ContestApplicationService 
     @Override
     public List<ContestResponse> getRunningContests(ContestType type) {
         return service.getRunningContests(type).stream().map(ContestAssembler.INSTANCE::domainToResponse).toList();
+    }
+
+    @Override
+    public List<ContestResponse> getAllContestsByMemberStaff(HttpServletRequest request) {
+        Long userId = null;
+        try {
+            Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
+            userId = claims.get("id", Long.class);
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+        return service.getAllContestsByMemberStaff(userId).stream().map(ContestAssembler.INSTANCE::domainToResponse).toList();
     }
 }

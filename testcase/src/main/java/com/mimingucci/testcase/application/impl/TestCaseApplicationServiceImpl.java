@@ -102,4 +102,16 @@ public class TestCaseApplicationServiceImpl implements TestCaseApplicationServic
         for (var i : tc) i.setProblem(testcases.getProblem());
         return service.createTestCases(tc.stream().map(TestCaseAssembler.INSTANCE::toDomain).toList(), testcases.getProblem(), author).stream().map(TestCaseAssembler.INSTANCE::toResponse).toList();
     }
+
+    @Override
+    public Boolean deleteTestCaseByProblemId(Long problemId, HttpServletRequest request) {
+        Long author = null;
+        try {
+            Claims claims = this.jwtUtil.extractClaimsFromHttpRequest(request);
+            author = claims.get("id", Long.class);
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+        return service.deleteTestCaseByProblemId(author, problemId);
+    }
 }

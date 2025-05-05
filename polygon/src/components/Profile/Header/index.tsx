@@ -1,25 +1,72 @@
 'use client';
 
-import { Box, Avatar, Typography, Stack } from '@mui/material';
+import { Box, Avatar, Typography, Stack, Skeleton } from '@mui/material';
 import { format, parseISO } from 'date-fns';
 import { AccountCircle as DefaultAvatar } from '@mui/icons-material';
-
-// Mock user data
-const mockUser = {
-  username: 'Jiangly',
-  avatar: null, // Set to null to test default avatar
-  registeredAt: '2025-05-01T00:00:00Z',
-  rating: 3200,
-};
-
-const getRatingColor = (rating: number): string => {
-  if (rating >= 3000) return '#FF0000';
-  if (rating >= 2600) return '#FFA500';
-  if (rating >= 2200) return '#FFFF00';
-  return '#808080';
-};
+import { useEffect, useState } from 'react';
+import { User } from 'features/user/type';
+import { UserApi } from 'features/user/api';
+import { useParams } from 'next/navigation';
 
 export default function ProfileHeader() {
+  const params = useParams();
+  const userId = params.id as string;
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const formatTimestamp = (timestamp: string) => {
+    // Split into seconds and nanoseconds
+    const [seconds, nanos] = timestamp.split('.');
+    // Convert seconds to milliseconds and create Date
+    const date = new Date(parseInt(seconds) * 1000);
+    return format(date, 'MMMM yyyy');
+  };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        setLoading(true);
+        const userData = await UserApi.getUser(userId);
+        console.log('Fetched user:', userData);
+        setUser(userData);
+      } catch (error) {
+        console.error('Failed to fetch user:', error);
+        setError('Failed to load user profile');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (userId) {
+      fetchUser();
+    }
+  }, [userId]);
+
+  if (loading) {
+    return (
+      <Box sx={{ height: 200, bgcolor: 'grey.900' }}>
+        <Stack direction="row" spacing={3} sx={{ p: 3 }}>
+          <Skeleton variant="circular" width={150} height={150} />
+          <Stack spacing={1} sx={{ pt: 2 }}>
+            <Skeleton variant="text" width={200} height={60} />
+            <Skeleton variant="text" width={150} height={30} />
+          </Stack>
+        </Stack>
+      </Box>
+    );
+  }
+
+  if (error || !user) {
+    return (
+      <Box sx={{ height: 200, bgcolor: 'grey.900' }}>
+        <Typography color="error" sx={{ p: 3 }}>
+          {error || 'User not found'}
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box
       sx={{
@@ -49,10 +96,10 @@ export default function ProfileHeader() {
           color: 'white',
         }}
       >
-        {mockUser.avatar ? (
+        {user.avatar ? (
           <Avatar
-            src={mockUser.avatar}
-            alt={mockUser.username}
+            src={user.avatar}
+            alt={user.username}
             sx={{
               width: 150,
               height: 150,
@@ -82,13 +129,13 @@ export default function ProfileHeader() {
               textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
             }}
           >
-            {mockUser.username}
+            {user.username}
           </Typography>
           <Typography
             variant="subtitle1"
             sx={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}
           >
-            Member since {format(parseISO(mockUser.registeredAt), 'MMMM yyyy')}
+            Member since {formatTimestamp(user.createdAt)}
           </Typography>
         </Stack>
       </Stack>

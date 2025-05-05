@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -43,6 +44,12 @@ public class ContestControllerImpl implements ContestController {
     @Override
     public BaseResponse<List<ContestResponse>> getRunningContest(@RequestParam(name = "type", defaultValue = "SYSTEM") ContestType type) {
         return BaseResponse.success(service.getRunningContests(type));
+    }
+
+    @GetMapping(path = PathConstants.MEMBER)
+    @Override
+    public BaseResponse<List<ContestResponse>> getAllContestsByMemberStaff(HttpServletRequest request) {
+        return BaseResponse.success(service.getAllContestsByMemberStaff(request));
     }
 
     @GetMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION + PathConstants.PAGEABLE)
@@ -124,7 +131,7 @@ public class ContestControllerImpl implements ContestController {
 
     @GetMapping(path = PathConstants.ALL)
     @Override
-    public BaseResponse<PageableResponse<ContestResponse>> getListContests(@RequestParam(name = "name", defaultValue = "") String name, Pageable pageable) {
-        return BaseResponse.success(service.getListContests(name, pageable));
+    public BaseResponse<PageableResponse<ContestResponse>> getListContests(@RequestParam(name = "name", defaultValue = "", required = false) String name, @RequestParam(name = "type", defaultValue = "", required = false) String type, @RequestParam(name = "start", required = false) Instant start, @RequestParam(name = "end", required = false) Instant end, Pageable pageable) {
+        return BaseResponse.success(service.getListContests(name, type, start, end, pageable));
     }
 }

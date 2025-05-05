@@ -12,7 +12,7 @@ import java.util.List;
 public interface ProblemApplicationService {
     ProblemResponse createProblem(ProblemCreateRequest request, HttpServletRequest httpServletRequest);
 
-    ProblemResponse getProblemById(Long id);
+    ProblemResponse getProblemById(Long id, HttpServletRequest request);
 
     ProblemResponse updateProblem(Long id, ProblemUpdateRequest request, HttpServletRequest httpServletRequest);
 

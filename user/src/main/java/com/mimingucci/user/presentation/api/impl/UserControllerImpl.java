@@ -71,6 +71,12 @@ public class UserControllerImpl implements UserController {
         return BaseResponse.success(this.userApplicationService.unsetAvatar(request));
     }
 
+    @PostMapping(path = PathConstants.BATCH)
+    @Override
+    public BaseResponse<List<UserGetResponse>> getUserByIds(@RequestBody @Validated List<Long> userIds) {
+        return BaseResponse.success(this.userApplicationService.getUserByIds(userIds));
+    }
+
 //    @Caching(evict = {
 //            @CacheEvict(value = "users", allEntries = true),
 //    })
@@ -80,7 +86,13 @@ public class UserControllerImpl implements UserController {
         return BaseResponse.success(this.userApplicationService.updateRatings(users, authToken));
     }
 
-//    @Caching(put = {
+    @GetMapping(path = PathConstants.SEARCH)
+    @Override
+    public BaseResponse<PageableResponse<UserGetResponse>> search(@RequestParam("query") String query, Pageable pageable) {
+        return BaseResponse.success(this.userApplicationService.search(query, pageable));
+    }
+
+    //    @Caching(put = {
 //            @CachePut(value = "users", key = "#request.id"),
 //    })
     @PutMapping(path = PathConstants.UPDATE)

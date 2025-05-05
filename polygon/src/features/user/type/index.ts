@@ -10,5 +10,5 @@ export interface User {
   contribute: number;
   country: string;
   avatar: string;
-  createdAt: Date;
+  createdAt: string;
 }

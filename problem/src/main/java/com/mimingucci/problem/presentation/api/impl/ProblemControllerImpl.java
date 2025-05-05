@@ -61,8 +61,8 @@ public class ProblemControllerImpl implements ProblemController {
 
     @GetMapping(path = PathConstants.PROBLEM_ID)
     @Override
-    public BaseResponse<ProblemResponse> getProblemById(@PathVariable(name = "problemId") Long problemId) {
-        return BaseResponse.success(this.problemApplicationService.getProblemById(problemId));
+    public BaseResponse<ProblemResponse> getProblemById(@PathVariable(name = "problemId") Long problemId, HttpServletRequest request) {
+        return BaseResponse.success(this.problemApplicationService.getProblemById(problemId, request));
     }
 
     @PutMapping(path = PathConstants.PROBLEM_ID)

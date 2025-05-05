@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
   Box,
   Container,
@@ -20,76 +20,21 @@ import {
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-
-// ... Keep the same interfaces and mock users from create page ...
-interface StaffMember {
-  id: string;
-  username: string;
-  role: 'AUTHOR' | 'TESTER' | 'COORDINATOR';
-}
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  rating: number;
-}
-
-// Add this after your StaffMember interface
-const mockUsers: User[] = [
-  { id: '1', username: 'tourist', email: 'tourist@example.com', rating: 3000 },
-  { id: '2', username: 'Petr', email: 'petr@example.com', rating: 2800 },
-  { id: '3', username: 'scott_wu', email: 'scott@example.com', rating: 2700 },
-  {
-    id: '4',
-    username: 'ecnerwala',
-    email: 'ecnerwala@example.com',
-    rating: 2900,
-  },
-  { id: '5', username: 'Benq', email: 'benq@example.com', rating: 2850 },
-  { id: '6', username: 'Um_nik', email: 'umnik@example.com', rating: 2750 },
-];
-
-// Mock current user
-const currentUser: User = {
-  id: '7',
-  username: 'Jiangly',
-  email: 'jiangly@example.com',
-  rating: 3200,
-};
-
-// Mock API call to fetch contest data
-const fetchContestData = async (id: string) => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  // Mock contest data
-  const mockContest = {
-    id,
-    name: 'Educational Codeforces Round 100',
-    startTime: new Date('2025-06-01T14:00:00Z'),
-    endTime: new Date('2025-06-01T16:00:00Z'),
-    isEnabled: true,
-    staff: [
-      { ...currentUser, role: 'AUTHOR' },
-      { ...mockUsers[0], role: 'COORDINATOR' },
-      { ...mockUsers[1], role: 'TESTER' },
-      { ...mockUsers[2], role: 'TESTER' },
-    ] as StaffMember[],
-  };
-
-  // Simulate API error for specific ID
-  if (id === '404') {
-    throw new Error('Contest not found');
-  }
-
-  return mockContest;
-};
+import { useSession } from 'next-auth/react';
+import { Contest, ContestStaffMember } from 'features/contest/type';
+import { UserApi } from 'features/user/api';
+import { ContestApi } from 'features/contest/api';
+import { User } from 'features/user/type';
+import { useDebouncedValue } from 'hooks/useDebouncedValue';
 
 export default function UpdateContest() {
   const params = useParams();
-  const contestId = params.id as string;
+  const router = useRouter();
 
+  const contestId = params.id as string;
+  const { data: session } = useSession();
+
+  const [contest, setContest] = useState<Contest | null>(null);
   const [name, setName] = useState('');
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
@@ -97,37 +42,113 @@ export default function UpdateContest() {
   const [loading, setLoading] = useState(true);
   const [saveLoading, setSaveLoading] = useState(false);
   const [error, setError] = useState('');
+  const [staff, setStaff] = useState<ContestStaffMember[]>([]);
+
+  // Add state for user search
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredUsers, setFilteredUsers] = useState<User[]>(mockUsers);
-  const [staff, setStaff] = useState<StaffMember[]>([]);
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+
+  const [searching, setSearching] = useState(false);
+  const [debouncedQuery] = useDebouncedValue(searchQuery, 300);
 
   useEffect(() => {
     const loadContestData = async () => {
       try {
-        const data = await fetchContestData(contestId);
+        setLoading(true);
+        const data = await ContestApi.getContest(contestId);
+
+        // Check if user has permission to edit
+        if (session?.user?.id !== data.createdBy) {
+          router.push(`/contests/${contestId}`);
+          return;
+        }
+
+        setContest(data);
         setName(data.name);
-        setStartTime(data.startTime);
-        setEndTime(data.endTime);
-        setIsEnabled(data.isEnabled);
-        setStaff(data.staff);
+        setStartTime(new Date(data.startTime));
+        setEndTime(new Date(data.endTime));
+        setIsEnabled(data.enabled);
+
+        // Collect all unique staff IDs
+        const allStaffIds = [
+          ...(data.authors || []),
+          ...(data.coordinators || []),
+          ...(data.testers || []),
+        ];
+
+        // Skip if no staff members
+        if (allStaffIds.length === 0) {
+          setStaff([]);
+          return;
+        }
+
+        // Fetch all users in one batch request
+        const users = await UserApi.getUsers([...new Set(allStaffIds)]);
+
+        // Map users to their roles
+        const staffMembers: ContestStaffMember[] = [
+          ...(data.authors
+            ?.map((id) => {
+              const user = users.find((u) => u.id === id);
+              return user ? { ...user, role: 'AUTHOR' as const } : null;
+            })
+            .filter(Boolean) || []),
+          ...(data.coordinators
+            ?.map((id) => {
+              const user = users.find((u) => u.id === id);
+              return user ? { ...user, role: 'COORDINATOR' as const } : null;
+            })
+            .filter(Boolean) || []),
+          ...(data.testers
+            ?.map((id) => {
+              const user = users.find((u) => u.id === id);
+              return user ? { ...user, role: 'TESTER' as const } : null;
+            })
+            .filter(Boolean) || []),
+        ];
+
+        setStaff(staffMembers);
       } catch (err) {
+        console.error('Failed to load contest:', err);
         setError('Failed to load contest data');
       } finally {
         setLoading(false);
       }
     };
 
-    loadContestData();
-  }, [contestId]);
-
-  // Mock API call to update contest
-  const updateContest = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // Simulate API error for specific condition
-    if (name.length < 3) {
-      throw new Error('Contest name must be at least 3 characters');
+    if (session?.user?.id) {
+      loadContestData();
     }
-    return true;
+  }, [contestId, session, router]);
+
+  useEffect(() => {
+    const searchUsers = async () => {
+      if (debouncedQuery.length < 2) {
+        setSearchResults([]);
+        return;
+      }
+
+      try {
+        setSearching(true);
+        const response = await UserApi.search(debouncedQuery);
+        const filteredResults = response.content.filter(
+          (user) => user.id !== session?.user?.id
+        );
+        setSearchResults(filteredResults);
+      } catch (error) {
+        console.error('Failed to search users:', error);
+        setSearchResults([]);
+      } finally {
+        setSearching(false);
+      }
+    };
+
+    searchUsers();
+  }, [debouncedQuery, session?.user?.id]);
+
+  // Update handleSearch to just set query
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -136,45 +157,42 @@ export default function UpdateContest() {
     setError('');
 
     try {
-      await updateContest();
-      // You might want to show success message or redirect
-    } catch (err: unknown) {
-      setError('Failed to update contest');
+      if (!startTime || !endTime) {
+        throw new Error('Please set both start and end time');
+      }
+
+      await ContestApi.updateContest(contestId, {
+        name,
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
+        enabled: isEnabled,
+        authors: staff.filter((s) => s.role === 'AUTHOR').map((s) => s.id),
+        coordinators: staff
+          .filter((s) => s.role === 'COORDINATOR')
+          .map((s) => s.id),
+        testers: staff.filter((s) => s.role === 'TESTER').map((s) => s.id),
+      });
+
+      router.push(`/contests/${contestId}`);
+    } catch (err: any) {
+      console.error('Failed to update contest:', err);
+      setError(err.message || 'Failed to update contest');
     } finally {
       setSaveLoading(false);
     }
   };
 
-  // Keep the same handler functions from create page
+  // Update staff handling
   const handleAddStaffMember =
-    (role: StaffMember['role']) => (event: any, value: any) => {
+    (role: ContestStaffMember['role']) => (event: any, value: User | null) => {
       if (value) {
-        setStaff([...staff, { ...value, role }]);
-        // Reset filtered users after selection
-        handleSearch(searchQuery);
+        const newMember = { ...value, role };
+        setStaff((prev) => [...prev, newMember]);
       }
     };
 
   const handleRemoveStaffMember = (memberId: string) => {
-    // Prevent removing current user as author
-    if (
-      memberId === currentUser.id &&
-      staff.find((m) => m.id === memberId)?.role === 'AUTHOR'
-    ) {
-      return;
-    }
-    setStaff(staff.filter((member) => !(member.id === memberId)));
-  };
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    const filtered = mockUsers.filter(
-      (user) =>
-        user.username.toLowerCase().includes(query.toLowerCase()) &&
-        // Allow adding same user in different roles
-        user.id !== currentUser.id // Don't show current user in search
-    );
-    setFilteredUsers(filtered);
+    setStaff((prev) => prev.filter((member) => member.id !== memberId));
   };
 
   if (loading) {
@@ -240,13 +258,23 @@ export default function UpdateContest() {
 
                       <Stack spacing={2}>
                         <Autocomplete
-                          options={filteredUsers}
+                          options={searchResults}
                           getOptionLabel={(option) =>
                             `${option.username} (${option.rating})`
                           }
                           onChange={handleAddStaffMember(
-                            role as StaffMember['role']
+                            role as ContestStaffMember['role']
                           )}
+                          onInputChange={(_, value) => handleSearch(value)}
+                          loading={searching}
+                          filterOptions={(x) => x}
+                          noOptionsText={
+                            searchQuery.length < 2
+                              ? 'Type to search users'
+                              : searching
+                                ? 'Searching...'
+                                : 'No users found'
+                          }
                           renderOption={(props, option) => (
                             <Box component="li" {...props}>
                               <Stack
@@ -273,12 +301,23 @@ export default function UpdateContest() {
                             <TextField
                               {...params}
                               label={`Add ${role.toLowerCase()}`}
-                              onChange={(e) => handleSearch(e.target.value)}
                               size="small"
+                              InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                  <>
+                                    {searching && (
+                                      <CircularProgress
+                                        color="inherit"
+                                        size={20}
+                                      />
+                                    )}
+                                    {params.InputProps.endAdornment}
+                                  </>
+                                ),
+                              }}
                             />
                           )}
-                          filterOptions={(x) => x}
-                          noOptionsText="No users found"
                         />
 
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -287,14 +326,14 @@ export default function UpdateContest() {
                             .map((member) => (
                               <Chip
                                 key={`${member.id}-${member.role}`}
-                                label={`${member.username} (${mockUsers.find((u) => u.id === member.id)?.rating || currentUser.rating})`}
+                                label={`${member.username}`}
                                 onDelete={
-                                  member.id === currentUser.id
+                                  member.id === session?.user?.id
                                     ? undefined
                                     : () => handleRemoveStaffMember(member.id)
                                 }
                                 color={
-                                  member.id === currentUser.id
+                                  member.id === session?.user?.id
                                     ? 'primary'
                                     : 'default'
                                 }

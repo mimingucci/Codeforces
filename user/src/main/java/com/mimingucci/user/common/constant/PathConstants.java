@@ -20,4 +20,6 @@ public class PathConstants {
     public static final String ROLE = "/role";
     public static final String AVATAR = "/avatar";
     public static final String RATING = "/rating";
+    public static final String SEARCH = "/search";
+    public static final String BATCH = "/batch";
 }
