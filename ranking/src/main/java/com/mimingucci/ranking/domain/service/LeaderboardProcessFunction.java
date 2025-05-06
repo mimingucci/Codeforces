@@ -153,7 +153,10 @@ public class LeaderboardProcessFunction extends KeyedProcessFunction<Long, Submi
             penalty += attemps * 10 + solve_time;
             entry.setPenalty(penalty);
         } else {
-            penalty += (old_attemps + 1) * 10 + entry.getProblemSolveTimes().get(event.getProblem());
+            penalty += (old_attemps + 1) * 10;
+            if (entry.getProblemSolveTimes().containsKey(event.getProblem())) {
+                penalty += entry.getProblemSolveTimes().get(event.getProblem());
+            }
             entry.setPenalty(penalty);
         }
 

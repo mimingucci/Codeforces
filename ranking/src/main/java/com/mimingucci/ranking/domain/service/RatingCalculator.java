@@ -46,11 +46,11 @@ public class RatingCalculator {
 
         List<Pair<Long, Integer>> result = calculateRatingChanges(contestId, entries, contest.getType());
 
+        this.userClient.updateUserRatings(result);
+
         // clear
         SubmissionHistoryFileHandler.deleteSubmissionHistory(contestId);
         LeaderboardFileHandler.deleteLeaderboardByContestId(contestId);
-
-        this.userClient.updateUserRatings(result);
 
         return true;
     }

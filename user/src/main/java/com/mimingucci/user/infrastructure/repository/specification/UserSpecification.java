@@ -27,6 +27,14 @@ public class UserSpecification {
                 ));
             }
 
+            // Add email filter
+            if (StringUtils.hasText(param.getEmail())) {
+                predicates.add(criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("email")),
+                        "%" + param.getEmail().toLowerCase() + "%"
+                ));
+            }
+
             // Add sorting
             if (StringUtils.hasText(param.getRatingDir())) {
                 if ("ASC".equalsIgnoreCase(param.getRatingDir())) {

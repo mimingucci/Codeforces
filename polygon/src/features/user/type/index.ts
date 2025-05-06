@@ -1,3 +1,9 @@
+export enum Role {
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+}
+
 export interface User {
   id: string;
   email: string;
@@ -11,4 +17,5 @@ export interface User {
   country: string;
   avatar: string;
   createdAt: string;
+  roles?: Role[];
 }

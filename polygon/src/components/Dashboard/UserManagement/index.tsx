@@ -25,7 +25,7 @@ import {
 import { blue } from '@mui/material/colors';
 import { useSnackbar } from 'notistack';
 import { UserApi } from 'features/user/api';
-import { User } from 'features/user/type';
+import { Role, User } from 'features/user/type';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { convertUnixFormatToDate } from 'utils/date';
 
@@ -52,7 +52,12 @@ export default function UserManagement() {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const response = await UserApi.search(debouncedQuery);
+        const response = await UserApi.getAll(
+          debouncedQuery,
+          debouncedQuery,
+          page,
+          rowsPerPage
+        );
         setUsers(response.content);
         setTotalElements(response.totalElements);
       } catch (error) {
@@ -81,20 +86,51 @@ export default function UserManagement() {
     setPage(0);
   };
 
-  const handleToggleEnabled = async (user: User) => {
+  const handleToggleAdmin = async (user: User) => {
     try {
-      // await UserApi.updateUser(user.id, { enabled: !user.enabled });
-      enqueueSnackbar('User status updated successfully', {
+      await UserApi.changeAdmin(user.id);
+      enqueueSnackbar('User role updated successfully', {
         variant: 'success',
         autoHideDuration: 3000,
       });
       // Refresh users
-      const response = await UserApi.search(debouncedQuery);
+      const response = await UserApi.getAll(
+        debouncedQuery,
+        debouncedQuery,
+        page,
+        rowsPerPage
+      );
       setUsers(response.content);
       setTotalElements(response.totalElements);
     } catch (error) {
-      console.error('Failed to update user status:', error);
-      enqueueSnackbar('Failed to update user status', {
+      console.error('Failed to update user role:', error);
+      enqueueSnackbar('Failed to update user role', {
+        variant: 'error',
+        autoHideDuration: 3000,
+      });
+    }
+  };
+
+  // Add ban user handler
+  const handleBanUser = async (user: User) => {
+    try {
+      await UserApi.banUser(user.id);
+      enqueueSnackbar('User banned successfully', {
+        variant: 'success',
+        autoHideDuration: 3000,
+      });
+      // Refresh users
+      const response = await UserApi.getAll(
+        debouncedQuery,
+        debouncedQuery,
+        page,
+        rowsPerPage
+      );
+      setUsers(response.content);
+      setTotalElements(response.totalElements);
+    } catch (error) {
+      console.error('Failed to ban user:', error);
+      enqueueSnackbar('Failed to ban user', {
         variant: 'error',
         autoHideDuration: 3000,
       });
@@ -152,6 +188,7 @@ export default function UserManagement() {
                 <TableCell>Email</TableCell>
                 <TableCell>Rating</TableCell>
                 <TableCell>Contributions</TableCell>
+                <TableCell>Roles</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Created At</TableCell>
                 <TableCell align="right">Actions</TableCell>
@@ -177,6 +214,23 @@ export default function UserManagement() {
                     />
                   </TableCell>
                   <TableCell>{user.contribute || 0}</TableCell>
+                  <TableCell>
+                    {user.roles?.map((role) => (
+                      <Chip
+                        key={role}
+                        label={role}
+                        size="small"
+                        color={
+                          role === Role.SUPER_ADMIN
+                            ? 'primary'
+                            : role === Role.ADMIN
+                              ? 'warning'
+                              : 'default'
+                        }
+                        sx={{ mr: 0.5 }}
+                      />
+                    ))}
+                  </TableCell>
                   <TableCell>
                     <Chip
                       label={user.enabled ? 'Active' : 'Disabled'}
@@ -225,12 +279,25 @@ export default function UserManagement() {
         <MenuItem
           onClick={() => {
             if (selectedUser) {
-              handleToggleEnabled(selectedUser);
+              handleToggleAdmin(selectedUser);
             }
             setActionMenuAnchor(null);
           }}
         >
-          {selectedUser?.enabled ? 'Disable' : 'Enable'} User
+          {selectedUser?.roles?.includes(Role.ADMIN)
+            ? 'Remove Admin Role'
+            : 'Add Admin Role'}
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (selectedUser) {
+              handleBanUser(selectedUser);
+            }
+            setActionMenuAnchor(null);
+          }}
+          sx={{ color: 'error.main' }}
+        >
+          Ban User
         </MenuItem>
       </Menu>
     </Box>

@@ -27,7 +27,7 @@ public class ContestRegistrationServiceImpl implements ContestRegistrationServic
     @Override
     public ContestRegistration register(ContestRegistration domain) {
         Contest contest = this.contestRepository.getContest(domain.getContest());
-        if (Instant.now().isAfter(contest.getEndTime())) throw new ApiRequestException(ErrorMessageConstants.CONTEST_HAS_FINISHED, HttpStatus.BAD_REQUEST);
+        if (Instant.now().isAfter(contest.getStartTime())) throw new ApiRequestException(ErrorMessageConstants.CONTEST_HAS_STARTED, HttpStatus.BAD_REQUEST);
         return repository.register(domain);
     }
 

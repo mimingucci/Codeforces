@@ -58,7 +58,6 @@ public class RankingApplicationServiceImpl implements RankingApplicationService 
         if (token == null) throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         try {
             Claims claims = this.jwtUtil.validateToken(token);
-            System.out.println(claims.getSubject());
             if (!claims.getSubject().equals("SYSTEM")) return false;
         } catch (Exception e) {
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);

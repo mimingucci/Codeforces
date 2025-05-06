@@ -1,5 +1,6 @@
 package com.mimingucci.user.presentation.dto.response;
 
+import com.mimingucci.user.common.enums.Role;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -29,6 +31,8 @@ public class UserGetResponse {
     private Integer rating;
 
     private Integer contribute;
+
+    private Set<Role> roles;
 
     private String country;
 

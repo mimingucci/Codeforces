@@ -18,4 +18,6 @@ public class UserParam {
 
     private String username;
 
+    private String email;
+
 }

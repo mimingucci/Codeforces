@@ -20,7 +20,7 @@ public class User {
 
     private String username;
 
-    private Set<Role> roles = new HashSet<>();
+    private Set<Role> roles;
 
     private Boolean enabled;
 

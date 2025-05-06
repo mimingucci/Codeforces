@@ -40,7 +40,7 @@ public class LeaderboardService {
     }
 
     private String getKey(Long contestId) {
-        return "leaderboard" + contestId;
+        return "leaderboard:" + contestId;
     }
 
     public LeaderboardUpdate getLeaderboardByContestId(Long contestId) {

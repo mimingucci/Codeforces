@@ -246,7 +246,7 @@ public class ContestEventScheduler {
         logger.info("CONTEST STARTED: {} (ID: {})", contest.getName(), contest.getId());
 
         // Update problems in contest to public
-        if (problemClient.updateProblemStatus(contest.getId(), new ProblemUpdateRequest(true)).code() != "200") {
+        if (problemClient.updateProblemStatus(contest.getId(), new ProblemUpdateRequest(true)).data() != true) {
             throw new ApiRequestException(ErrorMessageConstants.CONTEST_HAS_NOT_STARTED, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -290,49 +290,49 @@ public class ContestEventScheduler {
      * This ensures events are published even if the scheduler missed an event
      * Now optimized with time-based maps
      */
-    @Scheduled(cron = "0 * * * * ?") // Run every minute at 0 seconds
-    public void checkContestStartsAndEnds() {
-        logger.info("Running minutely contest check...");
-
-        if (contestsById.isEmpty()) {
-            return; // Nothing to check
-        }
-
-        Instant now = Instant.now();
-        Instant oneMinuteAgo = now.minus(1, ChronoUnit.MINUTES);
-
-        // Get all minute timestamps between oneMinuteAgo and now (typically just a few values)
-        Set<Instant> relevantMinuteTimestamps = getMinuteTimestampsBetween(oneMinuteAgo, now);
-
-        // Check contests scheduled to start in the relevant time window
-        for (Instant timestamp : relevantMinuteTimestamps) {
-            List<Contest> contestsStartingAtTime = contestsByStartTime.get(timestamp);
-            if (contestsStartingAtTime != null) {
-                for (Contest contest : new ArrayList<>(contestsStartingAtTime)) {
-                    if (!publishedStartEvents.contains(contest.getId())) {
-                        logger.info("Detected contest start during minutely scan: {} (ID: {})",
-                                contest.getName(), contest.getId());
-                        emitContestStartedEvent(contest);
-                    }
-                }
-            }
-
-            // Check contests scheduled to end in the relevant time window
-            List<Contest> contestsEndingAtTime = contestsByEndTime.get(timestamp);
-            if (contestsEndingAtTime != null) {
-                for (Contest contest : new ArrayList<>(contestsEndingAtTime)) {
-                    if (!publishedEndEvents.contains(contest.getId())) {
-                        logger.info("Detected contest end during minutely scan: {} (ID: {})",
-                                contest.getName(), contest.getId());
-                        emitContestEndedEvent(contest);
-                    }
-                }
-            }
-        }
-
-        // Clean up old events from the published sets
-        cleanupOldPublishedEvents();
-    }
+//    @Scheduled(cron = "0 * * * * ?") // Run every minute at 0 seconds
+//    public void checkContestStartsAndEnds() {
+//        logger.info("Running minutely contest check...");
+//
+//        if (contestsById.isEmpty()) {
+//            return; // Nothing to check
+//        }
+//
+//        Instant now = Instant.now();
+//        Instant oneMinuteAgo = now.minus(1, ChronoUnit.MINUTES);
+//
+//        // Get all minute timestamps between oneMinuteAgo and now (typically just a few values)
+//        Set<Instant> relevantMinuteTimestamps = getMinuteTimestampsBetween(oneMinuteAgo, now);
+//
+//        // Check contests scheduled to start in the relevant time window
+//        for (Instant timestamp : relevantMinuteTimestamps) {
+//            List<Contest> contestsStartingAtTime = contestsByStartTime.get(timestamp);
+//            if (contestsStartingAtTime != null) {
+//                for (Contest contest : new ArrayList<>(contestsStartingAtTime)) {
+//                    if (!publishedStartEvents.contains(contest.getId())) {
+//                        logger.info("Detected contest start during minutely scan: {} (ID: {})",
+//                                contest.getName(), contest.getId());
+//                        emitContestStartedEvent(contest);
+//                    }
+//                }
+//            }
+//
+//            // Check contests scheduled to end in the relevant time window
+//            List<Contest> contestsEndingAtTime = contestsByEndTime.get(timestamp);
+//            if (contestsEndingAtTime != null) {
+//                for (Contest contest : new ArrayList<>(contestsEndingAtTime)) {
+//                    if (!publishedEndEvents.contains(contest.getId())) {
+//                        logger.info("Detected contest end during minutely scan: {} (ID: {})",
+//                                contest.getName(), contest.getId());
+//                        emitContestEndedEvent(contest);
+//                    }
+//                }
+//            }
+//        }
+//
+//        // Clean up old events from the published sets
+//        cleanupOldPublishedEvents();
+//    }
 
     /**
      * Helper method to get all minute timestamps between two instants
