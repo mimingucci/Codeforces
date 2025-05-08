@@ -1,122 +1,150 @@
 import React, { useRef, useEffect } from "react";
-import icons from "../../utils/icons";
+import {
+  Box,
+  Typography,
+  Avatar,
+  CircularProgress,
+  Paper,
+  Fade,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
 
-const { IoSend, IoArrowBack } = icons;
+// Styled components for messages
+const MessageBubble = styled(Paper)(({ theme, owner }) => ({
+  padding: theme.spacing(1.5, 2),
+  maxWidth: "70%",
+  borderRadius: owner ? "20px 20px 4px 20px" : "20px 20px 20px 4px",
+  backgroundColor: owner ? theme.palette.primary.main : theme.palette.grey[100],
+  color: owner
+    ? theme.palette.primary.contrastText
+    : theme.palette.text.primary,
+}));
 
-const MessageArea = ({ 
-  messages, 
-  currentUser, 
-  conversation, 
-  newMessage, 
-  setNewMessage, 
-  handleSendMessage 
+const TimeStamp = styled(Typography)(({ theme, owner }) => ({
+  fontSize: "0.75rem",
+  marginTop: 4,
+  textAlign: owner ? "right" : "left",
+  color: owner ? theme.palette.primary.light : theme.palette.text.secondary,
+}));
+
+const MessageArea = ({
+  messages,
+  currentUser,
+  conversation,
+  loadingMessages,
+  hasMoreMessages,
+  onLoadMore,
 }) => {
   const messagesEndRef = useRef(null);
+  const messageBoxRef = useRef(null);
 
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  // Handle enter key press
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
+  // Handle infinite scroll
+  const handleScroll = (e) => {
+    const element = e.target;
+    if (element.scrollTop === 0 && hasMoreMessages && !loadingMessages) {
+      const oldHeight = element.scrollHeight;
+      onLoadMore().then(() => {
+        // Maintain scroll position after loading more messages
+        element.scrollTop = element.scrollHeight - oldHeight;
+      });
     }
   };
 
-  // If no conversation is selected
   if (!conversation) {
     return (
-      <div className="h-full flex items-center justify-center text-gray-500">
-        Select a conversation to start chatting
-      </div>
+      <Box
+        sx={{
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Typography variant="body1" color="text.secondary">
+          Select a conversation to start chatting
+        </Typography>
+      </Box>
     );
   }
 
-  // Find the other user in conversation
   const otherUser = conversation.participants?.find(
-    (p) => p._id !== currentUser?._id
+    (p) => p !== currentUser?.id
   );
 
   return (
-    <>
-      {/* Header */}
-      <div className="p-3 border-b flex items-center">
-        <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden">
-          {otherUser?.profileImage ? (
-            <img 
-              src={otherUser.profileImage} 
-              alt={otherUser.username} 
-              className="w-full h-full object-cover" 
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-white bg-blue-500">
-              {otherUser?.username?.charAt(0).toUpperCase()}
-            </div>
-          )}
-        </div>
-        <div className="ml-3">
-          <div className="font-medium">{otherUser?.username}</div>
-        </div>
-      </div>
+    <Box
+      ref={messageBoxRef}
+      onScroll={handleScroll}
+      sx={{
+        flexGrow: 1,
+        p: 3,
+        overflow: "auto",
+        bgcolor: (theme) => theme.palette.grey[50],
+      }}
+    >
+      {/* Loading indicator for more messages */}
+      {loadingMessages && (
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+          <CircularProgress size={24} />
+        </Box>
+      )}
 
-      {/* Messages area */}
-      <div className="flex-1 p-4 overflow-y-auto">
-        {messages.length === 0 ? (
-          <div className="text-center text-gray-500">
-            No messages yet. Start the conversation!
-          </div>
-        ) : (
-          messages.map((message) => {
-            const isCurrentUser = message.senderId === currentUser?._id;
-            return (
-              <div
-                key={message._id}
-                className={`mb-4 flex ${isCurrentUser ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[70%] px-4 py-2 rounded-lg ${
-                    isCurrentUser 
-                      ? "bg-blue-500 text-white" 
-                      : "bg-gray-100 text-gray-800"
-                  }`}
-                >
-                  {message.text}
-                  <div className={`text-xs mt-1 ${isCurrentUser ? "text-blue-100" : "text-gray-500"}`}>
-                    {new Date(message.createdAt).toLocaleTimeString([], { 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
-                    })}
-                  </div>
-                </div>
-              </div>
-            );
-          })
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input area */}
-      <div className="p-3 border-t flex">
-        <textarea
-          className="flex-1 border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Type a message..."
-          rows="2"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
-        />
-        <button
-          className="ml-2 bg-blue-500 text-white rounded-full p-2 hover:bg-blue-600 focus:outline-none"
-          onClick={handleSendMessage}
-          disabled={!newMessage.trim()}
+      {messages.length === 0 ? (
+        <Box
+          sx={{
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            gap: 2,
+          }}
         >
-          <IoSend size={20} />
-        </button>
-      </div>
-    </>
+          <Typography variant="body1" color="text.secondary">
+            No messages yet
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Start the conversation with {otherUser?.username}
+          </Typography>
+        </Box>
+      ) : (
+        messages.map((message) => {
+          const isOwner = message.senderId === currentUser?.id;
+          return (
+            <Fade in key={message._id}>
+              <Box
+                sx={{
+                  mb: 2,
+                  display: "flex",
+                  justifyContent: isOwner ? "flex-end" : "flex-start",
+                }}
+              >
+                {!isOwner && (
+                  <Avatar
+                    src={otherUser?.profileImage}
+                    sx={{ width: 32, height: 32, mr: 1 }}
+                  >
+                    {otherUser?.username?.[0]?.toUpperCase()}
+                  </Avatar>
+                )}
+                <Box>
+                  <MessageBubble owner={isOwner} elevation={0}>
+                    <Typography variant="body2">{message.text}</Typography>
+                  </MessageBubble>
+                  <TimeStamp variant="caption" owner={isOwner}>
+                    {new Date(message.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </TimeStamp>
+                </Box>
+              </Box>
+            </Fade>
+          );
+        })
+      )}
+      <div ref={messagesEndRef} />
+    </Box>
   );
 };
 

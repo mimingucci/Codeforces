@@ -23,10 +23,20 @@ public class ChatRoomEntity {
 
     private String name; // null for 1-1 chat
 
-    @Convert(converter = LongSetConverter.class)
+    @ElementCollection
+    @CollectionTable(
+            name = "room_participants",
+            joinColumns = @JoinColumn(name = "room_id")
+    )
+    @Column(name = "user_id")
     private Set<Long> participants = new HashSet<>();
 
-    @Convert(converter = LongSetConverter.class)
+    @ElementCollection
+    @CollectionTable(
+            name = "room_admins",
+            joinColumns = @JoinColumn(name = "room_id")
+    )
+    @Column(name = "user_id")
     private Set<Long> admins = new HashSet<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)

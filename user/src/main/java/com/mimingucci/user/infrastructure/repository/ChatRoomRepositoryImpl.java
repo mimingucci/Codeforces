@@ -2,6 +2,7 @@ package com.mimingucci.user.infrastructure.repository;
 
 import com.mimingucci.user.common.constant.ErrorMessageConstants;
 import com.mimingucci.user.common.exception.ApiRequestException;
+import com.mimingucci.user.common.util.IdGenerator;
 import com.mimingucci.user.domain.model.chat.ChatRoom;
 import com.mimingucci.user.domain.repository.ChatRoomRepository;
 import com.mimingucci.user.infrastructure.repository.converter.ChatConverter;
@@ -24,6 +25,7 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
     @Override
     public ChatRoom create(ChatRoom domain) {
         ChatRoomEntity entity = chatConverter.toRoomEntity(domain);
+        entity.setId(IdGenerator.INSTANCE.nextId());
         ChatRoomEntity savedEntity = repository.save(entity);
         return chatConverter.toRoomDomain(savedEntity);
     }

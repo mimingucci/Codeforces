@@ -23,6 +23,7 @@ const path = {
   CHAT: "/chat",
   CONTEST: "/contests",
   CONTESTDETAIL: "/contest/:id",
+  CONTESTSTANDING: "/contest/:id/standing",
   SUBMITDETAIL: "/submission/:id",
   FORGOTPASSWORD: "/forgot-password",
   RESETPASSWORD: "/api/auth/reset-password/:token/:email",

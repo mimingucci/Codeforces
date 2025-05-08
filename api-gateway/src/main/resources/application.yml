@@ -71,13 +71,18 @@ spring:
                     predicates:
                         - Path=/api/v1/ranking/**
                 -   id: chat
-                    uri: lb:ws://user
+                    uri: lb://user
                     predicates:
                         - Path=/api/v1/chat/**
+                -   id: ws-chat
+                    uri: lb:ws://user
+                    predicates:
+                        - Path=/ws/v1/chat/**
                     metadata:
                         protocol: ws
                     filters:
                         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+                        - RewritePath=/ws/v1/chat/(?<segment>.*), /ws/v1/chat/$\{segment}
                 -   id: ws-submission
                     uri: lb:ws://submission
                     predicates:

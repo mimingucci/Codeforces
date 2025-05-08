@@ -22,4 +22,10 @@ public class PathConstants {
     public static final String RATING = "/rating";
     public static final String SEARCH = "/search";
     public static final String BATCH = "/batch";
+
+    public static final String CHAT = "/chat";
+    public static final String ROOM = "/room";
+    public static final String MESSAGE = "/message";
+    public static final String API_V1_CHAT = API_V1 + CHAT;
+    public static final String ROOM_ID = "/{roomId}";
 }

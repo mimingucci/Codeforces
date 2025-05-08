@@ -1,5 +1,6 @@
 package com.mimingucci.user.presentation.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,5 +18,6 @@ public class ChatRoomRequest {
 
     Set<Long> admins = new HashSet<>();
 
+    @JsonProperty("isGroupChat")
     boolean isGroupChat = false;
 }

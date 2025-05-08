@@ -1,4 +1,4 @@
-import { 
+import {
   Box,
   Paper,
   Typography,
@@ -10,16 +10,17 @@ import {
   Link,
   Chip,
   Tooltip,
-} from '@mui/material';
+} from "@mui/material";
 import icons from "../../utils/icons";
 import { useEffect, useState } from "react";
 import UserApi from "../../getApi/UserApi";
 import ImageUploader from "./ImageUploader";
 import CommitGrid from "./CommitGrid";
 import Ranking from "./Ranking";
-import RatingChart from './RatingChart';
-import { format, parseISO } from 'date-fns';
-import { mockRatingHistory } from '../../data/mockRatingHistory';
+import RatingChart from "./RatingChart";
+import { format, parseISO } from "date-fns";
+import { mockRatingHistory } from "../../data/mockRatingHistory";
+import { convertUnixTimestamp } from "../../utils/dateUtils";
 
 const {
   IoIosChatboxes,
@@ -36,56 +37,60 @@ const ProfileOverview = ({ id, isHome = false }) => {
   const [user, setUser] = useState();
 
   useEffect(() => {
-      UserApi.getUserById(id)
+    UserApi.getUserById(id)
       .then((res) => {
-          setUser(res?.data?.data);
+        setUser(res?.data?.data);
       })
       .catch((err) => console.log(err));
   }, [id]);
 
   return (
-    <Box sx={{ width: '100%' }}>      
+    <Box sx={{ width: "100%" }}>
       {/* User Info Card */}
-      <Paper 
+      <Paper
         elevation={1}
-        sx={{ 
+        sx={{
           p: 3,
           mr: 3,
           mb: 2,
           borderRadius: 1,
-          '& .MuiBox-root': { // Target all Box components inside Paper
-            textAlign: 'left'
+          "& .MuiBox-root": {
+            // Target all Box components inside Paper
+            textAlign: "left",
           },
-          '& .MuiTypography-root': { // Target all Typography components
-            textAlign: 'left'
-          }
+          "& .MuiTypography-root": {
+            // Target all Typography components
+            textAlign: "left",
+          },
         }}
       >
-        <Grid 
-          container 
+        <Grid
+          container
           spacing={3}
           sx={{
-            alignItems: 'flex-start', // Align items to the start
-            justifyContent: 'flex-start' // Justify content to the start
+            alignItems: "flex-start", // Align items to the start
+            justifyContent: "flex-start", // Justify content to the start
           }}
         >
           {/* Left Column - User Details */}
-          <Grid 
-            item 
-            xs={12} 
+          <Grid
+            item
+            xs={12}
             md={8}
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start' // Align items to the start
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start", // Align items to the start
             }}
           >
             {/* Username and Rating */}
-            <Box sx={{ 
-              mb: 2,
-              width: '100%',
-              textAlign: 'left'
-            }}>
+            <Box
+              sx={{
+                mb: 2,
+                width: "100%",
+                textAlign: "left",
+              }}
+            >
               <Ranking
                 username={user?.username}
                 rating={user?.rating}
@@ -95,10 +100,7 @@ const ProfileOverview = ({ id, isHome = false }) => {
 
             {/* Full Name */}
             {(user?.firstname || user?.lastname) && (
-              <Typography 
-                color="text.secondary"
-                sx={{ mb: 2 }}
-              >
+              <Typography color="text.secondary" sx={{ mb: 2 }}>
                 {`${user?.firstname} ${user?.lastname}`}
               </Typography>
             )}
@@ -110,11 +112,11 @@ const ProfileOverview = ({ id, isHome = false }) => {
                 <ListItemIcon sx={{ minWidth: 32 }}>
                   <FaChartLine color="#1976d2" />
                 </ListItemIcon>
-                <ListItemText 
+                <ListItemText
                   primary={
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      Rating: 
-                      <Chip 
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      Rating:
+                      <Chip
                         label={user?.rating || 0}
                         size="small"
                         sx={{ ml: 1 }}
@@ -129,12 +131,16 @@ const ProfileOverview = ({ id, isHome = false }) => {
                 <ListItemIcon sx={{ minWidth: 32 }}>
                   <FaLocationDot color="#1976d2" />
                 </ListItemIcon>
-                <ListItemText 
+                <ListItemText
                   primary={
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      Location: 
-                      <Link href="#" sx={{ ml: 1 }}>Hanoi</Link>,
-                      <Link href="#" sx={{ ml: 1 }}>Vietnam</Link>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      Location:
+                      <Typography
+                        component="span"
+                        sx={{ ml: 1, color: "text.secondary" }}
+                      >
+                        {user?.country || "_"}
+                      </Typography>
                     </Box>
                   }
                 />
@@ -145,16 +151,16 @@ const ProfileOverview = ({ id, isHome = false }) => {
                 <ListItemIcon sx={{ minWidth: 32 }}>
                   <FaStar color="#1976d2" />
                 </ListItemIcon>
-                <ListItemText 
+                <ListItemText
                   primary={
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      Contribution: 
-                      <Typography 
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      Contribution:
+                      <Typography
                         component="span"
-                        sx={{ 
+                        sx={{
                           ml: 1,
-                          color: 'success.main',
-                          fontWeight: 'bold'
+                          color: "success.main",
+                          fontWeight: "bold",
                         }}
                       >
                         {user?.contribution || 0}
@@ -170,7 +176,7 @@ const ProfileOverview = ({ id, isHome = false }) => {
                   <ListItemIcon sx={{ minWidth: 32 }}>
                     <IoIosSettings color="#1976d2" />
                   </ListItemIcon>
-                  <ListItemText 
+                  <ListItemText
                     primary={
                       <Link href={`/setting/${user?.username}`}>
                         Change settings
@@ -193,20 +199,27 @@ const ProfileOverview = ({ id, isHome = false }) => {
                 <ListItemIcon sx={{ minWidth: 32 }}>
                   <BsCalendar2DateFill color="#1976d2" />
                 </ListItemIcon>
-                <ListItemText 
+                <ListItemText
                   primary={
-                    <Tooltip 
-                      title={user?.createdAt ? 
-                        format(parseISO(user.createdAt), "EEEE, MMMM do yyyy 'at' HH:mm:ss")
-                        : "No date available"
+                    <Tooltip
+                      title={
+                        user?.createdAt
+                          ? format(
+                              convertUnixTimestamp(user.createdAt),
+                              "EEEE, MMMM do yyyy 'at' HH:mm:ss"
+                            )
+                          : "No date available"
                       }
                       arrow
                     >
-                      <Box component="span" sx={{ cursor: 'help' }}>
+                      <Box component="span" sx={{ cursor: "help" }}>
                         {`Registered: ${
-                          user?.createdAt ? 
-                          format(parseISO(user.createdAt), 'dd/MM/yyyy')
-                          : "time"
+                          user?.createdAt
+                            ? format(
+                                convertUnixTimestamp(user.createdAt),
+                                "dd/MM/yyyy"
+                              )
+                            : "time"
                         }`}
                       </Box>
                     </Tooltip>
@@ -220,12 +233,8 @@ const ProfileOverview = ({ id, isHome = false }) => {
                   <ListItemIcon sx={{ minWidth: 32 }}>
                     <IoDocumentText color="#1976d2" />
                   </ListItemIcon>
-                  <ListItemText 
-                    primary={
-                      <Link href="/writeblog">
-                        Write Blog
-                      </Link>
-                    }
+                  <ListItemText
+                    primary={<Link href="/writeblog">Write Blog</Link>}
                   />
                 </ListItem>
               )}
@@ -235,13 +244,9 @@ const ProfileOverview = ({ id, isHome = false }) => {
                 <ListItemIcon sx={{ minWidth: 32 }}>
                   <IoIosChatboxes color="#1976d2" />
                 </ListItemIcon>
-                <ListItemText 
+                <ListItemText
                   primary={
-                    <Link 
-                      href={isHome ? "/usertalk" : ``}
-                    >
-                      Message
-                    </Link>
+                    <Link href={isHome ? "/usertalk" : ``}>Message</Link>
                   }
                 />
               </ListItem>
@@ -259,12 +264,12 @@ const ProfileOverview = ({ id, isHome = false }) => {
       <RatingChart data={mockRatingHistory} />
 
       {/* Commit Grid */}
-      <Paper 
+      <Paper
         elevation={1}
-        sx={{ 
+        sx={{
           p: 3,
           mr: 3,
-          borderRadius: 1
+          borderRadius: 1,
         }}
       >
         <CommitGrid author={user?.id} day_of_register={user?.createdAt} />

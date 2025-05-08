@@ -1,27 +1,35 @@
 import axios from "axios";
+const JSONbig = require("json-bigint")({ storeAsString: true });
+const BASE_URL = "http://localhost:8080/api/v1/chat";
 
-const BASE_URL = "http://localhost:8080/api/chat";
-
-export const save = async ({ name, accessToken, users }) => {
-  return await axios.post(
-    BASE_URL + "/create",
-    { name, users },
-    { headers: { Authorization: "Bearer " + accessToken } }
-  );
-};
-
-export const addUserToChat = async ({ user, chat, accessToken }) => {
-  return await axios.post(
-    BASE_URL + "/add",
-    { user, chat },
-    { headers: { Authorization: "Bearer " + accessToken } }
-  );
-};
-
-export const open = async ({ username, _id, accessToken }) => {
-  return await axios.post(
-    BASE_URL + "/open",
-    { username, _id },
-    { headers: { Authorization: "Bearer " + accessToken } }
-  );
-};
+class ChatApi {
+  getRooms(accessToken) {
+    return axios.get(BASE_URL + "/room/user", {
+      headers: { Authorization: "Bearer " + accessToken },
+      transformResponse: (data) => {
+        return JSONbig.parse(data);
+      },
+    });
+  }
+  getMessages({ roomId, page = 0, size = 50, accessToken }) {
+    return axios.get(`${BASE_URL}/room/${roomId}/message`, {
+      params: {
+        page,
+        size,
+      },
+      headers: { Authorization: `Bearer ${accessToken}` },
+      transformResponse: (data) => {
+        return JSONbig.parse(data);
+      },
+    });
+  }
+  createRoom({ room, accessToken }) {
+    return axios.post(BASE_URL + "/room", room, {
+      headers: { Authorization: "Bearer " + accessToken },
+      transformResponse: (data) => {
+        return JSONbig.parse(data);
+      },
+    });
+  }
+}
+export default new ChatApi();

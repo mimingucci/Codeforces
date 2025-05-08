@@ -11,6 +11,8 @@ import com.mimingucci.user.domain.repository.ChatRoomRepository;
 import com.mimingucci.user.domain.repository.NotificationRepository;
 import com.mimingucci.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -44,12 +46,13 @@ public class ChatService {
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setGroupChat(false);
         chatRoom.setParticipants(Set.of(userId1, userId2));
-        chatRoom.setAdmins(new HashSet<>());
+        chatRoom.setAdmins(Set.of(userId1, userId2));
 
         return roomRepository.create(chatRoom);
     }
 
     public ChatRoom createGroupChat(String name, Long creatorId, Set<Long> participantIds) {
+        participantIds.add(creatorId);
         // Validate all users exist
         List<User> participants = userRepository.findByIds(participantIds);
         if (participants.size() != participantIds.size()) {
@@ -116,7 +119,16 @@ public class ChatService {
             throw new ApiRequestException("User is not a participant", HttpStatus.FORBIDDEN);
         }
 
-        return messageRepository.getByRoom(roomId, limit, userId);
+        return messageRepository.getByRoom(roomId, limit);
+    }
+
+    public Page<ChatMessage> getMessages(Long roomId, Long userId, Pageable pageable) {
+        // Verify user is participant
+        if (!roomRepository.isUserParticipant(roomId, userId)) {
+            throw new ApiRequestException("User is not a participant", HttpStatus.FORBIDDEN);
+        }
+
+        return messageRepository.getMessages(roomId, pageable);
     }
 
     // Notification Operations

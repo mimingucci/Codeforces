@@ -4,7 +4,7 @@ import Profile from "./Profile";
 import Calendar from "./Calendar";
 import path from "../../utils/path";
 import Login from "./Login";
-import { CreateProblem, Rating, SearchList } from ".";
+import { Rating, SearchList } from ".";
 import { useLocation } from "react-router-dom";
 import SignUp from "./SignUp";
 import Setting from "./Setting";
@@ -14,7 +14,6 @@ import Ide from "../CodeEditor/Components/Ide";
 import Problem from "./Problem";
 import RichTextInput from "../RichTextInput";
 import Problems from "./Problems";
-import EditProblem from "./EditProblem";
 import EditBlog from "./EditBlog";
 import ErrorPage from "../ErrorPage";
 import Submission from "./Submission";
@@ -23,7 +22,7 @@ import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPassword";
 import ChatPage from "../Chat/ChatPage";
 import ContestPage from "../contest/ContestPage";
-import ContestDetail from '../contest/ContestDetail';
+import ContestDetail from "../contest/ContestDetail";
 
 const Main = () => {
   const location = useLocation();
@@ -58,9 +57,7 @@ const Main = () => {
         <Route path={path.MESSAGE} element={<Message />} />
         <Route path={path.IDE} element={<Ide />} />
         <Route path={path.PROBLEM} element={<Problem />} />
-        <Route path={path.CREATEPROBLEM} element={<CreateProblem />} />
         <Route path={path.PROBLEMS} element={<Problems userPage={false} />} />
-        <Route path={path.EDITPROBLEM} element={<EditProblem />} />
         <Route path={path.EDITBLOG} element={<EditBlog />} />
         <Route path={path.SUBMIT} element={<Submission />} />
         <Route path={path.SUBMITDETAIL} element={<SubmitDetail />} />

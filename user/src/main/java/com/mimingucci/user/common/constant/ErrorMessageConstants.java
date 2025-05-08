@@ -25,10 +25,12 @@ public class ErrorMessageConstants {
     public static final String NOTIFICATION_NOT_FOUND = "Notification not found";
 
     public static final String CHAT_ROOM_NOT_FOUND = "Chat room not found";
+    public static final String CHAT_ROOM_INVALIDATED = "Chat room data is invalidated";
     public static final String USER_NOT_ADMIN = "User is not an admin of this chat room";
     public static final String USER_NOT_PARTICIPANT = "User is not a participant in this chat room";
 
     public static final String NOT_PERMISSION = "User can not have permission to do";
 
     public static final String UPLOAD_IMAGE_ERROR = "Something wrong happens when uploading image";
+    public static final String CHAT_MESSAGE_NOT_FOUND = "Chat message not found";
 }

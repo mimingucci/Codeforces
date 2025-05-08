@@ -12,30 +12,25 @@ import java.util.Optional;
 @Repository
 public interface ChatRoomJpaRepository extends JpaRepository<ChatRoomEntity, Long> {
 
-    // Find rooms where user is participant
-    @Query("SELECT cr FROM ChatRoomEntity cr WHERE :userId IN (SELECT CAST(unnest(string_to_array(cr.participants, ',')) AS LONG))")
+    @Query("SELECT cr FROM ChatRoomEntity cr JOIN cr.participants p WHERE p = :userId")
     List<ChatRoomEntity> findRoomsByParticipantId(@Param("userId") Long userId);
 
-    // Find rooms where user is admin
-    @Query("SELECT cr FROM ChatRoomEntity cr WHERE :userId IN (SELECT CAST(unnest(string_to_array(cr.admins, ',')) AS LONG))")
+    @Query("SELECT cr FROM ChatRoomEntity cr JOIN cr.admins a WHERE a = :userId")
     List<ChatRoomEntity> findRoomsByAdminId(@Param("userId") Long userId);
 
-    // Find group chats only
-    List<ChatRoomEntity> findByIsGroupChatTrue();
-
-    // Find direct (1-1) chats
-    List<ChatRoomEntity> findByIsGroupChatFalse();
-
-    // Find rooms by name (for group chats)
-    List<ChatRoomEntity> findByNameContainingIgnoreCase(String name);
-
     // Find direct chat between two users
-    @Query("SELECT cr FROM ChatRoomEntity cr WHERE cr.isGroupChat = false " +
-            "AND :userOneId IN (SELECT CAST(unnest(string_to_array(cr.participants, ',')) AS LONG)) " +
-            "AND :userTwoId IN (SELECT CAST(unnest(string_to_array(cr.participants, ',')) AS LONG))")
+    @Query("SELECT cr FROM ChatRoomEntity cr " +
+            "WHERE cr.isGroupChat = false " +
+            "AND EXISTS (SELECT p1 FROM cr.participants p1 WHERE p1 = :userOneId) " +
+            "AND EXISTS (SELECT p2 FROM cr.participants p2 WHERE p2 = :userTwoId)")
     Optional<ChatRoomEntity> findDirectChatBetweenUsers(
             @Param("userOneId") Long userOneId,
             @Param("userTwoId") Long userTwoId
     );
+
+    // These can remain unchanged
+    List<ChatRoomEntity> findByIsGroupChatTrue();
+    List<ChatRoomEntity> findByIsGroupChatFalse();
+    List<ChatRoomEntity> findByNameContainingIgnoreCase(String name);
 
 }

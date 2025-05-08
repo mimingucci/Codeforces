@@ -2,6 +2,7 @@ package com.mimingucci.user.infrastructure.repository.jpa;
 
 import com.mimingucci.user.domain.model.chat.ChatMessage;
 import com.mimingucci.user.infrastructure.repository.entity.ChatMessageEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -50,4 +51,9 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessageEntit
             @Param("limit") int limit
     );
 
+    @Query("SELECT m FROM ChatMessageEntity m WHERE m.chat = :chatId ORDER BY m.createdAt DESC")
+    Page<ChatMessageEntity> findPageMessages(
+            @Param("chatId") Long chatId,
+            Pageable pageable
+    );
 }

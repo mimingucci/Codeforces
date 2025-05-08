@@ -7,3 +7,5 @@ export * from "./ProblemApi";
 export * from "./TestCaseApi";
 export * from "./SubmissionApi";
 export * from "./ContestApi";
+export * from "./LeaderboardApi";
+export * from "./ChatApi";
