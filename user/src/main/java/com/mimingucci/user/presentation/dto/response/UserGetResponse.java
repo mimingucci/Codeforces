@@ -1,6 +1,7 @@
 package com.mimingucci.user.presentation.dto.response;
 
 import com.mimingucci.user.common.enums.Role;
+import com.mimingucci.user.domain.model.chat.UserStatus;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -39,4 +40,8 @@ public class UserGetResponse {
     private String avatar;
 
     private Instant createdAt;
+
+    private UserStatus.Status status;
+
+    private Instant lastActive;
 }

@@ -98,19 +98,7 @@ public class ChatService {
         message.setContent(content);
         message.setCreatedAt(Instant.now());
 
-        ChatMessage savedMessage = messageRepository.create(message);
-        // Notify other participants
-        ChatRoom room = roomRepository.getById(roomId);
-        Set<Long> recipientIds = new HashSet<>(room.getParticipants());
-        recipientIds.remove(senderId);
-        List<Notification> notifications = notifyUsers(recipientIds, "New message in chat room: " + room.getName());
-
-        // Notify other participants
-        notifications.stream()
-                .filter(notification -> !notification.getUserId().equals(senderId))
-                .forEach(notificationDispatcher::dispatchNotification);
-
-        return savedMessage;
+        return messageRepository.create(message);
     }
 
     public List<ChatMessage> getRoomMessages(Long roomId, Long userId, int limit) {

@@ -28,9 +28,9 @@ const Main = () => {
   const location = useLocation();
   let inLoginPage = false;
   if (
-    location?.pathname == "/login" ||
-    location?.pathname == "/signup" ||
-    location?.pathname == "/ide" ||
+    location?.pathname === "/login" ||
+    location?.pathname === "/signup" ||
+    location?.pathname === "/ide" ||
     location?.pathname.startsWith("/problem")
   ) {
     inLoginPage = true;

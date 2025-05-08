@@ -117,4 +117,28 @@ public class UserApplicationServiceImpl implements UserApplicationService {
     public List<UserGetResponse> getUserByIds(List<Long> userIds) {
         return this.userService.getUserByIds(userIds).stream().map(UserAssembler.INSTANCE::toGetResponse).toList();
     }
+
+    @Override
+    public Boolean setOnline(HttpServletRequest request) {
+        Long userId = null;
+        try {
+            userId = (Long) request.getAttribute("userId");
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+        if (userId == null) throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        return this.userService.setOnline(userId);
+    }
+
+    @Override
+    public Boolean setOffline(HttpServletRequest request) {
+        Long userId = null;
+        try {
+            userId = (Long) request.getAttribute("userId");
+        } catch (Exception e) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+        if (userId == null) throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        return this.userService.setOffline(userId);
+    }
 }

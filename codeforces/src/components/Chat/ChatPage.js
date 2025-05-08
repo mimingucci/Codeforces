@@ -21,6 +21,8 @@ import HandleCookies from "../../utils/HandleCookies";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
 import ChatApi from "../../getApi/ChatApi";
 import webSocketService from "../../getApi/ws/WebSocketService";
+import { isSameId } from "../../utils/idUtils";
+import { getRelativeTimeUnix } from "../../utils/dateUtils";
 
 const ChatPage = () => {
   const [activeConversation, setActiveConversation] = useState(null);
@@ -40,6 +42,8 @@ const ChatPage = () => {
   const [loadingMessages, setLoadingMessages] = useState(false);
 
   const [connected, setConnected] = useState(false);
+
+  const [isSending, setIsSending] = useState(false);
 
   // Get current user info
   useEffect(() => {
@@ -99,6 +103,7 @@ const ChatPage = () => {
     if (user) {
       const token = HandleCookies.getCookie("token");
 
+      console.log("Connecting to WebSocket with token:", token);
       webSocketService.connect(token, () => {
         setConnected(true);
 
@@ -125,22 +130,30 @@ const ChatPage = () => {
     }
   }, [user]);
 
-  // Subscribe to new conversation when it changes
+  // Subscribe to chat messages when active conversation changes
   useEffect(() => {
-    if (connected && activeConversation?.id) {
-      const subscription = webSocketService.subscribe(
-        `/topic/room.${activeConversation.id}`,
-        handleNewMessage
-      );
+    if (connected && activeConversation) {
+      const topic = `/topic/room.${activeConversation.id}`;
+      webSocketService.subscribe(topic, (message) => {
+        setMessages((prev) => [...prev, message]);
+      });
 
-      return () => subscription.unsubscribe();
+      // Unsubscribe when conversation changes or component unmounts
+      return () => {
+        webSocketService.unsubscribe(topic);
+      };
     }
-  }, [activeConversation?.id, connected]);
+  }, [connected, activeConversation]);
 
   const handleNewMessage = (message) => {
-    // Update messages if it's for current conversation
-    if (message.chat === activeConversation?.id) {
-      setMessages((prev) => [...prev, message]);
+    if (isSameId(message.chat, activeConversation?.id)) {
+      // Update messages - convert any matching pending message to a confirmed one
+      setMessages((prev) => {
+        const updatedMessages = [...prev];
+
+        // If no matching pending message found, this is a new message from someone else
+        return [...updatedMessages, message];
+      });
 
       // Scroll to bottom
       setTimeout(() => {
@@ -154,7 +167,7 @@ const ChatPage = () => {
     // Update room list with latest message
     setRooms((prevRooms) =>
       prevRooms.map((room) => {
-        if (room.id === message.chat) {
+        if (isSameId(room.id, message.chat)) {
           return {
             ...room,
             lastMessage: message.content,
@@ -168,12 +181,44 @@ const ChatPage = () => {
 
   const handleUserSelect = async (selectedUser) => {
     // Check if there's already a room with this user
-    const existingRoom = rooms.find(
-      (room) => !room.isGroupChat && room.participants.includes(selectedUser.id)
-    );
+    const existingRoom = rooms.find((room) => {
+      if (room.isGroupChat) return false;
+      // Check if both users are in participants
+      return (
+        room.participants.some((id) => isSameId(id, selectedUser.id)) &&
+        room.participants.some((id) => isSameId(id, user?.id))
+      );
+    });
 
     if (existingRoom) {
-      setActiveConversation(existingRoom);
+      // Enrich room with other user's info before setting as active
+      const enrichedRoom = {
+        ...existingRoom,
+        otherUser: selectedUser,
+      };
+
+      setActiveConversation(enrichedRoom);
+      // Load messages for existing room
+      try {
+        setLoadingMessages(true);
+        const accessToken = HandleCookies.getCookie("token");
+        const response = await ChatApi.getMessages({
+          roomId: existingRoom.id,
+          page: 0,
+          size: 50,
+          accessToken,
+        });
+
+        const { content, last } = response.data.data;
+        setMessages(content.reverse());
+        setMessagesPage(0);
+        setHasMoreMessages(!last);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      } finally {
+        setLoadingMessages(false);
+      }
+
       setSearchQuery("");
       setSearchResults([]);
       return;
@@ -192,28 +237,6 @@ const ChatPage = () => {
     setActiveConversation(newRoom);
     setSearchQuery("");
     setSearchResults([]);
-  };
-
-  const createNewRoom = async (otherUser) => {
-    try {
-      const accessToken = HandleCookies.getCookie("token");
-      const roomRequest = {
-        participants: [otherUser.id],
-        isGroupChat: false,
-      };
-
-      const response = await ChatApi.createRoom({
-        room: roomRequest,
-        accessToken,
-      });
-
-      const newRoom = response.data.data;
-      setRooms((prevRooms) => [...prevRooms, newRoom]);
-      return newRoom;
-    } catch (error) {
-      console.error("Error creating room:", error);
-      throw error;
-    }
   };
 
   // Handle conversation selection
@@ -246,50 +269,71 @@ const ChatPage = () => {
   };
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || !activeConversation?.id) return;
+    if (!newMessage.trim() || isSending) return;
 
     try {
+      setIsSending(true); // Disable send button
+
+      // Check if we need to create the room first (when id is null)
+      let currentConversation = activeConversation;
+
+      if (!currentConversation.id) {
+        // Create the room first
+        const accessToken = HandleCookies.getCookie("token");
+        const roomRequest = {
+          participants: [currentConversation.otherUser.id],
+          isGroupChat: false,
+        };
+
+        console.log("Creating new room before sending message...");
+        const response = await ChatApi.createRoom({
+          room: roomRequest,
+          accessToken,
+        });
+
+        const newRoom = response.data.data;
+
+        // Update rooms list with the new room
+        setRooms((prevRooms) => [...prevRooms, newRoom]);
+
+        // Update active conversation with the real room
+        currentConversation = newRoom;
+        setActiveConversation(newRoom);
+
+        // Subscribe to the new room's topic
+        if (connected) {
+          webSocketService.subscribe(
+            `/topic/room.${newRoom.id}`,
+            handleNewMessage
+          );
+        }
+      }
+
+      // Now send the message with the valid room id
       const messageData = {
-        chat: activeConversation.id,
+        chat: currentConversation.id,
         content: newMessage,
       };
 
-      // Send message through WebSocket
+      // Clear input
+      setNewMessage("");
+
+      // Send through WebSocket
       const sent = webSocketService.send("/app/chat.send", messageData);
 
-      if (sent) {
-        // Optimistically add message to UI
-        const optimisticMessage = {
-          id: Date.now().toString(), // temporary ID
-          chat: activeConversation.id,
-          content: newMessage,
-          author: user.id,
-          createdAt: new Date().toISOString(),
-          pending: true, // flag for UI to show sending state
-        };
-
-        setMessages((prev) => [...prev, optimisticMessage]);
-        setNewMessage("");
+      if (!sent) {
+        throw new Error("Failed to send message");
       }
     } catch (error) {
       console.error("Error sending message:", error);
-      // TODO: Show error toast/notification
+      // Show error notification or restore the message to input
+    } finally {
+      // Re-enable send button after a short delay
+      setTimeout(() => {
+        setIsSending(false);
+      }, 500); // Short delay to prevent accidental double-sends
     }
   };
-
-  // Add typing indicator (optional)
-  // const handleTyping = (e) => {
-  //   if (!activeConversation?.id) return;
-
-  //   // Debounce typing notification
-  //   if (typingTimeout.current) {
-  //     clearTimeout(typingTimeout.current);
-  //   }
-
-  //   typingTimeout.current = setTimeout(() => {
-  //     webSocketService.send('/app/chat.typing', activeConversation.id);
-  //   }, 500);
-  // };
 
   // Add function to load more messages
   const loadMoreMessages = async () => {
@@ -301,7 +345,7 @@ const ChatPage = () => {
       const response = await ChatApi.getMessages({
         roomId: activeConversation.id,
         page: messagesPage + 1,
-        size: 20,
+        size: 50,
         accessToken,
       });
 
@@ -436,15 +480,42 @@ const ChatPage = () => {
         {activeConversation ? (
           <>
             {/* Chat Header */}
-            <Box sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
-              <Typography variant="h6">
-                {activeConversation.id
-                  ? activeConversation.participants
-                      .filter((p) => p !== user?.id)
-                      .map((p) => p.username)
-                      .join(", ")
-                  : activeConversation.otherUser.username}
-              </Typography>
+            <Box
+              sx={{
+                p: 2,
+                borderBottom: 1,
+                borderColor: "divider",
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+              }}
+            >
+              <Avatar src={activeConversation.otherUser?.avatar}>
+                {activeConversation.otherUser?.username?.[0]?.toUpperCase()}
+              </Avatar>
+              <Box>
+                <Typography variant="h6">
+                  {activeConversation.otherUser?.username || "Chat"}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{
+                    ...(activeConversation.otherUser?.status === "ONLINE" && {
+                      color: "success.main",
+                      fontWeight: "bold",
+                    }),
+                  }}
+                >
+                  {activeConversation.otherUser?.status === "ONLINE"
+                    ? "Online"
+                    : activeConversation.otherUser?.lastActive
+                    ? `Last seen ${getRelativeTimeUnix(
+                        activeConversation.otherUser?.lastActive
+                      )}`
+                    : "Offline"}
+                </Typography>
+              </Box>
             </Box>
 
             {/* Messages Area */}
@@ -512,7 +583,7 @@ const ChatPage = () => {
                     <InputAdornment position="end">
                       <IconButton
                         onClick={handleSendMessage}
-                        disabled={!connected || !newMessage.trim()}
+                        disabled={!connected || !newMessage.trim() || isSending}
                         color="primary"
                       >
                         <SendIcon />

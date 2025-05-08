@@ -176,4 +176,14 @@ public class UserServiceImpl implements UserService {
     public List<User> getUserByIds(List<Long> userIds) {
         return this.userRepository.findByIds(userIds);
     }
+
+    @Override
+    public Boolean setOnline(Long userId) {
+        return this.userRepository.setOnline(userId);
+    }
+
+    @Override
+    public Boolean setOffline(Long userId) {
+        return this.userRepository.setOffline(userId);
+    }
 }

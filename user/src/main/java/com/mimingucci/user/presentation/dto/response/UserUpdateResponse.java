@@ -1,10 +1,13 @@
 package com.mimingucci.user.presentation.dto.response;
 
+import com.mimingucci.user.domain.model.chat.UserStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
+import java.time.Instant;
 
 @Data
 @NoArgsConstructor
@@ -29,4 +32,8 @@ public class UserUpdateResponse {
     private String country;
 
     private String avatar;
+
+    private UserStatus.Status status;
+
+    private Instant lastActive;
 }

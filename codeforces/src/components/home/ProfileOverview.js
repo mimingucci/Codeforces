@@ -12,6 +12,8 @@ import {
   Tooltip,
 } from "@mui/material";
 import icons from "../../utils/icons";
+import { getRelativeTimeUnix } from "../../utils/dateUtils";
+import { FaClock } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import UserApi from "../../getApi/UserApi";
 import ImageUploader from "./ImageUploader";
@@ -51,7 +53,6 @@ const ProfileOverview = ({ id, isHome = false }) => {
         elevation={1}
         sx={{
           p: 3,
-          mr: 3,
           mb: 2,
           borderRadius: 1,
           "& .MuiBox-root": {
@@ -194,6 +195,37 @@ const ProfileOverview = ({ id, isHome = false }) => {
                 <ListItemText primary={user?.email || "email"} />
               </ListItem>
 
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 32 }}>
+                  <FaClock color="#1976d2" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      Last visited:
+                      <Typography
+                        component="span"
+                        sx={{
+                          ml: 1,
+                          color:
+                            user?.status === "ONLINE"
+                              ? "success.main"
+                              : "text.secondary",
+                          fontWeight:
+                            user?.status === "ONLINE" ? "bold" : "regular",
+                        }}
+                      >
+                        {user?.status === "ONLINE"
+                          ? "online now"
+                          : user?.lastActive
+                          ? getRelativeTimeUnix(user.lastActive)
+                          : "never"}
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </ListItem>
+
               {/* Registration Date */}
               <ListItem>
                 <ListItemIcon sx={{ minWidth: 32 }}>
@@ -245,9 +277,7 @@ const ProfileOverview = ({ id, isHome = false }) => {
                   <IoIosChatboxes color="#1976d2" />
                 </ListItemIcon>
                 <ListItemText
-                  primary={
-                    <Link href={isHome ? "/usertalk" : ``}>Message</Link>
-                  }
+                  primary={<Link href={isHome ? "/chat" : ``}>Message</Link>}
                 />
               </ListItem>
             </List>
@@ -268,7 +298,6 @@ const ProfileOverview = ({ id, isHome = false }) => {
         elevation={1}
         sx={{
           p: 3,
-          mr: 3,
           borderRadius: 1,
         }}
       >

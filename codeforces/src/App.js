@@ -3,15 +3,20 @@ import Home from "./containers/public/Home";
 import Header from "./components/Header";
 import { Footer } from "./components/home";
 import { useEffect } from "react";
-import handleTokenAutomatically from "./utils/autoHandlerToken";
-import { LoadingProvider } from './components/shared/LoadingContext';
+import { LoadingProvider } from "./components/shared/LoadingContext";
+import HandleCookies from "./utils/HandleCookies";
+import userPresenceService from "./services/UserPresenceService";
 
 function App() {
   useEffect(() => {
-    async function init() {
-      await handleTokenAutomatically();
+    // Initialize user presence tracking if user is logged in
+    if (HandleCookies.checkCookie("token")) {
+      userPresenceService.init();
     }
-    init();
+
+    return () => {
+      userPresenceService.cleanup();
+    };
   }, []);
   return (
     <LoadingProvider>
@@ -21,7 +26,7 @@ function App() {
           <Home />
         </div>
         <Footer />
-    </div>
+      </div>
     </LoadingProvider>
   );
 }

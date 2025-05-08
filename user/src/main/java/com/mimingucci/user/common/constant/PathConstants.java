@@ -28,4 +28,7 @@ public class PathConstants {
     public static final String MESSAGE = "/message";
     public static final String API_V1_CHAT = API_V1 + CHAT;
     public static final String ROOM_ID = "/{roomId}";
+    public static final String STATUS = "/status";
+    public static final String ONLINE = "/online";
+    public static final String OFFLINE = "/offline";
 }

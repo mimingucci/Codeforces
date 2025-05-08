@@ -47,4 +47,8 @@ public interface UserService {
     Page<User> search(String query, Pageable pageable);
 
     List<User> getUserByIds(List<Long> userIds);
+
+    Boolean setOnline(Long userId);
+
+    Boolean setOffline(Long userId);
 }

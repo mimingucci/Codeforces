@@ -24,8 +24,8 @@ class ChatApi {
     });
   }
   createRoom({ room, accessToken }) {
-    return axios.post(BASE_URL + "/room", room, {
-      headers: { Authorization: "Bearer " + accessToken },
+    return axios.post(`${BASE_URL}/room`, room, {
+      headers: { Authorization: `Bearer ${accessToken}` },
       transformResponse: (data) => {
         return JSONbig.parse(data);
       },

@@ -23,7 +23,7 @@ public class ChatRoomEntity {
 
     private String name; // null for 1-1 chat
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "room_participants",
             joinColumns = @JoinColumn(name = "room_id")
@@ -31,7 +31,7 @@ public class ChatRoomEntity {
     @Column(name = "user_id")
     private Set<Long> participants = new HashSet<>();
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "room_admins",
             joinColumns = @JoinColumn(name = "room_id")

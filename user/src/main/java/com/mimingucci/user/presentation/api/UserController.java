@@ -35,5 +35,9 @@ public interface UserController {
 
     BaseResponse<Boolean> updateUserRatings(List<Pair<Long, Integer>> users, String authToken);
 
+    BaseResponse<Boolean> userConnected(HttpServletRequest request);
+
+    BaseResponse<Boolean> userDisconnected(HttpServletRequest request);
+
     BaseResponse<PageableResponse<UserGetResponse>> search(String query, Pageable pageable);
 }

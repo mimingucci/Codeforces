@@ -112,3 +112,21 @@ export const convertUnixTimestamp = (timestamp) => {
   // Convert to milliseconds
   return new Date(parseInt(seconds) * 1000);
 };
+
+export const getRelativeTimeUnix = (timestamp) => {
+  const now = new Date();
+  const lastActive = convertUnixTimestamp(timestamp); // Convert Unix timestamp to Date
+  const diffInMinutes = Math.floor((now - lastActive) / (1000 * 60));
+
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} ${diffInMinutes === 1 ? "minute" : "minutes"} ago`;
+  }
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) {
+    return `${diffInHours} ${diffInHours === 1 ? "hour" : "hours"} ago`;
+  }
+
+  const diffInDays = Math.floor(diffInHours / 24);
+  return `${diffInDays} ${diffInDays === 1 ? "day" : "days"} ago`;
+};

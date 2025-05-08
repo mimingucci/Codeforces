@@ -3,6 +3,7 @@ package com.mimingucci.user.common.interceptor;
 import com.mimingucci.user.common.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -15,6 +16,7 @@ import java.security.Principal;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
     private final JwtUtil jwtUtil;
@@ -23,26 +25,30 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-            // Get JWT from headers
-            String token = accessor.getFirstNativeHeader("Authorization");
-            if (token != null && token.startsWith("Bearer ")) {
-                token = token.substring(7);
+        if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
+            try {
+                // Get JWT from headers
+                String token = accessor.getFirstNativeHeader("Authorization");
+                log.debug("WebSocket connection attempt with token: {}", token != null ? "present" : "missing");
 
-                // Validate JWT and get user info
-                Claims claims = this.jwtUtil.extractAllClaims(token);
+                if (token != null && token.startsWith("Bearer ")) {
+                    token = token.substring(7);
 
-                Long userId = claims.get("id", Long.class);
-                String userEmail = claims.getSubject();
-                // Store in session attributes
-                accessor.setUser(new Principal() {
-                    @Override
-                    public String getName() {
-                        return String.valueOf(userId);
-                    }
-                });
-                accessor.getSessionAttributes().put("userId", userId);
-                accessor.getSessionAttributes().put("userEmail", userEmail);
+                    // Validate JWT and get user info
+                    Claims claims = this.jwtUtil.extractAllClaims(token);
+
+                    Long userId = claims.get("id", Long.class);
+                    String userEmail = claims.getSubject();
+                    log.info("WebSocket authenticated user: {} ({})", userEmail, userId);
+
+                    accessor.getSessionAttributes().put("userId", userId);
+                    accessor.getSessionAttributes().put("userEmail", userEmail);
+                } else {
+                    log.warn("WebSocket connection attempt with invalid token format");
+                }
+            } catch (Exception e) {
+                log.error("Error authenticating WebSocket connection", e);
+                // Don't throw exception, just log it - unauthorized users won't be able to subscribe to protected topics
             }
         }
         return message;

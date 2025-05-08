@@ -2,6 +2,7 @@ package com.mimingucci.user.domain.event;
 
 import com.mimingucci.user.common.util.JwtUtil;
 import com.mimingucci.user.domain.model.chat.UserStatus;
+import com.mimingucci.user.domain.service.UserService;
 import com.mimingucci.user.domain.service.chat.UserStatusService;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -22,46 +23,35 @@ import java.time.Instant;
 public class WebSocketEventListener {
     private final SimpMessagingTemplate messagingTemplate;
 
-    private UserStatusService userStatusService;
+    private final UserService service;
 
     private final JwtUtil jwtUtil;
 
-    @EventListener
-    public void handleWebSocketConnectListener(SessionConnectedEvent event) {
-        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-
-        Long userId = (Long) headerAccessor.getSessionAttributes().get("userId");
-        if (userId != null) {
-
-            // Set user status to online
-            userStatusService.setUserOnline(userId);
-
-            // Broadcast user online status
-            UserStatus status = new UserStatus(userId, UserStatus.Status.ONLINE, null);
-            messagingTemplate.convertAndSend("/topic/users.status", status);
-
-            log.info("User Connected: " + userId);
-        }
-    }
-
-    @EventListener
-    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.wrap(event.getMessage());
-
-        Long userId = (Long) headerAccessor.getSessionAttributes().get("userId");
-
-        if (userId != null) {
-            log.info("User Disconnected: " + userId);
-
-            Instant cur = Instant.now();
-            // Set user status to offline
-            userStatusService.setUserOffline(userId, cur);
-
-            // Broadcast user offline status
-            UserStatus status = new UserStatus(userId, UserStatus.Status.OFFLINE, cur);
-            messagingTemplate.convertAndSend("/topic/users.status", status);
-
-            log.info("User Disconnected: {}", userId);
-        }
-    }
+//    @EventListener
+//    public void handleWebSocketConnectListener(SessionConnectedEvent event) {
+//        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+//
+//        Long userId = (Long) headerAccessor.getSessionAttributes().get("userId");
+//        if (userId != null) {
+//            log.info("User connected: " + userId);
+//
+//            // Set user status to online
+//            service.setOnline(userId);
+//
+//        }
+//    }
+//
+//    @EventListener
+//    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
+//        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.wrap(event.getMessage());
+//
+//        Long userId = (Long) headerAccessor.getSessionAttributes().get("userId");
+//
+//        if (userId != null) {
+//            log.info("User Disconnected: " + userId);
+//
+//            // Set user status to offline
+//            service.setOffline(userId);
+//        }
+//    }
 }

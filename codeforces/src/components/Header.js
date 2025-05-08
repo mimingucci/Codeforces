@@ -14,11 +14,10 @@ import {
   Button,
   InputBase,
   Paper,
-  Badge,
 } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 
-const { IoIosNotifications, IoMdSearch } = icons;
+const { IoMdSearch } = icons;
 
 // Styled components
 const Search = styled("div")(({ theme }) => ({
@@ -90,11 +89,6 @@ const Header = () => {
 
           {/* User Section */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <IconButton>
-              <Badge badgeContent={4} color="primary">
-                <IoIosNotifications />
-              </Badge>
-            </IconButton>
             {checkLogin() ? (
               <>
                 <Button

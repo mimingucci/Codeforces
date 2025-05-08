@@ -6,20 +6,25 @@ import {
   Avatar,
   Typography,
   Box,
-  Badge,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import UserApi from "../../getApi/UserApi";
+import { isSameId } from "../../utils/idUtils";
 
-// Styled Badge for unread messages
-const StyledBadge = styled(Badge)(({ theme }) => ({
-  "& .MuiBadge-dot": {
-    backgroundColor: theme.palette.primary.main,
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-  },
+// Status indicator for online/offline status
+const StatusIndicator = styled("div")(({ theme, status }) => ({
+  width: 10,
+  height: 10,
+  borderRadius: "50%",
+  position: "absolute",
+  bottom: 0,
+  right: 0,
+  border: "2px solid #fff",
+  backgroundColor:
+    status === "ONLINE" ? theme.palette.success.main : theme.palette.grey[400],
 }));
 
 const ConversationList = ({
@@ -28,25 +33,100 @@ const ConversationList = ({
   onSelectConversation,
   currentUser,
 }) => {
+  const [participantDetails, setParticipantDetails] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  // Fetch participant details for all conversations
+  useEffect(() => {
+    const fetchParticipantDetails = async () => {
+      if (!conversations.length) return;
+
+      setLoading(true);
+
+      // Get all unique participant IDs (excluding current user)
+      const uniqueParticipantIds = [
+        ...new Set(
+          conversations.flatMap((conversation) =>
+            conversation.participants.filter(
+              (id) => !isSameId(id, currentUser?.id)
+            )
+          )
+        ),
+      ];
+
+      // Fetch details for each participant
+      const participantData = {};
+
+      try {
+        // Fetch in parallel for better performance
+        const detailsPromises = uniqueParticipantIds.map(
+          async (participantId) => {
+            try {
+              const response = await UserApi.getUserById(participantId);
+              return { id: participantId, data: response.data.data };
+            } catch (error) {
+              console.error(`Failed to fetch user ${participantId}`, error);
+              return { id: participantId, data: null };
+            }
+          }
+        );
+
+        const results = await Promise.all(detailsPromises);
+
+        // Create a map of id -> user details
+        results.forEach((result) => {
+          if (result.data) {
+            participantData[result.id] = result.data;
+          }
+        });
+
+        setParticipantDetails(participantData);
+      } catch (error) {
+        console.error("Error fetching participant details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchParticipantDetails();
+  }, [conversations, currentUser?.id]);
+
+  // Get the other participant for a 1-on-1 conversation
+  const getOtherParticipant = (conversation) => {
+    const otherParticipantId = conversation.participants.find(
+      (id) => !isSameId(id, currentUser?.id)
+    );
+    return (
+      participantDetails[otherParticipantId] || { username: "Unknown User" }
+    );
+  };
+
   return (
     <List sx={{ width: "100%", bgcolor: "background.paper", p: 0 }}>
-      {conversations.length === 0 ? (
+      {loading && conversations.length === 0 ? (
+        <Box sx={{ p: 3, textAlign: "center" }}>
+          <CircularProgress size={24} />
+        </Box>
+      ) : conversations.length === 0 ? (
         <Box sx={{ p: 3, textAlign: "center" }}>
           <Typography color="text.secondary">No conversations yet</Typography>
+          <Typography variant="caption" color="text.secondary">
+            Search for users to start chatting
+          </Typography>
         </Box>
       ) : (
         conversations.map((conversation, index) => {
-          // For 1-1 chats, find the other user
-          const otherParticipant = !conversation.isGroupChat
-            ? conversation.participants.find((id) => id !== currentUser?.id)
-            : null;
-
+          const otherUser = getOtherParticipant(conversation);
+          const isActive = isSameId(activeConversation?.id, conversation.id);
+          const userStatus = otherUser?.status || "OFFLINE";
           return (
             <React.Fragment key={conversation.id}>
               <ListItem
                 button
-                selected={activeConversation?.id === conversation.id}
-                onClick={() => onSelectConversation(conversation)}
+                selected={isActive}
+                onClick={() =>
+                  onSelectConversation({ ...conversation, otherUser })
+                }
                 sx={{
                   px: 2,
                   py: 1.5,
@@ -59,63 +139,18 @@ const ConversationList = ({
                 }}
               >
                 <ListItemAvatar>
-                  {conversation.isGroupChat ? (
-                    <Avatar sx={{ bgcolor: "primary.main" }}>
-                      {conversation.name?.[0]?.toUpperCase()}
+                  <Box sx={{ position: "relative" }}>
+                    <Avatar src={otherUser.avatar}>
+                      {otherUser.username?.[0]?.toUpperCase()}
                     </Avatar>
-                  ) : (
-                    <Avatar>
-                      {otherParticipant?.username?.[0]?.toUpperCase()}
-                    </Avatar>
-                  )}
+                    <StatusIndicator status={userStatus || "OFFLINE"} />
+                  </Box>
                 </ListItemAvatar>
                 <ListItemText
                   primary={
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Typography variant="subtitle1" component="span">
-                        {conversation.isGroupChat
-                          ? conversation.name
-                          : otherParticipant?.username}
-                      </Typography>
-                      {conversation.updatedAt && (
-                        <Typography variant="caption" color="text.secondary">
-                          {new Date(
-                            conversation.updatedAt
-                          ).toLocaleDateString()}
-                        </Typography>
-                      )}
-                    </Box>
-                  }
-                  secondary={
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          maxWidth: "80%",
-                        }}
-                      >
-                        {conversation.lastMessage || "No messages yet"}
-                      </Typography>
-                      {conversation.unread && (
-                        <StyledBadge variant="dot" overlap="circular" />
-                      )}
-                    </Box>
+                    <Typography variant="subtitle1" component="span">
+                      {otherUser.username}
+                    </Typography>
                   }
                 />
               </ListItem>

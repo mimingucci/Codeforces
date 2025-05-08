@@ -43,4 +43,8 @@ public interface UserRepository {
     void batchUpdateRatings(Map<Long, Integer> userRatings);
 
     Page<User> search(String query, Pageable pageable);
+
+    Boolean setOnline(Long userId);
+
+    Boolean setOffline(Long userId);
 }

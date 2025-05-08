@@ -1,5 +1,5 @@
 import axios from "axios";
-const JSONbig = require('json-bigint')({ storeAsString: true });
+const JSONbig = require("json-bigint")({ storeAsString: true });
 const BASE_URL = "http://localhost:8080/api/v1/user";
 const AUTH_URL = "http://localhost:8080/api/v1/auth";
 
@@ -12,25 +12,32 @@ class UserApi {
       },
     });
   }
-  getTopRatings({limit = 100}) {
-    return axios.get(BASE_URL + `/all?ratingDir=DESC&page=0&pageSize=${limit}`, {
-      transformResponse: (data) => {
-        const res = JSONbig.parse(data);
-        return res;
-      },
-    });
+  getTopRatings({ limit = 100 }) {
+    return axios.get(
+      BASE_URL + `/all?ratingDir=DESC&page=0&pageSize=${limit}`,
+      {
+        transformResponse: (data) => {
+          const res = JSONbig.parse(data);
+          return res;
+        },
+      }
+    );
   }
-  getTopContributors({limit = 100}) {
-    return axios.get(BASE_URL + `/all?contributionDir=DESC&page=0&pageSize=${limit}`, {
-      transformResponse: (data) => {
-        const res = JSONbig.parse(data);
-        return res;
-      },
-    });
+  getTopContributors({ limit = 100 }) {
+    return axios.get(
+      BASE_URL + `/all?contributionDir=DESC&page=0&pageSize=${limit}`,
+      {
+        transformResponse: (data) => {
+          const res = JSONbig.parse(data);
+          return res;
+        },
+      }
+    );
   }
   search({ page = 0, username, limit = 100 }) {
     return axios.get(
-      BASE_URL + `/all?page=${page}&username=${username}&pageSize=${limit}`, {
+      BASE_URL + `/all?page=${page}&username=${username}&pageSize=${limit}`,
+      {
         transformResponse: (data) => {
           const res = JSONbig.parse(data);
           return res;
@@ -73,16 +80,38 @@ class UserApi {
       headers: { Authorization: "Bearer " + accessToken },
     });
   }
+  setOnline(accessToken) {
+    return axios.put(
+      BASE_URL + "/status/online",
+      {},
+      {
+        headers: { Authorization: "Bearer " + accessToken },
+      }
+    );
+  }
+  setOffline(accessToken) {
+    return axios.put(
+      BASE_URL + "/status/offline",
+      {},
+      {
+        headers: { Authorization: "Bearer " + accessToken },
+      }
+    );
+  }
   login({ email, password }) {
-    return axios.post(AUTH_URL + "/login", {
-      email,
-      password,
-    }, {
-      transformResponse: (data) => {
-        const res = JSONbig.parse(data);
-        return res;
+    return axios.post(
+      AUTH_URL + "/login",
+      {
+        email,
+        password,
       },
-    });
+      {
+        transformResponse: (data) => {
+          const res = JSONbig.parse(data);
+          return res;
+        },
+      }
+    );
   }
   logout(accessToken) {
     return axios.get(AUTH_URL + "/logout", {
@@ -106,14 +135,18 @@ class UserApi {
     });
   }
   getUserInfo(accessToken) {
-    return axios.get(BASE_URL + "/info", {
-      headers: { Authorization: "Bearer " + accessToken },
-    }, {
-      transformResponse: (data) => {
-        const res = JSONbig.parse(data);
-        return res;
+    return axios.get(
+      BASE_URL + "/info",
+      {
+        headers: { Authorization: "Bearer " + accessToken },
       },
-    });
+      {
+        transformResponse: (data) => {
+          const res = JSONbig.parse(data);
+          return res;
+        },
+      }
+    );
   }
   allow({ accessToken, username, id }) {
     return axios.post(

@@ -8,6 +8,8 @@ import {
   Fade,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { isSameId } from "../../utils/idUtils";
+import { convertUnixTimestamp } from "../../utils/dateUtils";
 
 // Styled components for messages
 const MessageBubble = styled(Paper)(({ theme, owner }) => ({
@@ -74,6 +76,7 @@ const MessageArea = ({
   return (
     <Box
       ref={messageBoxRef}
+      className="message-box"
       onScroll={handleScroll}
       sx={{
         flexGrow: 1,
@@ -109,9 +112,9 @@ const MessageArea = ({
         </Box>
       ) : (
         messages.map((message) => {
-          const isOwner = message.senderId === currentUser?.id;
+          const isOwner = isSameId(message.author, currentUser?.id);
           return (
-            <Fade in key={message._id}>
+            <Fade in key={message.id}>
               <Box
                 sx={{
                   mb: 2,
@@ -121,21 +124,31 @@ const MessageArea = ({
               >
                 {!isOwner && (
                   <Avatar
-                    src={otherUser?.profileImage}
+                    src={otherUser?.avatar}
                     sx={{ width: 32, height: 32, mr: 1 }}
                   >
                     {otherUser?.username?.[0]?.toUpperCase()}
                   </Avatar>
                 )}
                 <Box>
-                  <MessageBubble owner={isOwner} elevation={0}>
-                    <Typography variant="body2">{message.text}</Typography>
+                  <MessageBubble
+                    owner={isOwner}
+                    elevation={0}
+                    sx={{
+                      opacity: message.pending ? 0.6 : 1,
+                      position: "relative",
+                    }}
+                  >
+                    <Typography variant="body2">{message.content}</Typography>
                   </MessageBubble>
                   <TimeStamp variant="caption" owner={isOwner}>
-                    {new Date(message.createdAt).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {convertUnixTimestamp(message.createdAt).toLocaleTimeString(
+                      [],
+                      {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }
+                    )}
                   </TimeStamp>
                 </Box>
               </Box>

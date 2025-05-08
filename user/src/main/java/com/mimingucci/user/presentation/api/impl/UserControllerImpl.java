@@ -86,6 +86,19 @@ public class UserControllerImpl implements UserController {
         return BaseResponse.success(this.userApplicationService.updateRatings(users, authToken));
     }
 
+    @PutMapping(path = PathConstants.STATUS + PathConstants.ONLINE)
+    @Override
+    public BaseResponse<Boolean> userConnected(HttpServletRequest request) {
+        return BaseResponse.success(this.userApplicationService.setOnline(request));
+    }
+
+    @PutMapping(path = PathConstants.STATUS + PathConstants.OFFLINE)
+    @Override
+    public BaseResponse<Boolean> userDisconnected(HttpServletRequest request) {
+        System.out.println("GO OFF");
+        return BaseResponse.success(this.userApplicationService.setOffline(request));
+    }
+
     @GetMapping(path = PathConstants.SEARCH)
     @Override
     public BaseResponse<PageableResponse<UserGetResponse>> search(@RequestParam("query") String query, Pageable pageable) {

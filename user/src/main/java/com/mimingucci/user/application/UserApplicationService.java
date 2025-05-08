@@ -34,4 +34,8 @@ public interface UserApplicationService {
     PageableResponse<UserGetResponse> search(String query, Pageable pageable);
 
     List<UserGetResponse> getUserByIds(List<Long> userIds);
+
+    Boolean setOnline(HttpServletRequest request);
+
+    Boolean setOffline(HttpServletRequest request);
 }

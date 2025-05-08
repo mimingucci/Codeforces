@@ -3,6 +3,7 @@ package com.mimingucci.user.infrastructure.repository;
 import com.mimingucci.user.common.constant.ErrorMessageConstants;
 import com.mimingucci.user.common.exception.ApiRequestException;
 import com.mimingucci.user.domain.model.User;
+import com.mimingucci.user.domain.model.chat.UserStatus;
 import com.mimingucci.user.domain.repository.UserRepository;
 import com.mimingucci.user.infrastructure.repository.converter.UserConverter;
 import com.mimingucci.user.infrastructure.repository.entity.UserEntity;
@@ -17,6 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -128,5 +130,27 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Page<User> search(String query, Pageable pageable) {
         return this.userJpaRepository.quickSearch(query, pageable).map(converter::toDomain);
+    }
+
+    @Override
+    public Boolean setOnline(Long userId) {
+        Optional<UserEntity> optional = this.userJpaRepository.findById(userId);
+        if (optional.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        UserEntity entity = optional.get();
+        entity.setStatus(UserStatus.Status.ONLINE);
+        entity.setLastActive(Instant.now());
+        this.userJpaRepository.save(entity);
+        return true;
+    }
+
+    @Override
+    public Boolean setOffline(Long userId) {
+        Optional<UserEntity> optional = this.userJpaRepository.findById(userId);
+        if (optional.isEmpty()) throw new ApiRequestException(ErrorMessageConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        UserEntity entity = optional.get();
+        entity.setStatus(UserStatus.Status.OFFLINE);
+        entity.setLastActive(Instant.now());
+        this.userJpaRepository.save(entity);
+        return true;
     }
 }

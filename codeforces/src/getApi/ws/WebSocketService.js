@@ -1,109 +1,82 @@
-import SockJS from "sockjs-client";
 import { Stomp } from "@stomp/stompjs";
-import { API_BASE_URL } from "../../config";
+const JSONbig = require("json-bigint")({ storeAsString: true });
 
 class WebSocketService {
   constructor() {
     this.stompClient = null;
-    this.connected = false;
     this.subscriptions = new Map();
-    this.connectionPromise = null;
-    this.connectionCallbacks = [];
-    this.errorCallbacks = [];
+  }
+
+  isConnected() {
+    return this.stompClient && this.stompClient.connected;
   }
 
   connect(accessToken, onConnected) {
-    if (this.connected) {
+    if (this.stompClient && this.stompClient.connected) {
       if (onConnected) onConnected();
       return;
     }
 
-    if (this.connectionPromise) {
-      // If already connecting, add callback to the queue
-      if (onConnected) this.connectionCallbacks.push(onConnected);
-      return this.connectionPromise;
-    }
+    // Use native WebSocket instead of SockJS
+    // const socket = new WebSocket(`ws://${window.location.host}/ws/v1/chat`);
+    // For local development with different ports:
+    const socket = new WebSocket(`ws://localhost:8080/ws/v1/chat`);
 
-    // Create promise for connection
-    this.connectionPromise = new Promise((resolve, reject) => {
-      const socket = new SockJS(`${API_BASE_URL}/ws/v1/chat`);
-      this.stompClient = Stomp.over(socket);
+    this.stompClient = Stomp.over(socket);
 
-      // Disable debug logging
-      this.stompClient.debug = null;
+    // Disable debug logs in production
+    this.stompClient.debug =
+      process.env.NODE_ENV === "development" ? console.log : () => {};
 
-      const headers = {
-        Authorization: `Bearer ${accessToken}`,
-      };
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+    };
 
-      this.stompClient.connect(
-        headers,
-        () => {
-          console.log("WebSocket connected");
-          this.connected = true;
-
-          // Resolve the promise
-          resolve();
-
-          // Call any pending callbacks
-          if (onConnected) onConnected();
-          this.connectionCallbacks.forEach((callback) => callback());
-          this.connectionCallbacks = [];
-
-          // Reset connection promise
-          this.connectionPromise = null;
-        },
-        (error) => {
-          console.error("WebSocket connection error:", error);
-          this.connected = false;
-          this.connectionPromise = null;
-
-          // Notify error callbacks
-          this.errorCallbacks.forEach((callback) => callback(error));
-
-          // Reject promise
-          reject(error);
-        }
-      );
-    });
-
-    return this.connectionPromise;
+    this.stompClient.connect(
+      headers,
+      () => {
+        if (onConnected) onConnected();
+      },
+      (error) => {
+        // Implement reconnection logic if needed
+        setTimeout(() => this.connect(accessToken, onConnected), 5000);
+      }
+    );
   }
 
   disconnect() {
-    if (this.stompClient && this.connected) {
+    if (this.stompClient) {
       // Unsubscribe from all topics
       this.subscriptions.forEach((subscription) => {
         subscription.unsubscribe();
       });
       this.subscriptions.clear();
 
-      // Disconnect from server
+      // Disconnect the client
       this.stompClient.disconnect();
       this.stompClient = null;
-      this.connected = false;
-      console.log("WebSocket disconnected");
     }
   }
 
   subscribe(topic, callback) {
-    if (!this.connected) {
-      console.error("WebSocket not connected. Cannot subscribe.");
-      return { unsubscribe: () => {} };
+    if (!this.stompClient || !this.stompClient.connected) {
+      return;
     }
 
-    // Create subscription
+    if (this.subscriptions.has(topic)) {
+      return;
+    }
+
     const subscription = this.stompClient.subscribe(topic, (message) => {
       try {
-        const data = JSON.parse(message.body);
+        // Use JSONbig.parse instead of JSON.parse
+        const data = JSONbig.parse(message.body);
         callback(data);
       } catch (error) {
-        console.error("Error parsing message:", error);
         callback(message.body);
       }
     });
 
-    // Store subscription for later cleanup
     this.subscriptions.set(topic, subscription);
     return subscription;
   }
@@ -117,20 +90,21 @@ class WebSocketService {
   }
 
   send(destination, body) {
-    if (!this.connected) {
-      console.error("WebSocket not connected. Cannot send message.");
+    if (!this.stompClient) {
       return false;
     }
 
-    this.stompClient.send(destination, {}, JSON.stringify(body));
-    return true;
-  }
+    if (!this.stompClient.connected) {
+      return false;
+    }
 
-  onError(callback) {
-    this.errorCallbacks.push(callback);
-    return () => {
-      this.errorCallbacks = this.errorCallbacks.filter((cb) => cb !== callback);
-    };
+    try {
+      // Use JSONbig.stringify instead of JSON.stringify
+      this.stompClient.send(destination, {}, JSONbig.stringify(body));
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
 
