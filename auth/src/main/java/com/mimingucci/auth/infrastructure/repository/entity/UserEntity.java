@@ -46,7 +46,6 @@ public class UserEntity {
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now(); // Set to current UTC time
-        this.enabled = false;
         this.rating = 0;
     }
 }

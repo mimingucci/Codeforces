@@ -46,10 +46,22 @@ public class ContestControllerImpl implements ContestController {
         return BaseResponse.success(service.getRunningContests(type));
     }
 
+    @GetMapping(path = PathConstants.ALL)
+    @Override
+    public BaseResponse<PageableResponse<ContestResponse>> getListContests(@RequestParam(name = "name", defaultValue = "", required = false) String name, @RequestParam(name = "type", defaultValue = "", required = false) String type, @RequestParam(name = "start", required = false) Instant start, @RequestParam(name = "end", required = false) Instant end, Pageable pageable) {
+        return BaseResponse.success(service.getListContests(name, type, start, end, pageable));
+    }
+
     @GetMapping(path = PathConstants.MEMBER)
     @Override
     public BaseResponse<List<ContestResponse>> getAllContestsByMemberStaff(HttpServletRequest request) {
         return BaseResponse.success(service.getAllContestsByMemberStaff(request));
+    }
+
+    @GetMapping(path = PathConstants.USER + PathConstants.USER_ID)
+    @Override
+    public BaseResponse<Boolean> isUserInRunningContest(@PathVariable(name = "userId") Long userId) {
+        return BaseResponse.success(service.isUserInRunningContest(userId));
     }
 
     @GetMapping(path = PathConstants.CONTEST_ID + PathConstants.REGISTRATION + PathConstants.PAGEABLE)
@@ -127,11 +139,5 @@ public class ContestControllerImpl implements ContestController {
     public BaseResponse<?> deleteContest(HttpServletRequest request, @PathVariable(name = "contestId") Long contestId) {
         service.deleteContest((Long) request.getAttribute("userId"), (Set<Role>) request.getAttribute("userRoles"), contestId);
         return BaseResponse.success();
-    }
-
-    @GetMapping(path = PathConstants.ALL)
-    @Override
-    public BaseResponse<PageableResponse<ContestResponse>> getListContests(@RequestParam(name = "name", defaultValue = "", required = false) String name, @RequestParam(name = "type", defaultValue = "", required = false) String type, @RequestParam(name = "start", required = false) Instant start, @RequestParam(name = "end", required = false) Instant end, Pageable pageable) {
-        return BaseResponse.success(service.getListContests(name, type, start, end, pageable));
     }
 }

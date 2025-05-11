@@ -8,14 +8,19 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const logger = new Logger('Bootstrap');
-  
-  app.useGlobalPipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-  }));
-  
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+    }),
+  );
+
   const port = configService.get<number>('PORT', 8095);
-  const serviceName = configService.get<string>('EUREKA_SERVICE_NAME', 'notification');
+  const serviceName = configService.get<string>(
+    'EUREKA_SERVICE_NAME',
+    'notification',
+  );
   const eurekaHost = configService.get<string>('EUREKA_HOST', 'localhost');
   const eurekaPort = configService.get<number>('EUREKA_PORT', 8761);
   const hostName = configService.get<string>('HOST_NAME', 'localhost');
@@ -27,7 +32,7 @@ async function bootstrap() {
       hostName: hostName,
       ipAddr: ipAddr,
       port: {
-        '$': port,
+        $: port,
         '@enabled': true,
       },
       vipAddress: serviceName,
@@ -46,10 +51,10 @@ async function bootstrap() {
       servicePath: '/eureka/apps/',
       maxRetries: 10,
       requestRetryDelay: 2000,
-      preferIpAddress: true
+      preferIpAddress: true,
     },
   });
-  
+
   await app.listen(port);
 
   await client.start();
@@ -59,7 +64,7 @@ async function bootstrap() {
     await client.stop();
     process.exit();
   });
-  
+
   process.on('SIGTERM', async () => {
     logger.log('Received SIGTERM. Deregistering from Eureka...');
     await client.stop();
@@ -69,17 +74,19 @@ async function bootstrap() {
   client.on('started', () => {
     logger.log('Eureka client started');
   });
-  
+
   client.on('error', (error) => {
     logger.error('Eureka client error:', error);
   });
-  
+
   client.on('deregistered', () => {
     logger.log('Eureka client deregistered');
   });
 
   logger.log(`Notification service is running on port ${port}`);
-  
-  logger.log(`Registered with Eureka at ${eurekaHost}:${eurekaPort} as ${serviceName}`);
+
+  logger.log(
+    `Registered with Eureka at ${eurekaHost}:${eurekaPort} as ${serviceName}`,
+  );
 }
 bootstrap();

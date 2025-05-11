@@ -1,20 +1,17 @@
-FROM eclipse-temurin:21-jdk-alpine as build
-WORKDIR /workspace/app
+FROM eclipse-temurin:21-jre
 
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-COPY src src
+WORKDIR /app
 
-RUN ./mvnw install -DskipTests
-RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
+# Copy pre-built JAR from local machine
+COPY target/*.jar app.jar
 
-FROM eclipse-temurin:21-jre-alpine
-VOLUME /tmp
-ARG DEPENDENCY=/workspace/app/target/dependency
-COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
-COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
-COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-ENTRYPOINT ["java","-cp","app:app/lib/*","com.mimingucci.eureka.EurekaApplication"]
+# Create a directory for external config
+RUN mkdir -p /config
+
+# Set environment variable to look for config in /config directory
+ENV SPRING_CONFIG_LOCATION=file:/config/,classpath:/
 
 EXPOSE 8761
+
+# Run with external config directory mounted
+ENTRYPOINT ["java", "-jar", "app.jar"]

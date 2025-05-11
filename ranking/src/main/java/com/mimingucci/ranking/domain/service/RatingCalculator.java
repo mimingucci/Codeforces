@@ -208,7 +208,7 @@ public class RatingCalculator {
      */
     private double getContestWeight(ContestType contestType) {
         switch (contestType) {
-            case ContestType.SYSTEM:
+            case SYSTEM:
                 return 1.0;
             default:
                 return 0.0;

@@ -48,4 +48,6 @@ public interface ContestController {
     BaseResponse<List<ContestResponse>> getRunningContest(ContestType type);
 
     BaseResponse<List<ContestResponse>> getAllContestsByMemberStaff(HttpServletRequest request);
+
+    BaseResponse<Boolean> isUserInRunningContest(Long userId);
 }

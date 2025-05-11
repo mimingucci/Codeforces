@@ -54,6 +54,8 @@ public class AuthServiceImpl implements AuthService {
 
         domain.setPassword(this.passwordEncoder.encode(domain.getPassword()));
 
+        domain.setEnabled(false);
+
         String newToken = RandomStringGenerator.generateSecure(128);
 
         domain.setForgotPasswordToken(newToken);

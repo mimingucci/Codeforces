@@ -10,9 +10,14 @@ import java.util.List;
 
 public interface ContestRegistrationRepository {
     Boolean hasRegistered(ContestRegistrationId contestRegistrationId);
+
     ContestRegistration register(ContestRegistration contestRegistration);
+
     ContestRegistration updateRegister(ContestRegistration contestRegistration);
+
     Boolean deleteRegistration(ContestRegistrationId id);
+
+    boolean isUserLockedForSubmission(Long userId);
 
     Page<ContestRegistration> getAll(Long contestId, Pageable pageable);
 

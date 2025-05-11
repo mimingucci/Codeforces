@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface ContestRegistrationJpaRepository extends JpaRepository<ContestRegistrationEntity, ContestRegistrationId> {
@@ -49,4 +50,12 @@ public interface ContestRegistrationJpaRepository extends JpaRepository<ContestR
     List<Object[]> findUsersWithMultipleRegistrations();
 
     List<ContestRegistrationEntity> findByContest(Long contest);
+
+    @Query("SELECT CASE WHEN COUNT(cr) > 0 THEN true ELSE false END FROM ContestRegistrationEntity cr " +
+            "WHERE cr.user = :userId " +
+            "AND cr.contest IN (SELECT c.id FROM ContestEntity c " +
+            "WHERE c.enabled = true " +
+            "AND c.startTime <= :now " +
+            "AND c.endTime > :now)")
+    boolean isUserInRunningContest(@Param("userId") Long userId, @Param("now") Instant now);
 }

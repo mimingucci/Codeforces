@@ -68,4 +68,9 @@ public class ContestRegistrationServiceImpl implements ContestRegistrationServic
         ContestRegistration registration = this.repository.getById(userId, contestId);
         return registration != null;
     }
+
+    @Override
+    public Boolean isUserInRunningContest(Long userId) {
+        return this.repository.isUserLockedForSubmission(userId);
+    }
 }

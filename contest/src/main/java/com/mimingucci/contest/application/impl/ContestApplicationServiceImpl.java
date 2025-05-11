@@ -141,4 +141,9 @@ public class ContestApplicationServiceImpl implements ContestApplicationService 
         }
         return service.getAllContestsByMemberStaff(userId).stream().map(ContestAssembler.INSTANCE::domainToResponse).toList();
     }
+
+    @Override
+    public Boolean isUserInRunningContest(Long userId) {
+        return registrationService.isUserInRunningContest(userId);
+    }
 }

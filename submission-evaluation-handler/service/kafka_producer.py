@@ -1,6 +1,7 @@
 import json
 from aiokafka import AIOKafkaProducer
 from config import settings
+import os
 
 class KafkaProducer:
     def __init__(self):
@@ -10,7 +11,7 @@ class KafkaProducer:
     async def connect(self):
         if not self.is_connected:
             self.producer = AIOKafkaProducer(
-                bootstrap_servers=settings.kafka_bootstrap_servers,
+                bootstrap_servers=os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092'),
                 value_serializer=lambda v: json.dumps(v).encode('utf-8')
             )
             await self.producer.start()

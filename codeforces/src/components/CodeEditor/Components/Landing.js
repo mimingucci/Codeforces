@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import CodeEditorWindow from "./CodeEditorWindow";
 import { classnames } from "../general";
 import { languageOptions } from "../languageOptions";
-import { Stomp } from '@stomp/stompjs';
+import { Stomp } from "@stomp/stompjs";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -24,29 +24,28 @@ int main() {\n\
     return 0;\n\
 }\n\
 ';
-let tcip = "";
-let tcop = "";
-const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
-  const [code, setCode] = useState(cppSource);
+const Landing = ({ problem = "", contest = null }) => {
+  const [code, setCode] = useState("");
   const [verdict, setVerdict] = useState(null);
-  const [theme, setTheme] = useState("cobalt");
+  const [theme, setTheme] = useState({
+    value: "oceanic-next",
+    label: "Oceanic Next",
+  });
   const [language, setLanguage] = useState(languageOptions[0]);
   const stompClient = useRef(null);
   const wsClient = useRef(null);
 
   useEffect(() => {
     return () => {
-        if (stompClient.current) {
-            stompClient.current.disconnect();
-        }
-        if (wsClient.current) {
-            wsClient.current.close();
-        }
+      if (stompClient.current) {
+        stompClient.current.disconnect();
+      }
+      if (wsClient.current) {
+        wsClient.current.close();
+      }
     };
   }, []);
 
-  tcip = sampleinput.trim();
-  tcop = sampleoutput.trim();
   const enterPress = useKeyPress("Enter");
   const ctrlPress = useKeyPress("Control");
 
@@ -54,8 +53,7 @@ const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
     setLanguage(sl);
   };
 
-  useEffect(() => {
-  }, [ctrlPress, enterPress]);
+  useEffect(() => {}, [ctrlPress, enterPress]);
   const onChange = (action, data) => {
     switch (action) {
       case "code": {
@@ -74,46 +72,48 @@ const Landing = ({ sampleinput = "", sampleoutput = "", problem = "" }) => {
       showErrorToast("Please login to submit your code");
       return;
     }
-    
+
     try {
-      setVerdict({message: "Pending"});
+      setVerdict({ message: "Pending" });
       // Submit code to backend and get submission ID
       const submission = await SubmissionApi.submit({
-        language: "CPP",
+        language: language.value,
         sourceCode: code,
-        problem: "1913822452007993344",
+        problem: problem,
+        contest: contest,
         token: accessToken,
       });
-      
-      if (!submission || submission.code != "200") {
+
+      if (!submission || submission.code !== "200") {
         showErrorToast("Failed to create submission");
         return;
       }
-      
+
       // Establish WebSocket connection to track judging progress
       const submissionId = submission.data.id.toString();
-      setVerdict({message: "Running..."});
+      setVerdict({ message: "Running..." });
       // Connect to WebSocket
-      wsClient.current = new WebSocket('ws://localhost:8080/api/v1/submissions');
+      wsClient.current = new WebSocket(
+        "ws://localhost:8080/api/v1/submissions"
+      );
       stompClient.current = Stomp.over(wsClient.current);
 
       stompClient.current.connect({}, () => {
         // Subscribe to submission updates
         stompClient.current.subscribe(
-            `/topic/submission/${submissionId}`,
-            (message) => {
-                const update = JSON.parse(message.body);
-                if (stompClient.current) {
-                  stompClient.current.disconnect();
-                }
-                if (wsClient.current) {
-                  wsClient.current.close();
-                }
-                setVerdict(update);
+          `/topic/submission/${submissionId}`,
+          (message) => {
+            const update = JSON.parse(message.body);
+            if (stompClient.current) {
+              stompClient.current.disconnect();
             }
+            if (wsClient.current) {
+              wsClient.current.close();
+            }
+            setVerdict(update);
+          }
         );
-    });
-      
+      });
     } catch (err) {
       showErrorToast(err.message || "Error submitting code");
     }

@@ -1,3 +1,4 @@
+import os
 import json
 from aiokafka import AIOKafkaConsumer
 from config import settings
@@ -6,7 +7,7 @@ class KafkaConsumer:
     def __init__(self):
         self.consumer = AIOKafkaConsumer(
             *settings.kafka_topics,
-            bootstrap_servers=settings.kafka_bootstrap_servers,
+            bootstrap_servers=os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092'),
             group_id=settings.kafka_consumer_group_id,
             value_deserializer=lambda v: json.loads(v.decode('utf-8')),
             enable_auto_commit=False,

@@ -58,8 +58,8 @@ const Submission = () => {
                   return (
                     <tr className="odd:bg-gray-100">
                       <td className="border border-slate-300" class="under">
-                        <a href={`/submission/${submission?._id}`}>
-                          {submission?._id}
+                        <a href={`/submission/${submission?.id}`}>
+                          {submission?.id}
                         </a>
                       </td>
                       <td className="border border-slate-300">
@@ -71,7 +71,7 @@ const Submission = () => {
                       <td className="border border-slate-300">
                         <a
                           class="under"
-                          href={"/problem/" + submission?.problem?._id}
+                          href={"/problem/" + submission?.problem?.id}
                         >
                           {submission?.problem.title}
                         </a>

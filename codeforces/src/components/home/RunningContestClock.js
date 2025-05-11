@@ -1,36 +1,37 @@
-import { useState, useEffect } from 'react';
-import { 
-  Paper, 
-  Typography, 
+import { useState, useEffect } from "react";
+import {
+  Paper,
+  Typography,
   Box,
   Link,
   Divider,
-  CircularProgress
-} from '@mui/material';
-import { FaArrowRightLong, FaHourglassHalf } from 'react-icons/fa6';
+  CircularProgress,
+} from "@mui/material";
+import { FaArrowRightLong, FaHourglassHalf } from "react-icons/fa6";
+import ContestApi from "../../getApi/ContestApi";
+import { calculateDuration } from "../../utils/dateUtils";
 
 const RunningContestClock = () => {
   const [runningContest, setRunningContest] = useState(null);
   const [timeLeft, setTimeLeft] = useState({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fake API call - replace with your actual API
   const fetchRunningContest = async () => {
     try {
-      // Simulate API call
-      const response = {
-        data: {
-          id: 1,
-          title: "Codeforces Round #123",
-          startTime: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // Started 1 hour ago
-          duration: "2:00", // 2 hours duration
-          endTime: new Date(Date.now() + 1 * 60 * 60 * 1000).toISOString() // Ends in 1 hour
-        }
-      };
-      setRunningContest(response.data);
-      setLoading(false);
+      setLoading(true);
+      const response = await ContestApi.getRunningContests({ type: "SYSTEM" });
+
+      if (response?.data?.code === "200" && response.data.data.length > 0) {
+        // Get the first running contest
+        setRunningContest(response.data.data[0]);
+      } else {
+        setRunningContest(null);
+      }
     } catch (error) {
       console.error("Failed to fetch running contest:", error);
+      setError("Failed to load contest information");
+    } finally {
       setLoading(false);
     }
   };
@@ -44,8 +45,8 @@ const RunningContestClock = () => {
     if (difference > 0) {
       return {
         hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / (1000 * 60)) % 60),
-        seconds: Math.floor((difference / 1000) % 60)
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60),
       };
     }
     return null;
@@ -75,34 +76,41 @@ const RunningContestClock = () => {
 
   if (loading) {
     return (
-      <Paper sx={{ mt: 2, p: 2, textAlign: 'center' }}>
+      <Paper elevation={1} sx={{ mt: 2, p: 2, textAlign: "center" }}>
         <CircularProgress size={20} />
+      </Paper>
+    );
+  }
+
+  if (error) {
+    return (
+      <Paper elevation={1} sx={{ mt: 2, p: 2 }}>
+        <Typography color="error" variant="body2" align="center">
+          {error}
+        </Typography>
       </Paper>
     );
   }
 
   if (!runningContest) return null;
 
-  const progress = ((new Date() - new Date(runningContest.startTime)) / 
-    (new Date(runningContest.endTime) - new Date(runningContest.startTime))) * 100;
+  // Calculate progress percentage
+  const progress =
+    ((new Date() - new Date(runningContest.startTime)) /
+      (new Date(runningContest.endTime) - new Date(runningContest.startTime))) *
+    100;
 
   return (
-    <Paper 
-      elevation={1}
-      sx={{ 
-        mt: 2,
-        borderRadius: 1,
-        overflow: 'hidden'
-      }}
-    >
-      {/* Header */}
-      <Box sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        p: 1.5,
-        bgcolor: 'action.hover'
-      }}>
-        <FaArrowRightLong style={{ color: '#1976d2', marginRight: 8 }} />
+    <Paper elevation={1} sx={{ mt: 2, borderRadius: 1, overflow: "hidden" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          p: 1.5,
+          bgcolor: "action.hover",
+        }}
+      >
+        <FaArrowRightLong style={{ color: "#1976d2", marginRight: 8 }} />
         <Typography color="primary" variant="subtitle1">
           Contest in progress
         </Typography>
@@ -110,74 +118,71 @@ const RunningContestClock = () => {
 
       <Divider />
 
-      {/* Content */}
       <Box sx={{ p: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-          <FaHourglassHalf style={{ color: '#1976d2' }} />
-          <Typography variant="subtitle2">
-            Running Contest:
-          </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+          <FaHourglassHalf style={{ color: "#1976d2" }} />
+          <Typography variant="subtitle2">Running Contest:</Typography>
         </Box>
 
         <Link
           href={`/contest/${runningContest.id}`}
           underline="hover"
           color="inherit"
-          sx={{ 
-            display: 'block',
+          sx={{
+            display: "block",
             mb: 2,
-            fontSize: '0.9rem',
-            fontWeight: 'bold'
+            fontSize: "0.9rem",
+            fontWeight: "bold",
           }}
         >
-          {runningContest.title}
+          {runningContest.name}
         </Link>
 
         {/* Progress bar */}
-        <Box sx={{ 
-          width: '100%', 
-          height: 4, 
-          bgcolor: 'grey.200',
-          borderRadius: 1,
-          mb: 2
-        }}>
-          <Box sx={{ 
-            width: `${progress}%`, 
-            height: '100%', 
-            bgcolor: 'primary.main',
+        <Box
+          sx={{
+            width: "100%",
+            height: 4,
+            bgcolor: "grey.200",
             borderRadius: 1,
-            transition: 'width 1s linear'
-          }} />
+            mb: 2,
+          }}
+        >
+          <Box
+            sx={{
+              width: `${Math.min(progress, 100)}%`,
+              height: "100%",
+              bgcolor: "primary.main",
+              borderRadius: 1,
+              transition: "width 1s linear",
+            }}
+          />
         </Box>
 
         {/* Time remaining */}
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'center',
-          gap: 2,
-          p: 2,
-          bgcolor: 'action.hover',
-          borderRadius: 1
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 2,
+            p: 2,
+            bgcolor: "action.hover",
+            borderRadius: 1,
+          }}
+        >
           {Object.entries(timeLeft).map(([unit, value]) => (
-            <Box 
-              key={unit}
-              sx={{ 
-                textAlign: 'center',
-                minWidth: 60
-              }}
-            >
-              <Typography 
-                variant="h6" 
+            <Box key={unit} sx={{ textAlign: "center", minWidth: 60 }}>
+              <Typography
+                variant="h6"
                 color="primary"
-                sx={{ fontWeight: 'bold' }}
+                sx={{ fontWeight: "bold" }}
               >
-                {String(value).padStart(2, '0')}
+                {String(value).padStart(2, "0")}
               </Typography>
-              <Typography 
-                variant="caption" 
+              <Typography
+                variant="caption"
                 color="text.secondary"
-                sx={{ textTransform: 'uppercase' }}
+                sx={{ textTransform: "uppercase" }}
               >
                 {unit}
               </Typography>
@@ -185,16 +190,17 @@ const RunningContestClock = () => {
           ))}
         </Box>
 
-        <Typography 
-          variant="caption" 
+        <Typography
+          variant="caption"
           color="text.secondary"
-          sx={{ 
-            display: 'block',
-            textAlign: 'center',
-            mt: 1
+          sx={{
+            display: "block",
+            textAlign: "center",
+            mt: 1,
           }}
         >
-          Total duration: {runningContest.duration} hours
+          Total duration:{" "}
+          {calculateDuration(runningContest.startTime, runningContest.endTime)}
         </Typography>
       </Box>
     </Paper>

@@ -21,4 +21,6 @@ public interface ContestRegistrationService {
     ContestRegistration getById(Long userId, Long contestId);
 
     Boolean checkUserCanSubmit(Long userId, Long contestId);
+
+    Boolean isUserInRunningContest(Long userId);
 }

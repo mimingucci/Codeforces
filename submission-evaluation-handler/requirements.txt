@@ -10,3 +10,5 @@ pymysql~=1.1.1
 httpx~=0.28.1
 psutil~=7.0.0
 pydantic-settings~=2.8.1
+pyjwt
+cryptography

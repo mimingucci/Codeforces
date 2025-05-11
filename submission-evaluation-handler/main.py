@@ -2,8 +2,9 @@
 import asyncio
 import os
 import json
+import socket
 import py_eureka_client.eureka_client as eureka_client
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Depends, Request, Header, Body
 from service.kafka_consumer import KafkaConsumer
 from event import JudgeSubmissionEvent
 from service.kafka_util import _kafka_producer, publish_event
@@ -12,6 +13,16 @@ from datetime import datetime, timezone
 from service.service_client import ServiceClient
 # Add CORS middleware (if needed)
 from fastapi.middleware.cors import CORSMiddleware
+from jwt_util import JwtUtil
+from typing import Optional
+from pydantic import BaseModel
+from judge import Language
+
+# Define a model for the submission request
+class SubmissionRequest(BaseModel):
+    sourceCode: str
+    input: str
+    language: str  # Will be converted to Language enum
 
 app = FastAPI()
 app.debug = 1
@@ -21,6 +32,11 @@ app.add_middleware(
     allow_origins=["*"],  # Allow all origins for WebSocket
     allow_methods=["*"],
     allow_headers=["*"],
+)
+
+jwt_util = JwtUtil(
+    public_key_path=os.getenv('JWT_PUBLIC_KEY', '/home/mimingucci/Work/Java/Codeforces/public-key.pem'),
+    private_key_path=os.getenv('JWT_PRIVATE_KEY', '/home/mimingucci/Work/Java/Codeforces/private-key.pem')
 )
 
 # Convert Unix timestamp (seconds since epoch) to datetime
@@ -135,13 +151,28 @@ class SubmissionHandler(KafkaConsumer):
 
 @app.on_event("startup")
 async def startup_event():
+    # Get container's hostname - this is the service name in docker-compose
+    hostname = socket.gethostname()
+    
+    # Get the container IP address for registration
+    try:
+        ip = socket.gethostbyname(hostname)
+    except:
+        # Fallback to service name if IP resolution fails
+        ip = hostname
+        
+    print(f"Registering service with IP/hostname: {ip}")
+
     # Get configuration from environment variables
-    eureka_server = os.getenv("EUREKA_SERVER_URL", "http://localhost:8761/eureka")
+    eureka_server = os.getenv("EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE", "http://localhost:8761/eureka")
+    instance_port = int(os.getenv("SERVER_PORT", "8088"))
+    
     # Initialize eureka client first
     await eureka_client.init_async(
         eureka_server=eureka_server,
-        app_name="submission-evaluation-handler",
-        instance_port=8088
+        app_name="submission-evaluation-handler",   
+        instance_port=instance_port,
+        instance_ip=ip
     )
     
     # Then start your Kafka consumer
@@ -155,6 +186,107 @@ async def shutdown_event():
     # Clean up Kafka producer if it exists
     if _kafka_producer:
         await _kafka_producer.disconnect()
+
+@app.post("/api/v1/submission-evaluation-handler/execute")
+async def execute_code(
+    request: Request,
+    submission_request: SubmissionRequest,
+    authorization: Optional[str] = Header(None)
+):
+    # Check JWT token
+    if not authorization or not authorization.startswith("Bearer "):
+        return {
+            "status": "error",
+            "message": "Missing or invalid authorization token",
+            "code": 401
+        }
+    
+    token = authorization.replace("Bearer ", "")
+    
+    # Validate JWT token
+    try:
+        claims = jwt_util.validate_token(token)
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Invalid token: {str(e)}",
+            "code": 401
+        }
+    
+    # Convert language string to enum
+    try:
+        language_enum = Language[submission_request.language.upper()]
+    except KeyError:
+        return {
+            "status": "error",
+            "message": f"Unsupported language: {submission_request.language}. Supported languages are: {', '.join([lang.name for lang in Language])}",
+            "code": 400
+        }
+    
+    # Set default time and memory limits
+    time_limit = 2000  # 2 seconds
+    memory_limit = 512 * 1024 * 1024  # 512 MB
+    
+    try:
+        # Execute code
+        response = await ServiceClient.post(
+            json_data={
+                "code": submission_request.sourceCode,
+                "input": submission_request.input,
+                "output": "",  # No expected output for direct execution
+                "time_limit": time_limit,
+                "memory_limit": memory_limit,
+                "language": language_enum.value
+            },
+            service_name="judger",
+            endpoint="judge",
+            headers={
+                "X-Judge-Server-Token": "6c3d42616001c43de92e516b0175ccff4c62c83c9ea02e8f022e2ee7e299c53b",
+                "Content-Type": "application/json"
+            }
+        )
+        
+        # Convert string response to dictionary if needed
+        if isinstance(response, str):
+            response = json.loads(response)
+        
+        # Create response with execution details
+        result = {
+            "status": "success",
+            "output": response.get("output", ""),
+            "execution_time_ms": response.get("real_time_ms", 0),
+            "memory_used_bytes": response.get("memory_bytes", 0),
+            "exit_code": response.get("exit_code", 0),
+            "code": 200
+        }
+
+        if response.get("status") == "Wrong Answer":
+            result["output"] = response.get("actual", "")
+        
+        # Handle error states
+        if response.get("status") != "Accepted" and response.get("status") != "Wrong Answer":
+            result["status"] = "error"
+            result["message"] = response.get("status", "Execution failed")
+            if "Time Limit Exceeded" in response.get("status", ""):
+                result["code"] = 408  # Request Timeout
+            elif "Memory Limit Exceeded" in response.get("status", ""):
+                result["code"] = 507  # Insufficient Storage
+            elif "Runtime Error" in response.get("status", ""):
+                result["code"] = 500  # Internal Server Error
+            elif "Compilation Error" in response.get("status", ""):
+                result["code"] = 422  # Unprocessable Entity
+                result["message"] = response.get("compile_output", "Compilation failed")
+            else:
+                result["code"] = 500
+        
+        return result
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Execution failed: {str(e)}",
+            "code": 500
+        }
 
 
 # uvicorn main:app --host 0.0.0.0 --port 8088 or fastapi dev main.py

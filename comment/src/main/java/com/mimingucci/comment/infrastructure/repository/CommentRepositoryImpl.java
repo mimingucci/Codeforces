@@ -76,7 +76,12 @@ public class CommentRepositoryImpl implements CommentRepository {
                         HttpStatus.NOT_FOUND
                 ));
 
-        entity.addLike(user);
+        if (entity.getLikes().contains(user)) {
+            entity.getLikes().remove(user);
+        } else {
+            entity.addLike(user);
+            if (entity.getDislikes().contains(user)) entity.getDislikes().remove(user);
+        }
         return CommentConverter.INSTANCE.toDomain(this.commentJpaRepository.save(entity));
     }
 
@@ -88,7 +93,12 @@ public class CommentRepositoryImpl implements CommentRepository {
                         HttpStatus.NOT_FOUND
                 ));
 
-        entity.addDislike(user);
+        if (entity.getDislikes().contains(user)) {
+            entity.getDislikes().remove(user);
+        } else {
+            entity.addDislike(user);
+            if (entity.getLikes().contains(user)) entity.getLikes().remove(user);
+        }
         return CommentConverter.INSTANCE.toDomain(this.commentJpaRepository.save(entity));
     }
 }

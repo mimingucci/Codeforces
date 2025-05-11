@@ -1,21 +1,18 @@
-FROM eclipse-temurin:21-jdk-alpine as build
-WORKDIR /workspace/app
+FROM eclipse-temurin:21-jre
 
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-COPY src src
+WORKDIR /app
 
-RUN chmod +x mvnw
-RUN ./mvnw install -DskipTests
-RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
+# Copy pre-built JAR from local machine
+COPY target/*.jar app.jar
 
-FROM eclipse-temurin:21-jre-alpine
-VOLUME /tmp
-ARG DEPENDENCY=/workspace/app/target/dependency
-COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
-COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
-COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-ENTRYPOINT ["java","-cp","app:app/lib/*","com.mimingucci.apigateway.ApiGatewayApplication"]
+# Create directories for config and keys
+RUN mkdir -p /config /keys
+
+# Set environment variables
+ENV SPRING_CONFIG_LOCATION=file:/config/,classpath:/
+ENV SPRING_PROFILES_ACTIVE=docker
 
 EXPOSE 8080
+
+# Run with Docker profile activated
+ENTRYPOINT ["java", "-Dspring.profiles.active=docker", "-jar", "app.jar"]

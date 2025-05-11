@@ -23,6 +23,7 @@ import ResetPassword from "./ResetPassword";
 import ChatPage from "../Chat/ChatPage";
 import ContestPage from "../contest/ContestPage";
 import ContestDetail from "../contest/ContestDetail";
+import VerifyEmail from "./VerifyEmail";
 
 const Main = () => {
   const location = useLocation();
@@ -49,6 +50,7 @@ const Main = () => {
         <Route path={path.CALENDAR} element={<Calendar />} />
         <Route path={path.LOGIN} element={<Login />} />
         <Route path={path.WRITEBLOG} element={<RichTextInput />} />
+        <Route path={path.VERIFY_EMAIL} element={<VerifyEmail />} />
         <Route path={path.SIGNUP} element={<SignUp />} />
         <Route path={path.CONTEST} element={<ContestPage />} />
         <Route path={path.CONTESTDETAIL} element={<ContestDetail />} />

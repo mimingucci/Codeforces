@@ -139,6 +139,8 @@ export default function ProblemForm() {
   const params = useParams();
   const router = useRouter();
 
+  const { data: session, status: sessionStatus } = useSession();
+
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [problemData, setProblemData] = useState<ProblemData>({
@@ -159,8 +161,6 @@ export default function ProblemForm() {
     isCoordinator: boolean;
     isTester: boolean;
   }>({ isAuthor: false, isCoordinator: false, isTester: false });
-
-  const { data: session } = useSession();
 
   const contestId = params.id as string;
   const problemId = params.action !== 'new' ? (params.action as string) : null;
@@ -194,24 +194,39 @@ export default function ProblemForm() {
   const checkUserAccess = async (contestId: string, userId: string) => {
     try {
       const contest = await ContestApi.getContest(contestId);
-      if (
-        contest &&
-        contest.authors &&
-        contest.coordinators &&
-        contest.testers &&
-        !contest.authors.includes(userId) &&
-        !contest.coordinators.includes(userId) &&
-        !contest.testers.includes(userId)
-      ) {
+
+      // Check if the user has any role in this contest
+      const isAuthor =
+        Array.isArray(contest.authors) && contest.authors.includes(userId);
+      const isCoordinator =
+        Array.isArray(contest.coordinators) &&
+        contest.coordinators.includes(userId);
+      const isTester =
+        Array.isArray(contest.testers) && contest.testers.includes(userId);
+      const isCreator = contest.createdBy === userId;
+
+      // If user has no role, redirect
+      if (!isAuthor && !isCoordinator && !isTester && !isCreator) {
         router.push('/not-found');
+        return {
+          isAuthor: false,
+          isCoordinator: false,
+          isTester: false,
+        };
       }
+
       return {
-        isAuthor: contest.authors?.includes(userId),
-        isCoordinator: contest.coordinators?.includes(userId),
-        isTester: contest.testers?.includes(userId),
+        isAuthor: isAuthor || isCreator, // Consider creator as author too
+        isCoordinator,
+        isTester,
       };
     } catch (error) {
       console.error('Failed to check user access:', error);
+      enqueueSnackbar('Error checking contest permissions', {
+        variant: 'error',
+        autoHideDuration: 3000,
+      });
+
       return {
         isAuthor: false,
         isCoordinator: false,
@@ -223,11 +238,27 @@ export default function ProblemForm() {
   useEffect(() => {
     const validateAccess = async () => {
       if (!session?.user?.id) {
-        return;
+        // If no user session, wait briefly and try again
+        const timer = setTimeout(() => validateAccess(), 500);
+
+        // Clean up timeout if component unmounts
+        return () => clearTimeout(timer);
       }
+
+      setInitialLoading(true);
 
       try {
         const contest = await ContestApi.getContest(contestId);
+
+        // Check if contest exists
+        if (!contest) {
+          enqueueSnackbar('Contest not found', {
+            variant: 'error',
+            autoHideDuration: 3000,
+          });
+          router.push('/not-found');
+          return;
+        }
 
         // Check if contest has started
         if (hasContestStarted(contest.startTime)) {
@@ -239,23 +270,38 @@ export default function ProblemForm() {
           return;
         }
 
-        const access = await checkUserAccess(contestId, session.user.id);
+        // Check user access with proper error handling
+        const userId = session.user.id;
+        const access = await checkUserAccess(contestId, userId);
         setUserRole(access);
 
-        // Redirect if user doesn't have proper access
+        // Only for new problem creation - check if user is author
         if (!problemId && !access.isAuthor) {
           enqueueSnackbar('Only authors can create new problems', {
             variant: 'error',
             autoHideDuration: 3000,
           });
           router.push(`/contests/${contestId}`);
+          return;
+        }
+
+        // Continue with the rest of the initialization
+        if (problemId) {
+          await validateAndFetchProblem();
         }
       } catch (error) {
         console.error('Failed to validate access:', error);
+        enqueueSnackbar('Failed to verify permissions', {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
         router.push(`/contests/${contestId}`);
+      } finally {
+        setInitialLoading(false);
       }
     };
 
+    // Separate the problem fetching logic
     const validateAndFetchProblem = async () => {
       try {
         // If not new, validate problemId is numeric
@@ -265,7 +311,6 @@ export default function ProblemForm() {
             return;
           }
 
-          setInitialLoading(true);
           // Fetch problem and testcases in parallel
           const [problem, testcases] = await Promise.all([
             ProblemApi.getProblem(problemId),
@@ -282,7 +327,7 @@ export default function ProblemForm() {
           setProblemData({
             name: problem.title,
             content: problem.statement,
-            tags: problem.tags,
+            tags: problem.tags || [],
             timeLimit: problem.timeLimit,
             score: problem.score,
             rating: problem.rating,
@@ -299,15 +344,14 @@ export default function ProblemForm() {
           variant: 'error',
           autoHideDuration: 3000,
         });
-        // router.push(`/contests/${contestId}`);
-      } finally {
-        setInitialLoading(false);
       }
     };
 
+    // Start the validation process
     validateAccess();
-    validateAndFetchProblem();
-  }, [session, problemId, contestId, router]);
+
+    // This effect depends on session, problemId, and contestId
+  }, [session, problemId, contestId, router, enqueueSnackbar]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -436,7 +480,7 @@ export default function ProblemForm() {
   };
 
   // Show loading state while fetching initial data
-  if (initialLoading) {
+  if (initialLoading || sessionStatus === 'loading') {
     return <Loading />;
   }
 

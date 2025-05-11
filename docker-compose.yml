@@ -85,36 +85,400 @@ services:
     ports:
       - "8090:8090"
 
-  # mysql:
-  #   image: mysql:8.0
-  #   container_name: mysql
-  #   ports:
-  #     - "33066:33066"
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: Andrew1122:))
-  #     MYSQL_DATABASE: codeforces
-  #     MYSQL_USER: root
-  #     MYSQL_PASSWORD: Andrew1122:))
-  #   volumes:
-  #     - mysql-data:/var/lib/mysql
-  #   restart: unless-stopped
-  #   command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: Andrew1122:))
+      MYSQL_DATABASE: codeforces
+      # Remove the duplicate user definition - MySQL root user is created by default
+      MYSQL_USER: root # This line should be removed
+      MYSQL_PASSWORD: Andrew1122:))
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password
 
-  # eureka-server:
-  #   build:
-  #     context: ./eureka
-  #     dockerfile: Dockerfile
-  #   container_name: eureka-server
-  #   ports:
-  #     - "8761:8761"
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #     start_period: 15s
-  #   restart: unless-stopped
+  eureka-server:
+    build:
+      context: ./eureka
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    volumes:
+      # Mount the config directory
+      - ./eureka/config:/config
+    environment:
+      # Add environment variables if needed
+      SPRING_PROFILES_ACTIVE: docker
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./api-gateway/config:/config
+      - ./public-key.pem:/keys/public-key.pem
+      - ./private-key.pem:/keys/private-key.pem
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_CONFIG_ENABLED: "false" # Disable Spring Cloud Config to ensure local properties are used
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      JWT_PUBLIC_KEY_PATH: /keys/public-key.pem
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--spider",
+          "-q",
+          "http://localhost:8080/actuator/health",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  auth:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    container_name: auth
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./auth/config:/config
+      - ./public-key.pem:/keys/public-key.pem
+      - ./private-key.pem:/keys/private-key.pem
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_CONFIG_ENABLED: "false"
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/codeforces?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JWT_PRIVATE_KEY: /keys/private-key.pem
+      JWT_PUBLIC_KEY: /keys/public-key.pem
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+      kafka:
+        condition: service_started
+    restart: unless-stopped
+
+  user:
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+    container_name: user
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./auth/config:/config
+      - ./public-key.pem:/keys/public-key.pem
+      - ./private-key.pem:/keys/private-key.pem
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_CONFIG_ENABLED: "false"
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/codeforces?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JWT_PRIVATE_KEY: /keys/private-key.pem
+      JWT_PUBLIC_KEY: /keys/public-key.pem
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+      kafka:
+        condition: service_started
+    restart: unless-stopped
+
+  blog:
+    build:
+      context: ./blog
+      dockerfile: Dockerfile
+    container_name: blog
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./auth/config:/config
+      - ./public-key.pem:/keys/public-key.pem
+      - ./private-key.pem:/keys/private-key.pem
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_CONFIG_ENABLED: "false"
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/codeforces?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JWT_PRIVATE_KEY: /keys/private-key.pem
+      JWT_PUBLIC_KEY: /keys/public-key.pem
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+      kafka:
+        condition: service_started
+    restart: unless-stopped
+
+  comment:
+    build:
+      context: ./comment
+      dockerfile: Dockerfile
+    container_name: comment
+    ports:
+      - "8084:8084"
+    volumes:
+      - ./auth/config:/config
+      - ./public-key.pem:/keys/public-key.pem
+      - ./private-key.pem:/keys/private-key.pem
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_CONFIG_ENABLED: "false"
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/codeforces?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JWT_PRIVATE_KEY: /keys/private-key.pem
+      JWT_PUBLIC_KEY: /keys/public-key.pem
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+      kafka:
+        condition: service_started
+    restart: unless-stopped
+
+  contest:
+    build:
+      context: ./contest
+      dockerfile: Dockerfile
+    container_name: contest
+    ports:
+      - "8085:8085"
+    volumes:
+      - ./auth/config:/config
+      - ./public-key.pem:/keys/public-key.pem
+      - ./private-key.pem:/keys/private-key.pem
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_CONFIG_ENABLED: "false"
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/codeforces?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JWT_PRIVATE_KEY: /keys/private-key.pem
+      JWT_PUBLIC_KEY: /keys/public-key.pem
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+      kafka:
+        condition: service_started
+    restart: unless-stopped
+
+  problem:
+    build:
+      context: ./problem
+      dockerfile: Dockerfile
+    container_name: problem
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./auth/config:/config
+      - ./public-key.pem:/keys/public-key.pem
+      - ./private-key.pem:/keys/private-key.pem
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_CONFIG_ENABLED: "false"
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/codeforces?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JWT_PRIVATE_KEY: /keys/private-key.pem
+      JWT_PUBLIC_KEY: /keys/public-key.pem
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+      kafka:
+        condition: service_started
+    restart: unless-stopped
+
+  submission:
+    build:
+      context: ./submission
+      dockerfile: Dockerfile
+    container_name: submission
+    ports:
+      - "8087:8087"
+    volumes:
+      - ./auth/config:/config
+      - ./public-key.pem:/keys/public-key.pem
+      - ./private-key.pem:/keys/private-key.pem
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_CONFIG_ENABLED: "false"
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/codeforces?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JWT_PRIVATE_KEY: /keys/private-key.pem
+      JWT_PUBLIC_KEY: /keys/public-key.pem
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+      kafka:
+        condition: service_started
+    restart: unless-stopped
+
+  testcase:
+    build:
+      context: ./testcase
+      dockerfile: Dockerfile
+    container_name: testcase
+    ports:
+      - "8097:8097"
+    volumes:
+      - ./auth/config:/config
+      - ./public-key.pem:/keys/public-key.pem
+      - ./private-key.pem:/keys/private-key.pem
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_CONFIG_ENABLED: "false"
+      EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/codeforces?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JWT_PRIVATE_KEY: /keys/private-key.pem
+      JWT_PUBLIC_KEY: /keys/public-key.pem
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+    restart: unless-stopped
+
+  ranking:
+    build:
+      context: ./ranking
+      dockerfile: Dockerfile
+    container_name: ranking
+    hostname: ranking # Add explicit hostname
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./ranking/config:/config # Make sure this points to the right config directory
+      - ./public-key.pem:/keys/public-key.pem
+      - ./private-key.pem:/keys/private-key.pem
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CONFIG_LOCATION: file:/config/,classpath:/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      EUREKA_INSTANCE_HOSTNAME: "ranking"
+      EUREKA_INSTANCE_PREFERIPADDRESS: "false"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/codeforces?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_PASSWORD: "Andrew1122:))"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka:29092"
+      REDIS_HOST: "redis"
+      REDIS_PORT: "6379"
+      JWT_PUBLIC_KEY: "/keys/public-key.pem"
+      JWT_PRIVATE_KEY: "/keys/private-key.pem"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      mysql:
+        condition: service_started
+      kafka:
+        condition: service_started
+    restart: unless-stopped
+
+  submission-evaluation-handler:
+    build:
+      context: ./submission-evaluation-handler
+      dockerfile: Dockerfile
+    container_name: submission-evaluation-handler
+    ports:
+      - "8088:8088"
+    volumes:
+      - ./public-key.pem:/keys/public-key.pem
+      - ./private-key.pem:/keys/private-key.pem
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: "http://eureka-server:8761/eureka"
+      JWT_PUBLIC_KEY: "/keys/public-key.pem"
+      JWT_PRIVATE_KEY: "/keys/private-key.pem"
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:29092"
+      SERVER_PORT: "8088"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      testcase:
+        condition: service_started
+      judger:
+        condition: service_started
+    restart: unless-stopped
+
+  notification:
+    build:
+      context: ./notification
+      dockerfile: Dockerfile
+    container_name: notification
+    ports:
+      - "8095:8095"
+    environment:
+      PORT: 8095
+      EUREKA_SERVICE_NAME: notification
+      EUREKA_HOST: eureka-server
+      EUREKA_PORT: 8761
+      HOST_NAME: notification
+      IP_ADDR: notification
+      KAFKA_BROKERS: kafka:29092
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: 587
+      MAIL_SECURE: "false"
+      # MAIL_USER:
+      # MAIL_PASSWORD:
+      MAIL_FROM_NAME: Codeforces
+      MAIL_FROM_EMAIL: noreply@codeforces.com
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    restart: unless-stopped
 
 volumes:
   redis-data:
   mysql-data:
+
+networks:
+  backend:
+    driver: bridge

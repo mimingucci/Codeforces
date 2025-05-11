@@ -50,4 +50,6 @@ public interface ContestApplicationService {
     List<ContestResponse> getRunningContests(ContestType type);
 
     List<ContestResponse> getAllContestsByMemberStaff(HttpServletRequest request);
+
+    Boolean isUserInRunningContest(Long userId);
 }

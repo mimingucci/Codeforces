@@ -1,10 +1,12 @@
-import axios from 'axios';
-import { API_BASE_URL } from '../config';
-import JSONbig from 'json-bigint';
+import axios from "axios";
+import { API_BASE_URL } from "../config";
+import JSONbig from "json-bigint";
+
+const BASE_URL = "http://localhost:8088/api/v1/submission-evaluation-handler";
 
 // Create a custom axios instance with JSONbig
 const axiosInstance = axios.create({
-  transformResponse: [data => JSONbig.parse(data)]
+  transformResponse: [(data) => JSONbig.parse(data)],
 });
 
 const SubmissionApi = {
@@ -20,19 +22,20 @@ const SubmissionApi = {
         {
           language: data.language,
           sourceCode: data.sourceCode,
-          problem: data.problem.toString()
+          contest: data.contest,
+          problem: data.problem.toString(),
         },
         {
           headers: {
             Authorization: `Bearer ${data.token}`,
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
-          transformRequest: [(data) => JSONbig.stringify(data)]
+          transformRequest: [(data) => JSONbig.stringify(data)],
         }
       );
       return response.data;
     } catch (error) {
-      console.error('Error submitting code:', error);
+      console.error("Error submitting code:", error);
       throw error;
     }
   },
@@ -49,13 +52,13 @@ const SubmissionApi = {
         `${API_BASE_URL}/api/v1/submission/${id}`,
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
       );
       return response.data;
     } catch (error) {
-      console.error('Error getting submission details:', error);
+      console.error("Error getting submission details:", error);
       throw error;
     }
   },
@@ -70,15 +73,37 @@ const SubmissionApi = {
       const response = await axiosInstance.get(
         `${API_BASE_URL}/api/v1/submission/user/${id}?page=${page}&size=${size}`,
         {
-          transformResponse: (data) => JSONbig.parse(data)
+          transformResponse: (data) => JSONbig.parse(data),
         }
       );
       return response.data;
     } catch (error) {
-      console.error('Error getting submission details:', error);
+      console.error("Error getting submission details:", error);
       throw error;
     }
-  }
+  },
+  execute: async ({ accessToken, language, sourceCode, input }) => {
+    try {
+      const response = await axiosInstance.post(
+        `${BASE_URL}/execute`,
+        {
+          language,
+          sourceCode,
+          input,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error executing code:", error);
+      throw error;
+    }
+  },
 };
 
 export default SubmissionApi;

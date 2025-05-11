@@ -1,128 +1,357 @@
 import { useState } from "react";
 import UserApi from "../../getApi/UserApi";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  Container,
+  Alert,
+  Snackbar,
+  CircularProgress,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
+import {
+  Visibility,
+  VisibilityOff,
+  Email as EmailIcon,
+  Person as PersonIcon,
+  Lock as LockIcon,
+} from "@mui/icons-material";
+
 const SignUp = () => {
-  const [nickname, setNickname] = useState("");
+  // Form fields state
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmpassword, setConfirmpassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [email, setEmail] = useState("");
 
+  // Validation errors state
+  const [errors, setErrors] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  // UI state
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Validate email format
   const validateEmail = (email) => {
     return email.match(
       /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
   };
 
-  const handleSubmit = async () => {
-    if (confirmpassword != password) {
-      alert("Please enter true password");
+  // Form validation
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = { ...errors };
+
+    // Validate username
+    if (!username.trim()) {
+      newErrors.username = "Username is required";
+      isValid = false;
+    } else if (username.length < 3) {
+      newErrors.username = "Username must be at least 3 characters";
+      isValid = false;
+    } else {
+      newErrors.username = "";
+    }
+
+    // Validate email
+    if (!email) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    } else if (!validateEmail(email)) {
+      newErrors.email = "Please enter a valid email";
+      isValid = false;
+    } else {
+      newErrors.email = "";
+    }
+
+    // Validate password
+    if (!password) {
+      newErrors.password = "Password is required";
+      isValid = false;
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+      isValid = false;
+    } else {
+      newErrors.password = "";
+    }
+
+    // Validate confirm password
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+      isValid = false;
+    } else {
+      newErrors.confirmPassword = "";
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  // Form submission handler
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
       return;
     }
-    if (!validateEmail(email)) {
-      alert("Please enter a valid email");
-      return;
-    }
+
+    setLoading(true);
+    setErrorMessage("");
+
     try {
-      const res = await UserApi.signup(email, nickname, password);
-      window.location.replace("/login");
+      const res = await UserApi.signup(email, username, password);
+
+      if (res.data && res.data.code === "200") {
+        setSuccess(true);
+        // Clear form fields
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+      } else {
+        setErrorMessage(
+          res.data?.message || "Registration failed. Please try again."
+        );
+      }
     } catch (err) {
-      alert("Something wennt wrong");
+      if (err.response?.data?.message) {
+        setErrorMessage(err.response.data.message);
+      } else if (err.message) {
+        setErrorMessage(err.message);
+      } else {
+        setErrorMessage(
+          "An unexpected error occurred. Please try again later."
+        );
+      }
+    } finally {
+      setLoading(false);
     }
   };
-  const handleChangeUsername = (e) => {
-    setNickname(e);
-  };
-  const handleChangeEmail = (e) => {
-    setEmail(e);
-  };
-  const handleChangePassword = (e) => {
-    setPassword(e);
-  };
-  const handleChangeConfirmpassword = (e) => {
-    setConfirmpassword(e);
-  };
+
   return (
-    <div className="mt-5">
-      <div className="text-left">
-        <p className="font-bold">Fill in the form to login into Codeforces.</p>
-        <p>You can use Gmail as an alternative way to enter.</p>
-      </div>
-      <div>
-        <div className="relative flex flex-col justify-center min-h-screen overflow-hidden">
-          <div className="w-full p-6 m-auto bg-white rounded-md shadow-xl lg:max-w-xl">
-            <h1 className="text-3xl font-semibold text-center text-blue-500 uppercase">
-              Sign Up
-            </h1>
-            <form className="mt-6">
-              <div className="mb-2">
-                <label
-                  for="email"
-                  className="block text-sm font-semibold text-gray-800 text-left"
+    <Container maxWidth="sm">
+      <Box sx={{ mt: 6, mb: 4 }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          align="center"
+          gutterBottom
+          color="primary"
+          fontWeight="500"
+        >
+          Create Your Account
+        </Typography>
+        <Typography
+          variant="body1"
+          align="center"
+          color="text.secondary"
+          paragraph
+        >
+          Join Codeforces to start solving problems and participating in
+          contests!
+        </Typography>
+      </Box>
+
+      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+        {/* Success message */}
+        {success && (
+          <Alert severity="success" sx={{ mb: 3 }}>
+            <Typography variant="subtitle1" fontWeight="medium">
+              Account created successfully!
+            </Typography>
+            <Typography variant="body2">
+              Please check your email to verify your account before logging in.
+            </Typography>
+          </Alert>
+        )}
+
+        {/* Error message */}
+        {errorMessage && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {errorMessage}
+          </Alert>
+        )}
+
+        {!success && (
+          <Box component="form" onSubmit={handleSubmit} noValidate>
+            {/* Username field */}
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              error={!!errors.username}
+              helperText={errors.username}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonIcon color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              disabled={loading}
+            />
+
+            {/* Email field */}
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              error={!!errors.email}
+              helperText={errors.email}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <EmailIcon color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              disabled={loading}
+            />
+
+            {/* Password field */}
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              id="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              error={!!errors.password}
+              helperText={errors.password}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              disabled={loading}
+            />
+
+            {/* Confirm Password field */}
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="confirmPassword"
+              label="Confirm Password"
+              type={showConfirmPassword ? "text" : "password"}
+              id="confirmPassword"
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle confirm password visibility"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              disabled={loading}
+            />
+
+            {/* Submit button */}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2, py: 1.2 }}
+              disabled={loading}
+            >
+              {loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Sign Up"
+              )}
+            </Button>
+
+            {/* Login link */}
+            <Box sx={{ textAlign: "center", mt: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                Already have an account?{" "}
+                <RouterLink
+                  to="/login"
+                  style={{ color: "#1976d2", textDecoration: "none" }}
                 >
-                  Email
-                </label>
-                <input
-                  onChange={(e) => handleChangeEmail(e.target.value)}
-                  type="email"
-                  className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                />
-              </div>
-              <div className="mb-2">
-                <label
-                  for="nickname"
-                  className="block text-sm font-semibold text-gray-800 text-left"
-                >
-                  Username
-                </label>
-                <input
-                  onChange={(e) => {
-                    handleChangeUsername(e.target.value);
-                  }}
-                  type="text"
-                  className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                />
-              </div>
-              <div className="mb-2">
-                <label
-                  for="password"
-                  className="block text-sm font-semibold text-gray-800 text-left"
-                >
-                  Password
-                </label>
-                <input
-                  onChange={(e) => handleChangePassword(e.target.value)}
-                  type="password"
-                  className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                />
-              </div>
-              <div className="mb-2">
-                <label
-                  for="confirmpassword"
-                  className="block text-sm font-semibold text-gray-800 text-left"
-                >
-                  Confirm Password
-                </label>
-                <input
-                  onChange={(e) => handleChangeConfirmpassword(e.target.value)}
-                  type="password"
-                  className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                />
-              </div>
-              <div className="mt-6">
-                <button
-                  className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-blue-400 rounded-md hover:bg-blue-500 focus:outline-none focus:bg-blue-600"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleSubmit();
-                  }}
-                >
-                  Sign Up
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+                  Sign In
+                </RouterLink>
+              </Typography>
+            </Box>
+          </Box>
+        )}
+      </Paper>
+
+      {/* Account successfully created */}
+      {success && (
+        <Box sx={{ mt: 3, textAlign: "center" }}>
+          <Button
+            variant="contained"
+            component={RouterLink}
+            to="/login"
+            sx={{ mt: 2 }}
+          >
+            Go to Login
+          </Button>
+        </Box>
+      )}
+    </Container>
   );
 };
+
 export default SignUp;

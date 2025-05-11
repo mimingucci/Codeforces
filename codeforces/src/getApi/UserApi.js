@@ -64,20 +64,34 @@ class UserApi {
   getResultBySearch(keyword) {
     return axios.get(BASE_URL + "/search", { params: { query: keyword } });
   }
+  changePassword({ accessToken, email, password }) {
+    return axios.post(
+      AUTH_URL + "/change-password",
+      { email, password },
+      {
+        headers: { Authorization: "Bearer " + accessToken },
+      }
+    );
+  }
   updateUser({
     accessToken,
+    id,
     firstname = null,
     lastname = null,
     description = null,
-    password = null,
+    country,
   }) {
-    let body = {};
+    let body = { id };
     if (firstname) body.firstname = firstname;
     if (lastname) body.lastname = lastname;
     if (description) body.description = description;
-    if (password) body.password = password;
-    return axios.put(BASE_URL + "/update", body, {
+    if (country) body.country = country;
+    return axios.put(BASE_URL + "/profile/update", body, {
       headers: { Authorization: "Bearer " + accessToken },
+      transformResponse: (data) => {
+        const res = JSONbig.parse(data);
+        return res;
+      },
     });
   }
   setOnline(accessToken) {
@@ -148,6 +162,15 @@ class UserApi {
       }
     );
   }
+  verifyEmail(accessToken) {
+    return axios.post(
+      AUTH_URL + "/verify",
+      { token: accessToken },
+      {
+        headers: { Authorization: "Bearer " + accessToken },
+      }
+    );
+  }
   allow({ accessToken, username, id }) {
     return axios.post(
       BASE_URL + "/allow",
@@ -163,7 +186,11 @@ class UserApi {
     });
   }
   signup(email, username, password) {
-    return axios.post(BASE_URL + "/create", { username, password, email });
+    return axios.post(AUTH_URL + "/registration", {
+      username,
+      password,
+      email,
+    });
   }
   forgotPassword(email) {
     return axios.get(BASE_URL + "/forgot-password?email=" + email);

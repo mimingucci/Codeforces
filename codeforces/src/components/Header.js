@@ -65,13 +65,14 @@ const Header = () => {
 
   const handleLogout = async () => {
     user = "";
-    await UserApi.logout(HandleCookies.getCookie("token"));
+    // await UserApi.logout(HandleCookies.getCookie("token"));
     HandleCookies.setCookie("token", "", 0);
     HandleCookies.setCookie("username", "", 0);
     HandleCookies.setCookie("id", "", 0);
     HandleCookies.setCookie("email", "", 0);
     window.location.replace("/");
   };
+
   useEffect(() => {
     checkLogin();
   }, [user]);

@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -25,6 +26,11 @@ public class ContestRegistrationRepositoryImpl implements ContestRegistrationRep
     private final ContestRegistrationJpaRepository contestRegistrationJpaRepository;
 
     private final ContestJpaRepository contestJpaRepository;
+
+    @Override
+    public boolean isUserLockedForSubmission(Long userId) {
+        return contestRegistrationJpaRepository.isUserInRunningContest(userId, Instant.now());
+    }
 
     @Override
     public Boolean hasRegistered(ContestRegistrationId contestRegistrationId) {

@@ -6,6 +6,8 @@ import { languageOptions } from "../languageOptions";
 import "@vaadin/split-layout";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import SubmissionApi from "../../../getApi/SubmissionApi";
+import HandleCookies from "../../../utils/HandleCookies";
 
 import { defineTheme } from "../defineTheme";
 import useKeyPress from "../useKeyPress";
@@ -16,6 +18,7 @@ import ThemeDropdown from "./ThemeDropdown";
 import LanguagesDropdown from "./LanguagesDropdown";
 import InputIde from "./InputIde";
 import OutputIde from "./OutputIde";
+import { Alert, Button, Typography, Box } from "@mui/material";
 
 var cppSource =
   '\
@@ -31,25 +34,31 @@ const Ide = () => {
   const [code, setCode] = useState(cppSource);
   const [customInput, setCustomInput] = useState("");
   const [outputDetails, setOutputDetails] = useState(null);
-  const [processing, setProcessing] = useState(null);
+  const [processing, setProcessing] = useState(false);
   const [theme, setTheme] = useState("cobalt");
   const [language, setLanguage] = useState(languageOptions[0]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [error, setError] = useState(null);
 
   const enterPress = useKeyPress("Enter");
   const ctrlPress = useKeyPress("Control");
 
+  // Check authentication status on component mount
+  useEffect(() => {
+    const token = HandleCookies.getCookie("token");
+    setIsLoggedIn(!!token);
+  }, []);
+
   const onSelectChange = (sl) => {
-    console.log("selected Option...", sl);
     setLanguage(sl);
   };
 
   useEffect(() => {
-    if (enterPress && ctrlPress) {
-      console.log("enterPress", enterPress);
-      console.log("ctrlPress", ctrlPress);
+    if (enterPress && ctrlPress && isLoggedIn) {
       handleCompile();
     }
-  }, [ctrlPress, enterPress]);
+  }, [ctrlPress, enterPress, isLoggedIn]);
+
   const onChange = (action, data) => {
     switch (action) {
       case "code": {
@@ -61,89 +70,47 @@ const Ide = () => {
       }
     }
   };
-  const handleCompile = () => {
+
+  const handleCompile = async () => {
+    if (!isLoggedIn) {
+      showErrorToast("Please log in to execute code");
+      return;
+    }
+
     setProcessing(true);
-    const formData = {
-      language_id: language.id,
-      // encode source code in base64
-      source_code: btoa(code),
-      stdin: btoa(customInput),
-    };
-    const options = {
-      method: "POST",
-      url: "https://judge0-ce.p.rapidapi.com/submissions",
-      params: { base64_encoded: "true", fields: "*" },
-      headers: {
-        "Content-Type": "application/json",
-        // "X-RapidAPI-Host": process.env.REACT_APP_RAPID_API_HOST,
-        "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
-      },
-      data: formData,
-    };
+    setError(null);
 
-    axios
-      .request(options)
-      .then(function (response) {
-        console.log("res.data", response.data);
-        const token = response.data.token;
-        checkStatus(token);
-      })
-      .catch((err) => {
-        let error = err.response ? err.response.data : err;
-        // get error status
-        let status = err.response.status;
-        console.log("status", status);
-        if (status === 429) {
-          console.log("too many requests", status);
-
-          showErrorToast(
-            `Quota of 100 requests exceeded for the Day! Please read the blog on freeCodeCamp to learn how to setup your own RAPID API Judge0!`,
-            10000
-          );
-        }
-        setProcessing(false);
-        console.log("catch block...", error);
-      });
-  };
-
-  const checkStatus = async (token) => {
-    const options = {
-      method: "GET",
-      url: "https://judge0-ce.p.rapidapi.com/submissions/" + token,
-      params: { base64_encoded: "true", fields: "*" },
-      headers: {
-        // "X-RapidAPI-Host": process.env.REACT_APP_RAPID_API_HOST,
-        "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
-      },
-    };
     try {
-      let response = await axios.request(options);
-      let statusId = response.data.status?.id;
+      // Get the selected language value from languageOptions
+      const languageId = language.value.toLowerCase();
 
-      // Processed - we have a result
-      if (statusId === 1 || statusId === 2) {
-        // still processing
-        setTimeout(() => {
-          checkStatus(token);
-        }, 2000);
-        return;
+      const accessToken = HandleCookies.getCookie("token");
+
+      const response = await SubmissionApi.execute({
+        accessToken,
+        language: languageId,
+        sourceCode: code,
+        input: customInput,
+      });
+
+      setOutputDetails(response);
+
+      if (response.status === "success") {
+        showSuccessToast("Code executed successfully!");
       } else {
-        setProcessing(false);
-        setOutputDetails(response.data);
-        showSuccessToast(`Compiled Successfully!`);
-        console.log("response.data", response.data);
-        return;
+        showErrorToast(response.message || "Execution failed");
       }
     } catch (err) {
-      console.log("err", err);
+      console.error("Error executing code:", err);
+      setError(err.response?.data?.message || "Something went wrong");
+      showErrorToast(err.response?.data?.message || "Failed to execute code");
+    } finally {
       setProcessing(false);
-      showErrorToast();
     }
   };
 
   function handleThemeChange(th) {
     const theme = th;
-    console.log("theme...", theme);
 
     if (["light", "vs-dark"].includes(theme.value)) {
       setTheme(theme);
@@ -151,6 +118,7 @@ const Ide = () => {
       defineTheme(theme.value).then((_) => setTheme(theme));
     }
   }
+
   useEffect(() => {
     defineTheme("oceanic-next").then((_) =>
       setTheme({ value: "oceanic-next", label: "Oceanic Next" })
@@ -158,9 +126,9 @@ const Ide = () => {
   }, []);
 
   const showSuccessToast = (msg) => {
-    toast.success(msg || `Compiled Successfully!`, {
+    toast.success(msg || `Executed Successfully!`, {
       position: "top-right",
-      autoClose: 1000,
+      autoClose: 2000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
@@ -168,10 +136,11 @@ const Ide = () => {
       progress: undefined,
     });
   };
+
   const showErrorToast = (msg, timer) => {
     toast.error(msg || `Something went wrong! Please try again.`, {
       position: "top-right",
-      autoClose: timer ? timer : 1000,
+      autoClose: timer ? timer : 3000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
@@ -194,6 +163,20 @@ const Ide = () => {
         pauseOnHover
       />
 
+      {!isLoggedIn && (
+        <Alert
+          severity="info"
+          sx={{ mb: 2, mx: 4, mt: 2 }}
+          action={
+            <Button color="inherit" size="small" href="/login">
+              LOGIN
+            </Button>
+          }
+        >
+          You need to be logged in to execute code
+        </Alert>
+      )}
+
       <div className="flex flex-row">
         <div className="px-4 py-2">
           <LanguagesDropdown onSelectChange={onSelectChange} />
@@ -204,19 +187,29 @@ const Ide = () => {
         <div className="px-4 py-2">
           <button
             onClick={handleCompile}
-            disabled={!code}
+            disabled={!code || processing || !isLoggedIn}
             className={classnames(
               "border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 bg-white flex-shrink-0",
-              !code ? "opacity-50" : ""
+              !code || processing || !isLoggedIn
+                ? "opacity-50 cursor-not-allowed"
+                : ""
             )}
           >
             {processing ? "Processing..." : "Compile and Execute"}
           </button>
         </div>
       </div>
-      <div className="px-4 py-4">
+
+      {error && (
+        <Box sx={{ px: 4, py: 1 }}>
+          <Alert severity="error">{error}</Alert>
+        </Box>
+      )}
+
+      <div className="px-4 py-4 flex flex-col h-full">
+        {/* Top section - Code editor and Input */}
         <vaadin-split-layout>
-          <div className="flex flex-col w-[65%] h-full justify-start items-end">
+          <div className="flex flex-col w-[70%] h-full justify-start items-end">
             <CodeEditorWindow
               code={code}
               onChange={onChange}
@@ -225,21 +218,26 @@ const Ide = () => {
             />
           </div>
 
-          <vaadin-split-layout orientation="vertical">
-            <div>
-              <InputIde
-                customInput={customInput}
-                setCustomInput={setCustomInput}
-                theme={theme.value}
-              />
-            </div>
-            <div>
-              <OutputIde outputDetails={outputDetails} theme={theme.value} />
-            </div>
-          </vaadin-split-layout>
+          <div className="flex flex-col w-[30%] h-[500px]">
+            <InputIde
+              customInput={customInput}
+              setCustomInput={setCustomInput}
+              theme={theme.value}
+            />
+          </div>
         </vaadin-split-layout>
+
+        {/* Bottom section - Output (full width) */}
+        <div style={{ marginTop: "16px" }}>
+          <OutputIde
+            outputDetails={outputDetails}
+            theme={theme.value}
+            isProcessing={processing}
+          />
+        </div>
       </div>
     </>
   );
 };
+
 export default Ide;

@@ -1,11 +1,11 @@
-import { 
-  Box, 
-  Paper, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
   TableRow,
   TablePagination,
   Dialog,
@@ -14,30 +14,32 @@ import {
   IconButton,
   Typography,
   Chip,
-  LinearProgress
-} from '@mui/material';
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+  LinearProgress,
+  Alert,
+} from "@mui/material";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
-import SubmissionApi from '../../getApi/SubmissionApi';
-import HandleCookies from '../../utils/HandleCookies';
-import { Close as CloseIcon } from '@mui/icons-material';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import SubmissionApi from "../../getApi/SubmissionApi";
+import ContestApi from "../../getApi/ContestApi";
+import HandleCookies from "../../utils/HandleCookies";
+import { Close as CloseIcon, Lock as LockIcon } from "@mui/icons-material";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { materialDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const StyledId = ({ id }) => (
-<Typography
+  <Typography
     component="span"
     sx={{
-    color: 'primary.main',
-    textDecoration: 'underline',
-    cursor: 'pointer',
-    fontFamily: 'monospace',
-    fontWeight: 'medium'
+      color: "primary.main",
+      textDecoration: "underline",
+      cursor: "pointer",
+      fontFamily: "monospace",
+      fontWeight: "medium",
     }}
->
+  >
     {id}
-</Typography>
+  </Typography>
 );
 
 const UserSubmissions = ({ userId }) => {
@@ -48,26 +50,53 @@ const UserSubmissions = ({ userId }) => {
   const [total, setTotal] = useState(0);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [openModal, setOpenModal] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const [checkingLock, setCheckingLock] = useState(false);
+
+  // Check if user is currently in a contest (locked)
+  const checkContestLock = async () => {
+    try {
+      setCheckingLock(true);
+      const currentUserId = HandleCookies.getCookie("id");
+
+      // Only check lock if viewing own submissions
+      if (currentUserId && currentUserId !== userId) {
+        const response = await ContestApi.lockSubmissionApi(userId);
+        setIsLocked(
+          response?.data?.code === "200" && response?.data?.data === true
+        );
+      } else {
+        // Always restrict viewing other users' code during contests
+        setIsLocked(false);
+      }
+    } catch (error) {
+      console.error("Failed to check contest lock:", error);
+      // Default to locked for safety in case of errors
+      setIsLocked(true);
+    } finally {
+      setCheckingLock(false);
+    }
+  };
 
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
-      const token = HandleCookies.getCookie('token');
+      const token = HandleCookies.getCookie("token");
       const response = await SubmissionApi.getAllSubmissions(
-        userId, 
-        token, 
+        userId,
+        token,
         page,
         rowsPerPage
       );
-      
+
       if (response?.code === "200") {
         setSubmissions(response.data.content);
         setTotal(response.data.totalElements);
       } else {
-        console.error('Failed to fetch submissions:', response?.message);
+        console.error("Failed to fetch submissions:", response?.message);
       }
     } catch (error) {
-      console.error('Failed to fetch submissions:', error);
+      console.error("Failed to fetch submissions:", error);
     } finally {
       setLoading(false);
     }
@@ -75,6 +104,7 @@ const UserSubmissions = ({ userId }) => {
 
   useEffect(() => {
     fetchSubmissions();
+    checkContestLock();
   }, [page, rowsPerPage, userId]);
 
   const handleChangePage = (event, newPage) => {
@@ -86,28 +116,52 @@ const UserSubmissions = ({ userId }) => {
     setPage(0);
   };
 
-  const handleSubmissionClick = (submission) => {
+  const handleSubmissionClick = async (submission) => {
+    // Re-check lock status before showing code
+    await checkContestLock();
+
+    if (isLocked) {
+      // Show modal with locked message instead of code
+      setSelectedSubmission(submission);
+      setOpenModal(true);
+      return;
+    }
+
     setSelectedSubmission(submission);
     setOpenModal(true);
   };
 
   const getVerdictColor = (verdict) => {
     switch (verdict) {
-      case 'ACCEPTED': return 'success';
-      case 'WRONG_ANSWER': return 'error';
-      case 'TIME_LIMIT_EXCEEDED': return 'warning';
-      case 'MEMORY_LIMIT_EXCEEDED': return 'warning';
-      case 'RUNTIME_ERROR': return 'error';
-      case 'COMPILATION_ERROR': return 'error';
-      default: return 'default';
+      case "ACCEPTED":
+        return "success";
+      case "WRONG_ANSWER":
+        return "error";
+      case "TIME_LIMIT_EXCEEDED":
+        return "warning";
+      case "MEMORY_LIMIT_EXCEEDED":
+        return "warning";
+      case "RUNTIME_ERROR":
+        return "error";
+      case "COMPILATION_ERROR":
+        return "error";
+      default:
+        return "default";
     }
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
+    <Box sx={{ width: "100%" }}>
+      {isLocked && (
+        <Alert severity="warning" sx={{ mb: 2 }} icon={<LockIcon />}>
+          Source code is hidden during contests. You can view submission
+          details, but code is not available.
+        </Alert>
+      )}
+
+      <Paper sx={{ width: "100%", mb: 2 }}>
         <TableContainer>
-          {loading && <LinearProgress />}
+          {(loading || checkingLock) && <LinearProgress />}
           <Table>
             <TableHead>
               <TableRow>
@@ -122,11 +176,11 @@ const UserSubmissions = ({ userId }) => {
             </TableHead>
             <TableBody>
               {submissions.map((submission) => (
-                <TableRow 
+                <TableRow
                   key={submission.id}
                   hover
                   onClick={() => handleSubmissionClick(submission)}
-                  sx={{ cursor: 'pointer' }}
+                  sx={{ cursor: "pointer" }}
                 >
                   <TableCell>
                     <StyledId id={submission.id?.toString()} />
@@ -136,33 +190,32 @@ const UserSubmissions = ({ userId }) => {
                   </TableCell>
                   <TableCell>
                     <Link
-                        to={`/problem/${submission.problem?.toString()}`}
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                            color: '#2196f3',
-                            textDecoration: 'none',
-                            '&:hover': {
-                            textDecoration: 'underline'
-                            }
-                        }}
-                        >
+                      to={`/problem/${submission.problem?.toString()}`}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        color: "#2196f3",
+                        textDecoration: "none",
+                        "&:hover": {
+                          textDecoration: "underline",
+                        },
+                      }}
+                    >
                       {submission.problem?.toString()}
                     </Link>
                   </TableCell>
                   <TableCell>{submission.language?.toString()}</TableCell>
                   <TableCell>
-                    <Chip 
-                      label={submission?.verdict} 
+                    <Chip
+                      label={submission?.verdict}
                       color={getVerdictColor(submission?.verdict)}
                       size="small"
                     />
                   </TableCell>
                   <TableCell>{submission?.execution_time_ms || 0} ms</TableCell>
                   <TableCell>
-                  {submission.memory_used_bytes != null 
-                    ? `${Math.round(submission.memory_used_bytes / 1024)} KB` 
-                    : '0 KB'
-                  }
+                    {submission.memory_used_bytes != null
+                      ? `${Math.round(submission.memory_used_bytes / 1024)} KB`
+                      : "0 KB"}
                   </TableCell>
                 </TableRow>
               ))}
@@ -180,24 +233,28 @@ const UserSubmissions = ({ userId }) => {
         />
       </Paper>
 
-      <Dialog 
-        open={openModal} 
+      <Dialog
+        open={openModal}
         onClose={() => setOpenModal(false)}
         maxWidth="md"
         fullWidth
         PaperProps={{
           sx: {
-            height: '80vh',
-            maxHeight: '80vh',
+            height: "80vh",
+            maxHeight: "80vh",
             width: "75vw",
-            maxWidth: '75vw',
-            display: 'flex',
-            flexDirection: 'column'
-          }
+            maxWidth: "75vw",
+            display: "flex",
+            flexDirection: "column",
+          },
         }}
       >
         <DialogTitle>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+          >
             <Typography>
               Submission <StyledId id={selectedSubmission?.id?.toString()} />
             </Typography>
@@ -206,57 +263,88 @@ const UserSubmissions = ({ userId }) => {
             </IconButton>
           </Box>
         </DialogTitle>
-        <DialogContent sx={{ 
-          flex: 1,
-          overflow: 'auto',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
+        <DialogContent
+          sx={{
+            flex: 1,
+            overflow: "auto",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <Box sx={{ mb: 2 }}>
             <Typography variant="subtitle2" gutterBottom>
-              Problem:{' '}
-              <Link 
+              Problem:{" "}
+              <Link
                 to={`/problem/${selectedSubmission?.problem?.toString()}`}
                 onClick={(e) => e.stopPropagation()}
-                style={{ color: '#2196f3' }}
+                style={{ color: "#2196f3" }}
               >
                 {selectedSubmission?.problem?.toString()}
               </Link>
             </Typography>
             <Typography variant="subtitle2" gutterBottom>
-              Verdict: 
-              <Chip 
-                label={selectedSubmission?.verdict?.toString()} 
+              Verdict:
+              <Chip
+                label={selectedSubmission?.verdict?.toString()}
                 color={getVerdictColor(selectedSubmission?.verdict?.toString())}
                 size="small"
                 sx={{ ml: 1 }}
               />
             </Typography>
             <Typography variant="subtitle2">
-              Time: {selectedSubmission?.execution_time_ms || 0} ms | 
-              Memory: {Math.round((selectedSubmission?.memory_used_bytes || 0) / 1024)} KB
+              Time: {selectedSubmission?.execution_time_ms || 0} ms | Memory:{" "}
+              {Math.round((selectedSubmission?.memory_used_bytes || 0) / 1024)}{" "}
+              KB
             </Typography>
-            <Typography variant="subtitle2" >
-                Sent: {selectedSubmission?.sent ? new Date(selectedSubmission.sent).toLocaleString() : 'N/A'}
+            <Typography variant="subtitle2">
+              Sent:{" "}
+              {selectedSubmission?.sent
+                ? new Date(selectedSubmission.sent).toLocaleString()
+                : "N/A"}
             </Typography>
             {selectedSubmission?.judged && (
-            <Typography variant="subtitle2" >
+              <Typography variant="subtitle2">
                 Judged: {new Date(selectedSubmission.judged).toLocaleString()}
-            </Typography>
+              </Typography>
             )}
           </Box>
-          <Box sx={{ flex: 1, overflow: 'auto' }}>
-            <SyntaxHighlighter 
-              language={selectedSubmission?.language?.toLowerCase()} 
-              style={materialDark}
-              customStyle={{
-                margin: 0,
-                height: '100%'
+
+          {isLocked ? (
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              sx={{
+                flex: 1,
+                bgcolor: "action.hover",
+                borderRadius: 1,
+                p: 4,
               }}
             >
-              {selectedSubmission?.sourceCode || ''}
-            </SyntaxHighlighter>
-          </Box>
+              <LockIcon fontSize="large" color="warning" sx={{ mb: 2 }} />
+              <Typography variant="h6" align="center" gutterBottom>
+                Source code is hidden during contests
+              </Typography>
+              <Typography variant="body2" align="center" color="text.secondary">
+                Source code viewing is disabled while a contest is in progress.
+                You can view code after the contest ends.
+              </Typography>
+            </Box>
+          ) : (
+            <Box sx={{ flex: 1, overflow: "auto" }}>
+              <SyntaxHighlighter
+                language={selectedSubmission?.language?.toLowerCase()}
+                style={materialDark}
+                customStyle={{
+                  margin: 0,
+                  height: "100%",
+                }}
+              >
+                {selectedSubmission?.sourceCode || ""}
+              </SyntaxHighlighter>
+            </Box>
+          )}
         </DialogContent>
       </Dialog>
     </Box>

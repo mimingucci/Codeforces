@@ -1,47 +1,83 @@
-import { Box, Tabs, Tab } from '@mui/material';
-import { useState } from 'react';
+import { Box, Tabs, Tab } from "@mui/material";
+import { useEffect, useState } from "react";
+import {
+  Person as PersonIcon,
+  Article as ArticleIcon,
+  Code as CodeIcon,
+  Settings as SettingsIcon,
+} from "@mui/icons-material";
 
-const NavProfile = ({ id, onTabChange }) => {
-  const [activeTab, setActiveTab] = useState(0);
+const NavProfile = ({ id, onTabChange, isHome, activeTab = 0 }) => {
+  const [value, setValue] = useState(activeTab);
 
-  const tabs = [
-    { label: 'Overview' },
-    { label: 'Blog' },
-    { label: 'Submissions' }
-  ];
+  useEffect(() => {
+    setValue(activeTab);
+  }, [activeTab]);
 
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-    onTabChange?.(newValue); // Call parent handler to update content
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+    onTabChange(newValue);
+  };
+
+  const a11yProps = (index) => {
+    return {
+      id: `profile-tab-${index}`,
+      "aria-controls": `profile-tabpanel-${index}`,
+    };
   };
 
   return (
-    <Box sx={{ 
-      borderBottom: 1, 
-      borderColor: 'divider',
-      mb: 3,
-      mt: 2
-    }}>
-      <Tabs 
-        value={activeTab} 
-        onChange={handleTabChange}
+    <Box
+      sx={{
+        borderBottom: 1,
+        borderColor: "divider",
+        mb: 3,
+        mt: 2,
+      }}
+    >
+      <Tabs
+        value={value}
+        onChange={handleChange}
         indicatorColor="primary"
         textColor="primary"
         sx={{
-          '& .MuiTab-root': {
-            textTransform: 'none',
+          "& .MuiTab-root": {
+            textTransform: "none",
             minWidth: 100,
-            fontWeight: 'medium',
-          }
+            fontWeight: "medium",
+          },
         }}
       >
-        {tabs.map((tab, index) => (
-          <Tab 
-            key={index} 
-            label={tab.label}
-            sx={{ '&:hover': { color: 'primary.main' } }}
+        <Tab
+          icon={<PersonIcon fontSize="small" />}
+          iconPosition="start"
+          label="Overview"
+          sx={{ "&:hover": { color: "primary.main" } }}
+          {...a11yProps(0)}
+        />
+        <Tab
+          icon={<ArticleIcon fontSize="small" />}
+          iconPosition="start"
+          label="Blog"
+          sx={{ "&:hover": { color: "primary.main" } }}
+          {...a11yProps(1)}
+        />
+        <Tab
+          icon={<CodeIcon fontSize="small" />}
+          iconPosition="start"
+          label="Submissions"
+          sx={{ "&:hover": { color: "primary.main" } }}
+          {...a11yProps(2)}
+        />
+        {isHome && (
+          <Tab
+            icon={<SettingsIcon fontSize="small" />}
+            iconPosition="start"
+            label="Settings"
+            sx={{ "&:hover": { color: "primary.main" } }}
+            {...a11yProps(3)}
           />
-        ))}
+        )}
       </Tabs>
     </Box>
   );

@@ -18,6 +18,7 @@ const path = {
   PROBLEMS: "/problems",
   CREATEPROBLEM: "/createproblem",
   EDITPROBLEM: "/editproblem/:id",
+  VERIFY_EMAIL: "/verify",
   EDITBLOG: "/editblog/:id",
   SUBMIT: "/profile/submissions/:author/:page",
   CHAT: "/chat",

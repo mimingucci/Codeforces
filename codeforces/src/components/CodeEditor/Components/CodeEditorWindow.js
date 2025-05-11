@@ -780,15 +780,15 @@ const CodeEditorWindow = ({ onChange, language, code, theme }) => {
 
   useEffect(() => {
     switch (language) {
-      case "cpp":
+      case "CPP":
         setValue(cppSource);
         onChange("code", cppSource);
         break;
-      case "c":
+      case "C":
         setValue(cSource);
         onChange("code", cSource);
         break;
-      case "javascript":
+      case "JS":
         setValue(javaScriptSource);
         onChange("code", javaScriptSource);
         break;
@@ -844,7 +844,7 @@ const CodeEditorWindow = ({ onChange, language, code, theme }) => {
         setValue(fortranSource);
         onChange("code", fortranSource);
         break;
-      case "go":
+      case "GO":
         setValue(goSource);
         onChange("code", goSource);
         break;
@@ -856,7 +856,7 @@ const CodeEditorWindow = ({ onChange, language, code, theme }) => {
         setValue(haskellSource);
         onChange("code", haskellSource);
         break;
-      case "java":
+      case "JAVA":
         setValue(javaSource);
         onChange("code", javaSource);
         break;
@@ -888,11 +888,11 @@ const CodeEditorWindow = ({ onChange, language, code, theme }) => {
         setValue(perlSource);
         onChange("code", perlSource);
         break;
-      case "php":
+      case "PHP":
         setValue(phpSource);
         onChange("code", phpSource);
         break;
-      case "python":
+      case "PY3":
         setValue(pythonSource);
         onChange("code", pythonSource);
         break;
@@ -948,12 +948,12 @@ const CodeEditorWindow = ({ onChange, language, code, theme }) => {
   return (
     <div className="overlay rounded-md overflow-hidden w-full h-[500px] shadow-4xl">
       <Editor
-        height="85vh"
+        height="100%"
         width={`100%`}
         language={language || "javascript"}
         value={value}
         theme={theme}
-        defaultValue="//code here"
+        defaultValue=""
         onChange={handleEditorChange}
       />
     </div>

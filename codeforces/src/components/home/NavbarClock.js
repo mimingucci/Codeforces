@@ -1,34 +1,43 @@
-import { useState, useEffect } from 'react';
-import { 
-  Paper, 
-  Typography, 
+import { useState, useEffect } from "react";
+import {
+  Paper,
+  Typography,
   Box,
   Link,
   Divider,
-} from '@mui/material';
-import { FaArrowRightLong, FaClock } from 'react-icons/fa6';
+  CircularProgress,
+} from "@mui/material";
+import { FaArrowRightLong, FaClock } from "react-icons/fa6";
+import ContestApi from "../../getApi/ContestApi";
+import { calculateDuration } from "../../utils/dateUtils";
 
 const NavbarClock = () => {
   const [nextContest, setNextContest] = useState(null);
   const [timeLeft, setTimeLeft] = useState({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fake API call - replace with your actual API
   const fetchNextContest = async () => {
     try {
-      // Simulate API call
-      const response = {
-        data: {
-          id: 1,
-          title: "Educational Codeforces Round 123",
-          startTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days from now
-          duration: "2:00"
-        }
-      };
-      setNextContest(response.data);
-      setLoading(false);
+      setLoading(true);
+      const response = await ContestApi.getUpcomingContests({
+        days: 7,
+        type: "SYSTEM",
+      });
+
+      if (response?.data?.code === "200" && response.data.data.length > 0) {
+        // Sort contests by start time and get the nearest one
+        const contests = response.data.data;
+        const nearestContest = contests.sort(
+          (a, b) => new Date(a.startTime) - new Date(b.startTime)
+        )[0];
+
+        setNextContest(nearestContest);
+      }
     } catch (error) {
       console.error("Failed to fetch next contest:", error);
+      setError("Failed to load contest information");
+    } finally {
       setLoading(false);
     }
   };
@@ -44,7 +53,7 @@ const NavbarClock = () => {
         days: Math.floor(difference / (1000 * 60 * 60 * 24)),
         hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
         minutes: Math.floor((difference / (1000 * 60)) % 60),
-        seconds: Math.floor((difference / 1000) % 60)
+        seconds: Math.floor((difference / 1000) % 60),
       };
     }
     return null;
@@ -70,25 +79,43 @@ const NavbarClock = () => {
     return () => clearInterval(timer);
   }, [nextContest]);
 
-  if (!nextContest) return null;
+  if (loading) {
+    return (
+      <Paper elevation={1} sx={{ mt: 2, p: 3, textAlign: "center" }}>
+        <CircularProgress size={24} />
+      </Paper>
+    );
+  }
+
+  if (error) {
+    return (
+      <Paper elevation={1} sx={{ mt: 2, p: 2 }}>
+        <Typography color="error" variant="body2" align="center">
+          {error}
+        </Typography>
+      </Paper>
+    );
+  }
 
   return (
-    <Paper 
+    <Paper
       elevation={1}
-      sx={{ 
+      sx={{
         mt: 2,
         borderRadius: 1,
-        overflow: 'hidden'
+        overflow: "hidden",
       }}
     >
       {/* Header */}
-      <Box sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        p: 1.5,
-        bgcolor: 'action.hover'
-      }}>
-        <FaArrowRightLong style={{ color: '#1976d2', marginRight: 8 }} />
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          p: 1.5,
+          bgcolor: "action.hover",
+        }}
+      >
+        <FaArrowRightLong style={{ color: "#1976d2", marginRight: 8 }} />
         <Typography color="primary" variant="subtitle1">
           Pay attention
         </Typography>
@@ -97,74 +124,83 @@ const NavbarClock = () => {
       <Divider />
 
       {/* Content */}
-      <Box sx={{ p: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-          <FaClock style={{ color: '#1976d2' }} />
-          <Typography variant="subtitle2">
-            Next Contest:
+      {!nextContest ? (
+        <Paper elevation={1} sx={{ mt: 2, p: 2 }}>
+          <Typography variant="body2" align="center" color="text.secondary">
+            No upcoming contests
+          </Typography>
+        </Paper>
+      ) : (
+        <Box sx={{ p: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+            <FaClock style={{ color: "#1976d2" }} />
+            <Typography variant="subtitle2">Next Contest:</Typography>
+          </Box>
+
+          <Link
+            href={`/contest/${nextContest.id}`}
+            underline="hover"
+            color="inherit"
+            sx={{
+              display: "block",
+              mb: 2,
+              fontSize: "0.9rem",
+              fontWeight: "bold",
+            }}
+          >
+            {nextContest.name}
+          </Link>
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 2,
+              p: 2,
+              bgcolor: "action.hover",
+              borderRadius: 1,
+            }}
+          >
+            {Object.entries(timeLeft).map(([unit, value]) => (
+              <Box
+                key={unit}
+                sx={{
+                  textAlign: "center",
+                  minWidth: 60,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  color="primary"
+                  sx={{ fontWeight: "bold" }}
+                >
+                  {String(value).padStart(2, "0")}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ textTransform: "uppercase" }}
+                >
+                  {unit}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{
+              display: "block",
+              textAlign: "center",
+              mt: 1,
+            }}
+          >
+            Duration:{" "}
+            {calculateDuration(nextContest.startTime, nextContest.endTime)}
           </Typography>
         </Box>
-
-        <Link
-          href={`/contest/${nextContest.id}`}
-          underline="hover"
-          color="inherit"
-          sx={{ 
-            display: 'block',
-            mb: 2,
-            fontSize: '0.9rem',
-            fontWeight: 'bold'
-          }}
-        >
-          {nextContest.title}
-        </Link>
-
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'center',
-          gap: 2,
-          p: 2,
-          bgcolor: 'action.hover',
-          borderRadius: 1
-        }}>
-          {Object.entries(timeLeft).map(([unit, value]) => (
-            <Box 
-              key={unit}
-              sx={{ 
-                textAlign: 'center',
-                minWidth: 60
-              }}
-            >
-              <Typography 
-                variant="h6" 
-                color="primary"
-                sx={{ fontWeight: 'bold' }}
-              >
-                {String(value).padStart(2, '0')}
-              </Typography>
-              <Typography 
-                variant="caption" 
-                color="text.secondary"
-                sx={{ textTransform: 'uppercase' }}
-              >
-                {unit}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
-
-        <Typography 
-          variant="caption" 
-          color="text.secondary"
-          sx={{ 
-            display: 'block',
-            textAlign: 'center',
-            mt: 1
-          }}
-        >
-          Duration: {nextContest.duration} hours
-        </Typography>
-      </Box>
+      )}
     </Paper>
   );
 };
