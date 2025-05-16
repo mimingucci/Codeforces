@@ -28,6 +28,10 @@ public class ContestRegistrationServiceImpl implements ContestRegistrationServic
     public ContestRegistration register(ContestRegistration domain) {
         Contest contest = this.contestRepository.getContest(domain.getContest());
         if (Instant.now().isAfter(contest.getStartTime())) throw new ApiRequestException(ErrorMessageConstants.CONTEST_HAS_STARTED, HttpStatus.BAD_REQUEST);
+        // user who is develop team of contest
+        if (contest.getAuthors().contains(domain.getUser()) || contest.getCoordinators().contains(domain.getUser()) || contest.getTesters().contains(domain.getUser())) {
+            throw new ApiRequestException(ErrorMessageConstants.NOT_PERMISSION, HttpStatus.BAD_GATEWAY);
+        }
         return repository.register(domain);
     }
 

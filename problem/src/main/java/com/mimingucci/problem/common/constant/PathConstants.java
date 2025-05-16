@@ -16,4 +16,5 @@ public class PathConstants {
 
     public static final String CONTEST_ID = "/{contestId}";
     public static final String DEV = "/dev";
+    public static final String UPLOAD = "/upload";
 }

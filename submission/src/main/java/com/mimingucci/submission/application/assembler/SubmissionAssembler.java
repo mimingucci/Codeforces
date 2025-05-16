@@ -3,6 +3,7 @@ package com.mimingucci.submission.application.assembler;
 import com.mimingucci.submission.domain.model.Submission;
 import com.mimingucci.submission.presentation.dto.request.SubmissionRequest;
 import com.mimingucci.submission.presentation.dto.response.PageableResponse;
+import com.mimingucci.submission.presentation.dto.response.SubmissionGridResponse;
 import com.mimingucci.submission.presentation.dto.response.SubmissionResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
@@ -17,6 +18,8 @@ public interface SubmissionAssembler {
     Submission toDomain(SubmissionRequest request);
 
     SubmissionResponse toResponse(Submission submission);
+
+    SubmissionGridResponse toGrid(Submission submission);
 
     default PageableResponse<SubmissionResponse> pageToResponse(Page<Submission> page) {
         PageableResponse<SubmissionResponse> response = new PageableResponse<>();

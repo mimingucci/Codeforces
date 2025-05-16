@@ -46,7 +46,7 @@ public class RatingCalculator {
 
         List<Pair<Long, Integer>> result = calculateRatingChanges(contestId, entries, contest.getType());
 
-        this.userClient.updateUserRatings(result);
+        if (contest.getType().equals(ContestType.SYSTEM)) this.userClient.updateUserRatings(result);
 
         // clear
         SubmissionHistoryFileHandler.deleteSubmissionHistory(contestId);

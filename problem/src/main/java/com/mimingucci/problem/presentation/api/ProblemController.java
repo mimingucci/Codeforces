@@ -9,6 +9,7 @@ import com.mimingucci.problem.presentation.dto.response.ProblemResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -28,5 +29,7 @@ public interface ProblemController {
     BaseResponse<ProblemResponse> getProblemByIdDev(Long id, HttpServletRequest request);
 
     BaseResponse<List<ProblemResponse>> getAllProblemsByContestIdDev(Long contestId, HttpServletRequest request);
+
+    BaseResponse<String> uploadImage(MultipartFile file, HttpServletRequest request);
 
 }

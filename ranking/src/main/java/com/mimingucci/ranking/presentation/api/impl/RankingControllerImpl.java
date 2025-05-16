@@ -4,6 +4,7 @@ import com.mimingucci.ranking.application.RankingApplicationService;
 import com.mimingucci.ranking.common.constant.PathConstants;
 import com.mimingucci.ranking.common.util.SubmissionHistoryFileHandler;
 import com.mimingucci.ranking.domain.model.LeaderboardEntry;
+import com.mimingucci.ranking.domain.model.RatingChange;
 import com.mimingucci.ranking.domain.model.VirtualContestMetadata;
 import com.mimingucci.ranking.presentation.api.RankingController;
 import com.mimingucci.ranking.presentation.dto.request.VirtualContestRequest;
@@ -26,6 +27,12 @@ public class RankingControllerImpl implements RankingController {
     public BaseResponse<VirtualContestMetadata> startVirtualContest(@RequestBody @Validated VirtualContestRequest request,
                                                                     @RequestHeader(value = "Authorization", required = true) String authToken) {
         return BaseResponse.success(service.startVirtual(request, authToken));
+    }
+
+    @GetMapping(path = PathConstants.CHANGES + PathConstants.USER_ID)
+    @Override
+    public BaseResponse<List<RatingChange>> getHistoryRatingChanges(@PathVariable("userId") Long userId) {
+        return BaseResponse.success(service.getHistoryRatingChanges(userId));
     }
 
     @GetMapping(path = PathConstants.CONTEST_ID)

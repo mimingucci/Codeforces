@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -36,6 +37,12 @@ public class ProblemControllerImpl implements ProblemController {
     @Override
     public BaseResponse<ProblemResponse> getProblemByIdDev(@PathVariable(name = "problemId") Long problemId, HttpServletRequest request) {
         return BaseResponse.success(this.problemApplicationService.getProblemByIdDev(problemId, request));
+    }
+
+    @PostMapping(path = PathConstants.UPLOAD)
+    @Override
+    public BaseResponse<String> uploadImage(@RequestParam("image") MultipartFile file, HttpServletRequest request) {
+        return BaseResponse.success(this.problemApplicationService.uploadImage(file, request));
     }
 
     @GetMapping(path = PathConstants.ALL)

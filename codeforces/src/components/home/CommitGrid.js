@@ -4,6 +4,7 @@ import "react-calendar-heatmap/dist/styles.css";
 import tippy from "tippy.js";
 import "tippy.js/dist/tippy.css";
 import SubmissionApi from "../../getApi/SubmissionApi";
+import { convertUnixTimestamp } from "../../utils/dateUtils";
 const CommitGrid = ({ author, day_of_register }) => {
   // Get today's date
   let today = new Date();
@@ -24,7 +25,6 @@ const CommitGrid = ({ author, day_of_register }) => {
   const [endDate, setEndDate] = useState(new Date());
   const handleChange = () => {
     let value = +document.getElementById("chooseyear").value;
-    console.log(value);
     if (value === 0) {
       setStartDate(new Date().setDate(new Date().getDate() - 365));
       setEndDate(new Date());
@@ -36,38 +36,44 @@ const CommitGrid = ({ author, day_of_register }) => {
   };
   useEffect(() => {
     let y = [];
+    const registerYear = new Date(day_of_register * 1000).getFullYear(); // Convert Unix timestamp to year
     for (
       let i = new Date().getFullYear();
-      i >= new Date(day_of_register).getFullYear();
+      i >= registerYear;
       i--
     ) {
       y.push(i);
     }
     setYears(y);
     async function fetchData() {
-      return await SubmissionApi.getByAuthor(author);
+      return await SubmissionApi.getByAuthorAndDateRange(
+        author,
+        convertUnixTimestamp(day_of_register)?.toISOString(),
+        new Date().toISOString()
+      );
     }
     fetchData().then((rs) => {
       let data = rs?.data?.data;
+      console.log(data);
       if (data) {
         let problems = new Set();
         let problemsYear = new Set();
         let problemsMonth = new Set();
         for (let i = 0; i < data.length; i++) {
-          if (active.has(data[i].createdAt.slice(0, 10))) {
+          if (active.has(data[i].sent.slice(0, 10))) {
             active.set(
-              data[i].createdAt.slice(0, 10),
-              active.get(data[i].createdAt.slice(0, 10)) + 1
+              data[i].sent.slice(0, 10),
+              active.get(data[i].sent.slice(0, 10)) + 1
             );
           } else {
-            active.set(data[i].createdAt.slice(0, 10), 1);
+            active.set(data[i].sent.slice(0, 10), 1);
           }
-          if (data[i].status === "Accepted") {
+          if (data[i].verdict === "ACCEPT") {
             problems.add(data[i].problem);
-            if (new Date(data[i].createdAt) >= dayLastMonth) {
+            if (new Date(data[i].sent) >= dayLastMonth) {
               problemsMonth.add(data[i].problem);
             }
-            if (new Date(data[i].createdAt) >= dayLastYear) {
+            if (new Date(data[i].sent) >= dayLastYear) {
               problemsYear.add(data[i].problem);
             }
           }

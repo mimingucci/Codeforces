@@ -37,7 +37,6 @@ public class DataInitializer implements ApplicationListener<ApplicationReadyEven
             superAdmin.setPassword(passwordEncoder.encode("SuperAdmin123!"));
             superAdmin.setRoles(Set.of(Role.SUPER_ADMIN));
             superAdmin.setEnabled(true);
-            superAdmin.setRating(0);
             superAdmin.setCreatedAt(Instant.now());
             
             userRepository.save(superAdmin);

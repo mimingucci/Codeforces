@@ -6,7 +6,9 @@ import com.mimingucci.ranking.common.constant.ErrorMessageConstants;
 import com.mimingucci.ranking.common.exception.ApiRequestException;
 import com.mimingucci.ranking.common.util.JwtUtil;
 import com.mimingucci.ranking.domain.model.LeaderboardEntry;
+import com.mimingucci.ranking.domain.model.RatingChange;
 import com.mimingucci.ranking.domain.model.VirtualContestMetadata;
+import com.mimingucci.ranking.domain.repository.RatingChangeRepository;
 import com.mimingucci.ranking.domain.service.LeaderboardService;
 import com.mimingucci.ranking.domain.service.RatingCalculator;
 import com.mimingucci.ranking.domain.service.VirtualContestService;
@@ -24,6 +26,8 @@ public class RankingApplicationServiceImpl implements RankingApplicationService 
     private final VirtualContestService virtualContestService;
 
     private final RatingCalculator ratingCalculator;
+
+    private final RatingChangeRepository ratingChangeRepository;
 
     private final LeaderboardService leaderboardService;
 
@@ -63,5 +67,10 @@ public class RankingApplicationServiceImpl implements RankingApplicationService 
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
         return ratingCalculator.completeContest(contestId);
+    }
+
+    @Override
+    public List<RatingChange> getHistoryRatingChanges(Long userId) {
+        return ratingChangeRepository.getByUser(userId);
     }
 }

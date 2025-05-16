@@ -6,6 +6,7 @@ import com.mimingucci.problem.presentation.dto.response.PageableResponse;
 import com.mimingucci.problem.presentation.dto.response.ProblemResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,4 +28,6 @@ public interface ProblemApplicationService {
     ProblemResponse getProblemByIdDev(Long problemId, HttpServletRequest request);
 
     List<ProblemResponse> getAllProblemsByContestIdDev(Long contestId, HttpServletRequest request);
+
+    String uploadImage(MultipartFile file, HttpServletRequest request);
 }

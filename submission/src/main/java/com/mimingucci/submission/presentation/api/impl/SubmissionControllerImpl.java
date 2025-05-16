@@ -6,12 +6,16 @@ import com.mimingucci.submission.presentation.api.SubmissionController;
 import com.mimingucci.submission.presentation.dto.request.SubmissionRequest;
 import com.mimingucci.submission.presentation.dto.response.BaseResponse;
 import com.mimingucci.submission.presentation.dto.response.PageableResponse;
+import com.mimingucci.submission.presentation.dto.response.SubmissionGridResponse;
 import com.mimingucci.submission.presentation.dto.response.SubmissionResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +33,14 @@ public class SubmissionControllerImpl implements SubmissionController {
     @Override
     public BaseResponse<PageableResponse<SubmissionResponse>> getPageSubmissionsByUserId(@PathVariable(name = "userId") Long userId, Pageable pageable) {
         return BaseResponse.success(applicationService.getPageSubmissionsByUserId(userId, pageable));
+    }
+
+    @GetMapping(path = PathConstants.AUTHOR + PathConstants.USER_ID)
+    @Override
+    public BaseResponse<List<SubmissionGridResponse>> getSubmissionByDateRange(@PathVariable("userId") Long userId, @RequestParam(name = "startDate", required = false) Instant startDate, @RequestParam(name = "endDate", required = false) Instant endDate) {
+        if (startDate == null) startDate = Instant.MIN;
+        if (endDate == null) endDate = Instant.MAX;
+        return BaseResponse.success(applicationService.getSubmissionGrid(userId, startDate, endDate));
     }
 
     @GetMapping(path = PathConstants.SUBMISSION_ID)

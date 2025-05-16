@@ -6,11 +6,15 @@ import com.mimingucci.submission.domain.model.Submission;
 import com.mimingucci.submission.domain.service.SubmissionService;
 import com.mimingucci.submission.presentation.dto.request.SubmissionRequest;
 import com.mimingucci.submission.presentation.dto.response.PageableResponse;
+import com.mimingucci.submission.presentation.dto.response.SubmissionGridResponse;
 import com.mimingucci.submission.presentation.dto.response.SubmissionResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,5 +36,10 @@ public class SubmissionApplicationServiceImpl implements SubmissionApplicationSe
     @Override
     public PageableResponse<SubmissionResponse> getPageSubmissionsByUserId(Long userId, Pageable pageable) {
         return SubmissionAssembler.INSTANCE.pageToResponse(service.findAllByUserId(userId, pageable));
+    }
+
+    @Override
+    public List<SubmissionGridResponse> getSubmissionGrid(Long userId, Instant startDate, Instant endDate) {
+        return service.getSubmissionGrid(userId, startDate, endDate).stream().map(SubmissionAssembler.INSTANCE::toGrid).toList();
     }
 }

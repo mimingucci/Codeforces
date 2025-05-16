@@ -104,6 +104,17 @@ const SubmissionApi = {
       throw error;
     }
   },
+  getByAuthorAndDateRange: (authorId, startDate, endDate) => {
+    return axios.get(`${API_BASE_URL}/api/v1/submission/author/${authorId}`, {
+      params: {
+        startDate,
+        endDate
+      }
+    });
+  },
+  getByAuthorAndVerdict: (authorId, verdict) => {
+    return axios.get(`${API_BASE_URL}/api/v1/submissions/author/${authorId}/verdict/${verdict}`);
+  },
 };
 
 export default SubmissionApi;

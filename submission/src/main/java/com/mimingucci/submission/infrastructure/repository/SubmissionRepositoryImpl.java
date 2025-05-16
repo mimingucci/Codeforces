@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -58,5 +59,11 @@ public class SubmissionRepositoryImpl implements SubmissionRepository {
         if (submission.getExecution_time_ms() != null) entity.setExecution_time_ms(submission.getExecution_time_ms());
         if (submission.getMemory_used_bytes() != null) entity.setMemory_used_bytes(submission.getMemory_used_bytes());
         return SubmissionConverter.INSTANCE.toDomain(jpaRepository.save(entity));
+    }
+
+    @Override
+    public List<Submission> getSubmissionGrid(Long userId, Instant startDate, Instant endDate) {
+        List<SubmissionEntity> submissions = jpaRepository.findByAuthorAndSentBetween(userId, startDate, endDate);
+        return submissions.stream().map(SubmissionConverter.INSTANCE::toDomain).toList();
     }
 }

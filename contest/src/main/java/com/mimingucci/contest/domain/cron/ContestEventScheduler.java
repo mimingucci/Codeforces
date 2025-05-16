@@ -269,8 +269,8 @@ public class ContestEventScheduler {
         // Publish to Kafka
         publishContestEndedToKafka(contest);
 
-        // Schedule ranking completion 10 minutes after contest end
-        Instant rankingCompletionTime = contest.getEndTime().plus(10, ChronoUnit.MINUTES);
+        // Schedule ranking completion 1 minute after contest end
+        Instant rankingCompletionTime = contest.getEndTime().plus(1, ChronoUnit.MINUTES);
         ScheduledFuture<?> rankingTask = taskScheduler.schedule(
                 () -> completeContestRanking(contest),
                 Date.from(rankingCompletionTime)

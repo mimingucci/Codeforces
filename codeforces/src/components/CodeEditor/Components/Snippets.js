@@ -1,0 +1,1075 @@
+// Define snippets for different languages
+export const snippets = {
+    c: [
+      {
+        label: 'fori',
+        insertText: 'for (int ${1:i} = 0; ${1:i} < ${2:n}; ${1:i}++) {\n\t$0\n}',
+        documentation: 'For loop with index',
+        insertTextRules: 4,
+      },
+      {
+        label: 'forr',
+        insertText: 'for (int ${1:i} = ${2:n} - 1; ${1:i} >= 0; ${1:i}--) {\n\t$0\n}',
+        documentation: 'Reverse for loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'while',
+        insertText: 'while (${1:condition}) {\n\t$0\n}',
+        documentation: 'While loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'if',
+        insertText: 'if (${1:condition}) {\n\t$0\n}',
+        documentation: 'If statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'ifelse',
+        insertText: 'if (${1:condition}) {\n\t$2\n} else {\n\t$0\n}',
+        documentation: 'If-else statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'printf',
+        insertText: 'printf("${1:%d}\\n", ${2:value});',
+        documentation: 'Print with newline',
+        insertTextRules: 4,
+      },
+      {
+        label: 'scanf',
+        insertText: 'scanf("${1:%d}", &${2:value});',
+        documentation: 'Read input',
+        insertTextRules: 4,
+      }
+    ],
+    cpp: [
+      {
+        label: 'fori',
+        insertText: 'for (int ${1:i} = 0; ${1:i} < ${2:n}; ${1:i}++) {\n\t$0\n}',
+        documentation: 'For loop with index',
+        insertTextRules: 4,
+      },
+      {
+        label: 'forr',
+        insertText: 'for (int ${1:i} = ${2:n} - 1; ${1:i} >= 0; ${1:i}--) {\n\t$0\n}',
+        documentation: 'Reverse for loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'while',
+        insertText: 'while (${1:condition}) {\n\t$0\n}',
+        documentation: 'While loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'if',
+        insertText: 'if (${1:condition}) {\n\t$0\n}',
+        documentation: 'If statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'ifelse',
+        insertText: 'if (${1:condition}) {\n\t$2\n} else {\n\t$0\n}',
+        documentation: 'If-else statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'cout',
+        insertText: 'cout << ${1:value} << endl;',
+        documentation: 'Print with newline',
+        insertTextRules: 4,
+      },
+      {
+        label: 'cin',
+        insertText: 'cin >> ${1:value};',
+        documentation: 'Read input',
+        insertTextRules: 4,
+      },
+      {
+        label: 'vector',
+        insertText: 'vector<${1:int}> ${2:name}(${3:size}, ${4:value});',
+        documentation: 'Create vector',
+        insertTextRules: 4,
+      },
+      {
+        label: 'map',
+        insertText: 'map<${1:int}, ${2:int}> ${3:name};',
+        documentation: 'Create map',
+        insertTextRules: 4,
+      },
+      {
+        label: 'set',
+        insertText: 'set<${1:int}> ${2:name};',
+        documentation: 'Create set',
+        insertTextRules: 4,
+      },
+      {
+        label: 'unordered_map',
+        insertText: 'unordered_map<${1:int}, ${2:int}> ${3:name};',
+        documentation: 'Create unordered_map',
+        insertTextRules: 4,
+      },
+      {
+        label: 'unordered_set',
+        insertText: 'unordered_set<${1:int}> ${2:name};',
+        documentation: 'Create unordered_set',
+        insertTextRules: 4,
+      },
+      {
+        label: 'priority_queue',
+        insertText: 'priority_queue<${1:int}> ${2:name};',
+        documentation: 'Create max heap',
+        insertTextRules: 4,
+      },
+      {
+        label: 'priority_queue_min',
+        insertText: 'priority_queue<${1:int}, vector<${1:int}>, greater<${1:int}>> ${2:name};',
+        documentation: 'Create min heap',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sort',
+        insertText: 'sort(${1:vector}.begin(), ${1:vector}.end());',
+        documentation: 'Sort vector',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sortr',
+        insertText: 'sort(${1:vector}.begin(), ${1:vector}.end(), greater<${2:int}>());',
+        documentation: 'Sort vector in reverse',
+        insertTextRules: 4,
+      },
+      {
+        label: 'max',
+        insertText: 'max(${1:a}, ${2:b});',
+        documentation: 'Find maximum',
+        insertTextRules: 4,
+      },
+      {
+        label: 'min',
+        insertText: 'min(${1:a}, ${2:b});',
+        documentation: 'Find minimum',
+        insertTextRules: 4,
+      },
+      {
+        label: 'gcd',
+        insertText: '__gcd(${1:a}, ${2:b});',
+        documentation: 'Greatest common divisor',
+        insertTextRules: 4,
+      },
+      {
+        label: 'lcm',
+        insertText: '(${1:a} * ${2:b}) / __gcd(${1:a}, ${2:b});',
+        documentation: 'Least common multiple',
+        insertTextRules: 4,
+      },
+      {
+        label: 'pow',
+        insertText: 'pow(${1:base}, ${2:exp}) % ${3:mod};',
+        documentation: 'Power with modulo',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sqrt',
+        insertText: 'sqrt(${1:number});',
+        documentation: 'Square root',
+        insertTextRules: 4,
+      },
+      {
+        label: 'floor',
+        insertText: 'floor(${1:number});',
+        documentation: 'Floor division',
+        insertTextRules: 4,
+      },
+      {
+        label: 'ceil',
+        insertText: 'ceil(${1:number});',
+        documentation: 'Ceiling division',
+        insertTextRules: 4,
+      },
+      {
+        label: 'abs',
+        insertText: 'abs(${1:number});',
+        documentation: 'Absolute value',
+        insertTextRules: 4,
+      },
+      {
+        label: 'stringstream',
+        insertText: 'stringstream ${1:ss};\n${1:ss} << ${2:value};\nstring ${3:str} = ${1:ss}.str();',
+        documentation: 'String stream',
+        insertTextRules: 4,
+      },
+      {
+        label: 'stoi',
+        insertText: 'stoi(${1:string});',
+        documentation: 'String to integer',
+        insertTextRules: 4,
+      },
+      {
+        label: 'to_string',
+        insertText: 'to_string(${1:number});',
+        documentation: 'Number to string',
+        insertTextRules: 4,
+      },
+      {
+        label: 'try',
+        insertText: 'try {\n\t$1\n} catch (${2:exception} ${3:e}) {\n\t$0\n}',
+        documentation: 'Try-catch block',
+        insertTextRules: 4,
+      },
+      {
+        label: 'class',
+        insertText: 'class ${1:Name} {\npublic:\n\t${1:Name}(${2:params}) {\n\t\t$0\n\t}\n};',
+        documentation: 'Class declaration',
+        insertTextRules: 4,
+      },
+      {
+        label: 'struct',
+        insertText: 'struct ${1:Name} {\n\t${2:type} ${3:field};\n};',
+        documentation: 'Struct declaration',
+        insertTextRules: 4,
+      },
+      {
+        label: 'prime',
+        insertText: 'bool isPrime(int n) {\n\tif (n < 2) return false;\n\tfor (int i = 2; i * i <= n; i++) {\n\t\tif (n % i == 0) return false;\n\t}\n\treturn true;\n}',
+        documentation: 'Check if number is prime',
+        insertTextRules: 4,
+      },
+      {
+        label: 'binary',
+        insertText: 'int binarySearch(vector<int>& arr, int target) {\n\tint left = 0, right = arr.size() - 1;\n\twhile (left <= right) {\n\t\tint mid = (left + right) / 2;\n\t\tif (arr[mid] == target) return mid;\n\t\tif (arr[mid] < target) left = mid + 1;\n\t\telse right = mid - 1;\n\t}\n\treturn -1;\n}',
+        documentation: 'Binary search',
+        insertTextRules: 4,
+      },
+      {
+        label: 'dijkstra',
+        insertText: `vector<int> dijkstra(vector<vector<pair<int, int>>>& graph, int start) {
+      int n = graph.size();
+      vector<int> dist(n, INT_MAX);
+      dist[start] = 0;
+      
+      // Min heap: {distance, vertex}
+      priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+      pq.push({0, start});
+      
+      while (!pq.empty()) {
+          int u = pq.top().second;
+          int d = pq.top().first;
+          pq.pop();
+          
+          // Skip if we found a better path already
+          if (d > dist[u]) continue;
+          
+          // Check all neighbors
+          for (auto& [v, w] : graph[u]) {
+              if (dist[u] + w < dist[v]) {
+                  dist[v] = dist[u] + w;
+                  pq.push({dist[v], v});
+              }
+          }
+      }
+      return dist;
+  }`,
+        documentation: 'Dijkstra\'s algorithm for finding shortest paths',
+        insertTextRules: 4,
+      },
+    ],
+    java: [
+      {
+        label: 'fori',
+        insertText: 'for (int ${1:i} = 0; ${1:i} < ${2:n}; ${1:i}++) {\n\t$0\n}',
+        documentation: 'For loop with index',
+        insertTextRules: 4,
+      },
+      {
+        label: 'forr',
+        insertText: 'for (int ${1:i} = ${2:n} - 1; ${1:i} >= 0; ${1:i}--) {\n\t$0\n}',
+        documentation: 'Reverse for loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'while',
+        insertText: 'while (${1:condition}) {\n\t$0\n}',
+        documentation: 'While loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'if',
+        insertText: 'if (${1:condition}) {\n\t$0\n}',
+        documentation: 'If statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'ifelse',
+        insertText: 'if (${1:condition}) {\n\t$2\n} else {\n\t$0\n}',
+        documentation: 'If-else statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sout',
+        insertText: 'System.out.println(${1:value});',
+        documentation: 'Print with newline',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sc',
+        insertText: 'Scanner sc = new Scanner(System.in);',
+        documentation: 'Create scanner',
+        insertTextRules: 4,
+      },
+      {
+        label: 'next',
+        insertText: '${1:type} ${2:name} = sc.next${3:Int}();',
+        documentation: 'Read input',
+        insertTextRules: 4,
+      },
+      {
+        label: 'array',
+        insertText: '${1:int}[] ${2:name} = new ${1:int}[${3:size}];',
+        documentation: 'Create array',
+        insertTextRules: 4,
+      },
+      {
+        label: 'arraylist',
+        insertText: 'ArrayList<${1:Integer}> ${2:name} = new ArrayList<>();',
+        documentation: 'Create ArrayList',
+        insertTextRules: 4,
+      },
+      {
+        label: 'hashmap',
+        insertText: 'HashMap<${1:Integer}, ${2:Integer}> ${3:name} = new HashMap<>();',
+        documentation: 'Create HashMap',
+        insertTextRules: 4,
+      },
+      {
+        label: 'hashset',
+        insertText: 'HashSet<${1:Integer}> ${2:name} = new HashSet<>();',
+        documentation: 'Create HashSet',
+        insertTextRules: 4,
+      }
+    ],
+    python: [
+      {
+        label: 'fori',
+        insertText: 'for ${1:i} in range(${2:n}):\n\t$0',
+        documentation: 'For loop with range',
+        insertTextRules: 4,
+      },
+      {
+        label: 'forr',
+        insertText: 'for ${1:i} in range(${2:n}-1, -1, -1):\n\t$0',
+        documentation: 'Reverse for loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'while',
+        insertText: 'while ${1:condition}:\n\t$0',
+        documentation: 'While loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'if',
+        insertText: 'if ${1:condition}:\n\t$0',
+        documentation: 'If statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'ifelse',
+        insertText: 'if ${1:condition}:\n\t$2\nelse:\n\t$0',
+        documentation: 'If-else statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'print',
+        insertText: 'print(${1:value})',
+        documentation: 'Print with newline',
+        insertTextRules: 4,
+      },
+      {
+        label: 'input',
+        insertText: '${1:name} = input()',
+        documentation: 'Read input',
+        insertTextRules: 4,
+      },
+      {
+        label: 'list',
+        insertText: '${1:name} = [${2:0}] * ${3:size}',
+        documentation: 'Create list',
+        insertTextRules: 4,
+      },
+      {
+        label: 'dict',
+        insertText: '${1:name} = {}',
+        documentation: 'Create dictionary',
+        insertTextRules: 4,
+      },
+      {
+        label: 'set',
+        insertText: '${1:name} = set()',
+        documentation: 'Create set',
+        insertTextRules: 4,
+      },
+      {
+        label: 'deque',
+        insertText: 'from collections import deque\n${1:name} = deque()',
+        documentation: 'Create deque',
+        insertTextRules: 4,
+      },
+      {
+        label: 'heapq',
+        insertText: 'import heapq\nheapq.heapify(${1:list})',
+        documentation: 'Create heap',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sort',
+        insertText: '${1:list}.sort()',
+        documentation: 'Sort list',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sortr',
+        insertText: '${1:list}.sort(reverse=True)',
+        documentation: 'Sort list in reverse',
+        insertTextRules: 4,
+      },
+      {
+        label: 'max',
+        insertText: 'max(${1:list})',
+        documentation: 'Find maximum',
+        insertTextRules: 4,
+      },
+      {
+        label: 'min',
+        insertText: 'min(${1:list})',
+        documentation: 'Find minimum',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sum',
+        insertText: 'sum(${1:list})',
+        documentation: 'Sum of list',
+        insertTextRules: 4,
+      },
+      {
+        label: 'map',
+        insertText: 'list(map(${1:int}, input().split()))',
+        documentation: 'Read space-separated integers',
+        insertTextRules: 4,
+      },
+      {
+        label: 'split',
+        insertText: '${1:name}.split()',
+        documentation: 'Split string',
+        insertTextRules: 4,
+      },
+      {
+        label: 'join',
+        insertText: '${1:separator}.join(${2:list})',
+        documentation: 'Join list with separator',
+        insertTextRules: 4,
+      },
+      {
+        label: 'gcd',
+        insertText: 'from math import gcd\ngcd(${1:a}, ${2:b})',
+        documentation: 'Greatest common divisor',
+        insertTextRules: 4,
+      },
+      {
+        label: 'lcm',
+        insertText: 'from math import lcm\nlcm(${1:a}, ${2:b})',
+        documentation: 'Least common multiple',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sqrt',
+        insertText: 'from math import sqrt\nsqrt(${1:number})',
+        documentation: 'Square root',
+        insertTextRules: 4,
+      },
+      {
+        label: 'pow',
+        insertText: 'pow(${1:base}, ${2:exp}, ${3:mod})',
+        documentation: 'Power with modulo',
+        insertTextRules: 4,
+      },
+      {
+        label: 'defaultdict',
+        insertText: 'from collections import defaultdict\n${1:name} = defaultdict(${2:int})',
+        documentation: 'Create defaultdict',
+        insertTextRules: 4,
+      },
+      {
+        label: 'counter',
+        insertText: 'from collections import Counter\n${1:name} = Counter(${2:list})',
+        documentation: 'Create Counter',
+        insertTextRules: 4,
+      },
+      {
+        label: 'bisect',
+        insertText: 'import bisect\nbisect.bisect_left(${1:list}, ${2:value})',
+        documentation: 'Binary search left',
+        insertTextRules: 4,
+      },
+      {
+        label: 'try',
+        insertText: 'try:\n\t$1\nexcept ${2:Exception} as e:\n\t$0',
+        documentation: 'Try-except block',
+        insertTextRules: 4,
+      },
+      {
+        label: 'with',
+        insertText: 'with open(${1:filename}, ${2:mode}) as f:\n\t$0',
+        documentation: 'File handling',
+        insertTextRules: 4,
+      }
+    ],
+    javascript: [
+      {
+        label: 'fori',
+        insertText: 'for (let ${1:i} = 0; ${1:i} < ${2:n}; ${1:i}++) {\n\t$0\n}',
+        documentation: 'For loop with index',
+        insertTextRules: 4,
+      },
+      {
+        label: 'forr',
+        insertText: 'for (let ${1:i} = ${2:n} - 1; ${1:i} >= 0; ${1:i}--) {\n\t$0\n}',
+        documentation: 'Reverse for loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'while',
+        insertText: 'while (${1:condition}) {\n\t$0\n}',
+        documentation: 'While loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'if',
+        insertText: 'if (${1:condition}) {\n\t$0\n}',
+        documentation: 'If statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'ifelse',
+        insertText: 'if (${1:condition}) {\n\t$2\n} else {\n\t$0\n}',
+        documentation: 'If-else statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'console',
+        insertText: 'console.log(${1:value});',
+        documentation: 'Print to console',
+        insertTextRules: 4,
+      },
+      {
+        label: 'array',
+        insertText: 'const ${1:name} = new Array(${2:size}).fill(${3:0});',
+        documentation: 'Create array with size',
+        insertTextRules: 4,
+      },
+      {
+        label: 'map',
+        insertText: 'const ${1:name} = new Map();',
+        documentation: 'Create Map',
+        insertTextRules: 4,
+      },
+      {
+        label: 'set',
+        insertText: 'const ${1:name} = new Set();',
+        documentation: 'Create Set',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sort',
+        insertText: '${1:array}.sort((a, b) => a - b);',
+        documentation: 'Sort array ascending',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sortr',
+        insertText: '${1:array}.sort((a, b) => b - a);',
+        documentation: 'Sort array descending',
+        insertTextRules: 4,
+      },
+      {
+        label: 'max',
+        insertText: 'Math.max(...${1:array});',
+        documentation: 'Find maximum',
+        insertTextRules: 4,
+      },
+      {
+        label: 'min',
+        insertText: 'Math.min(...${1:array});',
+        documentation: 'Find minimum',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sum',
+        insertText: '${1:array}.reduce((a, b) => a + b, 0);',
+        documentation: 'Sum of array',
+        insertTextRules: 4,
+      },
+      {
+        label: 'gcd',
+        insertText: 'const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);',
+        documentation: 'Greatest common divisor',
+        insertTextRules: 4,
+      },
+      {
+        label: 'lcm',
+        insertText: 'const lcm = (a, b) => (a * b) / gcd(a, b);',
+        documentation: 'Least common multiple',
+        insertTextRules: 4,
+      },
+      {
+        label: 'pow',
+        insertText: 'Math.pow(${1:base}, ${2:exp}) % ${3:mod};',
+        documentation: 'Power with modulo',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sqrt',
+        insertText: 'Math.sqrt(${1:number});',
+        documentation: 'Square root',
+        insertTextRules: 4,
+      },
+      {
+        label: 'floor',
+        insertText: 'Math.floor(${1:number});',
+        documentation: 'Floor division',
+        insertTextRules: 4,
+      },
+      {
+        label: 'ceil',
+        insertText: 'Math.ceil(${1:number});',
+        documentation: 'Ceiling division',
+        insertTextRules: 4,
+      },
+      {
+        label: 'abs',
+        insertText: 'Math.abs(${1:number});',
+        documentation: 'Absolute value',
+        insertTextRules: 4,
+      },
+      {
+        label: 'split',
+        insertText: '${1:string}.split(${2:separator});',
+        documentation: 'Split string',
+        insertTextRules: 4,
+      },
+      {
+        label: 'join',
+        insertText: '${1:array}.join(${2:separator});',
+        documentation: 'Join array with separator',
+        insertTextRules: 4,
+      },
+      {
+        label: 'filter',
+        insertText: '${1:array}.filter(${2:item} => ${3:condition});',
+        documentation: 'Filter array',
+        insertTextRules: 4,
+      },
+      {
+        label: 'map',
+        insertText: '${1:array}.map(${2:item} => ${3:transformation});',
+        documentation: 'Map array',
+        insertTextRules: 4,
+      },
+      {
+        label: 'reduce',
+        insertText: '${1:array}.reduce((${2:acc}, ${3:curr}) => ${4:operation}, ${5:initial});',
+        documentation: 'Reduce array',
+        insertTextRules: 4,
+      },
+      {
+        label: 'try',
+        insertText: 'try {\n\t$1\n} catch (${2:error}) {\n\t$0\n}',
+        documentation: 'Try-catch block',
+        insertTextRules: 4,
+      },
+      {
+        label: 'function',
+        insertText: 'function ${1:name}(${2:params}) {\n\t$0\n}',
+        documentation: 'Function declaration',
+        insertTextRules: 4,
+      },
+      {
+        label: 'arrow',
+        insertText: 'const ${1:name} = (${2:params}) => {\n\t$0\n};',
+        documentation: 'Arrow function',
+        insertTextRules: 4,
+      },
+      {
+        label: 'class',
+        insertText: 'class ${1:Name} {\n\tconstructor(${2:params}) {\n\t\t$0\n\t}\n}',
+        documentation: 'Class declaration',
+        insertTextRules: 4,
+      }
+    ],
+    go: [
+      {
+        label: 'fori',
+        insertText: 'for ${1:i} := 0; ${1:i} < ${2:n}; ${1:i}++ {\n\t$0\n}',
+        documentation: 'For loop with index',
+        insertTextRules: 4,
+      },
+      {
+        label: 'forr',
+        insertText: 'for ${1:i} := ${2:n} - 1; ${1:i} >= 0; ${1:i}-- {\n\t$0\n}',
+        documentation: 'Reverse for loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'forr',
+        insertText: 'for ${1:i} := range ${2:slice} {\n\t$0\n}',
+        documentation: 'Range loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'while',
+        insertText: 'for ${1:condition} {\n\t$0\n}',
+        documentation: 'While loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'if',
+        insertText: 'if ${1:condition} {\n\t$0\n}',
+        documentation: 'If statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'ifelse',
+        insertText: 'if ${1:condition} {\n\t$2\n} else {\n\t$0\n}',
+        documentation: 'If-else statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'fmt',
+        insertText: 'fmt.Println(${1:value})',
+        documentation: 'Print with newline',
+        insertTextRules: 4,
+      },
+      {
+        label: 'scanf',
+        insertText: 'fmt.Scan(&${1:value})',
+        documentation: 'Read input',
+        insertTextRules: 4,
+      },
+      {
+        label: 'slice',
+        insertText: '${1:name} := make([]${2:int}, ${3:size})',
+        documentation: 'Create slice',
+        insertTextRules: 4,
+      },
+      {
+        label: 'map',
+        insertText: '${1:name} := make(map[${2:int}]${3:int})',
+        documentation: 'Create map',
+        insertTextRules: 4,
+      },
+      {
+        label: 'struct',
+        insertText: 'type ${1:Name} struct {\n\t${2:field} ${3:type}\n}',
+        documentation: 'Create struct',
+        insertTextRules: 4,
+      },
+      {
+        label: 'interface',
+        insertText: 'type ${1:Name} interface {\n\t${2:method}() ${3:returnType}\n}',
+        documentation: 'Create interface',
+        insertTextRules: 4,
+      },
+      {
+        label: 'func',
+        insertText: 'func ${1:name}(${2:params}) ${3:returnType} {\n\t$0\n}',
+        documentation: 'Function declaration',
+        insertTextRules: 4,
+      },
+      {
+        label: 'method',
+        insertText: 'func (${1:receiver} *${2:Type}) ${3:name}() ${4:returnType} {\n\t$0\n}',
+        documentation: 'Method declaration',
+        insertTextRules: 4,
+      },
+      {
+        label: 'goroutine',
+        insertText: 'go ${1:function}(${2:args})',
+        documentation: 'Start goroutine',
+        insertTextRules: 4,
+      },
+      {
+        label: 'channel',
+        insertText: '${1:name} := make(chan ${2:type})',
+        documentation: 'Create channel',
+        insertTextRules: 4,
+      },
+      {
+        label: 'select',
+        insertText: 'select {\ncase ${1:msg} := <-${2:ch}:\n\t$0\n}',
+        documentation: 'Select statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'defer',
+        insertText: 'defer ${1:function}()',
+        documentation: 'Defer statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sort',
+        insertText: 'sort.Ints(${1:slice})',
+        documentation: 'Sort slice',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sortr',
+        insertText: 'sort.Slice(${1:slice}, func(i, j int) bool {\n\treturn ${1:slice}[i] > ${1:slice}[j]\n})',
+        documentation: 'Sort slice in reverse',
+        insertTextRules: 4,
+      },
+      {
+        label: 'max',
+        insertText: 'func max(a, b ${1:int}) ${1:int} {\n\tif a > b {\n\t\treturn a\n\t}\n\treturn b\n}',
+        documentation: 'Max function',
+        insertTextRules: 4,
+      },
+      {
+        label: 'min',
+        insertText: 'func min(a, b ${1:int}) ${1:int} {\n\tif a < b {\n\t\treturn a\n\t}\n\treturn b\n}',
+        documentation: 'Min function',
+        insertTextRules: 4,
+      },
+      {
+        label: 'gcd',
+        insertText: 'func gcd(a, b int) int {\n\tfor b != 0 {\n\t\ta, b = b, a%b\n\t}\n\treturn a\n}',
+        documentation: 'Greatest common divisor',
+        insertTextRules: 4,
+      },
+      {
+        label: 'lcm',
+        insertText: 'func lcm(a, b int) int {\n\treturn a * b / gcd(a, b)\n}',
+        documentation: 'Least common multiple',
+        insertTextRules: 4,
+      },
+      {
+        label: 'pow',
+        insertText: 'func pow(base, exp, mod int) int {\n\tresult := 1\n\tfor exp > 0 {\n\t\tif exp&1 == 1 {\n\t\t\tresult = (result * base) % mod\n\t\t}\n\t\tbase = (base * base) % mod\n\t\texp >>= 1\n\t}\n\treturn result\n}',
+        documentation: 'Power with modulo',
+        insertTextRules: 4,
+      },
+      {
+        label: 'prime',
+        insertText: 'func isPrime(n int) bool {\n\tif n < 2 {\n\t\treturn false\n\t}\n\tfor i := 2; i*i <= n; i++ {\n\t\tif n%i == 0 {\n\t\t\treturn false\n\t\t}\n\t}\n\treturn true\n}',
+        documentation: 'Check if number is prime',
+        insertTextRules: 4,
+      },
+      {
+        label: 'binary',
+        insertText: 'func binarySearch(arr []int, target int) int {\n\tleft, right := 0, len(arr)-1\n\tfor left <= right {\n\t\tmid := (left + right) / 2\n\t\tif arr[mid] == target {\n\t\t\treturn mid\n\t\t}\n\t\tif arr[mid] < target {\n\t\t\tleft = mid + 1\n\t\t} else {\n\t\t\tright = mid - 1\n\t\t}\n\t}\n\treturn -1\n}',
+        documentation: 'Binary search',
+        insertTextRules: 4,
+      },
+      {
+        label: 'dijkstra',
+        insertText: 'func dijkstra(graph [][]int, start int) []int {\n\tn := len(graph)\n\tdist := make([]int, n)\n\tfor i := range dist {\n\t\tdist[i] = math.MaxInt32\n\t}\n\tdist[start] = 0\n\tpq := &PriorityQueue{}\n\theap.Push(pq, &Item{value: start, priority: 0})\n\tfor pq.Len() > 0 {\n\t\titem := heap.Pop(pq).(*Item)\n\t\tu := item.value\n\t\tif item.priority > dist[u] {\n\t\t\tcontinue\n\t\t}\n\t\tfor v, w := range graph[u] {\n\t\t\tif w > 0 && dist[u]+w < dist[v] {\n\t\t\t\tdist[v] = dist[u] + w\n\t\t\t\theap.Push(pq, &Item{value: v, priority: dist[v]})\n\t\t\t}\n\t\t}\n\t}\n\treturn dist\n}',
+        documentation: 'Dijkstra algorithm',
+        insertTextRules: 4,
+      }
+    ],
+    php: [
+      {
+        label: 'fori',
+        insertText: 'for ($${1:i} = 0; $${1:i} < $${2:n}; $${1:i}++) {\n\t$0\n}',
+        documentation: 'For loop with index',
+        insertTextRules: 4,
+      },
+      {
+        label: 'forr',
+        insertText: 'for ($${1:i} = $${2:n} - 1; $${1:i} >= 0; $${1:i}--) {\n\t$0\n}',
+        documentation: 'Reverse for loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'foreach',
+        insertText: 'foreach ($${1:array} as $${2:key} => $${3:value}) {\n\t$0\n}',
+        documentation: 'Foreach loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'while',
+        insertText: 'while (${1:condition}) {\n\t$0\n}',
+        documentation: 'While loop',
+        insertTextRules: 4,
+      },
+      {
+        label: 'if',
+        insertText: 'if (${1:condition}) {\n\t$0\n}',
+        documentation: 'If statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'ifelse',
+        insertText: 'if (${1:condition}) {\n\t$2\n} else {\n\t$0\n}',
+        documentation: 'If-else statement',
+        insertTextRules: 4,
+      },
+      {
+        label: 'echo',
+        insertText: 'echo $${1:value} . "\\n";',
+        documentation: 'Print with newline',
+        insertTextRules: 4,
+      },
+      {
+        label: 'scanf',
+        insertText: 'fscanf(STDIN, "%d", $${1:value});',
+        documentation: 'Read integer input',
+        insertTextRules: 4,
+      },
+      {
+        label: 'array',
+        insertText: '$${1:name} = array_fill(0, $${2:size}, $${3:value});',
+        documentation: 'Create array with size',
+        insertTextRules: 4,
+      },
+      {
+        label: 'map',
+        insertText: '$${1:name} = [];',
+        documentation: 'Create associative array',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sort',
+        insertText: 'sort($${1:array});',
+        documentation: 'Sort array ascending',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sortr',
+        insertText: 'rsort($${1:array});',
+        documentation: 'Sort array descending',
+        insertTextRules: 4,
+      },
+      {
+        label: 'max',
+        insertText: 'max($${1:array});',
+        documentation: 'Find maximum',
+        insertTextRules: 4,
+      },
+      {
+        label: 'min',
+        insertText: 'min($${1:array});',
+        documentation: 'Find minimum',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sum',
+        insertText: 'array_sum($${1:array});',
+        documentation: 'Sum of array',
+        insertTextRules: 4,
+      },
+      {
+        label: 'gcd',
+        insertText: 'function gcd($a, $b) {\n\treturn $b ? gcd($b, $a % $b) : $a;\n}',
+        documentation: 'Greatest common divisor',
+        insertTextRules: 4,
+      },
+      {
+        label: 'lcm',
+        insertText: 'function lcm($a, $b) {\n\treturn ($a * $b) / gcd($a, $b);\n}',
+        documentation: 'Least common multiple',
+        insertTextRules: 4,
+      },
+      {
+        label: 'pow',
+        insertText: 'pow($${1:base}, $${2:exp}) % $${3:mod};',
+        documentation: 'Power with modulo',
+        insertTextRules: 4,
+      },
+      {
+        label: 'sqrt',
+        insertText: 'sqrt($${1:number});',
+        documentation: 'Square root',
+        insertTextRules: 4,
+      },
+      {
+        label: 'floor',
+        insertText: 'floor($${1:number});',
+        documentation: 'Floor division',
+        insertTextRules: 4,
+      },
+      {
+        label: 'ceil',
+        insertText: 'ceil($${1:number});',
+        documentation: 'Ceiling division',
+        insertTextRules: 4,
+      },
+      {
+        label: 'abs',
+        insertText: 'abs($${1:number});',
+        documentation: 'Absolute value',
+        insertTextRules: 4,
+      },
+      {
+        label: 'explode',
+        insertText: 'explode($${1:delimiter}, $${2:string});',
+        documentation: 'Split string',
+        insertTextRules: 4,
+      },
+      {
+        label: 'implode',
+        insertText: 'implode($${1:glue}, $${2:array});',
+        documentation: 'Join array with glue',
+        insertTextRules: 4,
+      },
+      {
+        label: 'array_map',
+        insertText: 'array_map(function($${1:item}) {\n\treturn $${2:transformation};\n}, $${3:array});',
+        documentation: 'Map array',
+        insertTextRules: 4,
+      },
+      {
+        label: 'array_filter',
+        insertText: 'array_filter($${1:array}, function($${2:item}) {\n\treturn $${3:condition};\n});',
+        documentation: 'Filter array',
+        insertTextRules: 4,
+      },
+      {
+        label: 'array_reduce',
+        insertText: 'array_reduce($${1:array}, function($${2:carry}, $${3:item}) {\n\treturn $${4:operation};\n}, $${5:initial});',
+        documentation: 'Reduce array',
+        insertTextRules: 4,
+      },
+      {
+        label: 'try',
+        insertText: 'try {\n\t$1\n} catch (${2:Exception} $${3:e}) {\n\t$0\n}',
+        documentation: 'Try-catch block',
+        insertTextRules: 4,
+      },
+      {
+        label: 'function',
+        insertText: 'function ${1:name}($${2:params}) {\n\t$0\n}',
+        documentation: 'Function declaration',
+        insertTextRules: 4,
+      },
+      {
+        label: 'class',
+        insertText: 'class ${1:Name} {\n\tpublic function __construct($${2:params}) {\n\t\t$0\n\t}\n}',
+        documentation: 'Class declaration',
+        insertTextRules: 4,
+      },
+      {
+        label: 'prime',
+        insertText: 'function isPrime($n) {\n\tif ($n < 2) return false;\n\tfor ($i = 2; $i * $i <= $n; $i++) {\n\t\tif ($n % $i == 0) return false;\n\t}\n\treturn true;\n}',
+        documentation: 'Check if number is prime',
+        insertTextRules: 4,
+      },
+      {
+        label: 'binary',
+        insertText: 'function binarySearch($arr, $target) {\n\t$left = 0;\n\t$right = count($arr) - 1;\n\twhile ($left <= $right) {\n\t\t$mid = floor(($left + $right) / 2);\n\t\tif ($arr[$mid] == $target) return $mid;\n\t\tif ($arr[$mid] < $target) $left = $mid + 1;\n\t\telse $right = $mid - 1;\n\t}\n\treturn -1;\n}',
+        documentation: 'Binary search',
+        insertTextRules: 4,
+      },
+    ]
+};

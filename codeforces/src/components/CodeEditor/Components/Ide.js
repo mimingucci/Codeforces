@@ -31,7 +31,7 @@ int main() {\n\
 ';
 
 const Ide = () => {
-  const [code, setCode] = useState(cppSource);
+  const [code, setCode] = useState("");
   const [customInput, setCustomInput] = useState("");
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(false);
@@ -206,6 +206,15 @@ const Ide = () => {
         </Box>
       )}
 
+      {isLoggedIn && (
+        <Alert severity="info" sx={{ mb: 2, mx: 4 }}>
+          <Typography variant="body2">
+            💡 Press <strong>Ctrl+Space</strong> to get AI code suggestions.
+            Press <strong>Shift+Tab</strong> to accept.
+          </Typography>
+        </Alert>
+      )}
+
       <div className="px-4 py-4 flex flex-col h-full">
         {/* Top section - Code editor and Input */}
         <vaadin-split-layout>
@@ -215,6 +224,7 @@ const Ide = () => {
               onChange={onChange}
               language={language?.value}
               theme={theme.value}
+              isLoggedIn={isLoggedIn}
             />
           </div>
 

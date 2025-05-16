@@ -66,4 +66,20 @@ public interface ProblemJpaRepository extends JpaRepository<ProblemEntity, Long>
         ORDER BY problem.createdAt asc
         """)
     List<ProblemEntity> findAllProblemsByContestDev(@Param("contest") Long contest);
+
+    @Query("""
+            SELECT problem
+            FROM ProblemEntity problem
+            WHERE (:title IS NULL OR LOWER(problem.title) LIKE LOWER(CONCAT('%', :title, '%')))
+            AND (:rating IS NULL OR problem.rating = :rating)
+            AND (:tags IS NULL OR problem.tags IN :tags)
+            AND problem.isPublished = true
+            ORDER BY problem.createdAt desc
+            """)
+    Page<ProblemEntity> findProblemsWithFilters(
+        @Param("title") String title,
+        @Param("rating") Integer rating,
+        @Param("tags") List<String> tags,
+        Pageable pageable
+    );
 }

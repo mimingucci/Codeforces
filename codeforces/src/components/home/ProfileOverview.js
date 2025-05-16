@@ -21,7 +21,6 @@ import CommitGrid from "./CommitGrid";
 import Ranking from "./Ranking";
 import RatingChart from "./RatingChart";
 import { format, parseISO } from "date-fns";
-import { mockRatingHistory } from "../../data/mockRatingHistory";
 import { convertUnixTimestamp } from "../../utils/dateUtils";
 
 const {
@@ -291,7 +290,7 @@ const ProfileOverview = ({ id, isHome = false }) => {
       </Paper>
 
       {/* Rating Chart */}
-      <RatingChart data={mockRatingHistory} />
+      {/* <RatingChart id={id}/> */}
 
       {/* Commit Grid */}
       <Paper

@@ -22,4 +22,5 @@ public class PathConstants {
     public static final String PROBLEM_ID = "/{problemId}";
     public static final String ALL = "/all";
     public static final String USER_ID = "/{userId}";
+    public static final String AUTHOR = "/author";
 }

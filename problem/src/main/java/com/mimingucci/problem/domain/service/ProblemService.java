@@ -3,6 +3,7 @@ package com.mimingucci.problem.domain.service;
 import com.mimingucci.problem.domain.model.Problem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,4 +28,6 @@ public interface ProblemService {
     Problem findByIdDev(Long problemId, Long userId);
 
     List<Problem> findAllByContestDev(Long contestId, Long userId);
+
+    String uploadFile(MultipartFile file);
 }

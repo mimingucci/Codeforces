@@ -75,6 +75,22 @@ const availableTags = [
 ];
 
 const RichTextEditor = ({ initialValue, editorRef, disabled }: EditorProps) => {
+  const handleImageUpload = async (blobInfo: any) => {
+    try {
+      // Convert blob to File object
+      const file = new File([blobInfo.blob()], blobInfo.filename(), {
+        type: blobInfo.blob().type,
+      });
+
+      // Upload image using ProblemApi
+      const imageUrl = await ProblemApi.uploadImage(file);
+      return imageUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw new Error('Failed to upload image');
+    }
+  };
+
   return (
     <Editor
       apiKey="u9dip03wlnenlzj8lqd91ows2jqq8ez9p14k3melb4vchevu" // Get this from https://www.tiny.cloud/
@@ -113,23 +129,25 @@ const RichTextEditor = ({ initialValue, editorRef, disabled }: EditorProps) => {
         content_style:
           'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
         file_picker_types: 'image',
+        automatic_uploads: true,
+        images_reuse_filename: true,
+        images_upload_base_path: '/api/v1/problem/upload',
+        images_upload_credentials: true,
+        // Add image upload validation
         images_upload_handler: async (blobInfo: any) => {
-          // Implement your image upload logic here
-          // This is just a mock implementation
-          return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(blobInfo?.blob());
-            reader.onload = () => {
-              resolve(reader.result as string);
-            };
-            reader.onerror = (error) => reject(error);
-          });
+          // Validate file size (5MB limit)
+          if (blobInfo.blob().size > 5 * 1024 * 1024) {
+            throw new Error('Image size should be less than 5MB');
+          }
+
+          // Validate file type
+          const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+          if (!allowedTypes.includes(blobInfo.blob().type)) {
+            throw new Error('Only JPG, PNG and GIF images are allowed');
+          }
+
+          return handleImageUpload(blobInfo);
         },
-        codesample_languages: [
-          { text: 'C++', value: 'cpp' },
-          { text: 'Java', value: 'java' },
-          { text: 'Python', value: 'python' },
-        ],
       }}
     />
   );

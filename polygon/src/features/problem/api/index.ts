@@ -23,4 +23,15 @@ export const ProblemApi = {
     );
     return response.data;
   },
+  uploadImage: async (file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    const response = await apiClient.post<String>('/api/v1/problem/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
 };

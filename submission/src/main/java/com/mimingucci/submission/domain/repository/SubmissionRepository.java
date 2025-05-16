@@ -4,6 +4,9 @@ import com.mimingucci.submission.domain.model.Submission;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.Instant;
+import java.util.List;
+
 public interface SubmissionRepository {
     Submission save(Submission submission);
 
@@ -14,4 +17,6 @@ public interface SubmissionRepository {
     Page<Submission> findAllByUserId(Long userId, Pageable pageable);
 
     Submission update(Long id, Submission submission);
+
+    List<Submission> getSubmissionGrid(Long userId, Instant startDate, Instant endDate);
 }

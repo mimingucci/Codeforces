@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -83,6 +84,11 @@ public class SubmissionServiceImpl implements SubmissionService {
     @Override
     public Page<Submission> findAllByUserId(Long userId, Pageable pageable) {
         return repository.findAllByUserId(userId, pageable);
+    }
+
+    @Override
+    public List<Submission> getSubmissionGrid(Long userId, Instant startDate, Instant endDate) {
+        return repository.getSubmissionGrid(userId, startDate, endDate);
     }
 
     private String convertLanguage(SubmissionLanguage language) {

@@ -1,5 +1,7 @@
 package com.mimingucci.problem.domain.service.impl;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.mimingucci.problem.common.constant.ErrorMessageConstants;
 import com.mimingucci.problem.common.exception.ApiRequestException;
 import com.mimingucci.problem.domain.client.ContestClient;
@@ -13,9 +15,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +28,8 @@ public class ProblemServiceImpl implements ProblemService {
     private final ProblemRepository repository;
 
     private final ContestClient contestClient;
+
+    private final Cloudinary cloudinary;
 
     @Override
     public Problem createProblem(Problem domain) {
@@ -89,6 +96,16 @@ public class ProblemServiceImpl implements ProblemService {
             return this.repository.findAllProblemsByContestDev(contestId);
         } else {
             throw new ApiRequestException(ErrorMessageConstants.NOT_HAVE_PERMISSION, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public String uploadFile(MultipartFile file) {
+        try {
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            return uploadResult.get("url").toString();
+        } catch (IOException e) {
+            throw new ApiRequestException(ErrorMessageConstants.UPLOAD_IMAGE_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

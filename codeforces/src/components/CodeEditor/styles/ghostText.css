@@ -1,0 +1,34 @@
+.monaco-ghost-text {
+  opacity: 0.75 !important; /* Make it more visible */
+  color: #6a9955 !important; /* Bright green color - better visibility */
+  font-style: italic !important;
+  font-weight: normal !important;
+}
+
+.monaco-editor .suggest-widget {
+  z-index: 100 !important; /* Ensure it's above other elements */
+}
+ 
+.suggestion-loading {
+  color: #569cd6 !important;
+  font-size: 16px !important;
+  animation: spin 1s linear infinite;
+  display: inline-block !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 1000 !important;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.suggestion-line-highlight {
+  background-color: rgba(14, 99, 156, 0.1) !important;
+}
+
+.suggestion-glyph {
+  background-color: #007acc !important;
+  width: 4px !important;
+}

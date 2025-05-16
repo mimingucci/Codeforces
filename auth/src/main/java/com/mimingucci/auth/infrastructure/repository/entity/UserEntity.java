@@ -47,5 +47,6 @@ public class UserEntity {
     protected void onCreate() {
         this.createdAt = Instant.now(); // Set to current UTC time
         this.rating = 0;
+        this.enabled = false;
     }
 }
