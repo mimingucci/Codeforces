@@ -72,6 +72,9 @@ class ContestApi {
   lockSubmissionApi(userId) {
     return axios.get(BASE_URL + `/user/${userId}`);
   }
+  // createVirtualContest({accessToken, contest, startTime}) {
+  //   return axios.post(BASE_URL + `/virtual`);
+  // }
 }
 
 export default new ContestApi();

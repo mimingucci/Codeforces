@@ -90,7 +90,7 @@ const UserSubmissions = ({ userId }) => {
       );
 
       if (response?.code === "200") {
-        setSubmissions(response.data.content);
+        setSubmissions(response.data.content?.reverse());
         setTotal(response.data.totalElements);
       } else {
         console.error("Failed to fetch submissions:", response?.message);
@@ -133,7 +133,7 @@ const UserSubmissions = ({ userId }) => {
 
   const getVerdictColor = (verdict) => {
     switch (verdict) {
-      case "ACCEPTED":
+      case "ACCEPT":
         return "success";
       case "WRONG_ANSWER":
         return "error";
@@ -143,7 +143,7 @@ const UserSubmissions = ({ userId }) => {
         return "warning";
       case "RUNTIME_ERROR":
         return "error";
-      case "COMPILATION_ERROR":
+      case "COMPILE_ERROR":
         return "error";
       default:
         return "default";

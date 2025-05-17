@@ -433,7 +433,14 @@ public class ContestEventScheduler {
                 break;
             }
         }
-        if (!hasJoin) contestants.add(new ContestRegistration(virtualContest.getUser(), virtualContest.getContest(), true, true));
+
+        var currentUser = new ContestRegistration();
+        currentUser.setUser(virtualContest.getUser());
+        currentUser.setContest(virtualContest.getContest());
+        currentUser.setRated(true);
+        currentUser.setParticipated(true);
+        List<ContestRegistration> participants = new ArrayList<>(contestants);
+        if (!hasJoin) participants.add(currentUser);
         this.rankingClient.startVirtualContest(new VirtualContestRequest(
                 virtualContest.getId(),
                 virtualContest.getContest(),
@@ -443,7 +450,7 @@ public class ContestEventScheduler {
                 virtualContest.getStartTime(),
                 virtualContest.getEndTime(),
                 problemset,
-                ContestantsConverter.toJsonString(contestants)));
+                ContestantsConverter.toJsonString(participants)));
     }
 
     private void updateContestInCache(Contest contest) {

@@ -46,7 +46,6 @@ const PastContests = ({ contestType }) => {
               <TableCell>Type</TableCell>
               <TableCell>Start Time</TableCell>
               <TableCell>Duration</TableCell>
-              <TableCell>Participants</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -63,9 +62,8 @@ const PastContests = ({ contestType }) => {
                   {format(new Date(contest.startTime), 'MMM dd, yyyy HH:mm')}
                 </TableCell>
                 <TableCell>{calculateDuration(contest.startTime, contest.endTime)}</TableCell>
-                <TableCell>{0}</TableCell>
                 <TableCell>
-                  <Link href={`/contest/${contest.id}/standings`}>
+                  <Link href={`/contest/${contest.id}?tab=standing`}>
                     Standings
                   </Link>
                 </TableCell>

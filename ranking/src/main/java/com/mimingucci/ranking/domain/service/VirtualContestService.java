@@ -7,6 +7,7 @@ import com.mimingucci.ranking.domain.event.VirtualSubmissionResultEvent;
 import com.mimingucci.ranking.domain.model.VirtualContestMetadata;
 import com.mimingucci.ranking.domain.repository.SubmissionResultRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VirtualContestService {
@@ -35,6 +37,8 @@ public class VirtualContestService {
         startEvent.setProblemset(virtualContest.getProblemset());
         startEvent.setStartTime(virtualContest.getStartTime());
         startEvent.setEndTime(virtualContest.getEndTime());
+        startEvent.setActualStartTime(virtualContest.getActualStartTime());
+        startEvent.setActualEndTime(virtualContest.getActualEndTime());
         long contestStartDelayMillis = Duration.between(Instant.now(), virtualContest.getStartTime()).toMillis();
         scheduler.schedule(() -> {
             // Send contest start event
@@ -47,6 +51,8 @@ public class VirtualContestService {
         endEvent.setContest(virtualContest.getContest());
         endEvent.setStartTime(virtualContest.getStartTime());
         endEvent.setEndTime(virtualContest.getEndTime());
+        endEvent.setActualStartTime(virtualContest.getActualStartTime());
+        endEvent.setActualEndTime(virtualContest.getActualEndTime());
         long contestEndDelayMillis = Duration.between(Instant.now(), virtualContest.getEndTime()).toMillis();
         scheduler.schedule(() -> {
             // Send contest end event

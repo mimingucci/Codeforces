@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.time.Instant;
 
 @Entity
-@Table(name = "virtual-contest")
+@Table(name = "virtual_contest")
 @Getter
 @Setter
 @NoArgsConstructor

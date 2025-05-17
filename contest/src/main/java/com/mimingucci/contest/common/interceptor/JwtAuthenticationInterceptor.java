@@ -32,7 +32,7 @@ public class JwtAuthenticationInterceptor implements HandlerInterceptor {
         try {
             // Extract and validate the token
             Claims claims = jwtUtil.extractClaimsFromHttpRequest(request);
-            
+
             // If validation successful, store claims in request attributes for later use in controllers
             request.setAttribute("userId", claims.get("id", Long.class));
             request.setAttribute("userEmail", claims.getSubject());
@@ -43,7 +43,6 @@ public class JwtAuthenticationInterceptor implements HandlerInterceptor {
             request.setAttribute("userRoles", roleNames.stream()
                     .map(Role::valueOf)
                     .collect(Collectors.toSet()));
-
 
             return true;
         } catch (Exception e) {

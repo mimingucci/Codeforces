@@ -14,23 +14,23 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VirtualSubmissionResultEvent {
-    Long id;
+    Long id = null;
 
-    SubmissionVerdict verdict;
+    SubmissionVerdict verdict = null;
 
-    Long author;
+    Long author = null;
 
-    Long contest;
+    Long contest = null;
 
-    Long virtualContest;
+    Long virtualContest = null;
 
-    Long problem;
+    Long problem = null;
 
-    Integer score;
+    Integer score = null;
 
-    Instant sent_on;
+    Instant sent_on = null;
 
-    Instant judged_on;
+    Instant judged_on = null;
 
     Instant startTime;
 
@@ -42,7 +42,7 @@ public class VirtualSubmissionResultEvent {
 
     SubmissionType eventType;
 
-    String contestants;
+    String contestants = "";
 
-    String problemset;
+    String problemset = "";
 }

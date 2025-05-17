@@ -72,7 +72,10 @@ public class VirtualLeaderboardProcessFunction extends KeyedProcessFunction<Long
             if (event.getEventType().equals(SubmissionType.CONTEST_STARTED)) {
                 log.info("Contest has started");
                 List<ContestRegistrationResponse> contestants = ContestantsConverter.fromJsonString(event.getContestants());
-                List<Long> problemset = Arrays.stream(event.getProblemset().split(","))
+                List<Long> problemset = event.getProblemset() == null || event.getProblemset().trim().isEmpty()
+                        ? List.of() // Return empty list if null or empty
+                        : Arrays.stream(event.getProblemset().split(","))
+                        .filter(s -> !s.trim().isEmpty()) // Filter out empty strings
                         .map(Long::parseLong)
                         .toList();
                 for (var contestant : contestants) {

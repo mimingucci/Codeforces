@@ -1,9 +1,9 @@
 package com.mimingucci.ranking.domain.service;
 
 import com.mimingucci.ranking.common.constant.KafkaTopicConstants;
-import com.mimingucci.ranking.common.deserializer.SubmissionResultEventDeserializationSchema;
-import com.mimingucci.ranking.domain.event.SubmissionResultEvent;
-import com.mimingucci.ranking.domain.model.LeaderboardUpdateSerializable;
+import com.mimingucci.ranking.common.deserializer.VirtualSubmissionResultEventDeserializationSchema;
+import com.mimingucci.ranking.domain.event.VirtualSubmissionResultEvent;
+import com.mimingucci.ranking.domain.model.VirtualLeaderboardUpdateSerializable;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +19,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class LeaderboardFlinkService {
-
+public class VirtualLeaderboardFlinkService {
     @Value("${spring.kafka.bootstrap-servers:localhost:9092}")
     private String kafkaBootstrapServers;
 
@@ -33,8 +32,8 @@ public class LeaderboardFlinkService {
     @PostConstruct
     public void init() {
         // Start Flink job in a different thread to not block application startup
-        Thread flinkJobThread = new Thread(new FlinkJobRunner());
-        flinkJobThread.setDaemon(true);
+        Thread flinkJobThread = new Thread(new VirtualLeaderboardFlinkService.FlinkJobRunner());
+        flinkJobThread.setDaemon(false);
         flinkJobThread.start();
     }
 
@@ -88,30 +87,29 @@ public class LeaderboardFlinkService {
         // Start with just a simple job to test if Flink is working
         log.info("Creating Kafka source with bootstrap servers: {}", kafkaBootstrapServers);
 
-        // Regular contest processing - now with a single source
-        KafkaSource<SubmissionResultEvent> kafkaSource = KafkaSource.<SubmissionResultEvent>builder()
+        // Virtual contest processing
+        KafkaSource<VirtualSubmissionResultEvent> virtualKafkaSource = KafkaSource.<VirtualSubmissionResultEvent>builder()
                 .setBootstrapServers(kafkaBootstrapServers)
-                .setGroupId("leaderboard-consumer")
-                .setTopics(KafkaTopicConstants.SUBMISSION_RESULT)
-                .setValueOnlyDeserializer(new SubmissionResultEventDeserializationSchema())
+                .setGroupId("virtual-leaderboard-consumer")
+                .setTopics(KafkaTopicConstants.VIRTUAL_SUBMISSION_RESULT)
+                .setValueOnlyDeserializer(new VirtualSubmissionResultEventDeserializationSchema())
                 .setStartingOffsets(OffsetsInitializer.latest())
                 .build();
 
-        DataStream<LeaderboardUpdateSerializable> leaderboardStream = env
-                .fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "Kafka Source")
-                .keyBy(SubmissionResultEvent::getContest)
-                .process(new LeaderboardProcessFunction())
-                .name("Leaderboard Processor");
+        DataStream<VirtualLeaderboardUpdateSerializable> virtualLeaderboardStream = env
+                .fromSource(virtualKafkaSource, WatermarkStrategy.noWatermarks(), "Virtual Kafka Source")
+                .keyBy(VirtualSubmissionResultEvent::getVirtualContest)
+                .process(new VirtualLeaderboardProcessFunction())
+                .name("Virtual Leaderboard Processor");
 
-        // Add Redis sink
-        leaderboardStream
-                .addSink(new RedisLeaderboardSink(
-                redisHost,
-                redisPort,
-                "leaderboard:"
-        )).name("Redis Sink");
+        // Add Redis sinks for virtual contests
+        virtualLeaderboardStream
+                .addSink(new RedisVirtualLeaderboardSink(
+                        redisHost,
+                        redisPort,
+                        "virtual-leaderboard:"
+                )).name("Virtual Redis Sink");
 
         env.execute("Flink Leaderboard Job");
     }
 }
-

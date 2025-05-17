@@ -238,7 +238,7 @@ const Problem = () => {
 
       {canSubmit ? (
         <div>
-          <Landing problem={problem?.id} contest={problem?.contest} />
+          <Landing problem={problem?.id} contest={problem?.contest}/>
         </div>
       ) : (
         <Box

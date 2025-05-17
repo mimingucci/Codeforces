@@ -196,6 +196,7 @@ const Landing = ({ problem = "", contest = null }) => {
             onChange={onChange}
             language={language?.value}
             theme={theme.value}
+            isLoggedIn={true}
           />
         </div>
 

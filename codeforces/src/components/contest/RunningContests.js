@@ -102,7 +102,7 @@ const RunningContests = ({ contestType }) => {
                     Enter
                   </Link>
                   <Link 
-                    href={`/contest/${contest.id}/standings`}
+                    href={`/contest/${contest.id}?tab=standing`}
                     color="secondary"
                   >
                     Standings
