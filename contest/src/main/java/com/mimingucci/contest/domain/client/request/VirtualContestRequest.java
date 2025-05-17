@@ -10,9 +10,11 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VirtualContestRequest {
-    Long contestId;
+    Long id;
 
-    Long userId;
+    Long contest;
+
+    Long user;
 
     Instant actualStartTime;
 

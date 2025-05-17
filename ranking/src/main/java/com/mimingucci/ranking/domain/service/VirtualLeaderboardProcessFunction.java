@@ -92,7 +92,7 @@ public class VirtualLeaderboardProcessFunction extends KeyedProcessFunction<Long
                         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
                 String json = mapper.writeValueAsString(new LeaderboardUpdate(event.getContest(), sortedEntries));
-                out.collect(new VirtualLeaderboardUpdateSerializable(event.getContest(), event.getAuthor(), json));
+                out.collect(new VirtualLeaderboardUpdateSerializable(event.getVirtualContest(), json));
             } else {
                 log.info("Contest ended");
                 List<LeaderboardEntry> sortedEntries = recalculate_ranks();
@@ -102,7 +102,7 @@ public class VirtualLeaderboardProcessFunction extends KeyedProcessFunction<Long
                         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
                 String json = mapper.writeValueAsString(new LeaderboardUpdate(event.getContest(), sortedEntries));
-                out.collect(new VirtualLeaderboardUpdateSerializable(event.getContest(), event.getUser(), json));
+                out.collect(new VirtualLeaderboardUpdateSerializable(event.getVirtualContest(), json));
 
                 // Write submission history to file before clearing
 
@@ -143,7 +143,10 @@ public class VirtualLeaderboardProcessFunction extends KeyedProcessFunction<Long
             penalty += attemps * 10 + solve_time;
             entry.setPenalty(penalty);
         } else {
-            penalty += (old_attemps + 1) * 10 + entry.getProblemSolveTimes().get(event.getProblem());
+            penalty += (old_attemps + 1) * 10;
+            if (entry.getProblemSolveTimes().containsKey(event.getProblem())) {
+                penalty += entry.getProblemSolveTimes().get(event.getProblem());
+            }
             entry.setPenalty(penalty);
         }
 
@@ -156,6 +159,6 @@ public class VirtualLeaderboardProcessFunction extends KeyedProcessFunction<Long
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         String json = mapper.writeValueAsString(new LeaderboardUpdate(event.getContest(), sortedEntries));
-        out.collect(new VirtualLeaderboardUpdateSerializable(event.getContest(), event.getUser(), json));
+        out.collect(new VirtualLeaderboardUpdateSerializable(event.getVirtualContest(), json));
     }
 }

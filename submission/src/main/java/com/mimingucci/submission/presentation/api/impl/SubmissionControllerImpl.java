@@ -4,6 +4,7 @@ import com.mimingucci.submission.application.SubmissionApplicationService;
 import com.mimingucci.submission.common.constant.PathConstants;
 import com.mimingucci.submission.presentation.api.SubmissionController;
 import com.mimingucci.submission.presentation.dto.request.SubmissionRequest;
+import com.mimingucci.submission.presentation.dto.request.VirtualSubmissionRequest;
 import com.mimingucci.submission.presentation.dto.response.BaseResponse;
 import com.mimingucci.submission.presentation.dto.response.PageableResponse;
 import com.mimingucci.submission.presentation.dto.response.SubmissionGridResponse;
@@ -27,6 +28,12 @@ public class SubmissionControllerImpl implements SubmissionController {
     @Override
     public BaseResponse<SubmissionResponse> createSubmission(@RequestBody @Validated SubmissionRequest request, HttpServletRequest httpServletRequest) {
         return BaseResponse.success(applicationService.createSubmission(request, httpServletRequest));
+    }
+
+    @PostMapping(path = PathConstants.VIRTUAL)
+    @Override
+    public BaseResponse<SubmissionResponse> createVirtualSubmission(@RequestBody @Validated VirtualSubmissionRequest request, HttpServletRequest httpServletRequest) {
+        return BaseResponse.success(applicationService.createVirtualSubmission(request, httpServletRequest));
     }
 
     @GetMapping(path = PathConstants.USER_SUBMISSION)

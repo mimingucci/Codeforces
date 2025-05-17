@@ -25,7 +25,7 @@ public class RedisVirtualLeaderboardSink extends RichSinkFunction<VirtualLeaderb
 
     @Override
     public void invoke(VirtualLeaderboardUpdateSerializable update, Context context) {
-        String key = keyPrefix + update.getContestId() + "-" + update.getUserId();
+        String key = keyPrefix + update.getId();
 
         // Clear previous values
         jedis.del(key);

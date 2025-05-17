@@ -7,13 +7,12 @@ import com.mimingucci.contest.common.util.ContestantsConverter;
 import com.mimingucci.contest.domain.client.ProblemClient;
 import com.mimingucci.contest.domain.client.RankingClient;
 import com.mimingucci.contest.domain.client.request.ProblemUpdateRequest;
+import com.mimingucci.contest.domain.client.request.VirtualContestRequest;
 import com.mimingucci.contest.domain.client.response.ProblemResponse;
-import com.mimingucci.contest.domain.event.ContestActionEvent;
-import com.mimingucci.contest.domain.event.ContestCreatedEvent;
-import com.mimingucci.contest.domain.event.ContestDeletedEvent;
-import com.mimingucci.contest.domain.event.ContestUpdatedEvent;
+import com.mimingucci.contest.domain.event.*;
 import com.mimingucci.contest.domain.model.Contest;
 import com.mimingucci.contest.domain.model.ContestRegistration;
+import com.mimingucci.contest.domain.model.VirtualContest;
 import com.mimingucci.contest.domain.repository.ContestRepository;
 import com.mimingucci.contest.domain.service.ContestRegistrationService;
 import com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType;
@@ -27,7 +26,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
@@ -421,6 +419,31 @@ public class ContestEventScheduler {
         Long contestId = event.getContestId();
         logger.info("Contest deleted event received: ID {}", contestId);
         removeContestFromCache(contestId);
+    }
+
+    @EventListener
+    public void handleVirtualContestCreatedEvent(VirtualContestCreatedEvent event) {
+        VirtualContest virtualContest = event.getVirtualContest();
+        List<ContestRegistration> contestants = this.registrationService.getAll(virtualContest.getContest());
+        String problemset = this.problemClient.getAllProblemsByContestId(virtualContest.getContest()).data().stream().map(ProblemResponse::getId).toList().stream().map(Objects::toString).collect(Collectors.joining(","));
+        boolean hasJoin = false;
+        for (var x : contestants) {
+            if (x.getUser().equals(virtualContest.getUser())) {
+                hasJoin = true;
+                break;
+            }
+        }
+        if (!hasJoin) contestants.add(new ContestRegistration(virtualContest.getUser(), virtualContest.getContest(), true, true));
+        this.rankingClient.startVirtualContest(new VirtualContestRequest(
+                virtualContest.getId(),
+                virtualContest.getContest(),
+                virtualContest.getUser(),
+                virtualContest.getActualStartTime(),
+                virtualContest.getActualEndTime(),
+                virtualContest.getStartTime(),
+                virtualContest.getEndTime(),
+                problemset,
+                ContestantsConverter.toJsonString(contestants)));
     }
 
     private void updateContestInCache(Contest contest) {

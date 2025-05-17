@@ -16,4 +16,6 @@ public interface RankingApplicationService {
     Boolean completeContest(Long contestId, String token);
 
     List<RatingChange> getHistoryRatingChanges(Long userId);
+
+    List<LeaderboardEntry> getVirtualLeaderboard(Long contestId);
 }

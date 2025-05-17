@@ -5,6 +5,7 @@ import com.mimingucci.submission.application.assembler.SubmissionAssembler;
 import com.mimingucci.submission.domain.model.Submission;
 import com.mimingucci.submission.domain.service.SubmissionService;
 import com.mimingucci.submission.presentation.dto.request.SubmissionRequest;
+import com.mimingucci.submission.presentation.dto.request.VirtualSubmissionRequest;
 import com.mimingucci.submission.presentation.dto.response.PageableResponse;
 import com.mimingucci.submission.presentation.dto.response.SubmissionGridResponse;
 import com.mimingucci.submission.presentation.dto.response.SubmissionResponse;
@@ -41,5 +42,11 @@ public class SubmissionApplicationServiceImpl implements SubmissionApplicationSe
     @Override
     public List<SubmissionGridResponse> getSubmissionGrid(Long userId, Instant startDate, Instant endDate) {
         return service.getSubmissionGrid(userId, startDate, endDate).stream().map(SubmissionAssembler.INSTANCE::toGrid).toList();
+    }
+
+    @Override
+    public SubmissionResponse createVirtualSubmission(VirtualSubmissionRequest request, HttpServletRequest httpServletRequest) {
+        request.setAuthor((Long) httpServletRequest.getAttribute("userId"));
+        return SubmissionAssembler.INSTANCE.toResponse(service.createVirtualSubmission(request.getVirtualContest(), SubmissionAssembler.INSTANCE.toDomainFromVirtual(request)));
     }
 }

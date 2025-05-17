@@ -13,6 +13,8 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
+import java.util.jar.Manifest;
+
 @Service
 public class LeaderboardService {
     private final JedisPool jedisPool;
@@ -42,6 +44,9 @@ public class LeaderboardService {
     private String getKey(Long contestId) {
         return "leaderboard:" + contestId;
     }
+    private String getVirtualKey(Long contestId) {
+        return "virtual-leaderboard:" + contestId;
+    }
 
     public LeaderboardUpdate getLeaderboardByContestId(Long contestId) {
         try (Jedis jedis = jedisPool.getResource()) {
@@ -49,6 +54,19 @@ public class LeaderboardService {
             if (json == null) {
                 return new LeaderboardUpdate(contestId, repository.getAllEntriesByContestId(contestId));
             }
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+            return mapper.readValue(json, LeaderboardUpdate.class);
+        } catch (Exception e) {
+            throw new ApiRequestException("Failed to fetch leaderboard for contest: " + contestId, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public LeaderboardUpdate getVirtualLeaderboardByContestId(Long contestId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            String json = jedis.get(getVirtualKey(contestId));
             ObjectMapper mapper = new ObjectMapper();
             mapper.registerModule(new JavaTimeModule());
             mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);

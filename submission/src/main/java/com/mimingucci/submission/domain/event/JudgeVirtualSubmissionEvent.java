@@ -11,12 +11,14 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JudgeSubmissionEvent {
+public class JudgeVirtualSubmissionEvent {
     Long id;
 
     Long problem;
 
     Long contest;
+
+    Long virtualContest;
 
     Long author;
 
@@ -27,6 +29,10 @@ public class JudgeSubmissionEvent {
     Instant startTime;
 
     Instant endTime;
+
+    Instant actualStartTime;
+
+    Instant actualEndTime;
 
     String rule;
 

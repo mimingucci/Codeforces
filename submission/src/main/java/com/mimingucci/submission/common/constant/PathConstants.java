@@ -23,4 +23,8 @@ public class PathConstants {
     public static final String ALL = "/all";
     public static final String USER_ID = "/{userId}";
     public static final String AUTHOR = "/author";
+    public static final String VIRTUAL = "/virtual";
+    public static final String API_V1_VIRTUAL = API_V1 + VIRTUAL;
+
+    public static final String USER = "/user";
 }

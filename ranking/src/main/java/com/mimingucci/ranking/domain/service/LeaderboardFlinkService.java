@@ -114,28 +114,28 @@ public class LeaderboardFlinkService {
                 "leaderboard:"
         )).name("Redis Sink");
 
-        // // Virtual contest processing
-        // KafkaSource<VirtualSubmissionResultEvent> virtualKafkaSource = KafkaSource.<VirtualSubmissionResultEvent>builder()
-        //         .setBootstrapServers(kafkaBootstrapServers)
-        //         .setGroupId("virtual-leaderboard-consumer")
-        //         .setTopics(KafkaTopicConstants.VIRTUAL_SUBMISSION_RESULT)
-        //         .setValueOnlyDeserializer(new VirtualSubmissionResultEventDeserializationSchema())
-        //         .setStartingOffsets(OffsetsInitializer.latest())
-        //         .build();
+         // Virtual contest processing
+         KafkaSource<VirtualSubmissionResultEvent> virtualKafkaSource = KafkaSource.<VirtualSubmissionResultEvent>builder()
+                 .setBootstrapServers(kafkaBootstrapServers)
+                 .setGroupId("virtual-leaderboard-consumer")
+                 .setTopics(KafkaTopicConstants.VIRTUAL_SUBMISSION_RESULT)
+                 .setValueOnlyDeserializer(new VirtualSubmissionResultEventDeserializationSchema())
+                 .setStartingOffsets(OffsetsInitializer.latest())
+                 .build();
 
-        // DataStream<VirtualLeaderboardUpdateSerializable> virtualLeaderboardStream = env
-        //         .fromSource(virtualKafkaSource, WatermarkStrategy.noWatermarks(), "Virtual Kafka Source")
-        //         .keyBy(VirtualSubmissionResultEvent::getContest)
-        //         .process(new VirtualLeaderboardProcessFunction())
-        //         .name("Virtual Leaderboard Processor");
+         DataStream<VirtualLeaderboardUpdateSerializable> virtualLeaderboardStream = env
+                 .fromSource(virtualKafkaSource, WatermarkStrategy.noWatermarks(), "Virtual Kafka Source")
+                 .keyBy(VirtualSubmissionResultEvent::getVirtualContest)
+                 .process(new VirtualLeaderboardProcessFunction())
+                 .name("Virtual Leaderboard Processor");
 
-        // // Add Redis sinks for virtual contests
-        // virtualLeaderboardStream
-        //         .addSink(new RedisVirtualLeaderboardSink(
-        //                 redisHost,
-        //                 redisPort,
-        //                 "virtual-leaderboard:"
-        //         )).name("Virtual Redis Sink");
+         // Add Redis sinks for virtual contests
+         virtualLeaderboardStream
+                 .addSink(new RedisVirtualLeaderboardSink(
+                         redisHost,
+                         redisPort,
+                         "virtual-leaderboard:"
+                 )).name("Virtual Redis Sink");
 
         env.execute("Flink Leaderboard Job");
     }

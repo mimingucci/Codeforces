@@ -6,7 +6,7 @@ import socket
 import py_eureka_client.eureka_client as eureka_client
 from fastapi import FastAPI, Depends, Request, Header, Body
 from service.kafka_consumer import KafkaConsumer
-from event import JudgeSubmissionEvent
+from event import JudgeSubmissionEvent, JudgeVirtualSubmissionEvent
 from service.kafka_util import _kafka_producer, publish_event
 from judge import Judge, Language, Rule, Verdict
 from datetime import datetime, timezone
@@ -48,7 +48,14 @@ class SubmissionHandler(KafkaConsumer):
     async def handle_message(self, message):
         # Implement your message handling logic here
         try:
-            event = JudgeSubmissionEvent(**message.value)
+            if message.topic == "submission.judge":
+                event = JudgeSubmissionEvent(**message.value)
+            elif message.topic == "virtual.submission.judge":
+                event = JudgeVirtualSubmissionEvent(**message.value)
+            else:
+                print(f"Unknown topic: {message.topic}")
+                return
+            
             # Fetch test cases from test case service
             test_cases_response = await ServiceClient.get(
                 service_name="testcase", 
@@ -90,7 +97,7 @@ class SubmissionHandler(KafkaConsumer):
                             verdict = Verdict.COMPILE_ERROR
                     else:
                         ac += 1
-                message = {
+                judge_result = {
                     "id": event.id, 
                     "verdict": verdict.name,
                     "author": event.author,
@@ -105,9 +112,30 @@ class SubmissionHandler(KafkaConsumer):
                     "endTime": convert_timestamp(event.endTime),
                     "eventType": "SUBMISSION"
                 }
-                await publish_event("submission.update", message)
-                if event.startTime <= event.sent_on and event.sent_on <= event.endTime:
-                    await publish_event("submission.result", message)
+                await publish_event("submission.update", judge_result)
+                if message.topic == "submission.judge":
+                    if event.startTime <= event.sent_on and event.sent_on <= event.endTime:
+                        await publish_event("submission.result", judge_result)
+                else:
+                    virtualmessage = {
+                        "id": event.id, 
+                        "verdict": verdict.name,
+                        "author": event.author,
+                        "contest": event.contest,
+                        "virtualContest": event.virtualContest,
+                        "problem": event.problem,
+                        "execution_time_ms": max_time_limit,
+                        "memory_used_bytes": max_memory_limit,
+                        "score": (event.score * ac) // max(len(rep), 1),
+                        "sent_on": convert_timestamp(event.sent_on),
+                        "judged_on": datetime.now(timezone.utc).isoformat(),
+                        "startTime": convert_timestamp(event.startTime),
+                        "endTime": convert_timestamp(event.endTime),
+                        "actualStartTime": convert_timestamp(event.actualStartTime),
+                        "actualEndTime": convert_timestamp(event.actualEndTime),
+                        "eventType": "SUBMISSION"
+                    }
+                    await publish_event("virtual.submission.result", virtualmessage)
             else:
                 max_time_limit = 0
                 max_memory_limit = 0
@@ -127,7 +155,7 @@ class SubmissionHandler(KafkaConsumer):
                         else:
                             verdict = Verdict.COMPILE_ERROR
                         break
-                message = {
+                judge_result = {
                     "id": event.id, 
                     "verdict": verdict.name,
                     "author": event.author,
@@ -142,10 +170,32 @@ class SubmissionHandler(KafkaConsumer):
                     "endTime": convert_timestamp(event.endTime),
                     "eventType": "SUBMISSION"
                 }
-                await publish_event("submission.update", message)
+                await publish_event("submission.update", judge_result)
 
-                if event.startTime <= event.sent_on and event.sent_on <= event.endTime:
-                    await publish_event("submission.result", message)
+                if message.topic == "submission.judge":
+                    if event.startTime <= event.sent_on and event.sent_on <= event.endTime:
+                        await publish_event("submission.result", judge_result)
+                else:
+                    virtualmessage = {
+                        "id": event.id, 
+                        "verdict": verdict.name,
+                        "author": event.author,
+                        "contest": event.contest,
+                        "virtualContest": event.virtualContest,
+                        "problem": event.problem,
+                        "execution_time_ms": max_time_limit,
+                        "memory_used_bytes": max_memory_limit,
+                        "score": event.score if verdict == Verdict.ACCEPT else 0,
+                        "sent_on": convert_timestamp(event.sent_on),
+                        "judged_on": datetime.now(timezone.utc).isoformat(),
+                        "startTime": convert_timestamp(event.startTime),
+                        "endTime": convert_timestamp(event.endTime),
+                        "actualStartTime": convert_timestamp(event.actualStartTime),
+                        "actualEndTime": convert_timestamp(event.actualEndTime),
+                        "eventType": "SUBMISSION"
+                    }
+                    await publish_event("virtual.submission.result", virtualmessage)
+
         except Exception as e: 
             print(f"Invalid message format: {e}")
 

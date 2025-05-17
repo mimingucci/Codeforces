@@ -40,16 +40,12 @@ public class RankingApplicationServiceImpl implements RankingApplicationService 
 
     @Override
     public VirtualContestMetadata startVirtual(VirtualContestRequest request, String token) {
-        Long author = null;
+        if (token == null) {
+            throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
         try {
-            if (token != null && token.startsWith("Bearer ")) {
-                String auth = token.substring(7); // Remove "Bearer " prefix
-                Claims claims = this.jwtUtil.extractAllClaims(auth);
-                author = claims.get("id", Long.class);
-                request.setUserId(author);
-            } else {
-                throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.NOT_FOUND);
-            }
+            Claims claims = this.jwtUtil.validateToken(token);
+            if (!claims.getSubject().equals("SYSTEM")) throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             throw new ApiRequestException(ErrorMessageConstants.JWT_TOKEN_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
@@ -72,5 +68,10 @@ public class RankingApplicationServiceImpl implements RankingApplicationService 
     @Override
     public List<RatingChange> getHistoryRatingChanges(Long userId) {
         return ratingChangeRepository.getByUser(userId);
+    }
+
+    @Override
+    public List<LeaderboardEntry> getVirtualLeaderboard(Long contestId) {
+        return leaderboardService.getVirtualLeaderboardByContestId(contestId).getEntries();
     }
 }

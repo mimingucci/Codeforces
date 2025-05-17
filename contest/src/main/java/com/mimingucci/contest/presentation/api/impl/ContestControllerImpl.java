@@ -1,6 +1,7 @@
 package com.mimingucci.contest.presentation.api.impl;
 
 import com.mimingucci.contest.application.ContestApplicationService;
+import com.mimingucci.contest.application.VirtualContestApplicationService;
 import com.mimingucci.contest.common.constant.PathConstants;
 import com.mimingucci.contest.common.enums.Role;
 import com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType;
@@ -8,10 +9,8 @@ import com.mimingucci.contest.presentation.api.ContestController;
 import com.mimingucci.contest.presentation.dto.request.ContestCreateRequest;
 import com.mimingucci.contest.presentation.dto.request.ContestRegistrationDto;
 import com.mimingucci.contest.presentation.dto.request.ContestUpdateRequest;
-import com.mimingucci.contest.presentation.dto.response.BaseResponse;
-import com.mimingucci.contest.presentation.dto.response.ContestResponse;
-import com.mimingucci.contest.presentation.dto.response.ContestantCheckResponse;
-import com.mimingucci.contest.presentation.dto.response.PageableResponse;
+import com.mimingucci.contest.presentation.dto.request.VirtualContestRequest;
+import com.mimingucci.contest.presentation.dto.response.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +26,20 @@ import java.util.Set;
 @RequestMapping(path = PathConstants.API_V1_CONTEST)
 public class ContestControllerImpl implements ContestController {
     private final ContestApplicationService service;
+
+    private final VirtualContestApplicationService virtualContestApplicationService;
+
+    @PostMapping(path = PathConstants.VIRTUAL)
+    @Override
+    public BaseResponse<VirtualContestResponse> createOne(@RequestBody @Validated VirtualContestRequest request, HttpServletRequest servletRequest) {
+        return BaseResponse.success(this.virtualContestApplicationService.createOne(request, servletRequest));
+    }
+
+    @GetMapping(path = PathConstants.VIRTUAL + PathConstants.USER + PathConstants.USER_ID)
+    @Override
+    public BaseResponse<VirtualContestResponse> getNewestOne(@PathVariable(name = "userId") Long userId) {
+        return BaseResponse.success(this.virtualContestApplicationService.getNewestOne(userId));
+    }
 
     @GetMapping(path = PathConstants.UP_COMING)
     @Override

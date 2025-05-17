@@ -12,6 +12,8 @@ import java.util.List;
 public interface RankingController {
     BaseResponse<List<LeaderboardEntry>> getLeaderboardByContestId(Long contestId);
 
+    BaseResponse<List<LeaderboardEntry>> getVirtualLeaderboardByContestId(Long contestId);
+
     BaseResponse<VirtualContestMetadata> startVirtualContest(VirtualContestRequest request, String authToken);
 
     BaseResponse<Boolean> completeContest(Long contestId, String authToken);

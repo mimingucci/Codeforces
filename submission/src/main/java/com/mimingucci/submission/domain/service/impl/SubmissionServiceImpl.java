@@ -10,9 +10,11 @@ import com.mimingucci.submission.domain.client.ProblemClient;
 import com.mimingucci.submission.domain.client.response.ContestantCheckResponse;
 import com.mimingucci.submission.domain.client.response.ProblemResponse;
 import com.mimingucci.submission.domain.event.JudgeSubmissionEvent;
+import com.mimingucci.submission.domain.event.JudgeVirtualSubmissionEvent;
 import com.mimingucci.submission.domain.model.Submission;
 import com.mimingucci.submission.domain.repository.SubmissionRepository;
 import com.mimingucci.submission.domain.service.SubmissionService;
+import com.mimingucci.submission.presentation.dto.response.VirtualContestResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 
@@ -63,6 +64,45 @@ public class SubmissionServiceImpl implements SubmissionService {
         message.setMemoryLimit(problemResponse.getMemoryLimit());
         message.setSourceCode(domain.getSourceCode());
         producer.sendSubmissionToJudge(message);
+        return domain;
+    }
+
+    @Override
+    public Submission createVirtualSubmission(Long virtualContest, Submission submission) {
+        VirtualContestResponse virtualContestResponse = this.contestClient.getNewestOne(submission.getAuthor()).data();
+        if (virtualContestResponse == null || virtualContestResponse.getEndTime().isBefore(Instant.now()) || !Objects.equals(virtualContest, virtualContestResponse.getContest())) {
+            throw new ApiRequestException(ErrorMessageConstants.CONFLICT_DATA, HttpStatus.CONFLICT);
+        }
+
+        ProblemResponse problemResponse = problemClient.getProblemById(submission.getProblem()).data();
+        if (problemResponse == null) throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
+
+        if (!problemResponse.getIsPublished()) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
+        ContestantCheckResponse contestant = contestClient.checkRegistration(problemResponse.getContest(), submission.getAuthor()).data();
+        if (contestant == null) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
+        if (Instant.now().isBefore(contestant.getStartTime())) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
+
+        if (!Objects.equals(problemResponse.getContest(), submission.getContest())) throw new ApiRequestException(ErrorMessageConstants.CONFLICT_DATA, HttpStatus.CONFLICT);
+        Submission domain = repository.save(submission);
+
+        JudgeVirtualSubmissionEvent message = new JudgeVirtualSubmissionEvent();
+        message.setVirtualContest(virtualContestResponse.getId());
+        message.setStartTime(virtualContestResponse.getStartTime());
+        message.setEndTime(virtualContestResponse.getEndTime());
+        message.setAuthor(domain.getAuthor());
+        message.setId(domain.getId());
+        message.setContest(domain.getContest());
+        message.setLanguage(this.convertLanguage(domain.getLanguage()));
+        message.setRule(contestant.getType().equals(ContestType.ICPC) ? "ICPC" : "DEFAULT");
+        message.setSent_on(domain.getSent());
+        message.setActualStartTime(contestant.getStartTime());
+        message.setActualEndTime(contestant.getEndTime());
+        message.setProblem(domain.getProblem());
+        message.setScore(problemResponse.getScore());
+        message.setTimeLimit(problemResponse.getTimeLimit());
+        message.setMemoryLimit(problemResponse.getMemoryLimit());
+        message.setSourceCode(domain.getSourceCode());
+        producer.sendVirtualSubmissionToJudge(message);
         return domain;
     }
 

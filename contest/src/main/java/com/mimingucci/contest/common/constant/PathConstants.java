@@ -29,4 +29,9 @@ public class PathConstants {
     public static final String RUNNING = "/running";
     public static final String MEMBER = "/member";
     public static final String USER = "/user";
+
+    public static final String VIRTUAL = "/virtual";
+    public static final String API_V1_VIRTUAL = API_V1 + VIRTUAL;
+
+
 }

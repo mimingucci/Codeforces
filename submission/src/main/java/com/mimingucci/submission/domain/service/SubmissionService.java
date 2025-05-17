@@ -19,4 +19,6 @@ public interface SubmissionService {
     Page<Submission> findAllByUserId(Long userId, Pageable pageable);
 
     List<Submission> getSubmissionGrid(Long userId, Instant startDate, Instant endDate);
+
+    Submission createVirtualSubmission(Long virtualContest, Submission domainFromVirtual);
 }

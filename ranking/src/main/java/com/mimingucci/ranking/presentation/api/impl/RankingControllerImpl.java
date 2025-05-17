@@ -29,6 +29,12 @@ public class RankingControllerImpl implements RankingController {
         return BaseResponse.success(service.startVirtual(request, authToken));
     }
 
+    @GetMapping(path = PathConstants.VIRTUAL_CONTEST + PathConstants.CONTEST_ID)
+    @Override
+    public BaseResponse<List<LeaderboardEntry>> getVirtualLeaderboardByContestId(@PathVariable("contestId") Long contestId) {
+        return BaseResponse.success(service.getVirtualLeaderboard(contestId));
+    }
+
     @GetMapping(path = PathConstants.CHANGES + PathConstants.USER_ID)
     @Override
     public BaseResponse<List<RatingChange>> getHistoryRatingChanges(@PathVariable("userId") Long userId) {

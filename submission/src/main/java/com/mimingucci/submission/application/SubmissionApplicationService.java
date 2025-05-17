@@ -1,6 +1,7 @@
 package com.mimingucci.submission.application;
 
 import com.mimingucci.submission.presentation.dto.request.SubmissionRequest;
+import com.mimingucci.submission.presentation.dto.request.VirtualSubmissionRequest;
 import com.mimingucci.submission.presentation.dto.response.PageableResponse;
 import com.mimingucci.submission.presentation.dto.response.SubmissionGridResponse;
 import com.mimingucci.submission.presentation.dto.response.SubmissionResponse;
@@ -18,4 +19,6 @@ public interface SubmissionApplicationService {
     PageableResponse<SubmissionResponse> getPageSubmissionsByUserId(Long userId, Pageable pageable);
 
     List<SubmissionGridResponse> getSubmissionGrid(Long userId, Instant startDate, Instant endDate);
+
+    SubmissionResponse createVirtualSubmission(VirtualSubmissionRequest request, HttpServletRequest httpServletRequest);
 }

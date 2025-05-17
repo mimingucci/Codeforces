@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VirtualLeaderboardUpdateSerializable {
-    private Long contestId;
-
-    private Long userId;
+    private Long id;
 
     private String data;
 }

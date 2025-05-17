@@ -2,6 +2,7 @@ package com.mimingucci.submission.application.assembler;
 
 import com.mimingucci.submission.domain.model.Submission;
 import com.mimingucci.submission.presentation.dto.request.SubmissionRequest;
+import com.mimingucci.submission.presentation.dto.request.VirtualSubmissionRequest;
 import com.mimingucci.submission.presentation.dto.response.PageableResponse;
 import com.mimingucci.submission.presentation.dto.response.SubmissionGridResponse;
 import com.mimingucci.submission.presentation.dto.response.SubmissionResponse;
@@ -16,6 +17,8 @@ public interface SubmissionAssembler {
     SubmissionAssembler INSTANCE = Mappers.getMapper(SubmissionAssembler.class);
 
     Submission toDomain(SubmissionRequest request);
+
+    Submission toDomainFromVirtual(VirtualSubmissionRequest request);
 
     SubmissionResponse toResponse(Submission submission);
 

@@ -4,10 +4,8 @@ import com.mimingucci.contest.infrastructure.repository.entity.enums.ContestType
 import com.mimingucci.contest.presentation.dto.request.ContestCreateRequest;
 import com.mimingucci.contest.presentation.dto.request.ContestRegistrationDto;
 import com.mimingucci.contest.presentation.dto.request.ContestUpdateRequest;
-import com.mimingucci.contest.presentation.dto.response.BaseResponse;
-import com.mimingucci.contest.presentation.dto.response.ContestResponse;
-import com.mimingucci.contest.presentation.dto.response.ContestantCheckResponse;
-import com.mimingucci.contest.presentation.dto.response.PageableResponse;
+import com.mimingucci.contest.presentation.dto.request.VirtualContestRequest;
+import com.mimingucci.contest.presentation.dto.response.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -50,4 +48,8 @@ public interface ContestController {
     BaseResponse<List<ContestResponse>> getAllContestsByMemberStaff(HttpServletRequest request);
 
     BaseResponse<Boolean> isUserInRunningContest(Long userId);
+
+    BaseResponse<VirtualContestResponse> createOne(VirtualContestRequest request, HttpServletRequest servletRequest);
+
+    BaseResponse<VirtualContestResponse> getNewestOne(Long userId);
 }

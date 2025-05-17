@@ -19,6 +19,24 @@ class JudgeSubmissionEvent(BaseModel):
     startTime: float
     endTime: float
 
+class JudgeVirtualSubmissionEvent(BaseModel):
+    id: int
+    problem: int
+    sourceCode: str
+    contest: int
+    virtualContest: int
+    author: int
+    score: int
+    timeLimit: int
+    memoryLimit: int
+    language: Language
+    rule: Rule = Rule.DEFAULT
+    sent_on: float
+    startTime: float
+    endTime: float
+    actualStartTime: float
+    actualEndTime: float
+
 class SubmissionJudgedEvent(BaseModel):
     id: int
     verdict: Verdict

@@ -1,15 +1,11 @@
-package com.mimingucci.ranking.domain.model;
+package com.mimingucci.contest.domain.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class VirtualContestMetadata {
+public class VirtualContest {
     private Long id;
 
     private Long contest;
@@ -24,7 +20,4 @@ public class VirtualContestMetadata {
 
     private Instant actualEndTime;
 
-    private String contestants;
-
-    private String problemset;
 }
