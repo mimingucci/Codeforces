@@ -12,6 +12,14 @@ class LeaderboardApi {
       },
     });
   }
+  getVirtualLeaderboard(id) {
+    return axios.get(BASE_URL + "/virtual/" + id, {
+      transformResponse: (data) => {
+        const res = JSONbig.parse(data);
+        return res;
+      },
+    });
+  }
   getHistoryCompetition(userId) {
     return axios.get(BASE_URL + "/changes/" + userId, {
       transformResponse: (data) => {

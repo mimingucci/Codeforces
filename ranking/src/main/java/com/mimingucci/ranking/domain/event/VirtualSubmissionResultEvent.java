@@ -45,4 +45,8 @@ public class VirtualSubmissionResultEvent {
     String contestants = "";
 
     String problemset = "";
+
+    Long execution_time_ms;
+
+    Long memory_used_bytes;
 }

@@ -24,6 +24,7 @@ const path = {
   CHAT: "/chat",
   CONTEST: "/contests",
   CONTESTDETAIL: "/contest/:id",
+  VIRTUALCONTESTDETAIL: "/virtual-contest/:id",
   CONTESTSTANDING: "/contest/:id/standing",
   SUBMITDETAIL: "/submission/:id",
   FORGOTPASSWORD: "/forgot-password",

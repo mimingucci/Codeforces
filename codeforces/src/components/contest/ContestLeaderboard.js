@@ -43,7 +43,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 const ScoreCell = ({ attempts, solveTime }) => {
   if (!attempts) return "-";
 
-  if (!solveTime) {
+  if (!solveTime && solveTime !== 0) {
     return (
       <Tooltip title={`${attempts} failed attempts`}>
         <Box
@@ -77,7 +77,7 @@ const ScoreCell = ({ attempts, solveTime }) => {
   );
 };
 
-const ContestLeaderboard = ({ contest }) => {
+const ContestLeaderboard = ({ contest, virtualContestId = null }) => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [problems, setProblems] = useState([]);
@@ -92,7 +92,7 @@ const ContestLeaderboard = ({ contest }) => {
         // Fetch problems and leaderboard in parallel
         const [problemsResponse, leaderboardResponse] = await Promise.all([
           ProblemApi.getProblemsByContestId(contest.id),
-          LeaderboardApi.getLeaderboard(contest.id),
+          virtualContestId ? LeaderboardApi.getVirtualLeaderboard(virtualContestId) : LeaderboardApi.getLeaderboard(contest.id),
         ]);
 
         setProblems(problemsResponse.data.data);
@@ -106,7 +106,7 @@ const ContestLeaderboard = ({ contest }) => {
     };
 
     fetchData();
-  }, [contest.id]);
+  }, [contest.id, virtualContestId]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);

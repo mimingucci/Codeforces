@@ -54,6 +54,7 @@ const Main = () => {
         <Route path={path.SIGNUP} element={<SignUp />} />
         <Route path={path.CONTEST} element={<ContestPage />} />
         <Route path={path.CONTESTDETAIL} element={<ContestDetail />} />
+        <Route path={path.VIRTUALCONTESTDETAIL} element={<ContestDetail isVirtual={true} />} />
         <Route path={path.SETTING} element={<Setting />} />
         <Route path={path.BLOG} element={<BlogDetail />} />
         <Route path={path.MESSAGE} element={<Message />} />

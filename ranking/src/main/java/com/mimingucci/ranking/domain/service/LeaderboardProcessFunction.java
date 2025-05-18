@@ -148,7 +148,16 @@ public class LeaderboardProcessFunction extends KeyedProcessFunction<Long, Submi
             int solve_time = (int) Duration.between(event.getStartTime(), event.getSent_on()).toMinutes();
             entry.getProblemSolveTimes().put(event.getProblem(), solve_time);
             entry.getSolvedProblems().add(event.getProblem());
-            entry.setTotalScore(event.getScore());
+            if (!entry.getProblemScores().containsKey(event.getProblem())) {
+                entry.getProblemScores().put(event.getProblem(), event.getScore());
+                entry.setTotalScore(entry.getTotalScore() + event.getScore());
+            } else {
+                int newScore = entry.getTotalScore();
+                newScore -= entry.getProblemScores().get(event.getProblem());
+                newScore += event.getScore();
+                entry.setTotalScore(newScore);
+                entry.getProblemScores().put(event.getProblem(), event.getScore());
+            }
             int attemps = entry.getProblemAttempts().get(event.getProblem());
             penalty += attemps * 10 + solve_time;
             entry.setPenalty(penalty);
@@ -157,6 +166,17 @@ public class LeaderboardProcessFunction extends KeyedProcessFunction<Long, Submi
             if (entry.getProblemSolveTimes().containsKey(event.getProblem())) {
                 penalty += entry.getProblemSolveTimes().get(event.getProblem());
             }
+            int newScore = entry.getTotalScore();
+            int maxSubmissionScore = 0;
+            if (entry.getProblemScores().containsKey(event.getProblem())) {
+                maxSubmissionScore = entry.getProblemScores().get(event.getProblem());
+                newScore -= entry.getProblemScores().get(event.getProblem());
+            }
+            maxSubmissionScore = Math.max(maxSubmissionScore, event.getScore());
+            newScore += maxSubmissionScore;
+
+            entry.setTotalScore(newScore);
+            entry.getProblemScores().put(event.getProblem(), maxSubmissionScore);
             entry.setPenalty(penalty);
         }
 

@@ -23,7 +23,7 @@ import "@vaadin/split-layout";
 import Landing from "../CodeEditor/Components/Landing";
 import { useEffect, useState } from "react";
 import ProblemApi from "../../getApi/ProblemApi";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import HandleCookies from "../../utils/HandleCookies";
 import ContestApi from "../../getApi/ContestApi";
 
@@ -40,11 +40,23 @@ const Problem = () => {
   const [canSubmit, setCanSubmit] = useState(false);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const virtualContestId = searchParams.get('virtual');
+  const userId = HandleCookies.getCookie("id");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        if (virtualContestId) {
+          if (!userId) navigate("/404");
+          const virtualContestResponse = await ContestApi.getVirtualContestIfExists(userId);
+          if (virtualContestResponse?.data?.code != "200" || virtualContestResponse.data.data.user != userId || virtualContestResponse.data.data.id?.toString() !== virtualContestId) {
+            navigate("/404");
+          }
+        } 
         // Fetch problem data
         const problemResponse = await ProblemApi.getProblem(id);
 
@@ -78,7 +90,7 @@ const Problem = () => {
     };
 
     fetchData();
-  }, [id]);
+  }, [id, virtualContestId]);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -238,7 +250,7 @@ const Problem = () => {
 
       {canSubmit ? (
         <div>
-          <Landing problem={problem?.id} contest={problem?.contest}/>
+          <Landing problem={problem?.id} contest={problem?.contest} virtualContestId={virtualContestId || null} />
         </div>
       ) : (
         <Box

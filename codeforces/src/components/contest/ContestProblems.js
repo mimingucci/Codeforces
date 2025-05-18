@@ -10,7 +10,7 @@ import {
   Chip,
 } from "@mui/material";
 
-const ContestProblems = ({ problems, isContestFinished }) => {
+const ContestProblems = ({ problems, isContestFinished, virtualContestId = null }) => {
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -26,7 +26,7 @@ const ContestProblems = ({ problems, isContestFinished }) => {
             <TableRow key={problem?.id}>
               <TableCell>{String.fromCharCode(65 + index)}</TableCell>
               <TableCell>
-                <Link href={`/problem/${problem?.id}`}>{problem.title}</Link>
+                <Link href={virtualContestId ? `/problem/${problem?.id}?virtual=${virtualContestId}` : `/problem/${problem?.id}`}>{problem.title}</Link>
               </TableCell>
               {isContestFinished && (
                 <TableCell>

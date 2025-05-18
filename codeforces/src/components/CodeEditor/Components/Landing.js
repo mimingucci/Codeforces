@@ -24,7 +24,7 @@ int main() {\n\
     return 0;\n\
 }\n\
 ';
-const Landing = ({ problem = "", contest = null }) => {
+const Landing = ({ problem = "", contest = null, virtualContestId = null }) => {
   const [code, setCode] = useState("");
   const [verdict, setVerdict] = useState(null);
   const [theme, setTheme] = useState({
@@ -76,13 +76,15 @@ const Landing = ({ problem = "", contest = null }) => {
     try {
       setVerdict({ message: "Pending" });
       // Submit code to backend and get submission ID
-      const submission = await SubmissionApi.submit({
+      const submissionPayload = {
         language: language.value,
         sourceCode: code,
         problem: problem,
         contest: contest,
         token: accessToken,
-      });
+        virtualContest: virtualContestId,
+      };
+      const submission = virtualContestId ? await SubmissionApi.submitVirtual(submissionPayload) : await SubmissionApi.submit(submissionPayload);
 
       if (!submission || submission.code !== "200") {
         showErrorToast("Failed to create submission");

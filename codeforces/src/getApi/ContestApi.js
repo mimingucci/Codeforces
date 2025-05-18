@@ -72,9 +72,29 @@ class ContestApi {
   lockSubmissionApi(userId) {
     return axios.get(BASE_URL + `/user/${userId}`);
   }
-  // createVirtualContest({accessToken, contest, startTime}) {
-  //   return axios.post(BASE_URL + `/virtual`);
-  // }
+  createVirtualContest({accessToken, contest, startTime}) {
+    return axios.post(BASE_URL + "/virtual", {
+      contest,
+      startTime,
+    },
+    { 
+      headers: { Authorization: "Bearer " + accessToken },
+      transformResponse: (data) => {
+        const res = JSONbig.parse(data);
+        return res;
+      },
+    }
+  );
+  }
+  getVirtualContestIfExists(id) {
+    return axios.get(BASE_URL + `/virtual/user/${id}`, {
+        transformResponse: (data) => {
+          const res = JSONbig.parse(data);
+          return res;
+        },
+      }
+    )
+  }
 }
 
 export default new ContestApi();

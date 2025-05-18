@@ -6,7 +6,8 @@ import {
   Typography,
   Button,
   Chip,
-  Box
+  Box,
+  Link,
 } from '@mui/material';
 
 import { toast, ToastContainer } from "react-toastify";
@@ -18,6 +19,7 @@ import Loading from '../shared/Loading';
 import RegisterModal from './RegisterModal';
 import CancelRegistrationModal from './CancelRegistrationModal';
 import { formatContestDurationHours } from '../../utils/dateUtils';
+import { useNavigate } from 'react-router-dom';
 
 const UpcomingContests = ({ contestType }) => {
   const [contests, setContests] = useState([]);
@@ -25,6 +27,8 @@ const UpcomingContests = ({ contestType }) => {
   const [selectedContest, setSelectedContest] = useState(null);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleRegisterClick = (contest) => {
     const token = HandleCookies.getCookie('token');
@@ -184,7 +188,20 @@ const UpcomingContests = ({ contestType }) => {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                {contest.name}
+              <Link
+                  component="button"
+                  variant="h6"
+                  onClick={() => navigate(`/contest/${contest.id}`)}
+                  sx={{
+                    textAlign: 'left',
+                    textDecoration: 'none',
+                    '&:hover': {
+                      textDecoration: 'underline',
+                    },
+                  }}
+                >
+                  {contest.name}
+                </Link>
               </Typography>
               
               <Box sx={{ mb: 2 }}>

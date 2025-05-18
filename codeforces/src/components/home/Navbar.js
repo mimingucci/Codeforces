@@ -5,6 +5,7 @@ import NavbarPart3 from "./NavbarPart3";
 import NavbarPart4 from "./NavbarPart4";
 import NavbarClock from "./NavbarClock";
 import RunningContestClock from "./RunningContestClock";
+import VirtualContestClock from "./VirtualContestClock";
 
 const Navbar = () => {
   const location = useLocation();
@@ -24,6 +25,7 @@ const Navbar = () => {
       <NavbarPart1 />
       <NavbarClock />
       <RunningContestClock />
+      <VirtualContestClock />
       <NavbarPart2 />
       <NavbarPart3 />
       <NavbarPart4 />

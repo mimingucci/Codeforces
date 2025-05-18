@@ -40,6 +40,32 @@ const SubmissionApi = {
     }
   },
 
+  submitVirtual: async (data) => {
+    try {
+      const response = await axiosInstance.post(
+        `${API_BASE_URL}/api/v1/submission/virtual`,
+        {
+          language: data.language,
+          sourceCode: data.sourceCode,
+          contest: data.contest,
+          problem: data.problem.toString(),
+          virtualContest: data.virtualContest, 
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+            "Content-Type": "application/json",
+          },
+          transformRequest: [(data) => JSONbig.stringify(data)],
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error submitting code:", error);
+      throw error;
+    }
+  },
+
   /**
    * Get details of a submission
    * @param {string} id - Submission ID

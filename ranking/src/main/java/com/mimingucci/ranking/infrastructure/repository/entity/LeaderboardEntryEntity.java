@@ -48,6 +48,10 @@ public class LeaderboardEntryEntity {
     private Map<Long, Integer> problemAttempts = new HashMap<>();
 
     @Convert(converter = LongIntegerMapConverter.class)
+    @Column(name = "problem_scores")
+    private Map<Long, Integer> problemScores = new HashMap<>();
+
+    @Convert(converter = LongIntegerMapConverter.class)
     @Column(name = "problem_solve_times")
     private Map<Long, Integer> problemSolveTimes = new HashMap<>();
 }

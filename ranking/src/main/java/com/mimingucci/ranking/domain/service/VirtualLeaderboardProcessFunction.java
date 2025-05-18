@@ -107,13 +107,12 @@ public class VirtualLeaderboardProcessFunction extends KeyedProcessFunction<Long
                 String json = mapper.writeValueAsString(new LeaderboardUpdate(event.getContest(), sortedEntries));
                 out.collect(new VirtualLeaderboardUpdateSerializable(event.getVirtualContest(), json));
 
-                // Write submission history to file before clearing
-
                 leaderboard.clear();
             }
             return;
         }
 
+        log.info(event.toString());
         if (event.getSent_on().isBefore(event.getStartTime())) return;
         if (event.getSent_on().isAfter(event.getEndTime())) return;
 
@@ -141,7 +140,16 @@ public class VirtualLeaderboardProcessFunction extends KeyedProcessFunction<Long
             int solve_time = (int) Duration.between(event.getStartTime(), event.getSent_on()).toMinutes();
             entry.getProblemSolveTimes().put(event.getProblem(), solve_time);
             entry.getSolvedProblems().add(event.getProblem());
-            entry.setTotalScore(event.getScore());
+            if (!entry.getProblemScores().containsKey(event.getProblem())) {
+                entry.getProblemScores().put(event.getProblem(), event.getScore());
+                entry.setTotalScore(entry.getTotalScore() + event.getScore());
+            } else {
+                int newScore = entry.getTotalScore();
+                newScore -= entry.getProblemScores().get(event.getProblem());
+                newScore += event.getScore();
+                entry.setTotalScore(newScore);
+                entry.getProblemScores().put(event.getProblem(), event.getScore());
+            }
             int attemps = entry.getProblemAttempts().get(event.getProblem());
             penalty += attemps * 10 + solve_time;
             entry.setPenalty(penalty);
@@ -150,6 +158,17 @@ public class VirtualLeaderboardProcessFunction extends KeyedProcessFunction<Long
             if (entry.getProblemSolveTimes().containsKey(event.getProblem())) {
                 penalty += entry.getProblemSolveTimes().get(event.getProblem());
             }
+            int newScore = entry.getTotalScore();
+            int maxSubmissionScore = 0;
+            if (entry.getProblemScores().containsKey(event.getProblem())) {
+                maxSubmissionScore = entry.getProblemScores().get(event.getProblem());
+                newScore -= entry.getProblemScores().get(event.getProblem());
+            }
+            maxSubmissionScore = Math.max(maxSubmissionScore, event.getScore());
+            newScore += maxSubmissionScore;
+
+            entry.setTotalScore(newScore);
+            entry.getProblemScores().put(event.getProblem(), maxSubmissionScore);
             entry.setPenalty(penalty);
         }
 

@@ -70,7 +70,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     @Override
     public Submission createVirtualSubmission(Long virtualContest, Submission submission) {
         VirtualContestResponse virtualContestResponse = this.contestClient.getNewestOne(submission.getAuthor()).data();
-        if (virtualContestResponse == null || virtualContestResponse.getEndTime().isBefore(Instant.now()) || !Objects.equals(virtualContest, virtualContestResponse.getContest())) {
+        if (virtualContestResponse == null || virtualContestResponse.getEndTime().isBefore(Instant.now()) || !Objects.equals(virtualContest, virtualContestResponse.getId())) {
             throw new ApiRequestException(ErrorMessageConstants.CONFLICT_DATA, HttpStatus.CONFLICT);
         }
 
