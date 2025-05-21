@@ -67,27 +67,13 @@ class CodeSuggestionService {
     const position = this.editor.getPosition();
     if (!position) return;
 
-    // Create loading decoration
-    this.loadingDecoration = this.editor.createDecorationsCollection([
-      {
-        range: new this.monaco.Range(
-          position.lineNumber,
-          position.column,
-          position.lineNumber,
-          position.column
-        ),
-        options: {
-          after: {
-            content: " ⌛",
-            inlineClassName: "suggestion-loading",
-            marginLeft: "4px",
-          },
-          stickiness: this.monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
-        },
-      },
-    ]);
-
     try {
+      // Remove any existing loading indicator
+      this.removeLoadingIndicator();
+
+      // Add loading indicator as a DOM element
+      this.addLoadingIndicator(position);
+
       // Get code from start to current cursor position
       const codeUntilCursor = this.getCodeUntilCursor(position);
 
@@ -106,18 +92,19 @@ class CodeSuggestionService {
 
       // If another request has been made, ignore this one
       if (currentRequestId !== this.lastRequestId) {
-        this.loadingDecoration.clear();
+        this.removeLoadingIndicator();
         return;
       }
 
       if (!response.ok) {
         console.error("Failed to get suggestion:", await response.text());
-        this.loadingDecoration.clear();
+        this.removeLoadingIndicator();
         return;
       }
 
       const data = await response.json();
-      this.loadingDecoration.clear();
+      // Remove loading indicator
+      this.removeLoadingIndicator();
 
       const newParts = this.findNewCodeParts(code, data.suggestion);
       if (newParts) {
@@ -126,8 +113,34 @@ class CodeSuggestionService {
       }
     } catch (error) {
       console.error("Error getting code suggestion:", error);
-      this.loadingDecoration.clear();
+      // Remove loading indicator
+      this.removeLoadingIndicator();
     } 
+  }
+
+  addLoadingIndicator(position) {
+    // Get coordinates for position
+    const coords = this.editor.getScrolledVisiblePosition(position);
+    
+    // Create the loading element
+    const loadingElement = document.createElement('div');
+    loadingElement.id = 'suggestion-loading-indicator';
+    loadingElement.innerHTML = '<div class="loading-spinner"></div>'; // Use a spinner instead of dot
+    loadingElement.style.position = 'absolute';
+    loadingElement.style.left = (coords.left + 10) + 'px';
+    loadingElement.style.top = coords.top + 'px';
+    loadingElement.style.zIndex = '10000';
+    
+    // Add to editor's container
+    const editorContainer = this.editor._domElement;
+    editorContainer.appendChild(loadingElement);
+  }
+
+  removeLoadingIndicator() {
+    const indicator = document.getElementById('suggestion-loading-indicator');
+    if (indicator && indicator.parentNode) {
+      indicator.parentNode.removeChild(indicator);
+    }
   }
 
   getCodeUntilCursor(position) {
@@ -220,6 +233,9 @@ class CodeSuggestionService {
     const position = this.editor.getPosition();
     if (!position) return;
 
+    // Clear any existing suggestion
+    this.clearSuggestion();
+
     // Store the current suggestion
     this.currentSuggestion = {
       text: suggestion,
@@ -298,7 +314,7 @@ class CodeSuggestionService {
     this.disposables.forEach((d) => d.dispose());
     this.disposables = [];
     this.clearSuggestion();
-    if (this.statusBarItem) {
+    if (this.loadingDecoration) {
       this.loadingDecoration.clear();
       this.loadingDecoration = null;
     }

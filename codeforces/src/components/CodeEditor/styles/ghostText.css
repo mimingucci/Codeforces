@@ -9,18 +9,16 @@
   z-index: 100 !important; /* Ensure it's above other elements */
 }
  
-.suggestion-loading {
-  color: #569cd6 !important;
-  font-size: 16px !important;
+.loading-spinner {
+  border: 2px solid rgba(255, 157, 0, 0.2);
+  border-left-color: #ff9d00;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
   animation: spin 1s linear infinite;
-  display: inline-block !important;
-  opacity: 1 !important;
-  position: relative !important;
-  z-index: 1000 !important;
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
