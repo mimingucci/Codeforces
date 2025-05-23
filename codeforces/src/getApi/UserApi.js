@@ -34,9 +34,9 @@ class UserApi {
       }
     );
   }
-  search({ page = 0, username, limit = 100 }) {
+  search({ page = 0, query, limit = 100 }) {
     return axios.get(
-      BASE_URL + `/all?page=${page}&username=${username}&pageSize=${limit}`,
+      BASE_URL + `/search?page=${page}&query=${query}&pageSize=${limit}`,
       {
         transformResponse: (data) => {
           const res = JSONbig.parse(data);
@@ -193,10 +193,10 @@ class UserApi {
     });
   }
   forgotPassword(email) {
-    return axios.get(BASE_URL + "/forgot-password?email=" + email);
+    return axios.post(AUTH_URL + "/forgot-password", { email });
   }
   resetPassword({ email, token, password }) {
-    return axios.put(BASE_URL + "/reset-password", { email, token, password });
+    return axios.post(AUTH_URL + "/reset-password", { email, token, password });
   }
 }
 export default new UserApi();

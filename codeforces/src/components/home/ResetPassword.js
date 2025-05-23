@@ -1,73 +1,148 @@
 import { useEffect, useState } from "react";
 import UserApi from "../../getApi/UserApi";
 import { useNavigate, useParams } from "react-router-dom";
-const ResetPassword = () => {
-  const [email, setEmail] = useState();
-  const [token, setToken] = useState();
-  const [password, setPassword] = useState("");
-  const params = useParams();
-  const naviagte = useNavigate();
-  useEffect(() => {
-    if (!params?.email || !params?.token) {
-      naviagte("/error", { replace: true });
-    }
-    setEmail(params?.email);
-    setToken(params?.token);
-  }, []);
-  const handleSubmit = async () => {
-    try {
-      const rs = await UserApi.resetPassword({ email, token, password });
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+  CircularProgress,
+  Container,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
 
-      if (rs?.data?.status === "success") {
-        alert(rs?.data?.data);
-        naviagte("/login");
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  marginTop: theme.spacing(8),
+  padding: theme.spacing(4),
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  maxWidth: 400,
+  width: "100%",
+}));
+
+const ResetPassword = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const { token } = useParams();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/error", { replace: true });
+    }
+  }, [token, navigate]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await UserApi.resetPassword({ email, token, password });
+      
+      if (response?.data?.code === "200") {
+        setSuccess(true);
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
       } else {
-        alert(rs?.data?.data);
+        setError(response?.data?.data || "Failed to reset password");
       }
     } catch (error) {
-      alert("Something went wrong");
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="mt-5">
-      <div>
-        <div className="relative flex flex-col justify-center min-h-screen overflow-hidden">
-          <div className="w-full p-6 m-auto bg-white rounded-md shadow-xl lg:max-w-xl">
-            <h1 className="text-3xl font-semibold text-center text-blue-500 uppercase">
-              Reset Password
-            </h1>
-            <form className="mt-6">
-              <div className="mb-2">
-                <label
-                  for="password"
-                  className="block text-sm font-semibold text-gray-800 text-left"
-                >
-                  Password
-                </label>
-                <input
-                  onChange={(e) => setPassword(e.target.value)}
-                  type="text"
-                  className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                />
-              </div>
+    <Container component="main" maxWidth="xs">
+      <StyledPaper elevation={3}>
+        <Typography component="h1" variant="h5" color="primary" gutterBottom>
+          Reset Password
+        </Typography>
 
-              <div className="mt-6">
-                <button
-                  className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-blue-400 rounded-md hover:bg-blue-500 focus:outline-none focus:bg-blue-600"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleSubmit();
-                  }}
-                >
-                  Reset
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+        {success ? (
+          <Alert severity="success" sx={{ width: "100%", mb: 2 }}>
+            Password reset successful! Redirecting to login...
+          </Alert>
+        ) : (
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: "100%" }}>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Email Address"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              autoFocus
+            />
+
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="New Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Confirm Password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} /> : "Reset Password"}
+            </Button>
+          </Box>
+        )}
+      </StyledPaper>
+    </Container>
   );
 };
+
 export default ResetPassword;

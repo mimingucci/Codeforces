@@ -1,104 +1,117 @@
 import { useState } from "react";
 import UserApi from "../../getApi/UserApi";
-import HandleCookies from "../../utils/HandleCookies";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+  CircularProgress,
+  Container,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  marginTop: theme.spacing(8),
+  padding: theme.spacing(4),
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  maxWidth: 400,
+  width: "100%",
+}));
+
 const ForgotPassword = () => {
-  const [email, setEmail] = useState();
-  const [send, setSend] = useState(false);
-  const handleSubmit = async () => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
     try {
-      UserApi.forgotPassword(email)
-        .then((rs) => {
-          if (rs?.data?.status === "success") {
-            showSuccessToast("Send email successfully, please check email");
-            setSend(true);
-          } else {
-            showErrorToast(rs?.data?.data);
-          }
-        })
-        .catch((err) => showErrorToast("Something went wrong"));
+      const response = await UserApi.forgotPassword(email);
+      if (response?.data?.code === "200") {
+        setSuccess(true);
+        // Auto redirect after 3 seconds
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
+      } else {
+        setError(response?.data?.data || "Something went wrong");
+      }
     } catch (error) {
-      showErrorToast("Something went wrong");
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
-  const handleChangeEmail = (ps) => {
-    // console.log(ps);
-    setEmail(ps);
-  };
 
-  const showSuccessToast = (msg) => {
-    toast.success(msg || `Compiled Successfully!`, {
-      position: "top-right",
-      autoClose: 1000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-  const showErrorToast = (msg, timer) => {
-    toast.error(msg || `Something went wrong! Please try again.`, {
-      position: "top-right",
-      autoClose: timer ? timer : 1000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
   return (
-    <div className="mt-5">
-      <ToastContainer
-        position="top-center"
-        autoClose={2000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-      <div>
-        <div className="relative flex flex-col justify-center min-h-screen overflow-hidden">
-          <div className="w-full p-6 m-auto bg-white rounded-md shadow-xl lg:max-w-xl">
-            <h1 className="text-3xl font-semibold text-center text-blue-500 uppercase">
-              Forgot Password
-            </h1>
-            <form className="mt-6">
-              <div className="mb-2">
-                <label
-                  for="email"
-                  className="block text-sm font-semibold text-gray-800 text-left"
-                >
-                  Email
-                </label>
-                <input
-                  onChange={(e) => handleChangeEmail(e.target.value)}
-                  type="text"
-                  className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                />
-              </div>
+    <Container component="main" maxWidth="xs">
+      <StyledPaper elevation={3}>
+        <Typography component="h1" variant="h5" color="primary" gutterBottom>
+          Forgot Password
+        </Typography>
+        
+        {success ? (
+          <Alert severity="success" sx={{ width: "100%", mt: 2 }}>
+            Password reset link has been sent to your email. Please check your inbox.
+            Redirecting to login...
+          </Alert>
+        ) : (
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: "100%" }}>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
 
-              <div className="mt-6">
-                <button
-                  className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-blue-400 rounded-md hover:bg-blue-500 focus:outline-none focus:bg-blue-600"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleSubmit();
-                  }}
-                >
-                  {send ? "Resend" : "Send"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Enter your email address and we'll send you a link to reset your password.
+            </Typography>
+
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Email Address"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              autoFocus
+            />
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} /> : "Send Reset Link"}
+            </Button>
+
+            <Button
+              fullWidth
+              variant="text"
+              onClick={() => navigate("/login")}
+              sx={{ mt: 1 }}
+            >
+              Back to Login
+            </Button>
+          </Box>
+        )}
+      </StyledPaper>
+    </Container>
   );
 };
+
 export default ForgotPassword;

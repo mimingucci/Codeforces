@@ -466,8 +466,8 @@ services:
       MAIL_HOST: smtp.gmail.com
       MAIL_PORT: 587
       MAIL_SECURE: "false"
-      # MAIL_USER: 
-      # MAIL_PASSWORD: 
+      # MAIL_USER:
+      # MAIL_PASSWORD:
       MAIL_FROM_NAME: Codeforces
       MAIL_FROM_EMAIL: noreply@codeforces.com
     depends_on:
@@ -476,6 +476,41 @@ services:
       kafka:
         condition: service_started
     restart: unless-stopped
+
+  codeforces:
+    build:
+      context: ./codeforces
+      dockerfile: Dockerfile
+    container_name: codeforces
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_BASE_URL=http://localhost:8080
+    volumes:
+      - ./codeforces:/app
+      - /app/node_modules
+    depends_on:
+      - api-gateway
+    restart: unless-stopped
+
+  # polygon:
+  #   build:
+  #     context: ./polygon
+  #     dockerfile: Dockerfile
+  #   container_name: polygon
+  #   ports:
+  #     - "4000:4000"
+  #   environment:
+  #     - BACKEND_API_URL=http://api-gateway:8080
+  #     - NEXT_PUBLIC_BACKEND_API_URL=http://api-gateway:8080
+  #     - NODE_ENV=production
+  #   volumes:
+  #     - ./polygon:/app
+  #     - /app/node_modules
+  #     - /app/.next
+  #   depends_on:
+  #     - api-gateway
+  #   restart: unless-stopped
 
 volumes:
   redis-data:

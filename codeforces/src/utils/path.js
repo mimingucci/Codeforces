@@ -28,7 +28,7 @@ const path = {
   CONTESTSTANDING: "/contest/:id/standing",
   SUBMITDETAIL: "/submission/:id",
   FORGOTPASSWORD: "/forgot-password",
-  RESETPASSWORD: "/api/auth/reset-password/:token/:email",
+  RESETPASSWORD: "/reset-password/:token",
   POLYGON: "/polygon",
 };
 export default path;

@@ -1,0 +1,4 @@
+/home/mimingucci/Work/Java/Codeforces/api-gateway/src/main/java/com/mimingucci/api_gateway/ApiGatewayApplication.java
+/home/mimingucci/Work/Java/Codeforces/api-gateway/src/main/java/com/mimingucci/api_gateway/configuration/WebSocketConfig.java
+/home/mimingucci/Work/Java/Codeforces/api-gateway/src/main/java/com/mimingucci/api_gateway/filter/AuthFilter.java
+/home/mimingucci/Work/Java/Codeforces/api-gateway/src/main/java/com/mimingucci/api_gateway/utils/JwtUtil.java

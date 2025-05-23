@@ -11,6 +11,51 @@ import { styled } from "@mui/material/styles";
 import { isSameId } from "../../utils/idUtils";
 import { convertUnixTimestamp } from "../../utils/dateUtils";
 
+const formatMessageTime = (timestamp) => {
+  const messageDate = convertUnixTimestamp(timestamp);
+  const now = new Date();
+  
+  // Check if same day
+  if (messageDate.toDateString() === now.toDateString()) {
+    // Today, just show time
+    return messageDate.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+  
+  // Check if yesterday
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (messageDate.toDateString() === yesterday.toDateString()) {
+    return `Yesterday, ${messageDate.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
+  }
+  
+  // Check if same year
+  if (messageDate.getFullYear() === now.getFullYear()) {
+    return messageDate.toLocaleDateString([], {
+      month: 'short',
+      day: 'numeric',
+    }) + ', ' + messageDate.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+  
+  // Different year
+  return messageDate.toLocaleDateString([], {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  }) + ', ' + messageDate.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 // Styled components for messages
 const MessageBubble = styled(Paper)(({ theme, owner }) => ({
   padding: theme.spacing(1.5, 2),
@@ -142,13 +187,7 @@ const MessageArea = ({
                     <Typography variant="body2">{message.content}</Typography>
                   </MessageBubble>
                   <TimeStamp variant="caption" owner={isOwner}>
-                    {convertUnixTimestamp(message.createdAt).toLocaleTimeString(
-                      [],
-                      {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      }
-                    )}
+                    {formatMessageTime(message.createdAt)}
                   </TimeStamp>
                 </Box>
               </Box>

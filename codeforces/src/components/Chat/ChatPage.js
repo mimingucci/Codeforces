@@ -66,7 +66,7 @@ const ChatPage = () => {
 
       try {
         setIsSearching(true);
-        const response = await UserApi.search({ username: debouncedQuery });
+        const response = await UserApi.search({query: debouncedQuery });
         const filteredResults = response.data.data.content.filter(
           (u) => u.id !== user?.id
         );
@@ -146,13 +146,31 @@ const ChatPage = () => {
   }, [connected, activeConversation]);
 
   const handleNewMessage = (message) => {
-    if (isSameId(message.chat, activeConversation?.id)) {
-      // Update messages - convert any matching pending message to a confirmed one
-      setMessages((prev) => {
-        const updatedMessages = [...prev];
+    // Add debugging
+    console.log("Received message:", message);
+    console.log("Active conversation:", activeConversation);
 
-        // If no matching pending message found, this is a new message from someone else
-        return [...updatedMessages, message];
+    // Update messages if this is for the active conversation
+    if (activeConversation && isSameId(message.chat, activeConversation?.id)) {
+      setMessages((prev) => {
+        // Check if we already have this message (by id or by pending id)
+        const messageExists = prev.some(m => 
+          m.id === message.id || 
+          (m.pending && m.content === message.content && isSameId(m.author, message.author))
+        );
+        
+        if (messageExists) {
+          // Replace any pending versions with the confirmed message
+          return prev.map(m => {
+            if (m.pending && m.content === message.content && isSameId(m.author, message.author)) {
+              return message; // Replace pending message with real one
+            }
+            return m;
+          });
+        } else {
+          // New message, append it
+          return [...prev, message];
+        }
       });
 
       // Scroll to bottom
@@ -164,19 +182,31 @@ const ChatPage = () => {
       }, 100);
     }
 
-    // Update room list with latest message
-    setRooms((prevRooms) =>
-      prevRooms.map((room) => {
-        if (isSameId(room.id, message.chat)) {
-          return {
-            ...room,
-            lastMessage: message.content,
-            updatedAt: message.createdAt,
-          };
-        }
-        return room;
-      })
-    );
+    // Update room list with latest message - make sure it comes to the top
+    setRooms((prevRooms) => {
+      // Find the room
+      const updatedRoom = prevRooms.find(room => isSameId(room.id, message.chat));
+      
+      if (!updatedRoom) {
+        // If it's a new room we haven't seen yet, we might need to fetch it
+        console.log("Received message for unknown room:", message.chat);
+        // Optionally fetch the room details
+        return prevRooms;
+      }
+      
+      // Remove the room from the list
+      const otherRooms = prevRooms.filter(room => !isSameId(room.id, message.chat));
+      
+      // Create updated room with new message info
+      const refreshedRoom = {
+        ...updatedRoom,
+        lastMessage: message.content,
+        updatedAt: message.createdAt
+      };
+      
+      // Put the updated room at the top of the list
+      return [refreshedRoom, ...otherRooms];
+    });
   };
 
   const handleUserSelect = async (selectedUser) => {

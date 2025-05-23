@@ -1,9 +1,9 @@
 import { useEffect, useState, useDeferredValue, Suspense } from "react";
 import logo from "../assets/image/Codeforces_logo.svg.png";
 import icons from "../utils/icons";
-import UserApi from "../getApi/UserApi";
 import HandleCookies from "../utils/HandleCookies";
 import SearchResults from "./home/SearchResults";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { useNavigate } from "react-router-dom";
 import {
   AppBar,
@@ -37,20 +37,33 @@ const Search = styled("div")(({ theme }) => ({
 
 const Header = () => {
   let user = "";
-  const [value, setValue] = useState("");
-  const deferredQuery = useDeferredValue(value);
-  const navigate = useNavigate();
-  const handleClick = () => {
-    const query = value;
-    setValue("");
-    navigate(`/search?query=${query}`);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [debouncedQuery] = useDebouncedValue(searchQuery, 300);
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      let query = value;
-      setValue("");
-      navigate(`/search?query=${query}`);
+  const handleSearchFocus = () => {
+    setIsSearchFocused(true);
+  };
+
+  const handleSearchBlur = () => {
+    // Delay hiding to allow clicking on search results
+    setTimeout(() => {
+      setIsSearchFocused(false);
+    }, 200);
+  };
+
+  const navigate = useNavigate();
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    // setSearchQuery("");
+    if (searchQuery.trim().length > 0) {
+      setIsSearchFocused(false);
+      navigate(`/search?query=${searchQuery.trim()}`);
     }
   };
 
@@ -146,20 +159,24 @@ const Header = () => {
                   alignItems: "center",
                   width: 400,
                 }}
+                onSubmit={(e) => {
+                  e.preventDefault(); // Prevent form submission
+                  handleClick(e);
+                }}
               >
                 <InputBase
                   sx={{ ml: 1, flex: 1 }}
-                  placeholder="Search"
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                  onKeyDown={handleKeyDown}
+                  placeholder="Search users..."
+                  value={searchQuery}
+                  onChange={handleSearch}
+                  onFocus={handleSearchFocus}
+                  onBlur={handleSearchBlur}
                 />
-                <IconButton onClick={handleClick}>
+                <IconButton type="submit" onClick={handleClick}>
                   <IoMdSearch />
                 </IconButton>
               </Paper>
-              {/* Search Results */}
-              {deferredQuery && (
+              {debouncedQuery && isSearchFocused && (
                 <Paper
                   sx={{
                     position: "absolute",
@@ -168,15 +185,7 @@ const Header = () => {
                     mt: 0.5,
                   }}
                 >
-                  <Suspense
-                    fallback={
-                      <Box sx={{ p: 2, textAlign: "center" }}>
-                        <Typography>Loading...</Typography>
-                      </Box>
-                    }
-                  >
-                    <SearchResults query={deferredQuery} />
-                  </Suspense>
+                  <SearchResults query={debouncedQuery} />
                 </Paper>
               )}
             </Search>

@@ -3,7 +3,7 @@ import CodeEditorWindow from "./CodeEditorWindow";
 import { classnames } from "../general";
 import { languageOptions } from "../languageOptions";
 import { Stomp } from "@stomp/stompjs";
-
+import FileUpload from "./FileUpload";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -180,6 +180,13 @@ const Landing = ({ problem = "", contest = null, virtualContestId = null }) => {
         <div className="px-4 py-2">
           <ThemeDropdown handleThemeChange={handleThemeChange} theme={theme} />
         </div>
+        <div className="px-4 py-2">
+          <FileUpload 
+            language={language?.value}
+            onFileUpload={(content) => onChange("code", content)}
+            isLoggedIn={true}
+          />  
+        </div>  
         <div className="px-4 py-2">
           <button
             onClick={handleSubmit}

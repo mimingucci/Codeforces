@@ -69,7 +69,7 @@ class BlogApi {
     );
   }
   delete({ accessToken, id }) {
-    return axios.delete(BASE_URL + "/delete/" + id, {
+    return axios.delete(BASE_URL + "/" + id, {
       headers: { Authorization: "Bearer " + accessToken },
     });
   }

@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.mimingucci.testcase.TestcaseApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.842 s -- in com.mimingucci.testcase.TestcaseApplicationTests

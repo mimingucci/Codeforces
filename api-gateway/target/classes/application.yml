@@ -1,0 +1,103 @@
+server:
+    port: 8080
+
+spring:
+    main:
+        web-application-type: reactive
+    application:
+        name: api-gateway
+    cloud:
+        loadbalancer:
+            ribbon:
+                enabled: false
+        gateway:
+            default-filters:
+                - PreserveHostHeader
+            globalcors:
+                corsConfigurations:
+                    '[/**]':
+                        allowedOrigins:
+                            - "http://localhost:3000"
+                            - "http://localhost:4000"
+                        allowedHeaders: "*"
+                        allowedMethods:
+                            - GET
+                            - POST
+                            - PUT
+                            - DELETE
+                            - PATCH
+                            - OPTIONS
+                            - HEAD
+                        allowCredentials: true
+            discovery:
+                locator:
+                    enabled: true
+                    lower-case-service-id: true
+            routes:
+                -   id: auth
+                    uri: lb://auth
+                    predicates:
+                        - Path=/api/v1/auth/**
+                -   id: submission
+                    uri: lb://submission
+                    predicates:
+                        - Path=/api/v1/submission/**
+                -   id: submission-evaluation-handler
+                    uri: lb://submission-evaluation-handler
+                    predicates:
+                        - Path=/api/v1/submission-evaluation-handler/**
+                -   id: blog
+                    uri: lb://blog
+                    predicates:
+                        - Path=/api/v1/blog/**
+                -   id: comment
+                    uri: lb://comment
+                    predicates:
+                        - Path=/api/v1/comment/**
+                -   id: contest
+                    uri: lb://contest
+                    predicates:
+                        - Path=/api/v1/contest/**
+                -   id: problem
+                    uri: lb://problem
+                    predicates:
+                        - Path=/api/v1/problem/**
+                -   id: testcase
+                    uri: lb://testcase
+                    predicates:
+                        - Path=/api/v1/testcase/**
+                -   id: user
+                    uri: lb://user
+                    predicates:
+                        - Path=/api/v1/user/**
+                -   id: ranking
+                    uri: lb://ranking
+                    predicates:
+                        - Path=/api/v1/ranking/**
+                -   id: chat
+                    uri: lb://user
+                    predicates:
+                        - Path=/api/v1/chat/**
+                -   id: ws-chat
+                    uri: lb:ws://user
+                    predicates:
+                        - Path=/ws/v1/chat/**
+                -   id: ws-submission
+                    uri: lb:ws://submission
+                    predicates:
+                        - Path=/api/v1/submissions/**
+                    metadata:
+                        protocol: ws
+                    filters:
+                        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+                        - RewritePath=/api/v1/submissions/(?<segment>.*), /api/v1/submissions/$\{segment}
+
+eureka:
+    client:
+        register-with-eureka: true
+        fetch-registry: true
+        service-url:
+            defaultZone: http://localhost:8761/eureka/
+
+jwt:
+    public-key-path: /home/mimingucci/Work/Java/Codeforces/public-key.pem

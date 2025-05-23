@@ -1,0 +1,26 @@
+eureka:
+    client:
+        register-with-eureka: true
+        service-url:
+            defaultZone: http://localhost:8761/eureka/
+
+spring:
+    kafka:
+        bootstrap-servers: localhost:9092
+
+feign:
+    circuitbreaker:
+        enabled: true
+
+contest:
+    scheduler:
+        # Cron expressions for when to fetch contest data
+        fetch-cron-expressions:
+            - "0 0 0 * * ?"  # Default: Midnight each day (00:00:00)
+            - "0 0 12 * * ?" # Adding noon as an additional fetch time (12:00:00)
+
+        # Number of days to look ahead when fetching contests
+        max-look-ahead-days: 2
+
+        # Whether to fetch contests when the service starts
+        fetch-on-startup: true

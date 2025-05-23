@@ -8,6 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SubmissionApi from "../../../getApi/SubmissionApi";
 import HandleCookies from "../../../utils/HandleCookies";
+import FileUpload from "./FileUpload";
 
 import { defineTheme } from "../defineTheme";
 import useKeyPress from "../useKeyPress";
@@ -184,6 +185,13 @@ const Ide = () => {
         <div className="px-4 py-2">
           <ThemeDropdown handleThemeChange={handleThemeChange} theme={theme} />
         </div>
+        <div className="px-4 py-2">
+          <FileUpload 
+            language={language?.value}
+            onFileUpload={(content) => onChange("code", content)}
+            isLoggedIn={isLoggedIn}
+          />  
+        </div>  
         <div className="px-4 py-2">
           <button
             onClick={handleCompile}

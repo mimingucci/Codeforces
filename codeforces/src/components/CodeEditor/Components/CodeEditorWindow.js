@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import Editor from "@monaco-editor/react";
 import CodeSuggestionService from "../services/CodeSuggestionService";
-import "../styles/ghostText.css"; // Import the CSS file for ghost text styles
+import "../styles/ghostText.css"; 
+import "../styles/dragdrop.css";
 import { snippets } from "./Snippets";
 // Template Sources
 
@@ -62,6 +63,8 @@ const CodeEditorWindow = ({ onChange, language, code, theme, isLoggedIn }) => {
   const editorRef = useRef(null);
   const suggestionServiceRef = useRef(null);
   const monacoRef = useRef(null);
+  const editorContainerRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Effect for language settings
   useEffect(() => {
@@ -190,8 +193,79 @@ const CodeEditorWindow = ({ onChange, language, code, theme, isLoggedIn }) => {
     }
   }
 
+  const handleDragOver = (e) => {
+    if (!isLoggedIn) return;
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    if (!isLoggedIn) return;
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    
+    // Check file extension against current language
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    const isValidExtension = isValidFileForLanguage(fileExt, language);
+    
+    if (!isValidExtension) {
+      // Show error or notification about invalid file type
+      console.error(`Invalid file type for ${language}`);
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target.result;
+      onChange("code", content);
+    };
+    
+    reader.readAsText(file);
+  };
+  
+  const isValidFileForLanguage = (ext, lang) => {
+    switch (lang) {
+      case "CPP":
+        return ["cpp", "h", "hpp"].includes(ext);
+      case "C":
+        return ["c", "h"].includes(ext);
+      case "JAVA":
+        return ext === "java";
+      case "JS":
+        return ["js", "jsx", "ts", "tsx"].includes(ext);
+      case "PY3":
+        return ext === "py";
+      case "GO":
+        return ext === "go";
+      case "PHP":
+        return ext === "php";
+      default:
+        return false;
+    }
+  };
+
   return (
-    <div className="overlay rounded-md overflow-hidden w-full h-[500px] shadow-4xl">
+    <div 
+      className={ `overlay rounded-md overflow-hidden w-full h-[500px] shadow-4xl ${isDragging ? 'drag-over' : ''}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      ref={editorContainerRef}
+    >
+      {isDragging && isLoggedIn && (
+        <div className="drag-overlay">
+          <div className="drag-message">
+            Drop your code file here
+          </div>
+        </div>
+      )}
       <Editor
         height="100%"
         width={`100%`}

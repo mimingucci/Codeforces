@@ -142,7 +142,7 @@ export class NotificationConsumer implements OnModuleInit {
         {
           ...payload,
           year: new Date().getFullYear(),
-          resetLink: payload.forgotPasswordToken,
+          resetLink: `http://localhost:3000/reset-password/${payload.forgotPasswordToken}`,
         } as Record<string, any>,
       ),
     );
