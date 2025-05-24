@@ -1,0 +1,85 @@
+# ========================
+# General OS and IDE Files
+# ========================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+*.log
+
+# ========================
+# Java - Spring Boot
+# ========================
+/target/
+/out/
+*.class
+*.jar
+*.war
+*.ear
+*.hprof
+.mvn/
+.m2/
+log/
+logs/
+spring.log
+hs_err_pid*
+src/main/resources/application*.yml
+src/main/resources/application*.properties
+
+
+# ========================
+# Python - FastAPI
+# ========================
+__pycache__/
+run/
+*.py[cod]
+*.so
+*.pyd
+*.pyc
+.Python
+.env
+.venv/
+venv/
+instance/
+pip-log.txt
+pip-delete-this-directory.txt
+*.sqlite3
+db.sqlite3
+migrations/
+
+# ========================
+# Node.js - NestJS, Next.js
+# ========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist/
+.next/
+.cache/
+*.tsbuildinfo
+.env.local
+.env.development
+.env.production
+.env.test
+
+# ========================
+# Docker
+# ========================
+docker-compose.override.yml
+docker-compose.override.yaml
+.dockerignore
+
+# ========================
+# Logs and Temp Files
+# ========================
+*.log
+*.tmp
+*.swp
+*.swo
+*.swn
+*.bak
+*.pem
+*~ 

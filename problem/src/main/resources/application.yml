@@ -1,0 +1,23 @@
+spring:
+    data:
+        web:
+            pageable:
+                default-page-size: 50
+    kafka:
+        bootstrap-servers: localhost:9092
+
+eureka:
+    client:
+        register-with-eureka: true
+        fetch-registry: true
+        service-url:
+            defaultZone: http://localhost:8761/eureka/
+
+resilience4j:
+    circuitbreaker:
+        instances:
+            contest:
+                minimum-number-of-calls: 5
+feign:
+    circuitbreaker:
+        enabled: true

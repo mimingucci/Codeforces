@@ -1,0 +1,19 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: blog
+
+eureka:
+  client:
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: blog
+
+jwt:
+  private-key: /keys/private-key.pem
+  public-key: /keys/public-key.pem

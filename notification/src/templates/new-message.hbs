@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>New Message</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .header {
+      background-color: #1a75ff;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .content {
+      padding: 20px;
+    }
+    .footer {
+      background-color: #f5f5f5;
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 0.8em;
+      color: #666;
+    }
+    .message-preview {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 15px 0;
+      border-left: 4px solid #1a75ff;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 20px 0;
+      color: white;
+      background-color: #1a75ff;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>New Message</h1>
+  </div>
+  
+  <div class="content">
+    <p>Hello {{name}},</p>
+    
+    <p>You have a new message from <strong>{{senderName}}</strong>:</p>
+    
+    <div class="message-preview">
+      {{messagePreview}}
+    </div>
+    
+    <a href="{{messageLink}}" class="button">View Message</a>
+    
+    <p>Please log in to your account to respond to this message.</p>
+    
+    <p>Thanks,<br>The Codeforces Team</p>
+  </div>
+  
+  <div class="footer">
+    <p>This email was sent to {{recipient}}.</p>
+    <p>To manage email notifications, visit your <a href="https://codeforces.com/settings/notifications">notification settings</a>.</p>
+    <p>&copy; {{year}} Codeforces. All rights reserved.</p>
+  </div>
+</body>
+</html>
