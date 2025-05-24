@@ -14,6 +14,7 @@ import com.mimingucci.submission.domain.event.JudgeVirtualSubmissionEvent;
 import com.mimingucci.submission.domain.model.Submission;
 import com.mimingucci.submission.domain.repository.SubmissionRepository;
 import com.mimingucci.submission.domain.service.SubmissionService;
+import com.mimingucci.submission.presentation.dto.response.ContestResponse;
 import com.mimingucci.submission.presentation.dto.response.VirtualContestResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -42,11 +43,17 @@ public class SubmissionServiceImpl implements SubmissionService {
         if (problemResponse == null) throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
 
         if (!problemResponse.getIsPublished()) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
-        ContestantCheckResponse contestant = contestClient.checkRegistration(problemResponse.getContest(), submission.getAuthor()).data();
-        if (contestant == null) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
-        if (Instant.now().isBefore(contestant.getStartTime())) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
-
         if (!Objects.equals(problemResponse.getContest(), submission.getContest())) throw new ApiRequestException(ErrorMessageConstants.CONFLICT_DATA, HttpStatus.CONFLICT);
+
+        ContestResponse contest = contestClient.getContest(problemResponse.getContest()).data();
+
+        if (contest == null) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
+        if (!Instant.now().isAfter(contest.getEndTime())) {
+            ContestantCheckResponse contestant = contestClient.checkRegistration(problemResponse.getContest(), submission.getAuthor()).data();
+            if (contestant == null) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
+            if (Instant.now().isBefore(contestant.getStartTime())) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
+        }
+
         Submission domain = repository.save(submission);
 
         JudgeSubmissionEvent message = new JudgeSubmissionEvent();
@@ -54,10 +61,10 @@ public class SubmissionServiceImpl implements SubmissionService {
         message.setId(domain.getId());
         message.setContest(domain.getContest());
         message.setLanguage(this.convertLanguage(domain.getLanguage()));
-        message.setRule(contestant.getType().equals(ContestType.ICPC) ? "ICPC" : "DEFAULT");
+        message.setRule(contest.getType().equals(ContestType.ICPC) ? "ICPC" : "DEFAULT");
         message.setSent_on(domain.getSent());
-        message.setStartTime(contestant.getStartTime());
-        message.setEndTime(contestant.getEndTime());
+        message.setStartTime(contest.getStartTime());
+        message.setEndTime(contest.getEndTime());
         message.setProblem(domain.getProblem());
         message.setScore(problemResponse.getScore());
         message.setTimeLimit(problemResponse.getTimeLimit());
@@ -78,11 +85,13 @@ public class SubmissionServiceImpl implements SubmissionService {
         if (problemResponse == null) throw new ApiRequestException(ErrorMessageConstants.PROBLEM_NOT_FOUND, HttpStatus.NOT_FOUND);
 
         if (!problemResponse.getIsPublished()) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
-        ContestantCheckResponse contestant = contestClient.checkRegistration(problemResponse.getContest(), submission.getAuthor()).data();
-        if (contestant == null) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
-        if (Instant.now().isBefore(contestant.getStartTime())) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
 
         if (!Objects.equals(problemResponse.getContest(), submission.getContest())) throw new ApiRequestException(ErrorMessageConstants.CONFLICT_DATA, HttpStatus.CONFLICT);
+
+        ContestResponse contest = contestClient.getContest(problemResponse.getContest()).data();
+
+        if (contest == null || Instant.now().isBefore(contest.getEndTime())) throw new ApiRequestException(ErrorMessageConstants.CAN_NOT_SUBMIT, HttpStatus.BAD_REQUEST);
+
         Submission domain = repository.save(submission);
 
         JudgeVirtualSubmissionEvent message = new JudgeVirtualSubmissionEvent();
@@ -93,10 +102,10 @@ public class SubmissionServiceImpl implements SubmissionService {
         message.setId(domain.getId());
         message.setContest(domain.getContest());
         message.setLanguage(this.convertLanguage(domain.getLanguage()));
-        message.setRule(contestant.getType().equals(ContestType.ICPC) ? "ICPC" : "DEFAULT");
+        message.setRule(contest.getType().equals(ContestType.ICPC) ? "ICPC" : "DEFAULT");
         message.setSent_on(domain.getSent());
-        message.setActualStartTime(contestant.getStartTime());
-        message.setActualEndTime(contestant.getEndTime());
+        message.setActualStartTime(contest.getStartTime());
+        message.setActualEndTime(contest.getEndTime());
         message.setProblem(domain.getProblem());
         message.setScore(problemResponse.getScore());
         message.setTimeLimit(problemResponse.getTimeLimit());

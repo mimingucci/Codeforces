@@ -12,13 +12,8 @@ import {
   Alert,
   Avatar,
 } from "@mui/material";
-import {
-  PhotoCamera,
-  Clear,
-  Upload,
-  AccountCircle,
-} from "@mui/icons-material";
-import { DeleteOutline } from '@mui/icons-material';
+import { PhotoCamera, Clear, Upload, AccountCircle } from "@mui/icons-material";
+import { DeleteOutline } from "@mui/icons-material";
 import Cropper from "react-easy-crop";
 import HandleCookies from "../../utils/HandleCookies";
 import UserApi from "../../getApi/UserApi";
@@ -36,7 +31,6 @@ export default function ImageUploader({ user, isHome = false }) {
   const [cropDialogOpen, setCropDialogOpen] = useState(false);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [confirmUnsetOpen, setConfirmUnsetOpen] = useState(false);
-
 
   const filePicekerRef = useRef(null);
 
@@ -83,7 +77,7 @@ export default function ImageUploader({ user, isHome = false }) {
       const canvas = document.createElement("canvas");
       const image = new Image();
       image.src = imagePreview;
-      
+
       await new Promise((resolve) => {
         image.onload = resolve;
       });
@@ -130,7 +124,7 @@ export default function ImageUploader({ user, isHome = false }) {
         accessToken: HandleCookies.getCookie("token"),
       });
 
-      window.location.replace("/profile/" + user?.username);
+      window.location.replace("/profile/" + user?.id);
     } catch (err) {
       setError("Failed to upload image");
     } finally {
@@ -142,7 +136,7 @@ export default function ImageUploader({ user, isHome = false }) {
     try {
       setLoading(true);
       setError("");
-      
+
       await UserApi.unsetImage(HandleCookies.getCookie("token"));
       window.location.replace("/profile/" + user?.username);
     } catch (err) {
@@ -162,13 +156,21 @@ export default function ImageUploader({ user, isHome = false }) {
         type="file"
         hidden
       />
-      
+
       <Box sx={{ mb: 2 }}>
         {error && <Alert severity="error">{error}</Alert>}
       </Box>
 
-      <Box sx={{ position: "relative", width: 200, height: 200, margin: "auto", mb: 2 }}>
-      {getCurrentAvatar() ? (
+      <Box
+        sx={{
+          position: "relative",
+          width: 200,
+          height: 200,
+          margin: "auto",
+          mb: 2,
+        }}
+      >
+        {getCurrentAvatar() ? (
           <Box
             component="img"
             src={getCurrentAvatar()}
@@ -185,23 +187,25 @@ export default function ImageUploader({ user, isHome = false }) {
             sx={{
               width: "100%",
               height: "100%",
-              '&:hover': {
+              "&:hover": {
                 opacity: 0.8,
-                transition: 'opacity 0.2s'
-              }
+                transition: "opacity 0.2s",
+              },
             }}
           >
             <AccountCircle sx={{ width: "60%", height: "60%" }} />
           </Avatar>
         )}
         {isHome && (
-          <Box sx={{ 
-            position: 'absolute', 
-            bottom: 0, 
-            right: 0, 
-            display: 'flex', 
-            gap: 1 
-          }}>
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              display: "flex",
+              gap: 1,
+            }}
+          >
             <IconButton
               sx={{
                 backgroundColor: "error.main",
@@ -239,7 +243,7 @@ export default function ImageUploader({ user, isHome = false }) {
               setAvatar(null);
               setError("");
               if (filePicekerRef.current) {
-                filePicekerRef.current.value = '';
+                filePicekerRef.current.value = "";
               }
             }}
           >
@@ -290,36 +294,36 @@ export default function ImageUploader({ user, isHome = false }) {
       </Dialog>
 
       <Dialog
-      open={confirmUnsetOpen}
-      onClose={() => setConfirmUnsetOpen(false)}
-      aria-labelledby="unset-avatar-dialog"
-    >
-      <DialogTitle id="unset-avatar-dialog">
-        Remove Profile Picture
-      </DialogTitle>
-      <DialogContent>
-        <Typography>
-          Are you sure you want to remove your profile picture? This action cannot be undone.
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button 
-          onClick={() => setConfirmUnsetOpen(false)}
-          disabled={loading}
-        >
-          Cancel
-        </Button>
-        <Button
-          onClick={handleUnsetAvatar}
-          color="error"
-          variant="contained"
-          disabled={loading}
-          startIcon={loading ? <CircularProgress size={20} /> : <DeleteOutline />}
-        >
-          {loading ? "Removing..." : "Remove"}
-        </Button>
-      </DialogActions>
-    </Dialog>
+        open={confirmUnsetOpen}
+        onClose={() => setConfirmUnsetOpen(false)}
+        aria-labelledby="unset-avatar-dialog"
+      >
+        <DialogTitle id="unset-avatar-dialog">
+          Remove Profile Picture
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to remove your profile picture? This action
+            cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmUnsetOpen(false)} disabled={loading}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleUnsetAvatar}
+            color="error"
+            variant="contained"
+            disabled={loading}
+            startIcon={
+              loading ? <CircularProgress size={20} /> : <DeleteOutline />
+            }
+          >
+            {loading ? "Removing..." : "Remove"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

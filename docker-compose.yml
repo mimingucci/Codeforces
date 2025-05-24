@@ -57,36 +57,6 @@ services:
       - redis-data:/data
     restart: unless-stopped
 
-  judger:
-    build:
-      context: ./judger
-      dockerfile: Dockerfile
-    container_name: judger
-    privileged: true # Add this line
-    cap_add:
-      - SYS_PTRACE
-    cap_drop:
-      - SETPCAP
-      - MKNOD
-      - NET_BIND_SERVICE
-      - SYS_CHROOT
-      - SETFCAP
-      - FSETID
-    tmpfs:
-      - /tmp
-    volumes:
-      - ./tests/test_case:/test_case:ro
-      - ./log:/log
-      - ./run:/judger
-    environment:
-      BACKEND_URL: "http://backend:80/api/judge_server_heartbeat"
-      SERVICE_URL: "http://judge-server:12358"
-      TOKEN: "toivaban12345"
-      DEBUG_MODE: "1"
-      INSTANCE_HOST: ${INSTANCE_HOST:-host.docker.internal}
-    ports:
-      - "8090:8090"
-
   mysql:
     image: mysql:8.0
     container_name: mysql
@@ -161,6 +131,42 @@ services:
       timeout: 5s
       retries: 5
       start_period: 15s
+
+  judger:
+    build:
+      context: ./judger
+      dockerfile: Dockerfile
+    container_name: judger
+    ports:
+      - "8090:8090"
+    privileged: true # Add this line
+    cap_add:
+      - SYS_PTRACE
+    cap_drop:
+      - SETPCAP
+      - MKNOD
+      - NET_BIND_SERVICE
+      - SYS_CHROOT
+      - SETFCAP
+      - FSETID
+    tmpfs:
+      - /tmp
+    volumes:
+      - ./tests/test_case:/test_case:ro
+      - ./log:/log
+      - ./run:/judger
+    environment:
+      BACKEND_URL: "http://backend:80/api/judge_server_heartbeat"
+      SERVICE_URL: "http://judger:8090"
+      TOKEN: "toivaban12345"
+      DEBUG_MODE: "1"
+      EUREKA_SERVER_URL: "http://eureka-server:8761/eureka"
+      INSTANCE_HOST: "judger"
+      EUREKA_ENABLED: "true"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: unless-stopped
 
   auth:
     build:
@@ -493,24 +499,23 @@ services:
       - api-gateway
     restart: unless-stopped
 
-  # polygon:
-  #   build:
-  #     context: ./polygon
-  #     dockerfile: Dockerfile
-  #   container_name: polygon
-  #   ports:
-  #     - "4000:4000"
-  #   environment:
-  #     - BACKEND_API_URL=http://api-gateway:8080
-  #     - NEXT_PUBLIC_BACKEND_API_URL=http://api-gateway:8080
-  #     - NODE_ENV=production
-  #   volumes:
-  #     - ./polygon:/app
-  #     - /app/node_modules
-  #     - /app/.next
-  #   depends_on:
-  #     - api-gateway
-  #   restart: unless-stopped
+  polygon:
+    build:
+      context: ./polygon
+      dockerfile: Dockerfile
+    container_name: polygon
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: "production"
+      PORT: 4000
+      NEXT_PUBLIC_API_URL: http://api-gateway:8080 # Use service name for internal DNS
+      NEXTAUTH_URL: http://localhost:4000 # Should match client's URL
+      NEXTAUTH_SECRET: "your_nextauth_secret_key_here"
+      NEXT_PUBLIC_BACKEND_API_URL: http://api-gateway:8080
+    depends_on:
+      - api-gateway
+    restart: unless-stopped
 
 volumes:
   redis-data:

@@ -8,7 +8,7 @@ const JSONbigString = JSONbig({ storeAsString: true });
 
 // Create axios instance with custom JSON parser
 const apiClient = axios.create({
-  baseURL: process.env.BACKEND_API_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
   transformResponse: [
     (data) => {
       try {

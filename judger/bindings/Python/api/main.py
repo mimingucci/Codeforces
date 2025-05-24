@@ -10,6 +10,7 @@ import uuid
 import shlex
 import shutil
 import socket
+import asyncio
 # import uvicorn
 # coding=utf-8
 from enum import Enum
@@ -500,6 +501,36 @@ async def check_token_middleware(request: Request, call_next):
 
 @app.on_event("startup")
 async def startup_event():
+    # Check network connectivity first
+    def check_network_connectivity():
+        """Check if we can reach the Eureka server"""
+        eureka_host = os.environ.get('EUREKA_SERVER_URL', 'http://eureka-server:8761/eureka').split('//')[1].split(':')[0]
+        
+        try:
+            # Try to resolve the hostname
+            ip = socket.gethostbyname(eureka_host)
+            logging.info(f"Eureka server hostname '{eureka_host}' resolves to IP: {ip}")
+            
+            # Try to connect to the port
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(5)
+            result = sock.connect_ex((eureka_host, 8761))
+            sock.close()
+            
+            if result == 0:
+                logging.info(f"Successfully connected to Eureka server at {eureka_host}:8761")
+                return True
+            else:
+                logging.warning(f"Cannot connect to Eureka server at {eureka_host}:8761")
+                return False
+                
+        except socket.gaierror as e:
+            logging.error(f"Cannot resolve Eureka server hostname '{eureka_host}': {e}")
+            return False
+        except Exception as e:
+            logging.error(f"Network connectivity check failed: {e}")
+            return False
+
     # Get container's IP address
     def get_container_ip():
         try:
@@ -514,18 +545,53 @@ async def startup_event():
             return ip
         except Exception as e:
             logging.warning(f"Failed to get container IP: {e}")
-            return os.environ.get('INSTANCE_HOST', 'host.docker.internal')
+            return os.environ.get('INSTANCE_HOST', 'judger')
+
+    # Check if Eureka is enabled
+    eureka_enabled = os.environ.get('EUREKA_ENABLED', 'true').lower() == 'true'
+    
+    if not eureka_enabled:
+        logging.info("Eureka registration is disabled")
+        return
+
+    # Check network connectivity first
+    logging.info("Checking network connectivity to Eureka server...")
+    if not check_network_connectivity():
+        logging.warning("Eureka server is not reachable, will retry later...")
 
     instance_host = get_container_ip()
     logging.info(f"Using instance host: {instance_host}")
 
-    # Initialize eureka client first
-    await eureka_client.init_async(
-        eureka_server="http://192.168.100.7:8761/eureka",
-        app_name="judger",
-        instance_port=8090,
-        instance_host=instance_host,
-    )
+    # Get Eureka server URL from environment variable
+    eureka_server_url = os.environ.get('EUREKA_SERVER_URL', 'http://eureka-server:8761/eureka')
+    logging.info(f"Connecting to Eureka server: {eureka_server_url}")
+
+    # Retry logic for Eureka registration
+    max_retries = 5
+    retry_delay = 10  # seconds
+    
+    for attempt in range(max_retries):
+        try:
+            logging.info(f"Eureka registration attempt {attempt + 1}/{max_retries}")
+            
+            await eureka_client.init_async(
+                eureka_server=eureka_server_url,
+                app_name="judger",
+                instance_port=8090,
+                instance_host=instance_host,
+            )
+            
+            logging.info("Successfully registered with Eureka server")
+            break
+            
+        except Exception as e:
+            logging.error(f"Eureka registration attempt {attempt + 1} failed: {e}")
+            
+            if attempt < max_retries - 1:
+                logging.info(f"Retrying in {retry_delay} seconds...")
+                await asyncio.sleep(retry_delay)
+            else:
+                logging.error("All Eureka registration attempts failed. Service will continue without Eureka.")
 
 
 if DEBUG:
