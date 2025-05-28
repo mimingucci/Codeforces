@@ -21,8 +21,11 @@ import {
   Person as PersonIcon,
   Lock as LockIcon,
 } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 const SignUp = () => {
+  const { t } = useTranslation();
+
   // Form fields state
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -153,7 +156,7 @@ const SignUp = () => {
           color="primary"
           fontWeight="500"
         >
-          Create Your Account
+          {t("signup.title")}
         </Typography>
         <Typography
           variant="body1"
@@ -161,8 +164,7 @@ const SignUp = () => {
           color="text.secondary"
           paragraph
         >
-          Join Codeforces to start solving problems and participating in
-          contests!
+          {t("signup.message1")}
         </Typography>
       </Box>
 
@@ -171,11 +173,9 @@ const SignUp = () => {
         {success && (
           <Alert severity="success" sx={{ mb: 3 }}>
             <Typography variant="subtitle1" fontWeight="medium">
-              Account created successfully!
+              {t("signup.message2")}
             </Typography>
-            <Typography variant="body2">
-              Please check your email to verify your account before logging in.
-            </Typography>
+            <Typography variant="body2">{t("signup.message3")}</Typography>
           </Alert>
         )}
 
@@ -194,7 +194,7 @@ const SignUp = () => {
               required
               fullWidth
               id="username"
-              label="Username"
+              label={t("signup.username")}
               name="username"
               autoComplete="username"
               value={username}
@@ -217,7 +217,7 @@ const SignUp = () => {
               required
               fullWidth
               id="email"
-              label="Email Address"
+              label={t("signup.email")}
               name="email"
               autoComplete="email"
               value={email}
@@ -240,7 +240,7 @@ const SignUp = () => {
               required
               fullWidth
               name="password"
-              label="Password"
+              label={t("signup.password")}
               type={showPassword ? "text" : "password"}
               id="password"
               autoComplete="new-password"
@@ -275,7 +275,7 @@ const SignUp = () => {
               required
               fullWidth
               name="confirmPassword"
-              label="Confirm Password"
+              label={t("signup.confirmPassword")}
               type={showConfirmPassword ? "text" : "password"}
               id="confirmPassword"
               autoComplete="new-password"
@@ -317,19 +317,19 @@ const SignUp = () => {
               {loading ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
-                "Sign Up"
+                t("signup.signUp")
               )}
             </Button>
 
             {/* Login link */}
             <Box sx={{ textAlign: "center", mt: 2 }}>
               <Typography variant="body2" color="text.secondary">
-                Already have an account?{" "}
+                {t("signup.message4")}{" "}
                 <RouterLink
                   to="/login"
                   style={{ color: "#1976d2", textDecoration: "none" }}
                 >
-                  Sign In
+                  {t("signup.signIn")}
                 </RouterLink>
               </Typography>
             </Box>
@@ -346,7 +346,7 @@ const SignUp = () => {
             to="/login"
             sx={{ mt: 2 }}
           >
-            Go to Login
+            {t("signup.goToLogin")}
           </Button>
         </Box>
       )}

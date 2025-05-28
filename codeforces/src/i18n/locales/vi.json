@@ -1,0 +1,88 @@
+﻿{
+  "header": {
+    "home": "TRANG CHỦ",
+    "contest": "CUỘC THI",
+    "ide": "IDE",
+    "problemset": "BÀI TẬP",
+    "topUser": "BẢNG XẾP HẠNG",
+    "calendar": "LỊCH",
+    "profile": "HỒ SƠ",
+    "login": "ĐĂNG NHẬP",
+    "logout": "ĐĂNG XUẤT",
+    "searchPlaceholder": "Tìm kiếm người dùng..."
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "success": "Thành công"
+  },
+  "login": {
+    "message1": "Điền vào mẫu để đăng nhập vào Codeforces.",
+    "message2": "Bạn có thể sử dụng Gmail như một cách thay thế để đăng nhập.",
+    "signIn": "Đăng nhập",
+    "password": "Mật khẩu",
+    "forgotPassword": "Quên mật khẩu?",
+    "login": "Đăng nhập",
+    "loggingIn": "Đang đăng nhập...",
+    "message3": "Bạn chưa có tài khoản?",
+    "signUp": "Đăng ký"
+  },
+  "forgotPassword": {
+    "forgotPassword": "Quên mật khẩu",
+    "message1": "Nhập địa chỉ email của bạn và chúng tôi sẽ gửi cho bạn liên kết để đặt lại mật khẩu.",
+    "message2": "Liên kết đặt lại mật khẩu đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư đến của bạn. Đang chuyển hướng đến trang đăng nhập...",
+    "sendLink": "Gửi liên kết đặt lại",
+    "backToLogin": "Quay lại Đăng nhập"
+  },
+  "signup": {
+    "title": "Tạo tài khoản",
+    "message1": "Hãy tham gia Codeforces để bắt đầu giải quyết vấn đề và tham gia các cuộc thi!",
+    "message2": "Tài khoản được tạo thành công!",
+    "message3": "Vui lòng kiểm tra email để xác minh tài khoản của bạn trước khi đăng nhập.",
+    "username": "Tên người dùng",
+    "password": "Mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "email": "Email",
+    "signUp": "Đăng ký",
+    "message4": "Bạn đã có tài khoản?",
+    "signIn": "Đăng nhập",
+    "goToLogin": "Đi tới Đăng nhập"
+  },
+  "profile": {
+    "location": "Vị trí",
+    "rating": "Rating",
+    "contribution": "Sự đóng góp",
+    "changeSettings": "Thay đổi cài đặt",
+    "lastVisited": "Trạng thái hoạt động",
+    "registered": "Đăng ký vào",
+    "writeBlog": "Viết blog",
+    "message": "Nhắn tin"
+  },
+  "navbar": {
+    "username": "Tên người dùng",
+    "rating": "Xếp hạng",
+    "settings": "Cài đặt",
+    "blogs": "Blogs",
+    "talks": "Thảo luận",
+    "payAttention": "Chú ý",
+    "noUpcomingContests": "Không có cuộc thi sắp tới",
+    "nextContest": "Cuộc thi tiếp theo",
+    "duration": "Thời lượng",
+    "contestInProgress": "Cuộc thi đang diễn ra",
+    "runningContest": "Cuộc thi đang chạy",
+    "totalDuration": "Tổng thời lượng",
+    "yourVirtualContest": "Cuộc thi ảo của bạn",
+    "upcomingVirtualContest": "Cuộc thi ảo sắp tới",
+    "virtualContest": "Cuộc thi ảo",
+    "timeRemaining": "Thời gian còn lại: ",
+    "startingIn": "Bắt đầu sau: ",
+    "topRated": "Xếp hạng cao nhất",
+    "user": "Người dùng",
+    "viewAll": "Xem tất cả",
+    "topContributors": "Người đóng góp hàng đầu",
+    "contribution": "Đóng góp",
+    "viewAllContributors": "Xem tất cả người đóng góp",
+    "recentActions": "Hoạt động gần đây",
+    "viewAllActions": "Xem tất cả hoạt động"
+  }
+}

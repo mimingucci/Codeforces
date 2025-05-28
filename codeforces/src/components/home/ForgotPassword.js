@@ -12,6 +12,7 @@ import {
   Container,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { useTranslation } from "react-i18next";
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   marginTop: theme.spacing(8),
@@ -29,6 +30,8 @@ const ForgotPassword = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,16 +60,19 @@ const ForgotPassword = () => {
     <Container component="main" maxWidth="xs">
       <StyledPaper elevation={3}>
         <Typography component="h1" variant="h5" color="primary" gutterBottom>
-          Forgot Password
+          {t("forgotPassword.forgotPassword")}
         </Typography>
-        
+
         {success ? (
           <Alert severity="success" sx={{ width: "100%", mt: 2 }}>
-            Password reset link has been sent to your email. Please check your inbox.
-            Redirecting to login...
+            {t("forgotPassword.message2")}
           </Alert>
         ) : (
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: "100%" }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{ mt: 1, width: "100%" }}
+          >
             {error && (
               <Alert severity="error" sx={{ mb: 2 }}>
                 {error}
@@ -74,14 +80,14 @@ const ForgotPassword = () => {
             )}
 
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Enter your email address and we'll send you a link to reset your password.
+              {t("forgotPassword.message1")}
             </Typography>
 
             <TextField
               margin="normal"
               required
               fullWidth
-              label="Email Address"
+              label="Email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -96,7 +102,11 @@ const ForgotPassword = () => {
               sx={{ mt: 3, mb: 2 }}
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : "Send Reset Link"}
+              {loading ? (
+                <CircularProgress size={24} />
+              ) : (
+                t("forgotPassword.sendLink")
+              )}
             </Button>
 
             <Button
@@ -105,7 +115,7 @@ const ForgotPassword = () => {
               onClick={() => navigate("/login")}
               sx={{ mt: 1 }}
             >
-              Back to Login
+              {t("forgotPassword.backToLogin")}
             </Button>
           </Box>
         )}

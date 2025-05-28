@@ -14,10 +14,13 @@ import {
   Divider,
   Link,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 const { FaArrowRightLong, FaStar, GoDotFill } = icons;
 
 let userId = HandleCookies.getCookie("id") || "";
 const NavbarPart1 = () => {
+  const { t } = useTranslation();
+
   const [detain, setDetain] = useState();
 
   const checkLogin = () => {
@@ -60,7 +63,7 @@ const NavbarPart1 = () => {
       >
         <FaArrowRightLong style={{ color: "#1976d2", marginRight: 8 }} />
         <Typography color="primary" variant="subtitle1">
-          {detain?.username || "Username"}
+          {detain?.username || t("navbar.username")}
         </Typography>
       </Box>
 
@@ -82,15 +85,21 @@ const NavbarPart1 = () => {
                 <FaStar style={{ color: "#1976d2" }} />
               </ListItemIcon>
               <ListItemText
-                primary={`Rating: ${detain?.rating || "0"}`}
+                primary={`${t("navbar.rating")}: ${detain?.rating || "0"}`}
                 sx={{ "& .MuiListItemText-primary": { fontSize: "0.9rem" } }}
               />
             </ListItem>
 
             {[
-              { text: "Settings", link: `/setting/${detain?.username}` },
-              { text: "Blogs", link: `/userblog/${detain?.username}` },
-              { text: "Talks", link: "/chat" },
+              {
+                text: t("navbar.settings"),
+                link: `/setting/${detain?.username}`,
+              },
+              {
+                text: t("navbar.blogs"),
+                link: `/userblog/${detain?.username}`,
+              },
+              { text: t("navbar.talks"), link: "/chat" },
             ].map((item, index) => (
               <ListItem key={index}>
                 <ListItemIcon sx={{ minWidth: 32 }}>

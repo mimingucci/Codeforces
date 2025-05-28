@@ -22,6 +22,7 @@ import Ranking from "./Ranking";
 import RatingChart from "./RatingChart";
 import { format, parseISO } from "date-fns";
 import { convertUnixTimestamp } from "../../utils/dateUtils";
+import { useTranslation } from "react-i18next";
 
 const {
   IoIosChatboxes,
@@ -35,6 +36,8 @@ const {
 } = icons;
 
 const ProfileOverview = ({ id, isHome = false }) => {
+  const { t } = useTranslation();
+
   const [user, setUser] = useState();
 
   useEffect(() => {
@@ -115,7 +118,7 @@ const ProfileOverview = ({ id, isHome = false }) => {
                 <ListItemText
                   primary={
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      Rating:
+                      {t("profile.rating")}:
                       <Chip
                         label={user?.rating || 0}
                         size="small"
@@ -134,7 +137,7 @@ const ProfileOverview = ({ id, isHome = false }) => {
                 <ListItemText
                   primary={
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      Location:
+                      {t("profile.location")}:
                       <Typography
                         component="span"
                         sx={{ ml: 1, color: "text.secondary" }}
@@ -154,7 +157,7 @@ const ProfileOverview = ({ id, isHome = false }) => {
                 <ListItemText
                   primary={
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      Contribution:
+                      {t("profile.contribution")}:
                       <Typography
                         component="span"
                         sx={{
@@ -179,7 +182,7 @@ const ProfileOverview = ({ id, isHome = false }) => {
                   <ListItemText
                     primary={
                       <Link href={`/setting/${user?.username}`}>
-                        Change settings
+                        {t("profile.changeSettings")}
                       </Link>
                     }
                   />
@@ -201,7 +204,7 @@ const ProfileOverview = ({ id, isHome = false }) => {
                 <ListItemText
                   primary={
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      Last visited:
+                      {t("profile.lastVisited")}:
                       <Typography
                         component="span"
                         sx={{
@@ -244,7 +247,7 @@ const ProfileOverview = ({ id, isHome = false }) => {
                       arrow
                     >
                       <Box component="span" sx={{ cursor: "help" }}>
-                        {`Registered: ${
+                        {`${t("profile.registered")}: ${
                           user?.createdAt
                             ? format(
                                 convertUnixTimestamp(user.createdAt),
@@ -265,7 +268,9 @@ const ProfileOverview = ({ id, isHome = false }) => {
                     <IoDocumentText color="#1976d2" />
                   </ListItemIcon>
                   <ListItemText
-                    primary={<Link href="/writeblog">Write Blog</Link>}
+                    primary={
+                      <Link href="/writeblog">{t("profile.writeBlog")}</Link>
+                    }
                   />
                 </ListItem>
               )}
@@ -276,7 +281,11 @@ const ProfileOverview = ({ id, isHome = false }) => {
                   <IoIosChatboxes color="#1976d2" />
                 </ListItemIcon>
                 <ListItemText
-                  primary={<Link href={isHome ? "/chat" : ``}>Message</Link>}
+                  primary={
+                    <Link href={isHome ? "/chat" : ``}>
+                      {t("profile.message")}
+                    </Link>
+                  }
                 />
               </ListItem>
             </List>

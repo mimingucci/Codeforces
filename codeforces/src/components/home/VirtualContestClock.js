@@ -11,10 +11,17 @@ import { FaArrowRightLong, FaHourglassHalf } from "react-icons/fa6";
 import ContestApi from "../../getApi/ContestApi";
 import { calculateDuration } from "../../utils/dateUtils";
 import HandleCookies from "../../utils/HandleCookies";
+import { useTranslation } from "react-i18next";
 
 const VirtualContestClock = () => {
+  const { t } = useTranslation();
+
   const [virtualContest, setVirtualContest] = useState(null);
-  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
+  const [timeLeft, setTimeLeft] = useState({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [shouldRefetch, setShouldRefetch] = useState(true);
@@ -36,7 +43,7 @@ const VirtualContestClock = () => {
         const startTime = new Date(contest.startTime);
         const endTime = new Date(contest.endTime);
         const now = new Date();
-        
+
         if (endTime <= now) {
           setVirtualContest(null);
           setShouldRefetch(false);
@@ -60,7 +67,9 @@ const VirtualContestClock = () => {
   const calculateTimeLeft = () => {
     if (!virtualContest) return { hours: 0, minutes: 0, seconds: 0 };
 
-    const targetTime = isContestStarted ? new Date(virtualContest.endTime) : new Date(virtualContest.startTime);
+    const targetTime = isContestStarted
+      ? new Date(virtualContest.endTime)
+      : new Date(virtualContest.startTime);
     const difference = targetTime - new Date();
 
     if (difference > 0) {
@@ -85,10 +94,16 @@ const VirtualContestClock = () => {
     const timer = setInterval(() => {
       const newTimeLeft = calculateTimeLeft();
       setTimeLeft(newTimeLeft);
-      
-      if (!isContestStarted && new Date(virtualContest.startTime) <= new Date()) {
+
+      if (
+        !isContestStarted &&
+        new Date(virtualContest.startTime) <= new Date()
+      ) {
         setIsContestStarted(true);
-      } else if (isContestStarted && new Date(virtualContest.endTime) <= new Date()) {
+      } else if (
+        isContestStarted &&
+        new Date(virtualContest.endTime) <= new Date()
+      ) {
         clearInterval(timer);
         setVirtualContest(null);
         setShouldRefetch(false);
@@ -119,7 +134,8 @@ const VirtualContestClock = () => {
 
   const progress = isContestStarted
     ? ((new Date() - new Date(virtualContest.startTime)) /
-        (new Date(virtualContest.endTime) - new Date(virtualContest.startTime))) *
+        (new Date(virtualContest.endTime) -
+          new Date(virtualContest.startTime))) *
       100
     : 0;
 
@@ -135,7 +151,9 @@ const VirtualContestClock = () => {
       >
         <FaHourglassHalf style={{ color: "#1976d2", marginRight: 8 }} />
         <Typography color="primary" variant="subtitle1">
-          {isContestStarted ? "Your Virtual Contest" : "Upcoming Virtual Contest"}
+          {isContestStarted
+            ? t("navbar.yourVirtualContest")
+            : t("navbar.upcomingVirtualContest")}
         </Typography>
       </Box>
 
@@ -148,14 +166,18 @@ const VirtualContestClock = () => {
           color="inherit"
           sx={{ display: "block", mb: 1 }}
         >
-          <Typography variant="h6">Virtual Contest {virtualContest.id}</Typography>
+          <Typography variant="h6">
+            {t("navbar.virtualContest")} {virtualContest.id}
+          </Typography>
         </Link>
 
         <Box sx={{ mt: 2 }}>
           <Typography variant="body2" color="text.secondary">
-            {isContestStarted ? "Time remaining: " : "Starting in: "}
+            {isContestStarted
+              ? t("navbar.timeRemaining")
+              : t("navbar.startingIn")}
           </Typography>
-          
+
           {/* Time display */}
           <Box
             sx={{
@@ -220,7 +242,11 @@ const VirtualContestClock = () => {
               mt: 1,
             }}
           >
-            Total duration: {calculateDuration(virtualContest.startTime, virtualContest.endTime)}
+            {t("navbar.totalDuration")}:{" "}
+            {calculateDuration(
+              virtualContest.startTime,
+              virtualContest.endTime
+            )}
           </Typography>
         </Box>
       </Box>

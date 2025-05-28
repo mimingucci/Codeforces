@@ -10,8 +10,11 @@ import {
 import { FaArrowRightLong, FaClock } from "react-icons/fa6";
 import ContestApi from "../../getApi/ContestApi";
 import { calculateDuration } from "../../utils/dateUtils";
+import { useTranslation } from "react-i18next";
 
 const NavbarClock = () => {
+  const { t } = useTranslation();
+
   const [nextContest, setNextContest] = useState(null);
   const [timeLeft, setTimeLeft] = useState({});
   const [loading, setLoading] = useState(true);
@@ -117,7 +120,7 @@ const NavbarClock = () => {
       >
         <FaArrowRightLong style={{ color: "#1976d2", marginRight: 8 }} />
         <Typography color="primary" variant="subtitle1">
-          Pay attention
+          {t("navbar.payAttention")}
         </Typography>
       </Box>
 
@@ -127,14 +130,16 @@ const NavbarClock = () => {
       {!nextContest ? (
         <Paper elevation={1} sx={{ mt: 2, p: 2 }}>
           <Typography variant="body2" align="center" color="text.secondary">
-            No upcoming contests
+            {t("navbar.noUpcomingContests")}
           </Typography>
         </Paper>
       ) : (
         <Box sx={{ p: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
             <FaClock style={{ color: "#1976d2" }} />
-            <Typography variant="subtitle2">Next Contest:</Typography>
+            <Typography variant="subtitle2">
+              {t("navbar.nextContest")}:
+            </Typography>
           </Box>
 
           <Link
@@ -196,7 +201,7 @@ const NavbarClock = () => {
               mt: 1,
             }}
           >
-            Duration:{" "}
+            {t("navbar.duration")}:{" "}
             {calculateDuration(nextContest.startTime, nextContest.endTime)}
           </Typography>
         </Box>

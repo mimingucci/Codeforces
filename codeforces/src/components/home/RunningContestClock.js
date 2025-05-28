@@ -10,8 +10,11 @@ import {
 import { FaArrowRightLong, FaHourglassHalf } from "react-icons/fa6";
 import ContestApi from "../../getApi/ContestApi";
 import { calculateDuration } from "../../utils/dateUtils";
+import { useTranslation } from "react-i18next";
 
 const RunningContestClock = () => {
+  const { t } = useTranslation();
+
   const [runningContest, setRunningContest] = useState(null);
   const [timeLeft, setTimeLeft] = useState({});
   const [loading, setLoading] = useState(true);
@@ -112,7 +115,7 @@ const RunningContestClock = () => {
       >
         <FaArrowRightLong style={{ color: "#1976d2", marginRight: 8 }} />
         <Typography color="primary" variant="subtitle1">
-          Contest in progress
+          {t("navbar.contestInProgress")}
         </Typography>
       </Box>
 
@@ -121,7 +124,9 @@ const RunningContestClock = () => {
       <Box sx={{ p: 2 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
           <FaHourglassHalf style={{ color: "#1976d2" }} />
-          <Typography variant="subtitle2">Running Contest:</Typography>
+          <Typography variant="subtitle2">
+            {t("navbar.runningContest")}:
+          </Typography>
         </Box>
 
         <Link
@@ -199,7 +204,7 @@ const RunningContestClock = () => {
             mt: 1,
           }}
         >
-          Total duration:{" "}
+          {t("navbar.totalDuration")}:{" "}
           {calculateDuration(runningContest.startTime, runningContest.endTime)}
         </Typography>
       </Box>

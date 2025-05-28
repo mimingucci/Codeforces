@@ -15,10 +15,13 @@ import { useEffect, useState } from "react";
 import icons from "../../utils/icons";
 import UserApi from "../../getApi/UserApi";
 import Ranking from "./Ranking";
+import { useTranslation } from "react-i18next";
 
 const { FaArrowRightLong } = icons;
 
 const NavbarPart3 = () => {
+  const { t } = useTranslation();
+
   const [users, setUsers] = useState();
   const [loading, setLoading] = useState(true);
 
@@ -54,7 +57,7 @@ const NavbarPart3 = () => {
       >
         <FaArrowRightLong style={{ color: "#1976d2", marginRight: 8 }} />
         <Typography color="primary" variant="subtitle1">
-          Top Contributors
+          {t("navbar.topContributors")}
         </Typography>
       </Box>
 
@@ -64,8 +67,10 @@ const NavbarPart3 = () => {
           <TableHead>
             <TableRow>
               <TableCell sx={{ width: "10%" }}>#</TableCell>
-              <TableCell sx={{ width: "60%" }}>User</TableCell>
-              <TableCell sx={{ width: "30%" }}>Contribution</TableCell>
+              <TableCell sx={{ width: "60%" }}>{t("navbar.user")}</TableCell>
+              <TableCell sx={{ width: "30%" }}>
+                {t("navbar.contribution")}
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -131,7 +136,7 @@ const NavbarPart3 = () => {
             gap: 1,
           }}
         >
-          View all contributors
+          {t("navbar.viewAllContributors")}
           <FaArrowRightLong size={12} />
         </Link>
       </Box>

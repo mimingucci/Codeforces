@@ -15,10 +15,13 @@ import icons from "../../utils/icons";
 import { useEffect, useState } from "react";
 import UserApi from "../../getApi/UserApi";
 import Ranking from "./Ranking";
+import { useTranslation } from "react-i18next";
 
 const { FaArrowRightLong } = icons;
 
 const NavbarPart2 = () => {
+  const { t } = useTranslation();
+
   const [users, setUsers] = useState();
   const [loading, setLoading] = useState(true);
 
@@ -54,7 +57,7 @@ const NavbarPart2 = () => {
       >
         <FaArrowRightLong style={{ color: "#1976d2", marginRight: 8 }} />
         <Typography color="primary" variant="subtitle1">
-          Top rated
+          {t("navbar.topRated")}
         </Typography>
       </Box>
 
@@ -64,8 +67,8 @@ const NavbarPart2 = () => {
           <TableHead>
             <TableRow>
               <TableCell sx={{ width: "10%" }}>#</TableCell>
-              <TableCell sx={{ width: "60%" }}>User</TableCell>
-              <TableCell sx={{ width: "30%" }}>Rating</TableCell>
+              <TableCell sx={{ width: "60%" }}>{t("navbar.user")}</TableCell>
+              <TableCell sx={{ width: "30%" }}>{t("navbar.rating")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -130,7 +133,7 @@ const NavbarPart2 = () => {
             gap: 1,
           }}
         >
-          View all
+          {t("navbar.viewAll")}
           <FaArrowRightLong size={12} />
         </Link>
       </Box>

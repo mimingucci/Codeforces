@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import UserApi from "../../getApi/UserApi";
 import HandleCookies from "../../utils/HandleCookies";
+import { useTranslation } from "react-i18next";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -9,6 +10,8 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
 
   // Check if user is already logged in
   useEffect(() => {
@@ -61,14 +64,14 @@ const Login = () => {
   return (
     <div className="mt-5">
       <div className="text-left">
-        <p className="font-bold">Fill in the form to login into Codeforces.</p>
-        <p>You can use Gmail as an alternative way to enter.</p>
+        <p className="font-bold">{t("login.message1")}</p>
+        <p>{t("login.message2")}</p>
       </div>
       <div>
         <div className="relative flex flex-col justify-center min-h-screen overflow-hidden">
           <div className="w-full p-6 m-auto bg-white rounded-md shadow-xl lg:max-w-xl">
             <h1 className="text-3xl font-semibold text-center text-blue-500 uppercase">
-              Sign in
+              {t("login.signIn")}
             </h1>
 
             {errorMessage && (
@@ -98,7 +101,7 @@ const Login = () => {
                   htmlFor="password"
                   className="block text-sm font-semibold text-gray-800 text-left"
                 >
-                  Password
+                  {t("login.password")}
                 </label>
                 <input
                   onChange={(e) => {
@@ -114,7 +117,7 @@ const Login = () => {
                 href="/forgot-password"
                 className="text-xs text-blue-600 hover:underline"
               >
-                Forget Password?
+                {t("login.forgotPassword")}
               </a>
               <div className="mt-6">
                 <button
@@ -122,18 +125,18 @@ const Login = () => {
                   className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-blue-400 rounded-md hover:bg-blue-500 focus:outline-none focus:bg-blue-600 disabled:opacity-70"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Logging in..." : "Login"}
+                  {isLoading ? t("login.loggingIn") : t("login.login")}
                 </button>
               </div>
             </form>
 
             <p className="mt-8 text-xs font-light text-center text-gray-700">
-              Don't have an account?{" "}
+              {t("login.message3")}{" "}
               <a
                 href="/signup"
                 className="font-medium text-blue-500 hover:underline"
               >
-                Sign up
+                {t("login.signUp")}
               </a>
             </p>
           </div>

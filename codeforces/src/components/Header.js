@@ -5,6 +5,7 @@ import HandleCookies from "../utils/HandleCookies";
 import SearchResults from "./home/SearchResults";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { useNavigate } from "react-router-dom";
+import LanguageSwitcher from "./LanguageSwitcher";
 import {
   AppBar,
   Toolbar,
@@ -16,6 +17,7 @@ import {
   Paper,
 } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
+import { useTranslation } from "react-i18next";
 
 const { IoMdSearch } = icons;
 
@@ -40,6 +42,8 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [debouncedQuery] = useDebouncedValue(searchQuery, 300);
+
+  const { t } = useTranslation();
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
@@ -109,17 +113,18 @@ const Header = () => {
                   href={`http://localhost:3000/profile/${user}`}
                   color="inherit"
                 >
-                  Profile
+                  {t("header.profile")}
                 </Button>
                 <Button color="inherit" onClick={handleLogout}>
-                  Logout
+                  {t("header.logout")}
                 </Button>
               </>
             ) : (
               <Button href="http://localhost:3000/login" color="inherit">
-                Login
+                {t("header.login")}
               </Button>
             )}
+            <LanguageSwitcher />
           </Box>
         </Toolbar>
 
@@ -128,25 +133,25 @@ const Header = () => {
           <Toolbar>
             <Box sx={{ display: "flex", gap: 2, flexGrow: 1 }}>
               <Button href="http://localhost:3000/home" color="inherit">
-                HOME
+                {t("header.home")}
               </Button>
               <Button href="http://localhost:3000/contests" color="inherit">
-                CONTEST
+                {t("header.contest")}
               </Button>
               <Button href="http://localhost:3000/ide" color="inherit">
-                IDE
+                {t("header.ide")}
               </Button>
               <Button
                 href="http://localhost:3000/problems?page=0"
                 color="inherit"
               >
-                PROBLEMSET
+                {t("header.problemset")}
               </Button>
               <Button href="http://localhost:3000/rating" color="inherit">
-                TOP USER
+                {t("header.topUser")}
               </Button>
               <Button href="http://localhost:3000/calendar" color="inherit">
-                CALENDAR
+                {t("header.calendar")}
               </Button>
             </Box>
             {/* Search Bar */}
@@ -166,7 +171,7 @@ const Header = () => {
               >
                 <InputBase
                   sx={{ ml: 1, flex: 1 }}
-                  placeholder="Search users..."
+                  placeholder={t("header.searchPlaceholder")}
                   value={searchQuery}
                   onChange={handleSearch}
                   onFocus={handleSearchFocus}
