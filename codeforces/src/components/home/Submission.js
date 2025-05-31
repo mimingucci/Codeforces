@@ -5,7 +5,10 @@ import { useEffect, useState } from "react";
 import "../../assets/css/default.css";
 import { useParams, useNavigate } from "react-router-dom";
 import NavProfile from "./NavProfile";
+import { useTranslation } from "react-i18next";
+
 const Submission = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { author, page } = useParams();
   const [submissions, setSubmissions] = useState();
@@ -31,7 +34,9 @@ const Submission = () => {
     <div>
       <NavProfile username={author} />
       <div>
-        <h1 className="text-lg">{author} submissions</h1>
+        <h1 className="text-lg">
+          {author} {t("submission.submissions")}
+        </h1>
       </div>
       <div
         className={`mr-5 border-[2px] rounded-t-md border-solid border-gray-400 mt-4`}
@@ -43,20 +48,34 @@ const Submission = () => {
             <thead>
               <tr>
                 <th className="border border-slate-300">#</th>
-                <th className="border border-slate-300">When</th>
-                <th className="border border-slate-300">Who</th>
-                <th className="border border-slate-300">Problem</th>
-                <th className="border border-slate-300">Lang</th>
-                <th className="border border-slate-300">Verdict</th>
-                <th className="border border-slate-300">Time</th>
-                <th className="border border-slate-300">Memory</th>
+                <th className="border border-slate-300">
+                  {t("submission.when")}
+                </th>
+                <th className="border border-slate-300">
+                  {t("submission.who")}
+                </th>
+                <th className="border border-slate-300">
+                  {t("submission.problem")}
+                </th>
+                <th className="border border-slate-300">
+                  {t("submission.lang")}
+                </th>
+                <th className="border border-slate-300">
+                  {t("submission.verdict")}
+                </th>
+                <th className="border border-slate-300">
+                  {t("submission.time")}
+                </th>
+                <th className="border border-slate-300">
+                  {t("submission.memory")}
+                </th>
               </tr>
             </thead>
             <tbody>
               {submissions &&
                 submissions.map((submission, index) => {
                   return (
-                    <tr className="odd:bg-gray-100">
+                    <tr className="odd:bg-gray-100" key={submission?.id}>
                       <td className="border border-slate-300" class="under">
                         <a href={`/submission/${submission?.id}`}>
                           {submission?.id}

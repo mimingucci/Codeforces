@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import SubmissionApi from "../../getApi/SubmissionApi";
 import ContestApi from "../../getApi/ContestApi";
@@ -43,6 +44,7 @@ const StyledId = ({ id }) => (
 );
 
 const UserSubmissions = ({ userId }) => {
+  const { t } = useTranslation();
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -154,8 +156,7 @@ const UserSubmissions = ({ userId }) => {
     <Box sx={{ width: "100%" }}>
       {isLocked && (
         <Alert severity="warning" sx={{ mb: 2 }} icon={<LockIcon />}>
-          Source code is hidden during contests. You can view submission
-          details, but code is not available.
+          {t("userSubmissions.lockedMessage")}
         </Alert>
       )}
 
@@ -166,12 +167,12 @@ const UserSubmissions = ({ userId }) => {
             <TableHead>
               <TableRow>
                 <TableCell>#</TableCell>
-                <TableCell>When</TableCell>
-                <TableCell>Problem</TableCell>
-                <TableCell>Language</TableCell>
-                <TableCell>Verdict</TableCell>
-                <TableCell>Time</TableCell>
-                <TableCell>Memory</TableCell>
+                <TableCell>{t("userSubmissions.when")}</TableCell>
+                <TableCell>{t("userSubmissions.problem")}</TableCell>
+                <TableCell>{t("userSubmissions.language")}</TableCell>
+                <TableCell>{t("userSubmissions.verdict")}</TableCell>
+                <TableCell>{t("userSubmissions.time")}</TableCell>
+                <TableCell>{t("userSubmissions.memory")}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -256,7 +257,8 @@ const UserSubmissions = ({ userId }) => {
             justifyContent="space-between"
           >
             <Typography>
-              Submission <StyledId id={selectedSubmission?.id?.toString()} />
+              {t("userSubmissions.submission")}{" "}
+              <StyledId id={selectedSubmission?.id?.toString()} />
             </Typography>
             <IconButton onClick={() => setOpenModal(false)}>
               <CloseIcon />
@@ -273,7 +275,7 @@ const UserSubmissions = ({ userId }) => {
         >
           <Box sx={{ mb: 2 }}>
             <Typography variant="subtitle2" gutterBottom>
-              Problem:{" "}
+              {t("userSubmissions.problem")}:{" "}
               <Link
                 to={`/problem/${selectedSubmission?.problem?.toString()}`}
                 onClick={(e) => e.stopPropagation()}
@@ -283,7 +285,7 @@ const UserSubmissions = ({ userId }) => {
               </Link>
             </Typography>
             <Typography variant="subtitle2" gutterBottom>
-              Verdict:
+              {t("userSubmissions.verdict")}:
               <Chip
                 label={selectedSubmission?.verdict?.toString()}
                 color={getVerdictColor(selectedSubmission?.verdict?.toString())}
@@ -292,19 +294,22 @@ const UserSubmissions = ({ userId }) => {
               />
             </Typography>
             <Typography variant="subtitle2">
-              Time: {selectedSubmission?.execution_time_ms || 0} ms | Memory:{" "}
+              {t("userSubmissions.time")}:{" "}
+              {selectedSubmission?.execution_time_ms || 0} ms |{" "}
+              {t("userSubmissions.memory")}:{" "}
               {Math.round((selectedSubmission?.memory_used_bytes || 0) / 1024)}{" "}
               KB
             </Typography>
             <Typography variant="subtitle2">
-              Sent:{" "}
+              {t("userSubmissions.sent")}:{" "}
               {selectedSubmission?.sent
                 ? new Date(selectedSubmission.sent).toLocaleString()
                 : "N/A"}
             </Typography>
             {selectedSubmission?.judged && (
               <Typography variant="subtitle2">
-                Judged: {new Date(selectedSubmission.judged).toLocaleString()}
+                {t("userSubmissions.judged")}:{" "}
+                {new Date(selectedSubmission.judged).toLocaleString()}
               </Typography>
             )}
           </Box>
@@ -324,11 +329,10 @@ const UserSubmissions = ({ userId }) => {
             >
               <LockIcon fontSize="large" color="warning" sx={{ mb: 2 }} />
               <Typography variant="h6" align="center" gutterBottom>
-                Source code is hidden during contests
+                {t("userSubmissions.sourceHidden")}
               </Typography>
               <Typography variant="body2" align="center" color="text.secondary">
-                Source code viewing is disabled while a contest is in progress.
-                You can view code after the contest ends.
+                {t("userSubmissions.sourceHiddenDesc")}
               </Typography>
             </Box>
           ) : (

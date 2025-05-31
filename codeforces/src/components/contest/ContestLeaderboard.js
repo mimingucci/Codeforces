@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import {
   Paper,
@@ -40,12 +41,12 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 // Score cell component
-const ScoreCell = ({ attempts, solveTime }) => {
+const ScoreCell = ({ attempts, solveTime, t }) => {
   if (!attempts) return "-";
 
   if (!solveTime && solveTime !== 0) {
     return (
-      <Tooltip title={`${attempts} failed attempts`}>
+      <Tooltip title={t("contest.failedAttempts", { count: attempts })}>
         <Box
           sx={{
             color: "error.main",
@@ -59,7 +60,9 @@ const ScoreCell = ({ attempts, solveTime }) => {
   }
 
   return (
-    <Tooltip title={`Solved in ${solveTime} minutes (${attempts} attempts)`}>
+    <Tooltip
+      title={t("contest.solvedInMinutes", { minutes: solveTime, attempts })}
+    >
       <Box
         sx={{
           color: "success.main",
@@ -78,6 +81,7 @@ const ScoreCell = ({ attempts, solveTime }) => {
 };
 
 const ContestLeaderboard = ({ contest, virtualContestId = null }) => {
+  const { t } = useTranslation();
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [problems, setProblems] = useState([]);
@@ -92,7 +96,9 @@ const ContestLeaderboard = ({ contest, virtualContestId = null }) => {
         // Fetch problems and leaderboard in parallel
         const [problemsResponse, leaderboardResponse] = await Promise.all([
           ProblemApi.getProblemsByContestId(contest.id),
-          virtualContestId ? LeaderboardApi.getVirtualLeaderboard(virtualContestId) : LeaderboardApi.getLeaderboard(contest.id),
+          virtualContestId
+            ? LeaderboardApi.getVirtualLeaderboard(virtualContestId)
+            : LeaderboardApi.getLeaderboard(contest.id),
         ]);
 
         setProblems(problemsResponse.data.data);
@@ -146,10 +152,14 @@ const ContestLeaderboard = ({ contest, virtualContestId = null }) => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <StyledTableCell>Rank</StyledTableCell>
-              <StyledTableCell>User</StyledTableCell>
-              <StyledTableCell align="right">Score</StyledTableCell>
-              <StyledTableCell align="right">Penalty</StyledTableCell>
+              <StyledTableCell>{t("contest.rank")}</StyledTableCell>
+              <StyledTableCell>{t("contest.user")}</StyledTableCell>
+              <StyledTableCell align="right">
+                {t("contest.score")}
+              </StyledTableCell>
+              <StyledTableCell align="right">
+                {t("contest.penalty")}
+              </StyledTableCell>
               {problems.map((problem, index) => (
                 <StyledTableCell key={problem.id} align="center">
                   {problem.title.charAt(0)}
@@ -174,6 +184,7 @@ const ContestLeaderboard = ({ contest, virtualContestId = null }) => {
                       <ScoreCell
                         attempts={entry.problemAttempts[problem.id] || 0}
                         solveTime={entry.problemSolveTimes[problem.id]}
+                        t={t}
                       />
                     </TableCell>
                   );

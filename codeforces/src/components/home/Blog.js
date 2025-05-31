@@ -23,6 +23,7 @@ import Ranking from "./Ranking";
 import Overlay from "./Overlay";
 import UserApi from "../../getApi/UserApi";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 const { RiAttachment2, FaUser, BsCalendar2DateFill, IoIosChatboxes } = icons;
 
@@ -45,6 +46,7 @@ const StatsContainer = styled(Box)(({ theme }) => ({
 }));
 
 const Blog = ({ blog }) => {
+  const { t } = useTranslation();
   const [likes, setLikes] = useState(blog?.likes || []);
   const [dislikes, setDislikes] = useState(blog?.dislikes || []);
   const [show, setShow] = useState(false);
@@ -77,7 +79,7 @@ const Blog = ({ blog }) => {
   const handleLike = async () => {
     const accessToken = HandleCookies.getCookie("token");
     if (!accessToken) {
-      showErrorToast("Please login to continue...");
+      showErrorToast(t("blog.pleaseLogin"));
       return;
     }
     const id = blog?.id;
@@ -86,7 +88,7 @@ const Blog = ({ blog }) => {
       if (res?.data?.code === "200") {
         setLikes(res.data.data.likes);
         setDislikes(res.data.data.dislikes);
-        showSuccessToast("Like updated successfully");
+        showSuccessToast(t("blog.likeUpdated"));
       }
     } catch (error) {
       showErrorToast("Failed to update like");
@@ -96,7 +98,7 @@ const Blog = ({ blog }) => {
   const handleDislike = async () => {
     const accessToken = HandleCookies.getCookie("token");
     if (!accessToken) {
-      showErrorToast("Please login to continue...");
+      showErrorToast(t("blog.pleaseLogin"));
       return;
     }
     const id = blog?.id;
@@ -105,7 +107,7 @@ const Blog = ({ blog }) => {
       if (res?.data?.code === "200") {
         setLikes(res.data.data.likes);
         setDislikes(res.data.data.dislikes);
-        showSuccessToast("Dislike updated successfully");
+        showSuccessToast(t("blog.dislikeUpdated"));
       }
     } catch (error) {
       showErrorToast("Failed to update dislike");
@@ -118,7 +120,7 @@ const Blog = ({ blog }) => {
       id: blog.id,
     }).then((rs) => {
       if (rs?.data?.code === "200") {
-        showSuccessToast("Delete blog successfully");
+        showSuccessToast(t("blog.deleteSuccess"));
         setDeleted(true);
       }
     });
@@ -193,7 +195,7 @@ const Blog = ({ blog }) => {
                 size="small"
                 onClick={() => navigate(`/editblog/${blog?.id}`)}
               >
-                Edit
+                {t("blog.edit")}
               </Button>
               <Button
                 variant="contained"
@@ -201,7 +203,7 @@ const Blog = ({ blog }) => {
                 size="small"
                 onClick={() => setShow(true)}
               >
-                Delete
+                {t("blog.delete")}
               </Button>
             </Stack>
           )}
@@ -217,7 +219,7 @@ const Blog = ({ blog }) => {
           }}
         >
           <Typography variant="body2" component="span">
-            By
+            {t("blog.by")}
           </Typography>
           <Link
             to={`/profile/${author?.id}`}
@@ -255,7 +257,7 @@ const Blog = ({ blog }) => {
               gap: 0.5,
             }}
           >
-            Full text and comments
+            {t("blog.fullTextAndComments")}
           </Link>
         </Box>
 
@@ -263,7 +265,7 @@ const Blog = ({ blog }) => {
         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
           <RiAttachment2 size={15} />
           <Typography variant="caption" sx={{ ml: 1 }}>
-            Announcement of{" "}
+            {t("blog.announcementOf")}{" "}
             <Typography
               component="span"
               variant="caption"
@@ -279,7 +281,7 @@ const Blog = ({ blog }) => {
           {/* Voting */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Tooltip title={hasLiked ? "Unlike" : "Like"}>
+              <Tooltip title={hasLiked ? t("blog.unlike") : t("blog.like")}>
                 <IconButton
                   onClick={handleLike}
                   sx={{
@@ -303,7 +305,11 @@ const Blog = ({ blog }) => {
             </Box>
 
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Tooltip title={hasDisliked ? "Remove dislike" : "Dislike"}>
+              <Tooltip
+                title={
+                  hasDisliked ? t("blog.removeDislike") : t("blog.dislike")
+                }
+              >
                 <IconButton
                   onClick={handleDislike}
                   sx={{

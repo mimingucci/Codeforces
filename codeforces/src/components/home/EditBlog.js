@@ -1,4 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import BlogApi from "../../getApi/BlogApi";
@@ -11,6 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useParams } from "react-router-dom";
 
 const EditBlog = () => {
+  const { t } = useTranslation();
   const BASE_URL = "http://localhost:1234/api/image";
   const [text, setText] = useState("");
   const [title, setTitle] = useState("");
@@ -31,7 +33,7 @@ const EditBlog = () => {
   }, [id]);
 
   const showSuccessToast = (msg) => {
-    toast.success(msg || `Compiled Successfully!`, {
+    toast.success(msg || t("common.success"), {
       position: "top-right",
       autoClose: 1000,
       hideProgressBar: false,
@@ -42,7 +44,7 @@ const EditBlog = () => {
     });
   };
   const showErrorToast = (msg, timer) => {
-    toast.error(msg || `Something went wrong! Please try again.`, {
+    toast.error(msg || t("common.error"), {
       position: "top-right",
       autoClose: timer ? timer : 1000,
       hideProgressBar: false,
@@ -57,11 +59,11 @@ const EditBlog = () => {
     try {
       const valid = await handleTokenAutomatically();
       if (!valid) {
-        showErrorToast("Please login to update blog");
+        showErrorToast(t("editBlog.pleaseLogin"));
         return;
       }
       if (!text || !title) {
-        showErrorToast("Please fill out all the required info");
+        showErrorToast(t("editBlog.fillRequired"));
         return;
       }
       const rs = await BlogApi.updateById({
@@ -73,9 +75,9 @@ const EditBlog = () => {
         },
         accessToken: HandleCookies.getCookie("accessToken"),
       });
-      showSuccessToast("Blog updated successfully");
+      showSuccessToast(t("editBlog.updateSuccess"));
     } catch (err) {
-      showErrorToast("Oww! Something wrong");
+      showErrorToast(t("common.error"));
     }
   };
 
@@ -130,9 +132,9 @@ const EditBlog = () => {
         draggable
         pauseOnHover
       />
-      <h1 className="text-lg">Update Blog</h1>
+      <h1 className="text-lg">{t("editBlog.title")}</h1>
       <div className="flex items-center gap-3 my-10">
-        <h3 className="text-left">Title:</h3>
+        <h3 className="text-left">{t("editBlog.titleLabel")}:</h3>
         <input
           type="text"
           className="border-[2px] border-solid border-black rounded-md"
@@ -193,7 +195,7 @@ const EditBlog = () => {
         />
       </div>
       <div className="flex items-center gap-3 my-10">
-        <h3 className="text-left">Add Tag:</h3>
+        <h3 className="text-left">{t("editBlog.addTag")}:</h3>
         <TagsInput active={true} initTags={tags} setTags={setTags} />
       </div>
       <div className="col-md-3">
@@ -202,13 +204,13 @@ const EditBlog = () => {
           type="submit"
           onClick={handleUpdate}
         >
-          Update
+          {t("editBlog.update")}
         </button>
         <button
           className={`btn btn-block btn-primary btn-lg bg-blue-500 rounded-sm px-5 py-3 text-white mt-[10px] ml-5`}
           onClick={() => navigate("/writeblog")}
         >
-          New
+          {t("editBlog.new")}
         </button>
       </div>
     </div>

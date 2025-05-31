@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.mimingucci.submission.SubmissionApplicationTests" time="8.292" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.mimingucci.submission.SubmissionApplicationTests" time="9.233" tests="1" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -15,7 +15,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="/home/mimingucci/.jdks/corretto-21.0.6/lib"/>
-    <property name="sun.java.command" value="/home/mimingucci/Work/Java/Codeforces/submission/target/surefire/surefirebooter-20250518104146797_3.jar /home/mimingucci/Work/Java/Codeforces/submission/target/surefire 2025-05-18T10-41-46_725-jvmRun1 surefire-20250518104146797_1tmp surefire_0-20250518104146797_2tmp"/>
+    <property name="sun.java.command" value="/home/mimingucci/Work/Java/Codeforces/submission/target/surefire/surefirebooter-20250531201107832_3.jar /home/mimingucci/Work/Java/Codeforces/submission/target/surefire 2025-05-31T20-11-07_758-jvmRun1 surefire-20250531201107832_1tmp surefire_0-20250531201107832_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/home/mimingucci/Work/Java/Codeforces/submission/target/test-classes:/home/mimingucci/Work/Java/Codeforces/submission/target/classes:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-starter-data-jpa/3.4.4/spring-boot-starter-data-jpa-3.4.4.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-starter/3.4.4/spring-boot-starter-3.4.4.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot/3.4.4/spring-boot-3.4.4.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.4.4/spring-boot-autoconfigure-3.4.4.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-starter-logging/3.4.4/spring-boot-starter-logging-3.4.4.jar:/home/mimingucci/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.24.3/log4j-to-slf4j-2.24.3.jar:/home/mimingucci/.m2/repository/org/apache/logging/log4j/log4j-api/2.24.3/log4j-api-2.24.3.jar:/home/mimingucci/.m2/repository/org/slf4j/jul-to-slf4j/2.0.17/jul-to-slf4j-2.0.17.jar:/home/mimingucci/.m2/repository/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar:/home/mimingucci/.m2/repository/org/yaml/snakeyaml/2.3/snakeyaml-2.3.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-starter-jdbc/3.4.4/spring-boot-starter-jdbc-3.4.4.jar:/home/mimingucci/.m2/repository/com/zaxxer/HikariCP/5.1.0/HikariCP-5.1.0.jar:/home/mimingucci/.m2/repository/org/springframework/spring-jdbc/6.2.5/spring-jdbc-6.2.5.jar:/home/mimingucci/.m2/repository/org/hibernate/orm/hibernate-core/6.6.11.Final/hibernate-core-6.6.11.Final.jar:/home/mimingucci/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/mimingucci/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/mimingucci/.m2/repository/org/jboss/logging/jboss-logging/3.6.1.Final/jboss-logging-3.6.1.Final.jar:/home/mimingucci/.m2/repository/org/hibernate/common/hibernate-commons-annotations/7.0.3.Final/hibernate-commons-annotations-7.0.3.Final.jar:/home/mimingucci/.m2/repository/io/smallrye/jandex/3.2.0/jandex-3.2.0.jar:/home/mimingucci/.m2/repository/com/fasterxml/classmate/1.7.0/classmate-1.7.0.jar:/home/mimingucci/.m2/repository/net/bytebuddy/byte-buddy/1.15.11/byte-buddy-1.15.11.jar:/home/mimingucci/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.5/jaxb-runtime-4.0.5.jar:/home/mimingucci/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.5/jaxb-core-4.0.5.jar:/home/mimingucci/.m2/repository/org/eclipse/angus/angus-activation/2.0.2/angus-activation-2.0.2.jar:/home/mimingucci/.m2/repository/org/glassfish/jaxb/txw2/4.0.5/txw2-4.0.5.jar:/home/mimingucci/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.2/istack-commons-runtime-4.1.2.jar:/home/mimingucci/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/mimingucci/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/mimingucci/.m2/repository/org/springframework/data/spring-data-jpa/3.4.4/spring-data-jpa-3.4.4.jar:/home/mimingucci/.m2/repository/org/springframework/data/spring-data-commons/3.4.4/spring-data-commons-3.4.4.jar:/home/mimingucci/.m2/repository/org/springframework/spring-orm/6.2.5/spring-orm-6.2.5.jar:/home/mimingucci/.m2/repository/org/springframework/spring-aop/6.2.5/spring-aop-6.2.5.jar:/home/mimingucci/.m2/repository/org/springframework/spring-beans/6.2.5/spring-beans-6.2.5.jar:/home/mimingucci/.m2/repository/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar:/home/mimingucci/.m2/repository/org/springframework/spring-aspects/6.2.5/spring-aspects-6.2.5.jar:/home/mimingucci/.m2/repository/org/aspectj/aspectjweaver/1.9.23/aspectjweaver-1.9.23.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-starter-validation/3.4.4/spring-boot-starter-validation-3.4.4.jar:/home/mimingucci/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/10.1.39/tomcat-embed-el-10.1.39.jar:/home/mimingucci/.m2/repository/org/hibernate/validator/hibernate-validator/8.0.2.Final/hibernate-validator-8.0.2.Final.jar:/home/mimingucci/.m2/repository/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-starter-web/3.4.4/spring-boot-starter-web-3.4.4.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-starter-json/3.4.4/spring-boot-starter-json-3.4.4.jar:/home/mimingucci/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.18.3/jackson-datatype-jdk8-2.18.3.jar:/home/mimingucci/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.18.3/jackson-datatype-jsr310-2.18.3.jar:/home/mimingucci/.m2/repository/com/fasterxml/jackson/module/jackson-module-parameter-names/2.18.3/jackson-module-parameter-names-2.18.3.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/3.4.4/spring-boot-starter-tomcat-3.4.4.jar:/home/mimingucci/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.39/tomcat-embed-core-10.1.39.jar:/home/mimingucci/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/10.1.39/tomcat-embed-websocket-10.1.39.jar:/home/mimingucci/.m2/repository/org/springframework/spring-web/6.2.5/spring-web-6.2.5.jar:/home/mimingucci/.m2/repository/org/springframework/spring-webmvc/6.2.5/spring-webmvc-6.2.5.jar:/home/mimingucci/.m2/repository/org/springframework/spring-expression/6.2.5/spring-expression-6.2.5.jar:/home/mimingucci/.m2/repository/org/springframework/cloud/spring-cloud-starter-netflix-eureka-client/4.2.1/spring-cloud-starter-netflix-eureka-client-4.2.1.jar:/home/mimingucci/.m2/repository/org/springframework/cloud/spring-cloud-starter/4.2.1/spring-cloud-starter-4.2.1.jar:/home/mimingucci/.m2/repository/org/springframework/cloud/spring-cloud-context/4.2.1/spring-cloud-context-4.2.1.jar:/home/mimingucci/.m2/repository/org/bouncycastle/bcprov-jdk18on/1.78.1/bcprov-jdk18on-1.78.1.jar:/home/mimingucci/.m2/repository/org/springframework/cloud/spring-cloud-netflix-eureka-client/4.2.1/spring-cloud-netflix-eureka-client-4.2.1.jar:/home/mimingucci/.m2/repository/org/apache/httpcomponents/client5/httpclient5/5.4.2/httpclient5-5.4.2.jar:/home/mimingucci/.m2/repository/org/apache/httpcomponents/core5/httpcore5/5.3.3/httpcore5-5.3.3.jar:/home/mimingucci/.m2/repository/org/apache/httpcomponents/core5/httpcore5-h2/5.3.3/httpcore5-h2-5.3.3.jar:/home/mimingucci/.m2/repository/com/netflix/eureka/eureka-client/2.0.4/eureka-client-2.0.4.jar:/home/mimingucci/.m2/repository/com/thoughtworks/xstream/xstream/1.4.20/xstream-1.4.20.jar:/home/mimingucci/.m2/repository/io/github/x-stream/mxparser/1.2.2/mxparser-1.2.2.jar:/home/mimingucci/.m2/repository/xmlpull/xmlpull/1.1.3.1/xmlpull-1.1.3.1.jar:/home/mimingucci/.m2/repository/jakarta/ws/rs/jakarta.ws.rs-api/3.1.0/jakarta.ws.rs-api-3.1.0.jar:/home/mimingucci/.m2/repository/com/netflix/spectator/spectator-api/1.7.3/spectator-api-1.7.3.jar:/home/mimingucci/.m2/repository/org/apache/httpcomponents/httpclient/4.5.3/httpclient-4.5.3.jar:/home/mimingucci/.m2/repository/org/apache/httpcomponents/httpcore/4.4.16/httpcore-4.4.16.jar:/home/mimingucci/.m2/repository/commons-codec/commons-codec/1.17.2/commons-codec-1.17.2.jar:/home/mimingucci/.m2/repository/commons-configuration/commons-configuration/1.10/commons-configuration-1.10.jar:/home/mimingucci/.m2/repository/commons-lang/commons-lang/2.6/commons-lang-2.6.jar:/home/mimingucci/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.18.3/jackson-annotations-2.18.3.jar:/home/mimingucci/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.18.3/jackson-core-2.18.3.jar:/home/mimingucci/.m2/repository/com/netflix/netflix-commons/netflix-eventbus/0.3.0/netflix-eventbus-0.3.0.jar:/home/mimingucci/.m2/repository/com/netflix/netflix-commons/netflix-infix/0.3.0/netflix-infix-0.3.0.jar:/home/mimingucci/.m2/repository/commons-jxpath/commons-jxpath/1.3/commons-jxpath-1.3.jar:/home/mimingucci/.m2/repository/joda-time/joda-time/2.3/joda-time-2.3.jar:/home/mimingucci/.m2/repository/org/antlr/antlr-runtime/3.4/antlr-runtime-3.4.jar:/home/mimingucci/.m2/repository/org/antlr/stringtemplate/3.2.1/stringtemplate-3.2.1.jar:/home/mimingucci/.m2/repository/antlr/antlr/2.7.7/antlr-2.7.7.jar:/home/mimingucci/.m2/repository/com/google/guava/guava/14.0.1/guava-14.0.1.jar:/home/mimingucci/.m2/repository/com/google/code/gson/gson/2.11.0/gson-2.11.0.jar:/home/mimingucci/.m2/repository/com/netflix/servo/servo-core/0.5.3/servo-core-0.5.3.jar:/home/mimingucci/.m2/repository/org/apache/commons/commons-math/2.2/commons-math-2.2.jar:/home/mimingucci/.m2/repository/javax/annotation/javax.annotation-api/1.2/javax.annotation-api-1.2.jar:/home/mimingucci/.m2/repository/org/codehaus/jettison/jettison/1.5.4/jettison-1.5.4.jar:/home/mimingucci/.m2/repository/org/springframework/cloud/spring-cloud-starter-loadbalancer/4.2.1/spring-cloud-starter-loadbalancer-4.2.1.jar:/home/mimingucci/.m2/repository/org/springframework/cloud/spring-cloud-loadbalancer/4.2.1/spring-cloud-loadbalancer-4.2.1.jar:/home/mimingucci/.m2/repository/io/projectreactor/reactor-core/3.7.4/reactor-core-3.7.4.jar:/home/mimingucci/.m2/repository/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar:/home/mimingucci/.m2/repository/io/projectreactor/addons/reactor-extra/3.5.2/reactor-extra-3.5.2.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-starter-cache/3.4.4/spring-boot-starter-cache-3.4.4.jar:/home/mimingucci/.m2/repository/org/springframework/spring-context-support/6.2.5/spring-context-support-6.2.5.jar:/home/mimingucci/.m2/repository/com/stoyanr/evictor/1.0.0/evictor-1.0.0.jar:/home/mimingucci/.m2/repository/org/springframework/cloud/spring-cloud-starter-openfeign/4.2.1/spring-cloud-starter-openfeign-4.2.1.jar:/home/mimingucci/.m2/repository/org/springframework/cloud/spring-cloud-openfeign-core/4.2.1/spring-cloud-openfeign-core-4.2.1.jar:/home/mimingucci/.m2/repository/io/github/openfeign/feign-form-spring/13.5/feign-form-spring-13.5.jar:/home/mimingucci/.m2/repository/io/github/openfeign/feign-form/13.5/feign-form-13.5.jar:/home/mimingucci/.m2/repository/commons-fileupload/commons-fileupload/1.5/commons-fileupload-1.5.jar:/home/mimingucci/.m2/repository/org/springframework/cloud/spring-cloud-commons/4.2.1/spring-cloud-commons-4.2.1.jar:/home/mimingucci/.m2/repository/org/springframework/security/spring-security-crypto/6.4.4/spring-security-crypto-6.4.4.jar:/home/mimingucci/.m2/repository/io/github/openfeign/feign-core/13.5/feign-core-13.5.jar:/home/mimingucci/.m2/repository/io/github/openfeign/feign-slf4j/13.5/feign-slf4j-13.5.jar:/home/mimingucci/.m2/repository/org/springframework/cloud/spring-cloud-starter-circuitbreaker-resilience4j/3.2.1/spring-cloud-starter-circuitbreaker-resilience4j-3.2.1.jar:/home/mimingucci/.m2/repository/org/springframework/cloud/spring-cloud-circuitbreaker-resilience4j/3.2.1/spring-cloud-circuitbreaker-resilience4j-3.2.1.jar:/home/mimingucci/.m2/repository/io/github/resilience4j/resilience4j-spring-boot3/2.2.0/resilience4j-spring-boot3-2.2.0.jar:/home/mimingucci/.m2/repository/io/github/resilience4j/resilience4j-spring6/2.2.0/resilience4j-spring6-2.2.0.jar:/home/mimingucci/.m2/repository/io/github/resilience4j/resilience4j-annotations/2.2.0/resilience4j-annotations-2.2.0.jar:/home/mimingucci/.m2/repository/io/github/resilience4j/resilience4j-consumer/2.2.0/resilience4j-consumer-2.2.0.jar:/home/mimingucci/.m2/repository/io/github/resilience4j/resilience4j-circularbuffer/2.2.0/resilience4j-circularbuffer-2.2.0.jar:/home/mimingucci/.m2/repository/io/github/resilience4j/resilience4j-framework-common/2.2.0/resilience4j-framework-common-2.2.0.jar:/home/mimingucci/.m2/repository/io/github/resilience4j/resilience4j-micrometer/2.2.0/resilience4j-micrometer-2.2.0.jar:/home/mimingucci/.m2/repository/io/micrometer/micrometer-core/1.14.5/micrometer-core-1.14.5.jar:/home/mimingucci/.m2/repository/org/hdrhistogram/HdrHistogram/2.2.2/HdrHistogram-2.2.2.jar:/home/mimingucci/.m2/repository/org/latencyutils/LatencyUtils/2.0.3/LatencyUtils-2.0.3.jar:/home/mimingucci/.m2/repository/io/github/resilience4j/resilience4j-retry/2.2.0/resilience4j-retry-2.2.0.jar:/home/mimingucci/.m2/repository/io/github/resilience4j/resilience4j-ratelimiter/2.2.0/resilience4j-ratelimiter-2.2.0.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-configuration-processor/3.4.4/spring-boot-configuration-processor-3.4.4.jar:/home/mimingucci/.m2/repository/io/github/resilience4j/resilience4j-circuitbreaker/2.2.0/resilience4j-circuitbreaker-2.2.0.jar:/home/mimingucci/.m2/repository/io/github/resilience4j/resilience4j-core/2.2.0/resilience4j-core-2.2.0.jar:/home/mimingucci/.m2/repository/io/github/resilience4j/resilience4j-timelimiter/2.2.0/resilience4j-timelimiter-2.2.0.jar:/home/mimingucci/.m2/repository/org/springframework/kafka/spring-kafka/3.3.4/spring-kafka-3.3.4.jar:/home/mimingucci/.m2/repository/org/springframework/spring-context/6.2.5/spring-context-6.2.5.jar:/home/mimingucci/.m2/repository/org/springframework/spring-messaging/6.2.5/spring-messaging-6.2.5.jar:/home/mimingucci/.m2/repository/org/springframework/spring-tx/6.2.5/spring-tx-6.2.5.jar:/home/mimingucci/.m2/repository/org/springframework/retry/spring-retry/2.0.11/spring-retry-2.0.11.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-clients/3.8.1/kafka-clients-3.8.1.jar:/home/mimingucci/.m2/repository/com/github/luben/zstd-jni/1.5.6-4/zstd-jni-1.5.6-4.jar:/home/mimingucci/.m2/repository/org/lz4/lz4-java/1.8.0/lz4-java-1.8.0.jar:/home/mimingucci/.m2/repository/org/xerial/snappy/snappy-java/1.1.10.5/snappy-java-1.1.10.5.jar:/home/mimingucci/.m2/repository/io/micrometer/micrometer-observation/1.14.5/micrometer-observation-1.14.5.jar:/home/mimingucci/.m2/repository/io/micrometer/micrometer-commons/1.14.5/micrometer-commons-1.14.5.jar:/home/mimingucci/.m2/repository/org/mapstruct/mapstruct/1.6.3/mapstruct-1.6.3.jar:/home/mimingucci/.m2/repository/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar:/home/mimingucci/.m2/repository/com/mysql/mysql-connector-j/9.1.0/mysql-connector-j-9.1.0.jar:/home/mimingucci/.m2/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-starter-test/3.4.4/spring-boot-starter-test-3.4.4.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-test/3.4.4/spring-boot-test-3.4.4.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/3.4.4/spring-boot-test-autoconfigure-3.4.4.jar:/home/mimingucci/.m2/repository/com/jayway/jsonpath/json-path/2.9.0/json-path-2.9.0.jar:/home/mimingucci/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.2/jakarta.xml.bind-api-4.0.2.jar:/home/mimingucci/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.3/jakarta.activation-api-2.1.3.jar:/home/mimingucci/.m2/repository/net/minidev/json-smart/2.5.2/json-smart-2.5.2.jar:/home/mimingucci/.m2/repository/net/minidev/accessors-smart/2.5.2/accessors-smart-2.5.2.jar:/home/mimingucci/.m2/repository/org/ow2/asm/asm/9.7.1/asm-9.7.1.jar:/home/mimingucci/.m2/repository/org/assertj/assertj-core/3.26.3/assertj-core-3.26.3.jar:/home/mimingucci/.m2/repository/org/awaitility/awaitility/4.2.2/awaitility-4.2.2.jar:/home/mimingucci/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/home/mimingucci/.m2/repository/org/junit/jupiter/junit-jupiter/5.11.4/junit-jupiter-5.11.4.jar:/home/mimingucci/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.11.4/junit-jupiter-params-5.11.4.jar:/home/mimingucci/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.11.4/junit-jupiter-engine-5.11.4.jar:/home/mimingucci/.m2/repository/org/mockito/mockito-core/5.14.2/mockito-core-5.14.2.jar:/home/mimingucci/.m2/repository/net/bytebuddy/byte-buddy-agent/1.15.11/byte-buddy-agent-1.15.11.jar:/home/mimingucci/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/mimingucci/.m2/repository/org/mockito/mockito-junit-jupiter/5.14.2/mockito-junit-jupiter-5.14.2.jar:/home/mimingucci/.m2/repository/org/skyscreamer/jsonassert/1.5.3/jsonassert-1.5.3.jar:/home/mimingucci/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar:/home/mimingucci/.m2/repository/org/springframework/spring-core/6.2.5/spring-core-6.2.5.jar:/home/mimingucci/.m2/repository/org/springframework/spring-jcl/6.2.5/spring-jcl-6.2.5.jar:/home/mimingucci/.m2/repository/org/springframework/spring-test/6.2.5/spring-test-6.2.5.jar:/home/mimingucci/.m2/repository/org/xmlunit/xmlunit-core/2.10.0/xmlunit-core-2.10.0.jar:/home/mimingucci/.m2/repository/io/jsonwebtoken/jjwt-api/0.11.5/jjwt-api-0.11.5.jar:/home/mimingucci/.m2/repository/io/jsonwebtoken/jjwt-impl/0.11.5/jjwt-impl-0.11.5.jar:/home/mimingucci/.m2/repository/io/jsonwebtoken/jjwt-jackson/0.11.5/jjwt-jackson-0.11.5.jar:/home/mimingucci/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.18.3/jackson-databind-2.18.3.jar:/home/mimingucci/.m2/repository/org/springframework/kafka/spring-kafka-test/3.3.4/spring-kafka-test-3.3.4.jar:/home/mimingucci/.m2/repository/org/apache/zookeeper/zookeeper/3.8.4/zookeeper-3.8.4.jar:/home/mimingucci/.m2/repository/org/apache/zookeeper/zookeeper-jute/3.8.4/zookeeper-jute-3.8.4.jar:/home/mimingucci/.m2/repository/org/apache/yetus/audience-annotations/0.12.0/audience-annotations-0.12.0.jar:/home/mimingucci/.m2/repository/io/netty/netty-handler/4.1.119.Final/netty-handler-4.1.119.Final.jar:/home/mimingucci/.m2/repository/io/netty/netty-common/4.1.119.Final/netty-common-4.1.119.Final.jar:/home/mimingucci/.m2/repository/io/netty/netty-resolver/4.1.119.Final/netty-resolver-4.1.119.Final.jar:/home/mimingucci/.m2/repository/io/netty/netty-buffer/4.1.119.Final/netty-buffer-4.1.119.Final.jar:/home/mimingucci/.m2/repository/io/netty/netty-transport/4.1.119.Final/netty-transport-4.1.119.Final.jar:/home/mimingucci/.m2/repository/io/netty/netty-transport-native-unix-common/4.1.119.Final/netty-transport-native-unix-common-4.1.119.Final.jar:/home/mimingucci/.m2/repository/io/netty/netty-codec/4.1.119.Final/netty-codec-4.1.119.Final.jar:/home/mimingucci/.m2/repository/io/netty/netty-transport-native-epoll/4.1.119.Final/netty-transport-native-epoll-4.1.119.Final.jar:/home/mimingucci/.m2/repository/io/netty/netty-transport-classes-epoll/4.1.119.Final/netty-transport-classes-epoll-4.1.119.Final.jar:/home/mimingucci/.m2/repository/ch/qos/logback/logback-core/1.5.18/logback-core-1.5.18.jar:/home/mimingucci/.m2/repository/ch/qos/logback/logback-classic/1.5.18/logback-classic-1.5.18.jar:/home/mimingucci/.m2/repository/commons-io/commons-io/2.11.0/commons-io-2.11.0.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-clients/3.8.1/kafka-clients-3.8.1-test.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-server/3.8.1/kafka-server-3.8.1.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-group-coordinator/3.8.1/kafka-group-coordinator-3.8.1.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-transaction-coordinator/3.8.1/kafka-transaction-coordinator-3.8.1.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-raft/3.8.1/kafka-raft-3.8.1.jar:/home/mimingucci/.m2/repository/com/yammer/metrics/metrics-core/2.2.0/metrics-core-2.2.0.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-metadata/3.8.1/kafka-metadata-3.8.1.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-server-common/3.8.1/kafka-server-common-3.8.1.jar:/home/mimingucci/.m2/repository/net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar:/home/mimingucci/.m2/repository/org/pcollections/pcollections/4.0.1/pcollections-4.0.1.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-server-common/3.8.1/kafka-server-common-3.8.1-test.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-streams-test-utils/3.8.1/kafka-streams-test-utils-3.8.1.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-streams/3.8.1/kafka-streams-3.8.1.jar:/home/mimingucci/.m2/repository/org/rocksdb/rocksdbjni/7.9.2/rocksdbjni-7.9.2.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka_2.13/3.8.1/kafka_2.13-3.8.1.jar:/home/mimingucci/.m2/repository/org/scala-lang/scala-library/2.13.14/scala-library-2.13.14.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-group-coordinator-api/3.8.1/kafka-group-coordinator-api-3.8.1.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-storage-api/3.8.1/kafka-storage-api-3.8.1.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-tools-api/3.8.1/kafka-tools-api-3.8.1.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-storage/3.8.1/kafka-storage-3.8.1.jar:/home/mimingucci/.m2/repository/com/github/ben-manes/caffeine/caffeine/3.1.8/caffeine-3.1.8.jar:/home/mimingucci/.m2/repository/org/checkerframework/checker-qual/3.37.0/checker-qual-3.37.0.jar:/home/mimingucci/.m2/repository/com/google/errorprone/error_prone_annotations/2.21.1/error_prone_annotations-2.21.1.jar:/home/mimingucci/.m2/repository/net/sourceforge/argparse4j/argparse4j/0.7.0/argparse4j-0.7.0.jar:/home/mimingucci/.m2/repository/commons-validator/commons-validator/1.7/commons-validator-1.7.jar:/home/mimingucci/.m2/repository/commons-beanutils/commons-beanutils/1.9.4/commons-beanutils-1.9.4.jar:/home/mimingucci/.m2/repository/commons-digester/commons-digester/2.1/commons-digester-2.1.jar:/home/mimingucci/.m2/repository/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar:/home/mimingucci/.m2/repository/com/fasterxml/jackson/module/jackson-module-scala_2.13/2.18.3/jackson-module-scala_2.13-2.18.3.jar:/home/mimingucci/.m2/repository/com/thoughtworks/paranamer/paranamer/2.8/paranamer-2.8.jar:/home/mimingucci/.m2/repository/com/fasterxml/jackson/dataformat/jackson-dataformat-csv/2.18.3/jackson-dataformat-csv-2.18.3.jar:/home/mimingucci/.m2/repository/org/bitbucket/b_c/jose4j/0.9.4/jose4j-0.9.4.jar:/home/mimingucci/.m2/repository/org/scala-lang/modules/scala-collection-compat_2.13/2.10.0/scala-collection-compat_2.13-2.10.0.jar:/home/mimingucci/.m2/repository/org/scala-lang/modules/scala-java8-compat_2.13/1.0.2/scala-java8-compat_2.13-1.0.2.jar:/home/mimingucci/.m2/repository/org/scala-lang/scala-reflect/2.13.14/scala-reflect-2.13.14.jar:/home/mimingucci/.m2/repository/com/typesafe/scala-logging/scala-logging_2.13/3.9.4/scala-logging_2.13-3.9.4.jar:/home/mimingucci/.m2/repository/io/dropwizard/metrics/metrics-core/4.1.12.1/metrics-core-4.1.12.1.jar:/home/mimingucci/.m2/repository/commons-cli/commons-cli/1.4/commons-cli-1.4.jar:/home/mimingucci/.m2/repository/org/apache/kafka/kafka_2.13/3.8.1/kafka_2.13-3.8.1-test.jar:/home/mimingucci/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.11.4/junit-jupiter-api-5.11.4.jar:/home/mimingucci/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/mimingucci/.m2/repository/org/junit/platform/junit-platform-commons/1.11.4/junit-platform-commons-1.11.4.jar:/home/mimingucci/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/mimingucci/.m2/repository/org/junit/platform/junit-platform-launcher/1.11.4/junit-platform-launcher-1.11.4.jar:/home/mimingucci/.m2/repository/org/junit/platform/junit-platform-engine/1.11.4/junit-platform-engine-1.11.4.jar:/home/mimingucci/.m2/repository/org/springframework/boot/spring-boot-starter-websocket/3.4.4/spring-boot-starter-websocket-3.4.4.jar:/home/mimingucci/.m2/repository/org/springframework/spring-websocket/6.2.5/spring-websocket-6.2.5.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -32,13 +32,13 @@
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="FILE_LOG_CHARSET" value="UTF-8"/>
     <property name="java.awt.headless" value="true"/>
-    <property name="surefire.real.class.path" value="/home/mimingucci/Work/Java/Codeforces/submission/target/surefire/surefirebooter-20250518104146797_3.jar"/>
+    <property name="surefire.real.class.path" value="/home/mimingucci/Work/Java/Codeforces/submission/target/surefire/surefirebooter-20250531201107832_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="21.0.6+7-LTS"/>
     <property name="user.name" value="mimingucci"/>
     <property name="stdout.encoding" value="UTF-8"/>
     <property name="path.separator" value=":"/>
-    <property name="os.version" value="6.11.0-25-generic"/>
+    <property name="os.version" value="6.11.0-26-generic"/>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="file.encoding" value="UTF-8"/>
     <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
@@ -52,7 +52,7 @@
     <property name="user.dir" value="/home/mimingucci/Work/Java/Codeforces/submission"/>
     <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="PID" value="204374"/>
+    <property name="PID" value="104297"/>
     <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
     <property name="native.encoding" value="UTF-8"/>
     <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib"/>
@@ -64,9 +64,9 @@
     <property name="java.class.version" value="65.0"/>
     <property name="LOGGED_APPLICATION_NAME" value="[submission] "/>
   </properties>
-  <testcase name="contextLoads" classname="com.mimingucci.submission.SubmissionApplicationTests" time="0.422">
-    <system-out><![CDATA[10:41:47.645 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.mimingucci.submission.SubmissionApplicationTests]: SubmissionApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-10:41:47.786 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.mimingucci.submission.SubmissionApplication for test class com.mimingucci.submission.SubmissionApplicationTests
+  <testcase name="contextLoads" classname="com.mimingucci.submission.SubmissionApplicationTests" time="0.512">
+    <system-out><![CDATA[20:11:08.764 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.mimingucci.submission.SubmissionApplicationTests]: SubmissionApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20:11:08.908 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.mimingucci.submission.SubmissionApplication for test class com.mimingucci.submission.SubmissionApplicationTests
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -77,21 +77,21 @@
 
  :: Spring Boot ::                (v3.4.4)
 
-2025-05-18T10:41:48.541+07:00  INFO 204374 --- [submission] [           main] c.m.s.SubmissionApplicationTests         : Starting SubmissionApplicationTests using Java 21.0.6 with PID 204374 (started by mimingucci in /home/mimingucci/Work/Java/Codeforces/submission)
-2025-05-18T10:41:48.543+07:00  INFO 204374 --- [submission] [           main] c.m.s.SubmissionApplicationTests         : No active profile set, falling back to 1 default profile: "default"
-2025-05-18T10:41:49.464+07:00  INFO 204374 --- [submission] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2025-05-18T10:41:49.601+07:00  INFO 204374 --- [submission] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 126 ms. Found 1 JPA repository interface.
-2025-05-18T10:41:50.069+07:00  INFO 204374 --- [submission] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=605d773d-9480-3587-a0a0-2a02233e9ca8
-2025-05-18T10:41:50.755+07:00  INFO 204374 --- [submission] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2025-05-18T10:41:50.831+07:00  INFO 204374 --- [submission] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.11.Final
-2025-05-18T10:41:50.871+07:00  INFO 204374 --- [submission] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
-2025-05-18T10:41:51.111+07:00  INFO 204374 --- [submission] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2025-05-18T10:41:51.135+07:00  INFO 204374 --- [submission] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2025-05-18T10:41:51.284+07:00  INFO 204374 --- [submission] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@63b0b3dd
-2025-05-18T10:41:51.285+07:00  INFO 204374 --- [submission] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2025-05-18T10:41:51.323+07:00  WARN 204374 --- [submission] [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2025-05-18T10:41:51.324+07:00  WARN 204374 --- [submission] [           main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
-2025-05-18T10:41:51.338+07:00  INFO 204374 --- [submission] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2025-05-31T20:11:09.663+07:00  INFO 104297 --- [submission] [           main] c.m.s.SubmissionApplicationTests         : Starting SubmissionApplicationTests using Java 21.0.6 with PID 104297 (started by mimingucci in /home/mimingucci/Work/Java/Codeforces/submission)
+2025-05-31T20:11:09.665+07:00  INFO 104297 --- [submission] [           main] c.m.s.SubmissionApplicationTests         : No active profile set, falling back to 1 default profile: "default"
+2025-05-31T20:11:10.667+07:00  INFO 104297 --- [submission] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-05-31T20:11:10.815+07:00  INFO 104297 --- [submission] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 134 ms. Found 2 JPA repository interfaces.
+2025-05-31T20:11:11.288+07:00  INFO 104297 --- [submission] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=ad9540b1-668b-325f-bb46-69913999e824
+2025-05-31T20:11:12.023+07:00  INFO 104297 --- [submission] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-05-31T20:11:12.118+07:00  INFO 104297 --- [submission] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-05-31T20:11:12.166+07:00  INFO 104297 --- [submission] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-05-31T20:11:12.422+07:00  INFO 104297 --- [submission] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-05-31T20:11:12.446+07:00  INFO 104297 --- [submission] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-05-31T20:11:12.618+07:00  INFO 104297 --- [submission] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@45b6c666
+2025-05-31T20:11:12.620+07:00  INFO 104297 --- [submission] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-05-31T20:11:12.660+07:00  WARN 104297 --- [submission] [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-05-31T20:11:12.661+07:00  WARN 104297 --- [submission] [           main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-05-31T20:11:12.678+07:00  INFO 104297 --- [submission] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
 	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
 	Database driver: undefined/unknown
 	Database version: 8.0
@@ -99,26 +99,26 @@
 	Isolation level: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2025-05-18T10:41:52.185+07:00  INFO 204374 --- [submission] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2025-05-18T10:41:52.234+07:00  INFO 204374 --- [submission] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2025-05-18T10:41:52.892+07:00  WARN 204374 --- [submission] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2025-05-18T10:41:53.075+07:00  INFO 204374 --- [submission] [           main] o.s.c.openfeign.FeignClientFactoryBean   : For 'contest' URL not provided. Will try picking an instance via load-balancing.
-2025-05-18T10:41:53.311+07:00  INFO 204374 --- [submission] [           main] o.s.c.openfeign.FeignClientFactoryBean   : For 'problem' URL not provided. Will try picking an instance via load-balancing.
-2025-05-18T10:41:54.613+07:00  INFO 204374 --- [submission] [           main] DiscoveryClientOptionalArgsConfiguration : Eureka HTTP Client uses RestTemplate.
-2025-05-18T10:41:54.732+07:00  INFO 204374 --- [submission] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
-2025-05-18T10:41:54.733+07:00  INFO 204374 --- [submission] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@5128197f]]
-2025-05-18T10:41:54.733+07:00  INFO 204374 --- [submission] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
-2025-05-18T10:41:54.742+07:00  INFO 204374 --- [submission] [           main] o.s.c.n.eureka.InstanceInfoFactory       : Setting initial instance status as: STARTING
-2025-05-18T10:41:54.762+07:00  INFO 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Initializing Eureka in region us-east-1
-2025-05-18T10:41:54.764+07:00  INFO 204374 --- [submission] [           main] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
-2025-05-18T10:41:54.770+07:00  INFO 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Disable delta property : false
-2025-05-18T10:41:54.770+07:00  INFO 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Single vip registry refresh property : null
-2025-05-18T10:41:54.770+07:00  INFO 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Force full registry fetch : false
-2025-05-18T10:41:54.770+07:00  INFO 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Application is null : false
-2025-05-18T10:41:54.770+07:00  INFO 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Registered Applications size is zero : true
-2025-05-18T10:41:54.770+07:00  INFO 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Application version is -1: true
-2025-05-18T10:41:54.770+07:00  INFO 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Getting all instance registry info from the eureka server
-2025-05-18T10:41:55.013+07:00  INFO 204374 --- [submission] [           main] c.n.d.s.t.d.RedirectingEurekaHttpClient  : Request execution error. endpoint=DefaultEndpoint{ serviceUrl='http://localhost:8761/eureka/}, exception=I/O error on GET request for "http://localhost:8761/eureka/apps/": Connect to http://localhost:8761 [localhost/127.0.0.1] failed: Connection refused stacktrace=org.springframework.web.client.ResourceAccessException: I/O error on GET request for "http://localhost:8761/eureka/apps/": Connect to http://localhost:8761 [localhost/127.0.0.1] failed: Connection refused
+2025-05-31T20:11:13.684+07:00  INFO 104297 --- [submission] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-05-31T20:11:13.733+07:00  INFO 104297 --- [submission] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-05-31T20:11:14.462+07:00  WARN 104297 --- [submission] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-05-31T20:11:14.640+07:00  INFO 104297 --- [submission] [           main] o.s.c.openfeign.FeignClientFactoryBean   : For 'contest' URL not provided. Will try picking an instance via load-balancing.
+2025-05-31T20:11:14.882+07:00  INFO 104297 --- [submission] [           main] o.s.c.openfeign.FeignClientFactoryBean   : For 'problem' URL not provided. Will try picking an instance via load-balancing.
+2025-05-31T20:11:16.503+07:00  INFO 104297 --- [submission] [           main] DiscoveryClientOptionalArgsConfiguration : Eureka HTTP Client uses RestTemplate.
+2025-05-31T20:11:16.646+07:00  INFO 104297 --- [submission] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2025-05-31T20:11:16.647+07:00  INFO 104297 --- [submission] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@2a8ff32]]
+2025-05-31T20:11:16.647+07:00  INFO 104297 --- [submission] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2025-05-31T20:11:16.658+07:00  INFO 104297 --- [submission] [           main] o.s.c.n.eureka.InstanceInfoFactory       : Setting initial instance status as: STARTING
+2025-05-31T20:11:16.683+07:00  INFO 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Initializing Eureka in region us-east-1
+2025-05-31T20:11:16.686+07:00  INFO 104297 --- [submission] [           main] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2025-05-31T20:11:16.693+07:00  INFO 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Disable delta property : false
+2025-05-31T20:11:16.693+07:00  INFO 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Single vip registry refresh property : null
+2025-05-31T20:11:16.693+07:00  INFO 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Force full registry fetch : false
+2025-05-31T20:11:16.693+07:00  INFO 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Application is null : false
+2025-05-31T20:11:16.693+07:00  INFO 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Registered Applications size is zero : true
+2025-05-31T20:11:16.693+07:00  INFO 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Application version is -1: true
+2025-05-31T20:11:16.694+07:00  INFO 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Getting all instance registry info from the eureka server
+2025-05-31T20:11:17.002+07:00  INFO 104297 --- [submission] [           main] c.n.d.s.t.d.RedirectingEurekaHttpClient  : Request execution error. endpoint=DefaultEndpoint{ serviceUrl='http://localhost:8761/eureka/}, exception=I/O error on GET request for "http://localhost:8761/eureka/apps/": Connect to http://localhost:8761 [localhost/127.0.0.1] failed: Connection refused stacktrace=org.springframework.web.client.ResourceAccessException: I/O error on GET request for "http://localhost:8761/eureka/apps/": Connect to http://localhost:8761 [localhost/127.0.0.1] failed: Connection refused
 	at org.springframework.web.client.RestTemplate.createResourceAccessException(RestTemplate.java:926)
 	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:906)
 	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:841)
@@ -302,8 +302,8 @@ Caused by: org.apache.hc.client5.http.HttpHostConnectException: Connect to http:
 	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:900)
 	... 144 more
 
-2025-05-18T10:41:55.015+07:00  WARN 204374 --- [submission] [           main] c.n.d.s.t.d.RetryableEurekaHttpClient    : Request execution failed with message: I/O error on GET request for "http://localhost:8761/eureka/apps/": Connect to http://localhost:8761 [localhost/127.0.0.1] failed: Connection refused
-2025-05-18T10:41:55.016+07:00  INFO 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_SUBMISSION/mimingucci-Modern-15-A5M.lan:submission:8087 - was unable to refresh its cache! This periodic background refresh will be retried in 30 seconds. status = Cannot execute request on any known server stacktrace = com.netflix.discovery.shared.transport.TransportException: Cannot execute request on any known server
+2025-05-31T20:11:17.004+07:00  WARN 104297 --- [submission] [           main] c.n.d.s.t.d.RetryableEurekaHttpClient    : Request execution failed with message: I/O error on GET request for "http://localhost:8761/eureka/apps/": Connect to http://localhost:8761 [localhost/127.0.0.1] failed: Connection refused
+2025-05-31T20:11:17.005+07:00  INFO 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_SUBMISSION/mimingucci-Modern-15-A5M.lan:submission:8087 - was unable to refresh its cache! This periodic background refresh will be retried in 30 seconds. status = Cannot execute request on any known server stacktrace = com.netflix.discovery.shared.transport.TransportException: Cannot execute request on any known server
 	at com.netflix.discovery.shared.transport.decorator.RetryableEurekaHttpClient.execute(RetryableEurekaHttpClient.java:112)
 	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.getApplications(EurekaHttpClientDecorator.java:134)
 	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$6.execute(EurekaHttpClientDecorator.java:137)
@@ -440,16 +440,115 @@ Caused by: org.apache.hc.client5.http.HttpHostConnectException: Connect to http:
 	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
 	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
 
-2025-05-18T10:41:55.018+07:00  INFO 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Initial registry fetch from primary servers failed
-2025-05-18T10:41:55.018+07:00  WARN 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Using default backup registry implementation which does not do anything.
-2025-05-18T10:41:55.018+07:00  INFO 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Initial registry fetch from backup servers failed
-2025-05-18T10:41:55.019+07:00  INFO 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Starting heartbeat executor: renew interval is: 30
-2025-05-18T10:41:55.029+07:00  INFO 204374 --- [submission] [           main] c.n.discovery.InstanceInfoReplicator     : InstanceInfoReplicator onDemand update allowed rate per min is 4
-2025-05-18T10:41:55.033+07:00  INFO 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Discovery Client initialized at timestamp 1747539715030 with initial instances count: 0
-2025-05-18T10:41:55.042+07:00  INFO 204374 --- [submission] [           main] o.s.c.n.e.s.EurekaServiceRegistry        : Registering application SUBMISSION with eureka with status UP
-2025-05-18T10:41:55.043+07:00  INFO 204374 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1747539715043, current=UP, previous=STARTING]
-2025-05-18T10:41:55.045+07:00  INFO 204374 --- [submission] [foReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_SUBMISSION/mimingucci-Modern-15-A5M.lan:submission:8087: registering service...
-2025-05-18T10:41:55.095+07:00  INFO 204374 --- [submission] [           main] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
+2025-05-31T20:11:17.007+07:00  INFO 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Initial registry fetch from primary servers failed
+2025-05-31T20:11:17.008+07:00  WARN 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Using default backup registry implementation which does not do anything.
+2025-05-31T20:11:17.008+07:00  INFO 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Initial registry fetch from backup servers failed
+2025-05-31T20:11:17.009+07:00  INFO 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Starting heartbeat executor: renew interval is: 30
+2025-05-31T20:11:17.011+07:00  INFO 104297 --- [submission] [           main] c.n.discovery.InstanceInfoReplicator     : InstanceInfoReplicator onDemand update allowed rate per min is 4
+2025-05-31T20:11:17.016+07:00  INFO 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Discovery Client initialized at timestamp 1748697077012 with initial instances count: 0
+2025-05-31T20:11:17.028+07:00  INFO 104297 --- [submission] [           main] o.s.c.n.e.s.EurekaServiceRegistry        : Registering application SUBMISSION with eureka with status UP
+2025-05-31T20:11:17.029+07:00  INFO 104297 --- [submission] [           main] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1748697077029, current=UP, previous=STARTING]
+2025-05-31T20:11:17.030+07:00  INFO 104297 --- [submission] [foReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_SUBMISSION/mimingucci-Modern-15-A5M.lan:submission:8087: registering service...
+2025-05-31T20:11:17.068+07:00  INFO 104297 --- [submission] [foReplicator-%d] c.n.d.s.t.d.RedirectingEurekaHttpClient  : Request execution error. endpoint=DefaultEndpoint{ serviceUrl='http://localhost:8761/eureka/}, exception=I/O error on POST request for "http://localhost:8761/eureka/apps/SUBMISSION": Connect to http://localhost:8761 [localhost/127.0.0.1] failed: Connection refused stacktrace=org.springframework.web.client.ResourceAccessException: I/O error on POST request for "http://localhost:8761/eureka/apps/SUBMISSION": Connect to http://localhost:8761 [localhost/127.0.0.1] failed: Connection refused
+	at org.springframework.web.client.RestTemplate.createResourceAccessException(RestTemplate.java:926)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:906)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:841)
+	at org.springframework.web.client.RestTemplate.exchange(RestTemplate.java:702)
+	at org.springframework.cloud.netflix.eureka.http.RestTemplateEurekaHttpClient.register(RestTemplateEurekaHttpClient.java:87)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59)
+	at com.netflix.discovery.shared.transport.decorator.RedirectingEurekaHttpClient.executeOnNewServer(RedirectingEurekaHttpClient.java:121)
+	at com.netflix.discovery.shared.transport.decorator.RedirectingEurekaHttpClient.execute(RedirectingEurekaHttpClient.java:80)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59)
+	at com.netflix.discovery.shared.transport.decorator.RetryableEurekaHttpClient.execute(RetryableEurekaHttpClient.java:120)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59)
+	at com.netflix.discovery.shared.transport.decorator.SessionedEurekaHttpClient.execute(SessionedEurekaHttpClient.java:76)
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
+	at com.netflix.discovery.DiscoveryClient.register(DiscoveryClient.java:828)
+	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:125)
+	at com.netflix.discovery.InstanceInfoReplicator$2.run(InstanceInfoReplicator.java:105)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.apache.hc.client5.http.HttpHostConnectException: Connect to http://localhost:8761 [localhost/127.0.0.1] failed: Connection refused
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:542)
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:592)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)
+	at java.base/java.net.Socket.connect(Socket.java:751)
+	at org.apache.hc.client5.http.impl.io.DefaultHttpClientConnectionOperator.connect(DefaultHttpClientConnectionOperator.java:216)
+	at org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager.connect(PoolingHttpClientConnectionManager.java:490)
+	at org.apache.hc.client5.http.impl.classic.InternalExecRuntime.connectEndpoint(InternalExecRuntime.java:164)
+	at org.apache.hc.client5.http.impl.classic.InternalExecRuntime.connectEndpoint(InternalExecRuntime.java:174)
+	at org.apache.hc.client5.http.impl.classic.ConnectExec.execute(ConnectExec.java:144)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.ProtocolExec.execute(ProtocolExec.java:192)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.ContentCompressionExec.execute(ContentCompressionExec.java:150)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec.execute(HttpRequestRetryExec.java:113)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.RedirectExec.execute(RedirectExec.java:110)
+	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
+	at org.apache.hc.client5.http.impl.classic.InternalHttpClient.doExecute(InternalHttpClient.java:174)
+	at org.apache.hc.client5.http.impl.classic.CloseableHttpClient.execute(CloseableHttpClient.java:87)
+	at org.apache.hc.client5.http.impl.classic.CloseableHttpClient.execute(CloseableHttpClient.java:55)
+	at org.apache.hc.client5.http.classic.HttpClient.executeOpen(HttpClient.java:183)
+	at org.springframework.http.client.HttpComponentsClientHttpRequest.executeInternal(HttpComponentsClientHttpRequest.java:99)
+	at org.springframework.http.client.AbstractStreamingClientHttpRequest.executeInternal(AbstractStreamingClientHttpRequest.java:71)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:81)
+	at org.springframework.http.client.InterceptingClientHttpRequest$InterceptingRequestExecution.execute(InterceptingClientHttpRequest.java:117)
+	at org.springframework.cloud.netflix.eureka.http.RestTemplateTransportClientFactory.lambda$restTemplate$2(RestTemplateTransportClientFactory.java:145)
+	at org.springframework.http.client.InterceptingClientHttpRequest$InterceptingRequestExecution.execute(InterceptingClientHttpRequest.java:88)
+	at org.springframework.http.client.InterceptingClientHttpRequest.executeInternal(InterceptingClientHttpRequest.java:72)
+	at org.springframework.http.client.AbstractBufferingClientHttpRequest.executeInternal(AbstractBufferingClientHttpRequest.java:48)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:81)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:900)
+	... 22 more
+
+2025-05-31T20:11:17.069+07:00  WARN 104297 --- [submission] [foReplicator-%d] c.n.d.s.t.d.RetryableEurekaHttpClient    : Request execution failed with message: I/O error on POST request for "http://localhost:8761/eureka/apps/SUBMISSION": Connect to http://localhost:8761 [localhost/127.0.0.1] failed: Connection refused
+2025-05-31T20:11:17.069+07:00  WARN 104297 --- [submission] [foReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_SUBMISSION/mimingucci-Modern-15-A5M.lan:submission:8087 - registration failed Cannot execute request on any known server
+
+com.netflix.discovery.shared.transport.TransportException: Cannot execute request on any known server
+	at com.netflix.discovery.shared.transport.decorator.RetryableEurekaHttpClient.execute(RetryableEurekaHttpClient.java:112) ~[eureka-client-2.0.4.jar:2.0.4]
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56) ~[eureka-client-2.0.4.jar:2.0.4]
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59) ~[eureka-client-2.0.4.jar:2.0.4]
+	at com.netflix.discovery.shared.transport.decorator.SessionedEurekaHttpClient.execute(SessionedEurekaHttpClient.java:76) ~[eureka-client-2.0.4.jar:2.0.4]
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56) ~[eureka-client-2.0.4.jar:2.0.4]
+	at com.netflix.discovery.DiscoveryClient.register(DiscoveryClient.java:828) ~[eureka-client-2.0.4.jar:2.0.4]
+	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:125) ~[eureka-client-2.0.4.jar:2.0.4]
+	at com.netflix.discovery.InstanceInfoReplicator$2.run(InstanceInfoReplicator.java:105) ~[eureka-client-2.0.4.jar:2.0.4]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
+
+2025-05-31T20:11:17.073+07:00  WARN 104297 --- [submission] [foReplicator-%d] c.n.discovery.InstanceInfoReplicator     : There was a problem with the instance info replicator
+
+com.netflix.discovery.shared.transport.TransportException: Cannot execute request on any known server
+	at com.netflix.discovery.shared.transport.decorator.RetryableEurekaHttpClient.execute(RetryableEurekaHttpClient.java:112) ~[eureka-client-2.0.4.jar:2.0.4]
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56) ~[eureka-client-2.0.4.jar:2.0.4]
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59) ~[eureka-client-2.0.4.jar:2.0.4]
+	at com.netflix.discovery.shared.transport.decorator.SessionedEurekaHttpClient.execute(SessionedEurekaHttpClient.java:76) ~[eureka-client-2.0.4.jar:2.0.4]
+	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56) ~[eureka-client-2.0.4.jar:2.0.4]
+	at com.netflix.discovery.DiscoveryClient.register(DiscoveryClient.java:828) ~[eureka-client-2.0.4.jar:2.0.4]
+	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:125) ~[eureka-client-2.0.4.jar:2.0.4]
+	at com.netflix.discovery.InstanceInfoReplicator$2.run(InstanceInfoReplicator.java:105) ~[eureka-client-2.0.4.jar:2.0.4]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317) ~[na:na]
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
+
+2025-05-31T20:11:17.078+07:00  INFO 104297 --- [submission] [           main] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
 	allow.auto.create.topics = true
 	auto.commit.interval.ms = 5000
 	auto.include.jmx.reporter = true
@@ -548,129 +647,33 @@ Caused by: org.apache.hc.client5.http.HttpHostConnectException: Connect to http:
 	ssl.truststore.type = JKS
 	value.deserializer = class org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 
-2025-05-18T10:41:55.097+07:00  INFO 204374 --- [submission] [foReplicator-%d] c.n.d.s.t.d.RedirectingEurekaHttpClient  : Request execution error. endpoint=DefaultEndpoint{ serviceUrl='http://localhost:8761/eureka/}, exception=I/O error on POST request for "http://localhost:8761/eureka/apps/SUBMISSION": Connect to http://localhost:8761 [localhost/127.0.0.1] failed: Connection refused stacktrace=org.springframework.web.client.ResourceAccessException: I/O error on POST request for "http://localhost:8761/eureka/apps/SUBMISSION": Connect to http://localhost:8761 [localhost/127.0.0.1] failed: Connection refused
-	at org.springframework.web.client.RestTemplate.createResourceAccessException(RestTemplate.java:926)
-	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:906)
-	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:841)
-	at org.springframework.web.client.RestTemplate.exchange(RestTemplate.java:702)
-	at org.springframework.cloud.netflix.eureka.http.RestTemplateEurekaHttpClient.register(RestTemplateEurekaHttpClient.java:87)
-	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59)
-	at com.netflix.discovery.shared.transport.decorator.RedirectingEurekaHttpClient.executeOnNewServer(RedirectingEurekaHttpClient.java:121)
-	at com.netflix.discovery.shared.transport.decorator.RedirectingEurekaHttpClient.execute(RedirectingEurekaHttpClient.java:80)
-	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
-	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59)
-	at com.netflix.discovery.shared.transport.decorator.RetryableEurekaHttpClient.execute(RetryableEurekaHttpClient.java:120)
-	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
-	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59)
-	at com.netflix.discovery.shared.transport.decorator.SessionedEurekaHttpClient.execute(SessionedEurekaHttpClient.java:76)
-	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56)
-	at com.netflix.discovery.DiscoveryClient.register(DiscoveryClient.java:828)
-	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:125)
-	at com.netflix.discovery.InstanceInfoReplicator$2.run(InstanceInfoReplicator.java:105)
-	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
-	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
-	at java.base/java.lang.Thread.run(Thread.java:1583)
-Caused by: org.apache.hc.client5.http.HttpHostConnectException: Connect to http://localhost:8761 [localhost/127.0.0.1] failed: Connection refused
-	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
-	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:682)
-	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:542)
-	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:592)
-	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)
-	at java.base/java.net.Socket.connect(Socket.java:751)
-	at org.apache.hc.client5.http.impl.io.DefaultHttpClientConnectionOperator.connect(DefaultHttpClientConnectionOperator.java:216)
-	at org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager.connect(PoolingHttpClientConnectionManager.java:490)
-	at org.apache.hc.client5.http.impl.classic.InternalExecRuntime.connectEndpoint(InternalExecRuntime.java:164)
-	at org.apache.hc.client5.http.impl.classic.InternalExecRuntime.connectEndpoint(InternalExecRuntime.java:174)
-	at org.apache.hc.client5.http.impl.classic.ConnectExec.execute(ConnectExec.java:144)
-	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
-	at org.apache.hc.client5.http.impl.classic.ProtocolExec.execute(ProtocolExec.java:192)
-	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
-	at org.apache.hc.client5.http.impl.classic.ContentCompressionExec.execute(ContentCompressionExec.java:150)
-	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
-	at org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec.execute(HttpRequestRetryExec.java:113)
-	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
-	at org.apache.hc.client5.http.impl.classic.RedirectExec.execute(RedirectExec.java:110)
-	at org.apache.hc.client5.http.impl.classic.ExecChainElement.execute(ExecChainElement.java:51)
-	at org.apache.hc.client5.http.impl.classic.InternalHttpClient.doExecute(InternalHttpClient.java:174)
-	at org.apache.hc.client5.http.impl.classic.CloseableHttpClient.execute(CloseableHttpClient.java:87)
-	at org.apache.hc.client5.http.impl.classic.CloseableHttpClient.execute(CloseableHttpClient.java:55)
-	at org.apache.hc.client5.http.classic.HttpClient.executeOpen(HttpClient.java:183)
-	at org.springframework.http.client.HttpComponentsClientHttpRequest.executeInternal(HttpComponentsClientHttpRequest.java:99)
-	at org.springframework.http.client.AbstractStreamingClientHttpRequest.executeInternal(AbstractStreamingClientHttpRequest.java:71)
-	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:81)
-	at org.springframework.http.client.InterceptingClientHttpRequest$InterceptingRequestExecution.execute(InterceptingClientHttpRequest.java:117)
-	at org.springframework.cloud.netflix.eureka.http.RestTemplateTransportClientFactory.lambda$restTemplate$2(RestTemplateTransportClientFactory.java:145)
-	at org.springframework.http.client.InterceptingClientHttpRequest$InterceptingRequestExecution.execute(InterceptingClientHttpRequest.java:88)
-	at org.springframework.http.client.InterceptingClientHttpRequest.executeInternal(InterceptingClientHttpRequest.java:72)
-	at org.springframework.http.client.AbstractBufferingClientHttpRequest.executeInternal(AbstractBufferingClientHttpRequest.java:48)
-	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:81)
-	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:900)
-	... 22 more
-
-2025-05-18T10:41:55.098+07:00  WARN 204374 --- [submission] [foReplicator-%d] c.n.d.s.t.d.RetryableEurekaHttpClient    : Request execution failed with message: I/O error on POST request for "http://localhost:8761/eureka/apps/SUBMISSION": Connect to http://localhost:8761 [localhost/127.0.0.1] failed: Connection refused
-2025-05-18T10:41:55.098+07:00  WARN 204374 --- [submission] [foReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_SUBMISSION/mimingucci-Modern-15-A5M.lan:submission:8087 - registration failed Cannot execute request on any known server
-
-com.netflix.discovery.shared.transport.TransportException: Cannot execute request on any known server
-	at com.netflix.discovery.shared.transport.decorator.RetryableEurekaHttpClient.execute(RetryableEurekaHttpClient.java:112) ~[eureka-client-2.0.4.jar:2.0.4]
-	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56) ~[eureka-client-2.0.4.jar:2.0.4]
-	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59) ~[eureka-client-2.0.4.jar:2.0.4]
-	at com.netflix.discovery.shared.transport.decorator.SessionedEurekaHttpClient.execute(SessionedEurekaHttpClient.java:76) ~[eureka-client-2.0.4.jar:2.0.4]
-	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56) ~[eureka-client-2.0.4.jar:2.0.4]
-	at com.netflix.discovery.DiscoveryClient.register(DiscoveryClient.java:828) ~[eureka-client-2.0.4.jar:2.0.4]
-	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:125) ~[eureka-client-2.0.4.jar:2.0.4]
-	at com.netflix.discovery.InstanceInfoReplicator$2.run(InstanceInfoReplicator.java:105) ~[eureka-client-2.0.4.jar:2.0.4]
-	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317) ~[na:na]
-	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304) ~[na:na]
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
-	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
-
-2025-05-18T10:41:55.102+07:00  WARN 204374 --- [submission] [foReplicator-%d] c.n.discovery.InstanceInfoReplicator     : There was a problem with the instance info replicator
-
-com.netflix.discovery.shared.transport.TransportException: Cannot execute request on any known server
-	at com.netflix.discovery.shared.transport.decorator.RetryableEurekaHttpClient.execute(RetryableEurekaHttpClient.java:112) ~[eureka-client-2.0.4.jar:2.0.4]
-	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56) ~[eureka-client-2.0.4.jar:2.0.4]
-	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator$1.execute(EurekaHttpClientDecorator.java:59) ~[eureka-client-2.0.4.jar:2.0.4]
-	at com.netflix.discovery.shared.transport.decorator.SessionedEurekaHttpClient.execute(SessionedEurekaHttpClient.java:76) ~[eureka-client-2.0.4.jar:2.0.4]
-	at com.netflix.discovery.shared.transport.decorator.EurekaHttpClientDecorator.register(EurekaHttpClientDecorator.java:56) ~[eureka-client-2.0.4.jar:2.0.4]
-	at com.netflix.discovery.DiscoveryClient.register(DiscoveryClient.java:828) ~[eureka-client-2.0.4.jar:2.0.4]
-	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:125) ~[eureka-client-2.0.4.jar:2.0.4]
-	at com.netflix.discovery.InstanceInfoReplicator$2.run(InstanceInfoReplicator.java:105) ~[eureka-client-2.0.4.jar:2.0.4]
-	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572) ~[na:na]
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317) ~[na:na]
-	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304) ~[na:na]
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[na:na]
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[na:na]
-	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
-
-2025-05-18T10:41:55.146+07:00  INFO 204374 --- [submission] [           main] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
-2025-05-18T10:41:55.360+07:00  INFO 204374 --- [submission] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
-2025-05-18T10:41:55.360+07:00  INFO 204374 --- [submission] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
-2025-05-18T10:41:55.360+07:00  INFO 204374 --- [submission] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1747539715358
-2025-05-18T10:41:55.364+07:00  INFO 204374 --- [submission] [           main] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-submission-1, groupId=submission] Subscribed to topic(s): submission.update
-2025-05-18T10:41:55.380+07:00  INFO 204374 --- [submission] [           main] c.m.s.SubmissionApplicationTests         : Started SubmissionApplicationTests in 7.213 seconds (process running for 8.501)
-2025-05-18T10:41:55.626+07:00  INFO 204374 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Node -1 disconnected.
-2025-05-18T10:41:55.627+07:00  WARN 204374 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Connection to node -1 (localhost/127.0.0.1:9092) could not be established. Node may not be available.
-2025-05-18T10:41:55.628+07:00  WARN 204374 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Bootstrap broker localhost:9092 (id: -1 rack: null) disconnected
-2025-05-18T10:41:55.748+07:00  INFO 204374 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Node -1 disconnected.
-2025-05-18T10:41:55.748+07:00  WARN 204374 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Connection to node -1 (localhost/127.0.0.1:9092) could not be established. Node may not be available.
-2025-05-18T10:41:55.748+07:00  WARN 204374 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Bootstrap broker localhost:9092 (id: -1 rack: null) disconnected
+2025-05-31T20:11:17.136+07:00  INFO 104297 --- [submission] [           main] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2025-05-31T20:11:17.334+07:00  INFO 104297 --- [submission] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2025-05-31T20:11:17.334+07:00  INFO 104297 --- [submission] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2025-05-31T20:11:17.334+07:00  INFO 104297 --- [submission] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1748697077332
+2025-05-31T20:11:17.338+07:00  INFO 104297 --- [submission] [           main] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-submission-1, groupId=submission] Subscribed to topic(s): submission.update
+2025-05-31T20:11:17.356+07:00  INFO 104297 --- [submission] [           main] c.m.s.SubmissionApplicationTests         : Started SubmissionApplicationTests in 8.074 seconds (process running for 9.453)
+2025-05-31T20:11:17.661+07:00  INFO 104297 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Node -1 disconnected.
+2025-05-31T20:11:17.663+07:00  WARN 104297 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Connection to node -1 (localhost/127.0.0.1:9092) could not be established. Node may not be available.
+2025-05-31T20:11:17.663+07:00  WARN 104297 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Bootstrap broker localhost:9092 (id: -1 rack: null) disconnected
+2025-05-31T20:11:17.766+07:00  INFO 104297 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Node -1 disconnected.
+2025-05-31T20:11:17.766+07:00  WARN 104297 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Connection to node -1 (localhost/127.0.0.1:9092) could not be established. Node may not be available.
+2025-05-31T20:11:17.766+07:00  WARN 104297 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Bootstrap broker localhost:9092 (id: -1 rack: null) disconnected
+2025-05-31T20:11:17.868+07:00  INFO 104297 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Node -1 disconnected.
+2025-05-31T20:11:17.869+07:00  WARN 104297 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Connection to node -1 (localhost/127.0.0.1:9092) could not be established. Node may not be available.
+2025-05-31T20:11:17.869+07:00  WARN 104297 --- [submission] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-submission-1, groupId=submission] Bootstrap broker localhost:9092 (id: -1 rack: null) disconnected
 ]]></system-out>
-    <system-err><![CDATA[May 18, 2025 10:41:47 AM org.junit.platform.launcher.core.LauncherConfigurationParameters loadClasspathResource
+    <system-err><![CDATA[May 31, 2025 8:11:08 PM org.junit.platform.launcher.core.LauncherConfigurationParameters loadClasspathResource
 WARNING: Discovered 3 'junit-platform.properties' configuration files on the classpath (see below); only the first (*) will be used.
 - jar:file:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-clients/3.8.1/kafka-clients-3.8.1-test.jar!/junit-platform.properties (*)
 - jar:file:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-server-common/3.8.1/kafka-server-common-3.8.1-test.jar!/junit-platform.properties
 - jar:file:/home/mimingucci/.m2/repository/org/apache/kafka/kafka_2.13/3.8.1/kafka_2.13-3.8.1-test.jar!/junit-platform.properties
-May 18, 2025 10:41:47 AM org.junit.platform.launcher.core.LauncherConfigurationParameters loadClasspathResource
+May 31, 2025 8:11:08 PM org.junit.platform.launcher.core.LauncherConfigurationParameters loadClasspathResource
 WARNING: Discovered 3 'junit-platform.properties' configuration files on the classpath (see below); only the first (*) will be used.
 - jar:file:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-clients/3.8.1/kafka-clients-3.8.1-test.jar!/junit-platform.properties (*)
 - jar:file:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-server-common/3.8.1/kafka-server-common-3.8.1-test.jar!/junit-platform.properties
 - jar:file:/home/mimingucci/.m2/repository/org/apache/kafka/kafka_2.13/3.8.1/kafka_2.13-3.8.1-test.jar!/junit-platform.properties
-May 18, 2025 10:41:47 AM org.junit.platform.launcher.core.LauncherConfigurationParameters loadClasspathResource
+May 31, 2025 8:11:08 PM org.junit.platform.launcher.core.LauncherConfigurationParameters loadClasspathResource
 WARNING: Discovered 3 'junit-platform.properties' configuration files on the classpath (see below); only the first (*) will be used.
 - jar:file:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-clients/3.8.1/kafka-clients-3.8.1-test.jar!/junit-platform.properties (*)
 - jar:file:/home/mimingucci/.m2/repository/org/apache/kafka/kafka-server-common/3.8.1/kafka-server-common-3.8.1-test.jar!/junit-platform.properties

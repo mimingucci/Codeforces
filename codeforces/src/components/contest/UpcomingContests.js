@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -8,20 +8,22 @@ import {
   Chip,
   Box,
   Link,
-} from '@mui/material';
+} from "@mui/material";
 
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { formatDistanceToNow } from 'date-fns';
-import ContestApi from '../../getApi/ContestApi';
-import HandleCookies from '../../utils/HandleCookies';
-import Loading from '../shared/Loading';
-import RegisterModal from './RegisterModal';
-import CancelRegistrationModal from './CancelRegistrationModal';
-import { formatContestDurationHours } from '../../utils/dateUtils';
-import { useNavigate } from 'react-router-dom';
+import { formatDistanceToNow } from "date-fns";
+import ContestApi from "../../getApi/ContestApi";
+import HandleCookies from "../../utils/HandleCookies";
+import Loading from "../shared/Loading";
+import RegisterModal from "./RegisterModal";
+import CancelRegistrationModal from "./CancelRegistrationModal";
+import { formatContestDurationHours } from "../../utils/dateUtils";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const UpcomingContests = ({ contestType }) => {
+  const { t } = useTranslation();
   const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedContest, setSelectedContest] = useState(null);
@@ -31,9 +33,9 @@ const UpcomingContests = ({ contestType }) => {
   const navigate = useNavigate();
 
   const handleRegisterClick = (contest) => {
-    const token = HandleCookies.getCookie('token');
+    const token = HandleCookies.getCookie("token");
     if (!token) {
-      showErrorToast('Please login to register for contests');
+      showErrorToast(t("contest.pleaseLoginToRegister"));
       return;
     }
     setSelectedContest(contest);
@@ -42,24 +44,30 @@ const UpcomingContests = ({ contestType }) => {
 
   const handleRegisterConfirm = async ({ contestId, isRated }) => {
     try {
-      const res = await ContestApi.registerContest({ contestId, accessToken: HandleCookies.getCookie('token'), isRated });
+      const res = await ContestApi.registerContest({
+        contestId,
+        accessToken: HandleCookies.getCookie("token"),
+        isRated,
+      });
       if (res?.data?.code === "200") {
-        setContests(prev => prev.map(contest => 
-          contest.id === contestId 
-            ? { ...contest, registered: true, isRated }
-            : contest
-        ));
-      }  
-      showSuccessToast('Successfully registered for contest!');
+        setContests((prev) =>
+          prev.map((contest) =>
+            contest.id === contestId
+              ? { ...contest, registered: true, isRated }
+              : contest
+          )
+        );
+      }
+      showSuccessToast(t("contest.registrationSuccess"));
     } catch (error) {
-      showErrorToast('Failed to register for contest');
+      showErrorToast(t("contest.registrationFailed"));
     }
   };
 
   const handleCancelClick = (contest) => {
-    const token = HandleCookies.getCookie('token');
+    const token = HandleCookies.getCookie("token");
     if (!token) {
-      showErrorToast('Please login to manage registrations');
+      showErrorToast(t("contest.pleaseLoginToManage"));
       return;
     }
     setSelectedContest(contest);
@@ -68,40 +76,48 @@ const UpcomingContests = ({ contestType }) => {
 
   const handleCancelConfirm = async (contestId) => {
     try {
-      const res = await ContestApi.cancelRegistration({ contestId, accessToken: HandleCookies.getCookie('token') });
+      const res = await ContestApi.cancelRegistration({
+        contestId,
+        accessToken: HandleCookies.getCookie("token"),
+      });
       if (res?.data?.code === "200") {
-        setContests(prev => prev.map(contest => 
-          contest.id === contestId 
-            ? { ...contest, registered: false }
-            : contest
-        ));
-        showSuccessToast('Registration cancelled successfully');
+        setContests((prev) =>
+          prev.map((contest) =>
+            contest.id === contestId
+              ? { ...contest, registered: false }
+              : contest
+          )
+        );
+        showSuccessToast(t("contest.cancellationSuccess"));
       } else {
-        showErrorToast('Failed to cancel registration');
-      } 
+        showErrorToast(t("contest.cancellationFailed"));
+      }
     } catch (error) {
-      showErrorToast('Failed to cancel registration');
+      showErrorToast(t("contest.cancellationFailed"));
     }
   };
 
   const isContestStaff = (contest) => {
-    const userId = HandleCookies.getCookie('id');
+    const userId = HandleCookies.getCookie("id");
     if (!userId) return false;
-    
+
     return [
       ...(contest.authors || []),
       ...(contest.coordinators || []),
-      ...(contest.testers || [])
+      ...(contest.testers || []),
     ].includes(userId);
   };
 
   useEffect(() => {
     const fetchUpcomingContests = async () => {
       try {
-        const response = await ContestApi.getUpcomingContests({ type: contestType?.toUpperCase(), days: 7 });
-        
+        const response = await ContestApi.getUpcomingContests({
+          type: contestType?.toUpperCase(),
+          days: 7,
+        });
+
         const contestsData = response.data?.data || [];
-        const token = HandleCookies.getCookie('token');
+        const token = HandleCookies.getCookie("token");
 
         if (token) {
           // Check registration status for each contest
@@ -110,14 +126,17 @@ const UpcomingContests = ({ contestType }) => {
               try {
                 const regResponse = await ContestApi.getUserRegistration({
                   contestId: contest.id,
-                  accessToken: token
+                  accessToken: token,
                 });
-                
-                if (regResponse?.data?.code === "200" && regResponse?.data?.data) {
+
+                if (
+                  regResponse?.data?.code === "200" &&
+                  regResponse?.data?.data
+                ) {
                   return {
                     ...contest,
                     registered: true,
-                    isRated: regResponse.data.data?.rated
+                    isRated: regResponse.data.data?.rated,
                   };
                 }
                 return contest;
@@ -132,7 +151,7 @@ const UpcomingContests = ({ contestType }) => {
           setContests(contestsData);
         }
       } catch (error) {
-        showErrorToast('Failed to fetch contests');
+        showErrorToast(t("contest.fetchFailed"));
       } finally {
         setLoading(false);
       }
@@ -142,7 +161,7 @@ const UpcomingContests = ({ contestType }) => {
   }, [contestType]);
 
   const showSuccessToast = (msg) => {
-    toast.success(msg || `Compiled Successfully!`, {
+    toast.success(msg || t("contest.compiledSuccessfully"), {
       position: "top-center",
       autoClose: 1000,
       hideProgressBar: false,
@@ -154,7 +173,7 @@ const UpcomingContests = ({ contestType }) => {
   };
 
   const showErrorToast = (msg, timer) => {
-    toast.error(msg || `Something went wrong! Please try again.`, {
+    toast.error(msg || t("common.error"), {
       position: "top-center",
       autoClose: timer ? timer : 1000,
       hideProgressBar: false,
@@ -171,103 +190,116 @@ const UpcomingContests = ({ contestType }) => {
 
   return (
     <>
-    <ToastContainer
-      position="top-center"
-      autoClose={2000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-    />
-    <Grid container spacing={3}>
-      {contests.map(contest => (
-        <Grid item xs={12} md={6} key={contest.id}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-              <Link
-                  component="button"
-                  variant="h6"
-                  onClick={() => navigate(`/contest/${contest.id}`)}
-                  sx={{
-                    textAlign: 'left',
-                    textDecoration: 'none',
-                    '&:hover': {
-                      textDecoration: 'underline',
-                    },
-                  }}
-                >
-                  {contest.name}
-                </Link>
-              </Typography>
-              
-              <Box sx={{ mb: 2 }}>
-                <Chip 
-                  label={contest.type.toUpperCase()} 
-                  color="primary" 
-                  size="small" 
-                  sx={{ mr: 1 }}
-                />
-                <Chip 
-                  label={`Starts ${formatDistanceToNow(new Date(contest.startTime))}`}
-                  color="secondary"
-                  size="small"
-                />
-              </Box>
-
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Duration: {formatContestDurationHours(contest.startTime, contest.endTime)}
-              </Typography>
-
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                {isContestStaff(contest) ? (
-                  <Button 
-                    variant="outlined"
-                    disabled
-                    fullWidth
-                    sx={{ color: 'text.secondary' }}
+      <ToastContainer
+        position="top-center"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      <Grid container spacing={3}>
+        {contests.map((contest) => (
+          <Grid item xs={12} md={6} key={contest.id}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  <Link
+                    component="button"
+                    variant="h6"
+                    onClick={() => navigate(`/contest/${contest.id}`)}
+                    sx={{
+                      textAlign: "left",
+                      textDecoration: "none",
+                      "&:hover": {
+                        textDecoration: "underline",
+                      },
+                    }}
                   >
-                    Contest Staff
-                  </Button>
-                ) : (
-                  <Button 
-                    variant={contest?.registered ? "outlined" : "contained"}
-                    onClick={() => contest?.registered 
-                      ? handleCancelClick(contest)
-                      : handleRegisterClick(contest)
-                    }
-                    fullWidth
-                    color={contest?.registered ? "error" : "primary"}
-                  >
-                    {contest?.registered ? 'Cancel Registration' : 'Register'}
-                  </Button>
-                )}
-              </Box>
-              {contest?.registered && contest.type === 'SYSTEM' && (
-                <Typography 
-                  variant="caption" 
-                  color="text.secondary"
-                  sx={{ display: 'block', mt: 1, textAlign: 'center' }}
-                >
-                  Registered as {contest?.isRated ? 'rated' : 'unrated'} participant
+                    {contest.name}
+                  </Link>
                 </Typography>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
-      ))}
-    </Grid>
-    <RegisterModal
+
+                <Box sx={{ mb: 2 }}>
+                  <Chip
+                    label={contest.type.toUpperCase()}
+                    color="primary"
+                    size="small"
+                    sx={{ mr: 1 }}
+                  />
+                  <Chip
+                    label={t("contest.startsIn", {
+                      time: formatDistanceToNow(new Date(contest.startTime)),
+                    })}
+                    color="secondary"
+                    size="small"
+                  />
+                </Box>
+
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  {t("contest.duration")}:{" "}
+                  {formatContestDurationHours(
+                    contest.startTime,
+                    contest.endTime
+                  )}
+                </Typography>
+
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  {isContestStaff(contest) ? (
+                    <Button
+                      variant="outlined"
+                      disabled
+                      fullWidth
+                      sx={{ color: "text.secondary" }}
+                    >
+                      {t("contest.contestStaff")}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant={contest?.registered ? "outlined" : "contained"}
+                      onClick={() =>
+                        contest?.registered
+                          ? handleCancelClick(contest)
+                          : handleRegisterClick(contest)
+                      }
+                      fullWidth
+                      color={contest?.registered ? "error" : "primary"}
+                    >
+                      {contest?.registered
+                        ? t("contest.cancelRegistration")
+                        : t("contest.register")}
+                    </Button>
+                  )}
+                </Box>
+                {contest?.registered && contest.type === "SYSTEM" && (
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block", mt: 1, textAlign: "center" }}
+                  >
+                    {t("contest.registeredAs")}{" "}
+                    {contest?.isRated
+                      ? t("contest.rated")
+                      : t("contest.unrated")}{" "}
+                    {t("contest.participant")}
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+      <RegisterModal
         open={registerModalOpen}
         onClose={() => setRegisterModalOpen(false)}
         onConfirm={handleRegisterConfirm}
         contest={selectedContest}
-        showRatedOption={selectedContest?.type === 'SYSTEM'}
-    />
-    <CancelRegistrationModal
+        showRatedOption={selectedContest?.type === "SYSTEM"}
+      />
+      <CancelRegistrationModal
         open={cancelModalOpen}
         onClose={() => setCancelModalOpen(false)}
         onConfirm={handleCancelConfirm}

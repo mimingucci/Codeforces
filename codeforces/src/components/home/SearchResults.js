@@ -1,9 +1,19 @@
 import { useEffect, useState } from "react";
-import { Box, Typography, Avatar, List, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Avatar,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+} from "@mui/material";
 import UserApi from "../../getApi/UserApi";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
+import { useTranslation } from "react-i18next";
 
 const SearchResults = ({ query }) => {
+  const { t } = useTranslation();
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [debouncedQuery] = useDebouncedValue(query, 300);
@@ -17,7 +27,10 @@ const SearchResults = ({ query }) => {
 
       setLoading(true);
       try {
-        const response = await UserApi.search({ query: debouncedQuery, limit: 10 });
+        const response = await UserApi.search({
+          query: debouncedQuery,
+          limit: 10,
+        });
         if (response.data.code === "200") {
           setResults(response.data.data.content);
         }
@@ -32,13 +45,22 @@ const SearchResults = ({ query }) => {
   }, [debouncedQuery]);
 
   if (!debouncedQuery) return null;
-  if (loading) return <Typography sx={{ p: 2 }}>Loading...</Typography>;
-  if (results.length === 0) return <Typography sx={{ p: 2 }}>No results found</Typography>;
+  if (loading)
+    return <Typography sx={{ p: 2 }}>{t("common.loading")}</Typography>;
+  if (results.length === 0)
+    return (
+      <Typography sx={{ p: 2 }}>{t("searchResults.noResults")}</Typography>
+    );
 
   return (
     <List sx={{ width: "100%", maxHeight: 400, overflow: "auto" }}>
       {results.map((user) => (
-        <ListItem key={user.id} button component="a" href={`/profile/${user.id}`}>
+        <ListItem
+          key={user.id}
+          button
+          component="a"
+          href={`/profile/${user.id}`}
+        >
           <ListItemAvatar>
             <Avatar src={user.avatar} alt={user.username} />
           </ListItemAvatar>

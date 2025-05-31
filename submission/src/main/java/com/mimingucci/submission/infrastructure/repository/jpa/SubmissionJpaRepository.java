@@ -37,4 +37,20 @@ public interface SubmissionJpaRepository extends JpaRepository<SubmissionEntity,
      * @return List of submissions with the specified verdict
      */
     List<SubmissionEntity> findByAuthorAndVerdict(Long authorId, SubmissionVerdict verdict);
+
+    /**
+     * Find all accepted submissions for a contest in a date range
+     *
+     * @param contestId The contest ID
+     * @param verdict The verdict (should be SubmissionVerdict.ACCEPTED)
+     * @param startDate The start date
+     * @param endDate The end date
+     * @return List of accepted submissions
+     */
+    List<SubmissionEntity> findByContestAndVerdictAndSentBetween(
+            Long contestId,
+            SubmissionVerdict verdict,
+            Instant startDate,
+            Instant endDate
+    );
 }

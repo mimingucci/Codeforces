@@ -7,59 +7,62 @@ import {
   FormControlLabel,
   Checkbox,
   Typography,
-  Box
-} from '@mui/material';
-import { useState } from 'react';
+  Box,
+} from "@mui/material";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-const RegisterModal = ({ 
-  open, 
-  onClose, 
-  onConfirm, 
+const RegisterModal = ({
+  open,
+  onClose,
+  onConfirm,
   contest,
-  showRatedOption = false 
+  showRatedOption = false,
 }) => {
+  const { t } = useTranslation();
   const [isRated, setIsRated] = useState(false);
 
   const handleRegister = () => {
     onConfirm({
       contestId: contest.id,
-      isRated: showRatedOption ? isRated : undefined
+      isRated: showRatedOption ? isRated : undefined,
     });
     onClose();
   };
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Register for Contest</DialogTitle>
+      <DialogTitle>{t("contest.registerForContest")}</DialogTitle>
       <DialogContent>
         <Box sx={{ mb: 2 }}>
           <Typography variant="h6">{contest?.name}</Typography>
           <Typography variant="body2" color="text.secondary">
-            Duration: {contest?.durationHours} hours
+            {t("contest.duration")}: {contest?.durationHours}{" "}
+            {t("contest.hours")}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Type: {contest?.type}
+            {t("contest.type")}: {contest?.type}
           </Typography>
         </Box>
 
         {showRatedOption && (
           <FormControlLabel
             control={
-              <Checkbox 
+              <Checkbox
                 checked={isRated}
                 onChange={(e) => setIsRated(e.target.checked)}
               />
             }
-            label="Participate as rated contestant"
+            label={t("contest.participateAsRated")}
           />
         )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="inherit">
-          Cancel
+          {t("contest.cancel")}
         </Button>
         <Button onClick={handleRegister} variant="contained">
-          Confirm Registration
+          {t("contest.confirmRegistration")}
         </Button>
       </DialogActions>
     </Dialog>

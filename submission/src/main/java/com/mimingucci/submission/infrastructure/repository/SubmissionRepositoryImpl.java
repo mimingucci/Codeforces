@@ -66,4 +66,11 @@ public class SubmissionRepositoryImpl implements SubmissionRepository {
         List<SubmissionEntity> submissions = jpaRepository.findByAuthorAndSentBetween(userId, startDate, endDate);
         return submissions.stream().map(SubmissionConverter.INSTANCE::toDomain).toList();
     }
+
+    @Override
+    public List<Submission> findAcceptedSubmissionsByContest(Long contestId, Instant startDate, Instant endDate) {
+        List<SubmissionEntity> submissions = jpaRepository.findByContestAndVerdictAndSentBetween(contestId, SubmissionVerdict.ACCEPT, startDate, endDate);
+        return submissions.stream().map(SubmissionConverter.INSTANCE::toDomain).toList();
+    }
+
 }

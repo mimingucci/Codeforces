@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import CalendarHeatmap from "react-calendar-heatmap";
 import "react-calendar-heatmap/dist/styles.css";
 import tippy from "tippy.js";
@@ -6,6 +7,7 @@ import "tippy.js/dist/tippy.css";
 import SubmissionApi from "../../getApi/SubmissionApi";
 import { convertUnixTimestamp } from "../../utils/dateUtils";
 const CommitGrid = ({ author, day_of_register }) => {
+  const { t } = useTranslation();
   // Get today's date
   let today = new Date();
   // Calculate the date "n" days before today
@@ -37,11 +39,7 @@ const CommitGrid = ({ author, day_of_register }) => {
   useEffect(() => {
     let y = [];
     const registerYear = new Date(day_of_register * 1000).getFullYear(); // Convert Unix timestamp to year
-    for (
-      let i = new Date().getFullYear();
-      i >= registerYear;
-      i--
-    ) {
+    for (let i = new Date().getFullYear(); i >= registerYear; i--) {
       y.push(i);
     }
     setYears(y);
@@ -104,12 +102,12 @@ const CommitGrid = ({ author, day_of_register }) => {
           id="chooseyear"
           className="border-solid border-black border-[1px] rounded-sm"
         >
-          <option value={0}>Choose year</option>
+          <option value={0}>{t("commitGrid.chooseYear")}</option>
           {years?.map((year, i) => (
-            <option value={i + 1}>{year}</option>
+            <option key={i} value={i + 1}>
+              {year}
+            </option>
           ))}
-          {/* <option value={1}>2024</option>
-          <option value={2}>2023</option> */}
         </select>
       </div>
       <div className="">
@@ -132,16 +130,22 @@ const CommitGrid = ({ author, day_of_register }) => {
 
       <div className="flex">
         <div className="w-1/3 text-center">
-          <h2 className="text-[30px]">{`${problemAllTime} problems`}</h2>
-          <p>solved for all time</p>
+          <h2 className="text-[30px]">{`${problemAllTime} ${t(
+            "commitGrid.problems"
+          )}`}</h2>
+          <p>{t("commitGrid.allTime")}</p>
         </div>
         <div className="w-1/3 text-center">
-          <h2 className="text-[30px]">{`${problemLastYear} problems`}</h2>
-          <p>solved for last year</p>
+          <h2 className="text-[30px]">{`${problemLastYear} ${t(
+            "commitGrid.problems"
+          )}`}</h2>
+          <p>{t("commitGrid.lastYear")}</p>
         </div>
         <div className="w-1/3 text-center">
-          <h2 className="text-[30px]">{`${problemLastMonth} problems`}</h2>
-          <p>solved for last month</p>
+          <h2 className="text-[30px]">{`${problemLastMonth} ${t(
+            "commitGrid.problems"
+          )}`}</h2>
+          <p>{t("commitGrid.lastMonth")}</p>
         </div>
       </div>
     </div>

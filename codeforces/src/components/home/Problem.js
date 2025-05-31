@@ -26,6 +26,7 @@ import ProblemApi from "../../getApi/ProblemApi";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import HandleCookies from "../../utils/HandleCookies";
 import ContestApi from "../../getApi/ContestApi";
+import { useTranslation } from "react-i18next";
 
 // Custom TabPanel component
 const TabPanel = ({ children, value, index, ...other }) => (
@@ -35,6 +36,7 @@ const TabPanel = ({ children, value, index, ...other }) => (
 );
 
 const Problem = () => {
+  const { t } = useTranslation();
   const [problem, setProblem] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [canSubmit, setCanSubmit] = useState(false);
@@ -43,7 +45,7 @@ const Problem = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const virtualContestId = searchParams.get('virtual');
+  const virtualContestId = searchParams.get("virtual");
   const userId = HandleCookies.getCookie("id");
 
   useEffect(() => {
@@ -52,11 +54,16 @@ const Problem = () => {
         setLoading(true);
         if (virtualContestId) {
           if (!userId) navigate("/404");
-          const virtualContestResponse = await ContestApi.getVirtualContestIfExists(userId);
-          if (virtualContestResponse?.data?.code != "200" || virtualContestResponse.data.data.user != userId || virtualContestResponse.data.data.id?.toString() !== virtualContestId) {
+          const virtualContestResponse =
+            await ContestApi.getVirtualContestIfExists(userId);
+          if (
+            virtualContestResponse?.data?.code != "200" ||
+            virtualContestResponse.data.data.user != userId ||
+            virtualContestResponse.data.data.id?.toString() !== virtualContestId
+          ) {
             navigate("/404");
           }
-        } 
+        }
         // Fetch problem data
         const problemResponse = await ProblemApi.getProblem(id);
 
@@ -117,11 +124,14 @@ const Problem = () => {
               scrollButtons="auto"
               sx={{ borderBottom: 1, borderColor: "divider" }}
             >
-              <Tab icon={<DescriptionIcon />} label="Statement" />
-              <Tab icon={<TagIcon />} label="Tags" />
-              <Tab icon={<BarChartIcon />} label="Stats" />
-              <Tab icon={<EventIcon />} label="Contest" />
-              <Tab icon={<CodeIcon />} label="Solutions" />
+              <Tab
+                icon={<DescriptionIcon />}
+                label={t("problemInfo.statement")}
+              />
+              <Tab icon={<TagIcon />} label={t("problemInfo.tags")} />
+              <Tab icon={<BarChartIcon />} label={t("problemInfo.stats")} />
+              <Tab icon={<EventIcon />} label={t("problemInfo.contest")} />
+              <Tab icon={<CodeIcon />} label={t("problemInfo.solutions")} />
             </Tabs>
 
             {/* Statement Tab */}
@@ -131,14 +141,19 @@ const Problem = () => {
               </Typography>
               <Box sx={{ mb: 3 }}>
                 <Typography variant="body1">
-                  time limit per test: {problem.timeLimit / 1000} seconds
+                  {t("problemInfo.timeLimit")}: {problem.timeLimit / 1000}{" "}
+                  {t("problemInfo.seconds")}
                 </Typography>
                 <Typography variant="body1">
-                  memory limit per test: {problem.memoryLimit / 1000000}{" "}
-                  megabytes
+                  {t("problemInfo.memoryLimit")}:{" "}
+                  {problem.memoryLimit / 1000000} {t("problemInfo.megabytes")}
                 </Typography>
-                <Typography variant="body1">input: standard input</Typography>
-                <Typography variant="body1">output: standard output</Typography>
+                <Typography variant="body1">
+                  {t("input")}: {t("problemInfo.standardInput")}
+                </Typography>
+                <Typography variant="body1">
+                  {t("output")}: {t("problemInfo.standardOutput")}
+                </Typography>
               </Box>
               <div
                 dangerouslySetInnerHTML={{ __html: problem?.statement }}
@@ -150,7 +165,7 @@ const Problem = () => {
             <TabPanel value={activeTab} index={1}>
               <Box sx={{ mb: 3 }}>
                 <Typography variant="h6" gutterBottom>
-                  Problem Tags
+                  {t("problemInfo.problemTags")}
                 </Typography>
                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                   {problem?.tags?.map((tag, index) => (
@@ -172,23 +187,26 @@ const Problem = () => {
               <Stack spacing={3}>
                 <Box>
                   <Typography variant="h6" gutterBottom>
-                    Problem Information
+                    {t("problemInfo.problemInformation")}
                   </Typography>
                   <Stack spacing={2}>
                     <Box display="flex" alignItems="center" gap={1}>
                       <PersonIcon color="primary" />
                       <Typography>
-                        Author: {problem?.author?.username}
+                        {t("problemInfo.author")}: {problem?.author?.username}
                       </Typography>
                     </Box>
                     <Box display="flex" alignItems="center" gap={1}>
                       <StarIcon color="primary" />
-                      <Typography>Rating: {problem?.rating}</Typography>
+                      <Typography>
+                        {t("problemInfo.rating")}: {problem?.rating}
+                      </Typography>
                     </Box>
                     <Box display="flex" alignItems="center" gap={1}>
                       <AssignmentTurnedInIcon color="primary" />
                       <Typography>
-                        Total Submissions: {problem?.submissions}
+                        {t("problemInfo.totalSubmissions")}:{" "}
+                        {problem?.submissions}
                       </Typography>
                     </Box>
                   </Stack>
@@ -201,7 +219,7 @@ const Problem = () => {
               {problem?.contest ? (
                 <Box>
                   <Typography variant="h6" gutterBottom>
-                    Contest Information
+                    {t("problemInfo.contestInformation")}
                   </Typography>
                   <Button
                     variant="contained"
@@ -209,12 +227,12 @@ const Problem = () => {
                     startIcon={<EventIcon />}
                     sx={{ mt: 2 }}
                   >
-                    Go to Contest
+                    {t("problemInfo.goToContest")}
                   </Button>
                 </Box>
               ) : (
                 <Typography color="text.secondary">
-                  This problem is not part of any contest
+                  {t("problemInfo.notPartOfContest")}
                 </Typography>
               )}
             </TabPanel>
@@ -224,19 +242,19 @@ const Problem = () => {
               {problem?.solution ? (
                 <Box>
                   <Typography variant="h6" gutterBottom>
-                    Available Solutions
+                    {t("problemInfo.availableSolutions")}
                   </Typography>
                   <Button
                     variant="contained"
                     startIcon={<CodeIcon />}
                     href={`/solution/${problem.id}`}
                   >
-                    View Solution
+                    {t("problemInfo.viewSolution")}
                   </Button>
                 </Box>
               ) : (
                 <Typography color="text.secondary">
-                  No solutions available yet
+                  {t("problemInfo.noSolutionsAvailable")}
                 </Typography>
               )}
             </TabPanel>
@@ -244,13 +262,19 @@ const Problem = () => {
         </Box>
       ) : (
         <Box sx={{ p: 3, textAlign: "center" }}>
-          <Typography color="error">Cannot fetch problem statements</Typography>
+          <Typography color="error">
+            {t("problemInfo.cannotFetchProblem")}
+          </Typography>
         </Box>
       )}
 
       {canSubmit ? (
         <div>
-          <Landing problem={problem?.id} contest={problem?.contest} virtualContestId={virtualContestId || null} />
+          <Landing
+            problem={problem?.id}
+            contest={problem?.contest}
+            virtualContestId={virtualContestId || null}
+          />
         </div>
       ) : (
         <Box
@@ -263,12 +287,12 @@ const Problem = () => {
         >
           <Typography color="text.secondary">
             {HandleCookies.getCookie("token")
-              ? "You don't have permission to submit solutions for this problem"
-              : "Please log in to submit solutions"}
+              ? t("problemInfo.noPermissionToSubmit")
+              : t("problemInfo.pleaseLoginToSubmit")}
           </Typography>
           {!HandleCookies.getCookie("token") && (
             <Button variant="contained" href="/login" sx={{ mt: 2 }}>
-              Login
+              {t("problemInfo.login")}
             </Button>
           )}
         </Box>

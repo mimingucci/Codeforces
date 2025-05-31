@@ -19,4 +19,6 @@ public interface SubmissionRepository {
     Submission update(Long id, Submission submission);
 
     List<Submission> getSubmissionGrid(Long userId, Instant startDate, Instant endDate);
+
+    List<Submission> findAcceptedSubmissionsByContest(Long contestId, Instant startDate, Instant endDate);
 }

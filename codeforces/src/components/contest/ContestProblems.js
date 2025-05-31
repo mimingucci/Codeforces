@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   Table,
   TableBody,
@@ -10,15 +11,21 @@ import {
   Chip,
 } from "@mui/material";
 
-const ContestProblems = ({ problems, isContestFinished, virtualContestId = null }) => {
+const ContestProblems = ({
+  problems,
+  isContestFinished,
+  virtualContestId = null,
+}) => {
+  const { t } = useTranslation();
+
   return (
     <TableContainer component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
             <TableCell>#</TableCell>
-            <TableCell>Problem</TableCell>
-            {isContestFinished && <TableCell>Tags</TableCell>}
+            <TableCell>{t("contest.problem")}</TableCell>
+            {isContestFinished && <TableCell>{t("contest.tags")}</TableCell>}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -26,7 +33,15 @@ const ContestProblems = ({ problems, isContestFinished, virtualContestId = null 
             <TableRow key={problem?.id}>
               <TableCell>{String.fromCharCode(65 + index)}</TableCell>
               <TableCell>
-                <Link href={virtualContestId ? `/problem/${problem?.id}?virtual=${virtualContestId}` : `/problem/${problem?.id}`}>{problem.title}</Link>
+                <Link
+                  href={
+                    virtualContestId
+                      ? `/problem/${problem?.id}?virtual=${virtualContestId}`
+                      : `/problem/${problem?.id}`
+                  }
+                >
+                  {problem.title}
+                </Link>
               </TableCell>
               {isContestFinished && (
                 <TableCell>

@@ -21,5 +21,8 @@ public class ErrorMessageConstants {
     public static final String CAN_NOT_SUBMIT = "You cannot submit code";
     public static final String PROBLEM_NOT_FOUND = "Problem not found";
     public static final String CONFLICT_DATA = "Conflict data";
+    public static final String CONTEST_NOT_FOUND = "Contest not found";
+    public static final String REPORT_NOT_FOUND = "Moss report not found.";
+    public static final String NOT_PERMISSION = "You don't have permission to access this resources";
 }
 

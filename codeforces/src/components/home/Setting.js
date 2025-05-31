@@ -4,6 +4,7 @@ import UserApi from "../../getApi/UserApi";
 import HandleCookies from "../../utils/HandleCookies";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Paper,
@@ -32,6 +33,7 @@ import countries from "../../utils/countries";
 
 // Updated to take userId as a prop instead of using URL params
 const Setting = ({ userId }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // Tab state
@@ -126,16 +128,18 @@ const Setting = ({ userId }) => {
       });
 
       if (response?.data?.code === "200") {
-        setSuccess("Profile information updated successfully");
-        showSuccessToast("Profile updated successfully");
+        setSuccess(t("setting.profileUpdateSuccess"));
+        showSuccessToast(t("setting.profileUpdateSuccess"));
       } else {
-        setError(response?.data?.message || "Failed to update profile");
-        showErrorToast(response?.data?.message || "Failed to update profile");
+        setError(response?.data?.message || t("setting.profileUpdateFailed"));
+        showErrorToast(
+          response?.data?.message || t("setting.profileUpdateFailed")
+        );
       }
     } catch (err) {
       console.error("Error updating profile:", err);
-      setError("An error occurred while updating your profile");
-      showErrorToast("An error occurred while updating your profile");
+      setError(t("setting.profileUpdateError"));
+      showErrorToast(t("setting.profileUpdateError"));
     } finally {
       setSaving(false);
     }
@@ -151,12 +155,12 @@ const Setting = ({ userId }) => {
 
     // Form validation
     if (newPassword !== confirmPassword) {
-      setError("New passwords do not match");
+      setError(t("setting.passwordMismatch"));
       return;
     }
 
     if (newPassword.length < 6) {
-      setError("Password must be at least 6 characters long");
+      setError(t("setting.passwordTooShort"));
       return;
     }
 
@@ -170,19 +174,21 @@ const Setting = ({ userId }) => {
       });
 
       if (response?.data?.code === "200") {
-        setSuccess("Password changed successfully");
-        showSuccessToast("Password changed successfully");
+        setSuccess(t("setting.passwordChangeSuccess"));
+        showSuccessToast(t("setting.passwordChangeSuccess"));
         // Reset form fields
         setNewPassword("");
         setConfirmPassword("");
       } else {
-        setError(response?.data?.message || "Failed to change password");
-        showErrorToast(response?.data?.message || "Failed to change password");
+        setError(response?.data?.message || t("setting.passwordChangeFailed"));
+        showErrorToast(
+          response?.data?.message || t("setting.passwordChangeFailed")
+        );
       }
     } catch (err) {
       console.error("Error changing password:", err);
-      setError("An error occurred while changing your password");
-      showErrorToast("An error occurred while changing your password");
+      setError(t("setting.passwordChangeError"));
+      showErrorToast(t("setting.passwordChangeError"));
     } finally {
       setSaving(false);
     }
@@ -235,12 +241,12 @@ const Setting = ({ userId }) => {
           >
             <Tab
               icon={<PersonIcon />}
-              label="Profile Information"
+              label={t("setting.profileInfo")}
               iconPosition="start"
             />
             <Tab
               icon={<KeyIcon />}
-              label="Change Password"
+              label={t("setting.changePassword")}
               iconPosition="start"
             />
           </Tabs>
@@ -268,17 +274,17 @@ const Setting = ({ userId }) => {
               )}
 
               <Typography variant="h6" component="h2" gutterBottom>
-                Personal Information
+                {t("setting.personalInfo")}
               </Typography>
               <Typography variant="body2" color="text.secondary" paragraph>
-                Update your profile information
+                {t("setting.updateProfileDesc")}
               </Typography>
 
               <Grid container spacing={3}>
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
-                    label="First Name"
+                    label={t("setting.firstName")}
                     value={firstname}
                     onChange={(e) => setFirstname(e.target.value)}
                     variant="outlined"
@@ -296,7 +302,7 @@ const Setting = ({ userId }) => {
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
-                    label="Last Name"
+                    label={t("setting.lastName")}
                     value={lastname}
                     onChange={(e) => setLastname(e.target.value)}
                     variant="outlined"
@@ -320,7 +326,7 @@ const Setting = ({ userId }) => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label="Country"
+                        label={t("setting.country")}
                         variant="outlined"
                         margin="normal"
                         InputProps={{
@@ -339,14 +345,14 @@ const Setting = ({ userId }) => {
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="Description"
+                    label={t("setting.description")}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     multiline
                     rows={4}
                     variant="outlined"
                     margin="normal"
-                    placeholder="Tell us about yourself..."
+                    placeholder={t("setting.descriptionPlaceholder")}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment
@@ -375,7 +381,7 @@ const Setting = ({ userId }) => {
                   }
                   disabled={saving}
                 >
-                  {saving ? "Saving..." : "Save Changes"}
+                  {saving ? t("setting.saving") : t("setting.saveChanges")}
                 </Button>
               </Box>
             </Box>
@@ -404,15 +410,15 @@ const Setting = ({ userId }) => {
               )}
 
               <Typography variant="h6" component="h2" gutterBottom>
-                Change Password
+                {t("setting.changePassword")}
               </Typography>
               <Typography variant="body2" color="text.secondary" paragraph>
-                Update your account password
+                {t("setting.updatePasswordDesc")}
               </Typography>
 
               <TextField
                 fullWidth
-                label="New Password"
+                label={t("setting.newPassword")}
                 type={showNewPassword ? "text" : "password"}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -441,7 +447,7 @@ const Setting = ({ userId }) => {
 
               <TextField
                 fullWidth
-                label="Confirm New Password"
+                label={t("setting.confirmPassword")}
                 type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -488,7 +494,9 @@ const Setting = ({ userId }) => {
                   }
                   disabled={saving || !newPassword || !confirmPassword}
                 >
-                  {saving ? "Changing Password..." : "Change Password"}
+                  {saving
+                    ? t("setting.changingPassword")
+                    : t("setting.changePassword")}
                 </Button>
               </Box>
             </Box>

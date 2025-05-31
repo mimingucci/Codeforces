@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import UserApi from "../../getApi/UserApi";
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Container,
@@ -12,6 +13,7 @@ import {
 import { CheckCircle, Error, MarkEmailRead } from "@mui/icons-material";
 
 const VerifyEmail = () => {
+  const { t } = useTranslation();
   const [verifying, setVerifying] = useState(true);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
@@ -23,30 +25,25 @@ const VerifyEmail = () => {
     const verifyEmailToken = async () => {
       try {
         setVerifying(true);
-
-        // Extract token from URL query parameters
         const queryParams = new URLSearchParams(location.search);
         const token = queryParams.get("token");
 
         if (!token) {
-          setError("Invalid verification link. No token found.");
+          setError(t("verifyEmail.noToken"));
           setVerifying(false);
           return;
         }
 
-        // Call API to verify email
         const response = await UserApi.verifyEmail(token);
 
         if (response?.data?.code === "200") {
           setSuccess(true);
-          // Auto redirect to login after 5 seconds
           setTimeout(() => {
             navigate("/login");
           }, 5000);
         } else {
           setError(
-            response?.data?.message ||
-              "Email verification failed. Please try again."
+            response?.data?.message || t("verifyEmail.verificationFailed")
           );
         }
       } catch (error) {
@@ -56,9 +53,7 @@ const VerifyEmail = () => {
         } else if (error.message) {
           setError(error.message);
         } else {
-          setError(
-            "Email verification failed. The link may have expired or is invalid."
-          );
+          setError(t("verifyEmail.linkExpired"));
         }
       } finally {
         setVerifying(false);
@@ -66,7 +61,7 @@ const VerifyEmail = () => {
     };
 
     verifyEmailToken();
-  }, [location.search, navigate]);
+  }, [location.search, navigate, t]);
 
   const handleGoToLogin = () => {
     navigate("/login");
@@ -76,7 +71,7 @@ const VerifyEmail = () => {
     <Container maxWidth="sm">
       <Box sx={{ mt: 8, mb: 4, textAlign: "center" }}>
         <Typography variant="h4" component="h1" gutterBottom color="primary">
-          Email Verification
+          {t("verifyEmail.title")}
         </Typography>
       </Box>
 
@@ -96,23 +91,23 @@ const VerifyEmail = () => {
           <>
             <CircularProgress size={60} sx={{ mb: 3 }} />
             <Typography variant="h6" align="center">
-              Verifying your email...
+              {t("verifyEmail.verifying")}
             </Typography>
             <Typography color="text.secondary" align="center" sx={{ mt: 1 }}>
-              Please wait while we verify your email address
+              {t("verifyEmail.pleaseWait")}
             </Typography>
           </>
         ) : success ? (
           <>
             <CheckCircle sx={{ color: "success.main", fontSize: 80, mb: 3 }} />
             <Typography variant="h5" align="center" gutterBottom>
-              Email Verified Successfully!
+              {t("verifyEmail.successTitle")}
             </Typography>
             <Typography color="text.secondary" align="center" sx={{ mb: 3 }}>
-              Your account has been activated. You can now log in.
+              {t("verifyEmail.successMessage")}
             </Typography>
             <Typography color="text.secondary" align="center" sx={{ mb: 3 }}>
-              Redirecting to login page in 5 seconds...
+              {t("verifyEmail.redirecting")}
             </Typography>
             <Button
               variant="contained"
@@ -120,14 +115,14 @@ const VerifyEmail = () => {
               size="large"
               onClick={handleGoToLogin}
             >
-              Go to Login
+              {t("verifyEmail.goToLogin")}
             </Button>
           </>
         ) : (
           <>
             <Error sx={{ color: "error.main", fontSize: 80, mb: 3 }} />
             <Typography variant="h5" align="center" gutterBottom>
-              Verification Failed
+              {t("verifyEmail.failedTitle")}
             </Typography>
             <Typography color="text.secondary" align="center" sx={{ mb: 3 }}>
               {error}
@@ -137,10 +132,10 @@ const VerifyEmail = () => {
                 variant="outlined"
                 onClick={() => window.location.reload()}
               >
-                Try Again
+                {t("verifyEmail.tryAgain")}
               </Button>
               <Button variant="contained" onClick={handleGoToLogin}>
-                Back to Login
+                {t("verifyEmail.backToLogin")}
               </Button>
             </Box>
           </>
@@ -149,8 +144,7 @@ const VerifyEmail = () => {
 
       <Box sx={{ mt: 4, textAlign: "center" }}>
         <Typography variant="body2" color="text.secondary">
-          If you're having trouble verifying your email, please contact our
-          support team.
+          {t("verifyEmail.support")}
         </Typography>
       </Box>
     </Container>

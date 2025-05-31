@@ -26,6 +26,7 @@ import { relativeTime } from "../../utils/timeManufacture";
 import Ranking from "./Ranking";
 import { ThumbUp, ThumbDown } from "@mui/icons-material";
 import UserApi from "../../getApi/UserApi";
+import { useTranslation } from "react-i18next";
 
 const {
   RiAttachment2,
@@ -56,6 +57,7 @@ const VoteButton = styled(IconButton)(({ theme, active }) => ({
 }));
 
 const BlogDetail = () => {
+  const { t } = useTranslation();
   const ref = useRef();
   const [p, setP] = useState();
   const [comments, setComments] = useState();
@@ -113,12 +115,12 @@ const BlogDetail = () => {
   const handleLike = async () => {
     const accessToken = HandleCookies.getCookie("token");
     if (!accessToken) {
-      alert("Please login to continue...");
+      alert(t("blog.pleaseLogin"));
       return;
     }
     try {
       const res = await BlogApi.updateLike({ blog: p.id, accessToken });
-      showSuccessToast("Update like successfully");
+      showSuccessToast(t("blog.likeUpdated"));
       setP(res?.data?.data);
     } catch (error) {
       showErrorToast(error?.response?.data);
@@ -127,12 +129,12 @@ const BlogDetail = () => {
   const handleDislike = async () => {
     const accessToken = HandleCookies.getCookie("token");
     if (!accessToken) {
-      alert("Please login to continue...");
+      alert(t("blog.pleaseLogin"));
       return;
     }
     try {
       const res = await BlogApi.updateDislike({ blog: p.id, accessToken });
-      showSuccessToast("Update dislike successfully");
+      showSuccessToast(t("blog.dislikeUpdated"));
       setP(res?.data?.data);
     } catch (error) {
       showErrorToast(error?.response?.data);
@@ -142,7 +144,7 @@ const BlogDetail = () => {
   const handleSubmit = async () => {
     const accessToken = HandleCookies.getCookie("token");
     if (!accessToken) {
-      alert("Please login to write comment");
+      alert(t("blogDetail.pleaseLoginToComment"));
       return;
     }
     try {
@@ -151,12 +153,12 @@ const BlogDetail = () => {
         accessToken,
         content: text,
       });
-      showSuccessToast("Comment was created successfully");
+      showSuccessToast(t("blogDetail.commentCreated"));
       setText("");
       ref.current.value = "";
       setForceupdate(!forceupdate);
     } catch (err) {
-      showErrorToast("Oww! Something wrong");
+      showErrorToast(t("common.error"));
     }
   };
 
@@ -202,7 +204,7 @@ const BlogDetail = () => {
           {<div dangerouslySetInnerHTML={{ __html: p?.title }} />}
         </h1>
         <p className="flex gap-1">
-          By{" "}
+          {t("blog.by")}{" "}
           <span className="">
             <Link to={"/profile/" + p?.author}>
               <Ranking
@@ -219,7 +221,7 @@ const BlogDetail = () => {
         </div>
         <div className="flex items-center text-[12px]">
           <RiAttachment2 size={15} />
-          Announcement of{" "}
+          {t("blog.announcementOf")}{" "}
           <span className="text-gray-500 mx-[5px]">
             {p?.tags?.map((tag) => tag.name).join(", ")}
           </span>
@@ -286,7 +288,7 @@ const BlogDetail = () => {
             fullWidth
             multiline
             minRows={2}
-            placeholder="Write something..."
+            placeholder={t("blogDetail.writeSomething")}
             onChange={(e) => setText(e.target.value)}
             inputRef={ref}
           />

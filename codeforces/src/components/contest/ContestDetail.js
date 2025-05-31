@@ -27,8 +27,10 @@ import ContestLeaderboard from "./ContestLeaderboard";
 import HandleCookies from "../../utils/HandleCookies";
 import { toast } from "react-toastify";
 import { calculateDuration } from "../../utils/dateUtils";
+import { useTranslation } from "react-i18next";
 
 const ContestDetail = ({ isVirtual = false }) => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [contest, setContest] = useState(null);
   const [problems, setProblems] = useState([]);
@@ -54,17 +56,24 @@ const ContestDetail = ({ isVirtual = false }) => {
             navigate("/404");
           }
           // fetch virtual contest first
-          const virtualResponse = await ContestApi.getVirtualContestIfExists(userId);
+          const virtualResponse = await ContestApi.getVirtualContestIfExists(
+            userId
+          );
           setVirtualContest(virtualResponse.data.data);
 
           console.log(virtualResponse);
           // check if current user is the creator of the virtual contest
-          if (userId !== virtualResponse.data.data.user || id !== virtualResponse.data.data.id?.toString()) {
+          if (
+            userId !== virtualResponse.data.data.user ||
+            id !== virtualResponse.data.data.id?.toString()
+          ) {
             navigate("/404");
           }
 
           // fetch original contest detail
-          const contestResponse = await ContestApi.getContestById(virtualResponse.data.data.contest);
+          const contestResponse = await ContestApi.getContestById(
+            virtualResponse.data.data.contest
+          );
           setContest(contestResponse.data.data);
         } else {
           const response = await ContestApi.getContestById(id);
@@ -107,14 +116,12 @@ const ContestDetail = ({ isVirtual = false }) => {
   }, [searchParams]);
 
   const generateHourOptions = () => {
-    return Array.from({ length: 24 }, (_, i) => 
-      i.toString().padStart(2, '0')
-    );
+    return Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"));
   };
 
   const generateMinuteOptions = () => {
-    return Array.from({ length: 12 }, (_, i) => 
-      (i * 5).toString().padStart(2, '0')
+    return Array.from({ length: 12 }, (_, i) =>
+      (i * 5).toString().padStart(2, "0")
     );
   };
 
@@ -132,7 +139,12 @@ const ContestDetail = ({ isVirtual = false }) => {
       }
 
       const startTime = new Date(selectedDate);
-      startTime.setHours(parseInt(selectedHour), parseInt(selectedMinute), 0, 0);
+      startTime.setHours(
+        parseInt(selectedHour),
+        parseInt(selectedMinute),
+        0,
+        0
+      );
 
       // Validate if selected time is in the future
       if (startTime <= new Date()) {
@@ -154,8 +166,8 @@ const ContestDetail = ({ isVirtual = false }) => {
         setSelectedHour("");
         setSelectedMinute("");
 
-        navigate(`/virtual-contest/${response.data.data.id}`)
-        window.location.reload()
+        navigate(`/virtual-contest/${response.data.data.id}`);
+        window.location.reload();
       } else {
         toast.error("Failed to create virtual contest");
       }
@@ -172,7 +184,9 @@ const ContestDetail = ({ isVirtual = false }) => {
     setActiveTab(newValue);
     // Update URL without reloading
     if (isVirtual) {
-      navigate(`/virtual-contest/${virtualContest?.id}?tab=${newValue}`, { replace: true });
+      navigate(`/virtual-contest/${virtualContest?.id}?tab=${newValue}`, {
+        replace: true,
+      });
     } else {
       navigate(`/contest/${id}?tab=${newValue}`, { replace: true });
     }
@@ -222,12 +236,9 @@ const ContestDetail = ({ isVirtual = false }) => {
         >
           <AccessTime sx={{ fontSize: 60, color: "primary.main" }} />
           <Typography variant="h5" color="primary">
-            Contest hasn't started yet
+            {t("contestDetail.notStartedYet")}
           </Typography>
-          <ContestTimer
-            {...getContestTimes()}
-            name={contest?.name}
-          />
+          <ContestTimer {...getContestTimes()} name={contest?.name} />
         </Box>
       );
     }
@@ -239,8 +250,8 @@ const ContestDetail = ({ isVirtual = false }) => {
           onChange={handleTabChange}
           sx={{ borderBottom: 1, borderColor: "divider" }}
         >
-          <Tab value="problems" label="Problems" />
-          <Tab value="standing" label="Standings" />
+          <Tab value="problems" label={t("contestDetail.problems")} />
+          <Tab value="standing" label={t("contestDetail.standings")} />
         </Tabs>
         <Box sx={{ mt: 2 }}>
           {activeTab === "problems" && (
@@ -250,7 +261,12 @@ const ContestDetail = ({ isVirtual = false }) => {
               virtualContestId={isVirtual ? virtualContest?.id : null}
             />
           )}
-          {activeTab === "standing" && <ContestLeaderboard contest={contest} virtualContestId={isVirtual ? virtualContest?.id : null} />}
+          {activeTab === "standing" && (
+            <ContestLeaderboard
+              contest={contest}
+              virtualContestId={isVirtual ? virtualContest?.id : null}
+            />
+          )}
         </Box>
       </>
     );
@@ -277,14 +293,21 @@ const ContestDetail = ({ isVirtual = false }) => {
             <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
               <Typography variant="h5">{contest?.name}</Typography>
               <Chip label={contest?.type} color="primary" size="small" />
-              <Box sx={{ ml: "auto", display: "flex", alignItems: "center", gap: 2 }}>
+              <Box
+                sx={{
+                  ml: "auto",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                }}
+              >
                 {isContestFinished() && !isVirtual && (
                   <Button
                     variant="contained"
                     color="primary"
                     onClick={() => setCreateVirtualModalOpen(true)}
                   >
-                    Create Virtual Contest
+                    {t("contestDetail.createVirtualContest")}
                   </Button>
                 )}
                 <ContestTimer
@@ -302,35 +325,38 @@ const ContestDetail = ({ isVirtual = false }) => {
       <Container maxWidth="lg" sx={{ py: 3 }}>
         {!isContestStarted() && renderContestContent()}
       </Container>
-      <Dialog 
-        open={createVirtualModalOpen} 
+      <Dialog
+        open={createVirtualModalOpen}
         onClose={() => setCreateVirtualModalOpen(false)}
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Create Virtual Contest</DialogTitle>
+        <DialogTitle>{t("contestDetail.createVirtualContest")}</DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2 }}>
             <Typography variant="subtitle1" gutterBottom>
-              Contest: {contest?.name}
+              {t("contestDetail.contest")}: {contest?.name}
             </Typography>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              Duration: {calculateDuration(contest?.startTime, contest?.endTime)}
+              {t("contestDetail.duration")}:{" "}
+              {calculateDuration(contest?.startTime, contest?.endTime)}
             </Typography>
-            <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box
+              sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 2 }}
+            >
               <TextField
                 type="date"
-                label="Date"
+                label={t("contestDetail.date")}
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
                 InputLabelProps={{ shrink: true }}
-                inputProps={{ min: new Date().toISOString().split('T')[0] }}
+                inputProps={{ min: new Date().toISOString().split("T")[0] }}
                 fullWidth
               />
-              <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ display: "flex", gap: 2 }}>
                 <TextField
                   select
-                  label="Hour"
+                  label={t("contestDetail.hour")}
                   value={selectedHour}
                   onChange={(e) => setSelectedHour(e.target.value)}
                   sx={{ flex: 1 }}
@@ -343,7 +369,7 @@ const ContestDetail = ({ isVirtual = false }) => {
                 </TextField>
                 <TextField
                   select
-                  label="Minute"
+                  label={t("contestDetail.minute")}
                   value={selectedMinute}
                   onChange={(e) => setSelectedMinute(e.target.value)}
                   sx={{ flex: 1 }}
@@ -359,13 +385,15 @@ const ContestDetail = ({ isVirtual = false }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCreateVirtualModalOpen(false)}>Cancel</Button>
-          <Button 
+          <Button onClick={() => setCreateVirtualModalOpen(false)}>
+            {t("contestDetail.cancel")}
+          </Button>
+          <Button
             onClick={handleCreateVirtual}
             variant="contained"
             disabled={!selectedDate || !selectedHour || !selectedMinute}
           >
-            Create
+            {t("contestDetail.create")}
           </Button>
         </DialogActions>
       </Dialog>

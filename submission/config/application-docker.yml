@@ -17,3 +17,10 @@ eureka:
 jwt:
   private-key: /keys/private-key.pem
   public-key: /keys/public-key.pem
+
+# MOSS configuration
+moss:
+  script:
+    path: /app/moss
+  temp:
+    dir: /tmp/moss

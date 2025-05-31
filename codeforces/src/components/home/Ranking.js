@@ -1,116 +1,39 @@
 import "../../assets/css/ranking.css";
+import { useTranslation } from "react-i18next";
+
 const Ranking = ({ username, rating = 0, title = false }) => {
+  const { t } = useTranslation();
+
+  const getRankData = (rating) => {
+    if (rating < 1200)
+      return { title: t("ranking.newbie"), color: "text-gray-600" };
+    if (rating < 1400)
+      return { title: t("ranking.pupil"), color: "text-green-600" };
+    if (rating < 1600)
+      return { title: t("ranking.specialist"), color: "text-cyan-400" };
+    if (rating < 1900)
+      return { title: t("ranking.expert"), color: "text-blue-600" };
+    if (rating < 2400)
+      return { title: t("ranking.master"), color: "text-yellow-300" };
+    if (rating < 3000)
+      return { title: t("ranking.grandmaster"), color: "text-purple-600" };
+    return { title: t("ranking.legendaryGrandmaster"), color: "text-red-600" };
+  };
+
+  const { title: rankTitle, color } = getRankData(rating);
+
   if (title) {
-    if (rating < 1200) {
-      return (
-        <>
-          <h1 className="text-[20px] text-gray-600 font-bold">Newbie</h1>
-          <h1 className="text-[20px] text-gray-600 font-bold">
-            {username || "Username"}
-          </h1>
-        </>
-      );
-    } else {
-      if (rating < 1400) {
-        return (
-          <>
-            <h1 className="text-[20px] text-green-600 font-bold">Pupil</h1>
-            <h1 className="text-[20px] text-green-600 font-bold">
-              {username || "Username"}
-            </h1>
-          </>
-        );
-      } else {
-        if (rating < 1600) {
-          return (
-            <>
-              <h1 className="text-[20px] text-cyan-400 font-bold">
-                Specialist
-              </h1>
-              <h1 className="text-[20px] text-cyan-400 font-bold">
-                {username || "Username"}
-              </h1>
-            </>
-          );
-        } else {
-          if (rating < 1900) {
-            return (
-              <>
-                <h1 className="text-[20px] text-blue-600 font-bold">Expert</h1>
-                <h1 className="text-[20px] text-blue-600 font-bold">
-                  {username || "Username"}
-                </h1>
-              </>
-            );
-          } else {
-            if (rating < 2400) {
-              return (
-                <>
-                  <h1 className="text-[20px] text-yellow-300 font-bold">
-                    Master
-                  </h1>
-                  <h1 className="text-[20px] text-yellow-300 font-bold">
-                    {username || "Username"}
-                  </h1>
-                </>
-              );
-            } else {
-              if (rating < 3000) {
-                return (
-                  <>
-                    <h1 className="text-[20px] text-purple-600 font-bold">
-                      Grandmaster
-                    </h1>
-                    <h1 className="text-[20px] text-purple-600 font-bold">
-                      {username || "Username"}
-                    </h1>
-                  </>
-                );
-              } else {
-                return (
-                  <>
-                    <h1 className="text-[20px] text-red-600 font-bold">
-                      Legendary Grandmaster
-                    </h1>
-                    <h1 className="text-[20px] text-red-600 font-bold">
-                      {username || "Username"}
-                    </h1>
-                  </>
-                );
-              }
-            }
-          }
-        }
-      }
-    }
+    return (
+      <>
+        <h1 className={`text-[20px] ${color} font-bold`}>{rankTitle}</h1>
+        <h1 className={`text-[20px] ${color} font-bold`}>
+          {username || t("ranking.username")}
+        </h1>
+      </>
+    );
   }
-  if (rating < 1200) {
-    return <p className="text-gray-600">{username || "Username"}</p>;
-  } else {
-    if (rating < 1400) {
-      return <p className=" text-green-600">{username || "Username"}</p>;
-    } else {
-      if (rating < 1600) {
-        return <p className=" text-cyan-400">{username || "Username"}</p>;
-      } else {
-        if (rating < 1900) {
-          return <p className=" text-blue-600 ">{username || "Username"}</p>;
-        } else {
-          if (rating < 2400) {
-            return <p className=" text-yellow-300">{username || "Username"}</p>;
-          } else {
-            if (rating < 3000) {
-              return (
-                <p className=" text-purple-600">{username || "Username"}</p>
-              );
-            } else {
-              return <p className=" text-red-600">{username || "Username"}</p>;
-            }
-          }
-        }
-      }
-    }
-  }
+
+  return <p className={color}>{username || t("ranking.username")}</p>;
 };
 
 export default Ranking;

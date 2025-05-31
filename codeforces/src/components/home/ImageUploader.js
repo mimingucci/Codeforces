@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Button,
@@ -22,6 +23,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif"];
 
 export default function ImageUploader({ user, isHome = false }) {
+  const { t } = useTranslation();
   const [imagePreview, setImagePreview] = useState(null);
   const [avatar, setAvatar] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -35,9 +37,10 @@ export default function ImageUploader({ user, isHome = false }) {
   const filePicekerRef = useRef(null);
 
   const validateFile = (file) => {
-    if (!file) return "No file selected";
-    if (!ALLOWED_TYPES.includes(file.type)) return "Invalid file type";
-    if (file.size > MAX_FILE_SIZE) return "File size too large (max 5MB)";
+    if (!file) return t("imageUploader.noFileSelected");
+    if (!ALLOWED_TYPES.includes(file.type))
+      return t("imageUploader.invalidFileType");
+    if (file.size > MAX_FILE_SIZE) return t("imageUploader.fileTooLarge");
     return null;
   };
 
@@ -64,7 +67,7 @@ export default function ImageUploader({ user, isHome = false }) {
         setError("");
       };
     } catch (err) {
-      setError("Error reading file");
+      setError(t("imageUploader.errorReading"));
     }
   };
 
@@ -124,9 +127,9 @@ export default function ImageUploader({ user, isHome = false }) {
         accessToken: HandleCookies.getCookie("token"),
       });
 
-      window.location.replace("/profile/" + user?.id);
+      window.location.replace("/profile/" + user?.username);
     } catch (err) {
-      setError("Failed to upload image");
+      setError(t("imageUploader.uploadFailed"));
     } finally {
       setLoading(false);
     }
@@ -140,7 +143,7 @@ export default function ImageUploader({ user, isHome = false }) {
       await UserApi.unsetImage(HandleCookies.getCookie("token"));
       window.location.replace("/profile/" + user?.username);
     } catch (err) {
-      setError("Failed to remove avatar");
+      setError(t("imageUploader.removeFailed"));
     } finally {
       setLoading(false);
       setConfirmUnsetOpen(false);
@@ -247,7 +250,7 @@ export default function ImageUploader({ user, isHome = false }) {
               }
             }}
           >
-            Cancel
+            {t("imageUploader.cancel")}
           </Button>
           <Button
             variant="contained"
@@ -255,7 +258,11 @@ export default function ImageUploader({ user, isHome = false }) {
             onClick={handleUploadAvatar}
             disabled={loading}
           >
-            {loading ? <CircularProgress size={24} /> : "Upload"}
+            {loading ? (
+              <CircularProgress size={24} />
+            ) : (
+              t("imageUploader.upload")
+            )}
           </Button>
         </Box>
       )}
@@ -266,7 +273,7 @@ export default function ImageUploader({ user, isHome = false }) {
         fullWidth
         onClose={() => setCropDialogOpen(false)}
       >
-        <DialogTitle>Crop Image</DialogTitle>
+        <DialogTitle>{t("imageUploader.cropTitle")}</DialogTitle>
         <DialogContent>
           <Box sx={{ position: "relative", height: 400 }}>
             <Cropper
@@ -281,14 +288,16 @@ export default function ImageUploader({ user, isHome = false }) {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCropDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setCropDialogOpen(false)}>
+            {t("imageUploader.cancel")}
+          </Button>
           <Button
             onClick={() => {
               setCropDialogOpen(false);
             }}
             variant="contained"
           >
-            Apply
+            {t("imageUploader.apply")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -299,17 +308,14 @@ export default function ImageUploader({ user, isHome = false }) {
         aria-labelledby="unset-avatar-dialog"
       >
         <DialogTitle id="unset-avatar-dialog">
-          Remove Profile Picture
+          {t("imageUploader.removeTitle")}
         </DialogTitle>
         <DialogContent>
-          <Typography>
-            Are you sure you want to remove your profile picture? This action
-            cannot be undone.
-          </Typography>
+          <Typography>{t("imageUploader.removeConfirmation")}</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmUnsetOpen(false)} disabled={loading}>
-            Cancel
+            {t("imageUploader.cancel")}
           </Button>
           <Button
             onClick={handleUnsetAvatar}
@@ -320,7 +326,7 @@ export default function ImageUploader({ user, isHome = false }) {
               loading ? <CircularProgress size={20} /> : <DeleteOutline />
             }
           >
-            {loading ? "Removing..." : "Remove"}
+            {loading ? t("imageUploader.removing") : t("imageUploader.remove")}
           </Button>
         </DialogActions>
       </Dialog>

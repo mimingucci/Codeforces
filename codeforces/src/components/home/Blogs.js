@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
-import { 
-  Box, 
-  Pagination, 
-  CircularProgress, 
+import {
+  Box,
+  Pagination,
+  CircularProgress,
   Alert,
   Stack,
-  Container
+  Container,
 } from "@mui/material";
 import BlogApi from "../../getApi/BlogApi";
 import Blog from "./Blog";
+import { useTranslation } from "react-i18next";
 
 const Blogs = ({ author = "" }) => {
+  const { t } = useTranslation();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,7 +22,7 @@ const Blogs = ({ author = "" }) => {
   const fetchBlogs = async (pageNumber) => {
     try {
       setLoading(true);
-      const res = await (author.length === 0 
+      const res = await (author.length === 0
         ? BlogApi.getAllBlogs(pageNumber - 1)
         : BlogApi.getBlogByAuthor(author, pageNumber - 1));
 
@@ -48,7 +50,7 @@ const Blogs = ({ author = "" }) => {
   if (error) {
     return (
       <Alert severity="error" sx={{ mt: 2 }}>
-        {error}
+        {t("blogs.fetchError")}
       </Alert>
     );
   }
@@ -65,7 +67,7 @@ const Blogs = ({ author = "" }) => {
             {blogs.map((blog) => (
               <Blog blog={blog} key={blog.id} />
             ))}
-            
+
             {totalPages > 1 && (
               <Box display="flex" justifyContent="center" py={3}>
                 <Pagination

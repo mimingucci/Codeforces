@@ -4,8 +4,12 @@ import SubmissionApi from "../../getApi/SubmissionApi";
 import icons from "../../utils/icons";
 import tippy from "tippy.js";
 import "tippy.js/dist/tippy.css";
+import { useTranslation } from "react-i18next";
+
 const { FaArrowRightLong } = icons;
+
 const SubmitDetail = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [submission, setSubmission] = useState(null);
   const navigate = useNavigate();
@@ -27,28 +31,42 @@ const SubmitDetail = () => {
   function handleCopy() {
     navigator.clipboard.writeText(submission?.code);
     tippy("#copyButton", {
-      content: "Copied",
-      //   interactive: true,
+      content: t("submitDetail.copied"),
       trigger: "click",
       duration: 300,
-      //   placement: "top",
     }).show();
   }
   return (
     <div className="mr-5 mt-5">
       <div>
-        <div className="bg-gray-300 rounded-t-md">General</div>
+        <div className="bg-gray-300 rounded-t-md">
+          {t("submitDetail.general")}
+        </div>
         <table className="table-auto w-full border-collapse border border-slate-300">
           <thead>
             <tr>
               <th className="border border-slate-300">#</th>
-              <th className="border border-slate-300">When</th>
-              <th className="border border-slate-300">Who</th>
-              <th className="border border-slate-300">Problem</th>
-              <th className="border border-slate-300">Lang</th>
-              <th className="border border-slate-300">Verdict</th>
-              <th className="border border-slate-300">Time</th>
-              <th className="border border-slate-300">Memory</th>
+              <th className="border border-slate-300">
+                {t("submitDetail.when")}
+              </th>
+              <th className="border border-slate-300">
+                {t("submitDetail.who")}
+              </th>
+              <th className="border border-slate-300">
+                {t("submitDetail.problem")}
+              </th>
+              <th className="border border-slate-300">
+                {t("submitDetail.lang")}
+              </th>
+              <th className="border border-slate-300">
+                {t("submitDetail.verdict")}
+              </th>
+              <th className="border border-slate-300">
+                {t("submitDetail.time")}
+              </th>
+              <th className="border border-slate-300">
+                {t("submitDetail.memory")}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -96,7 +114,7 @@ const SubmitDetail = () => {
         <div className="flex justify-between">
           <div className="flex items-center text-blue-800">
             <FaArrowRightLong size={20} className="mx-[5px] " />
-            Source
+            {t("submitDetail.source")}
           </div>
           <div className="">
             <button
@@ -104,7 +122,7 @@ const SubmitDetail = () => {
               onClick={handleCopy}
               id="copyButton"
             >
-              Copy
+              {t("submitDetail.copy")}
             </button>
           </div>
         </div>

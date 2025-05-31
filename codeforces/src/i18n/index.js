@@ -15,12 +15,21 @@ const resources = {
   },
 };
 
+// Safe localStorage access
+const getStoredLanguage = () => {
+  try {
+    return localStorage.getItem("language") || "en";
+  } catch {
+    return "en";
+  }
+};
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
-    lng: localStorage.getItem("language") || "en", // Default language
+    lng: getStoredLanguage(),
     fallbackLng: "en",
     debug: process.env.NODE_ENV === "development",
 
@@ -31,7 +40,22 @@ i18n
     detection: {
       order: ["localStorage", "navigator", "htmlTag"],
       caches: ["localStorage"],
+      lookupLocalStorage: "language",
+      checkWhitelist: true,
+    },
+
+    react: {
+      useSuspense: false,
     },
   });
+
+// Listen for language changes and save to localStorage
+i18n.on("languageChanged", (lng) => {
+  try {
+    localStorage.setItem("language", lng);
+  } catch (error) {
+    console.warn("Cannot save language to localStorage:", error);
+  }
+});
 
 export default i18n;

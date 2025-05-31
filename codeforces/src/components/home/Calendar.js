@@ -5,8 +5,10 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import ContestApi from "../../getApi/ContestApi";
 import { Box, Typography, CircularProgress } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const Calendar = () => {
+  const { t } = useTranslation();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -99,7 +101,7 @@ const Calendar = () => {
         alignItems="center"
         height="400px"
       >
-        <Typography color="error">{error}</Typography>
+        <Typography color="error">{t("calendar.loadError")}</Typography>
       </Box>
     );
   }
