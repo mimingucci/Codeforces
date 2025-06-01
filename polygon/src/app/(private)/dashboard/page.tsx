@@ -22,6 +22,7 @@ import {
   Code as ProblemIcon,
   Send as SubmissionIcon,
   Dashboard as DashboardIcon,
+  Security as SecurityIcon,
 } from '@mui/icons-material';
 import Image from 'next/image';
 import UserManagement from '@/components/Dashboard/UserManagement';
@@ -29,6 +30,7 @@ import ContestManagement from '@/components/Dashboard/ContestManagement';
 import ProblemManagement from '@/components/Dashboard/ProblemManagement';
 import SubmissionManagement from '@/components/Dashboard/SubmissionManagement';
 import DashboardOverview from '@/components/Dashboard/DashboardOverview';
+import MossDetection from '@/components/Dashboard/MossDetection';
 
 const drawerWidth = 240;
 
@@ -51,6 +53,8 @@ export default function Dashboard() {
         return <ProblemManagement />;
       case 'submissions':
         return <SubmissionManagement />;
+      case 'moss':
+        return <MossDetection />;
       default:
         return <DashboardOverview />;
     }
@@ -192,6 +196,22 @@ export default function Dashboard() {
               </ListItemIcon>
               <ListItemText
                 primary="Submissions"
+                sx={{ opacity: open ? 1 : 0 }}
+              />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding sx={{ display: 'block' }}>
+            <ListItemButton
+              selected={selectedSection === 'moss'}
+              onClick={() => setSelectedSection('moss')}
+              sx={{ minHeight: 48 }}
+            >
+              <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto' }}>
+                <SecurityIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="MOSS Detection"
                 sx={{ opacity: open ? 1 : 0 }}
               />
             </ListItemButton>
