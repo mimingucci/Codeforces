@@ -64,46 +64,55 @@ public class VirtualContestService {
                 submissionResultRepository.findByContestId(virtualContest.getContest());
 
         for (SubmissionResultEvent submission : originalSubmissions) {
-            // ignore owner's submission
-            if (submission.getAuthor().equals(virtualContest.getUser())) continue;
+            try {
+                // ignore owner's submission
+                if (submission.getAuthor().equals(virtualContest.getUser())) continue;
 
-            VirtualSubmissionResultEvent virtualSubmission = new VirtualSubmissionResultEvent();
-            virtualSubmission.setId(submission.getId());
-            virtualSubmission.setContest(virtualContest.getContest());
-            virtualSubmission.setVirtualContest(virtualContest.getId());
-            virtualSubmission.setActualStartTime(virtualContest.getActualStartTime());
-            virtualSubmission.setActualEndTime(virtualContest.getActualEndTime());
-            virtualSubmission.setStartTime(virtualContest.getStartTime());
-            virtualSubmission.setEndTime(virtualContest.getEndTime());
-            virtualSubmission.setAuthor(submission.getAuthor());
-            virtualSubmission.setProblem(submission.getProblem());
-            virtualSubmission.setEventType(SubmissionType.SUBMISSION);
+                VirtualSubmissionResultEvent virtualSubmission = new VirtualSubmissionResultEvent();
+                virtualSubmission.setId(submission.getId());
+                virtualSubmission.setContest(virtualContest.getContest());
+                virtualSubmission.setVirtualContest(virtualContest.getId());
+                virtualSubmission.setActualStartTime(virtualContest.getActualStartTime());
+                virtualSubmission.setActualEndTime(virtualContest.getActualEndTime());
+                virtualSubmission.setStartTime(virtualContest.getStartTime());
+                virtualSubmission.setEndTime(virtualContest.getEndTime());
+                virtualSubmission.setAuthor(submission.getAuthor());
+                virtualSubmission.setProblem(submission.getProblem());
+                virtualSubmission.setEventType(SubmissionType.SUBMISSION);
+                virtualSubmission.setVerdict(submission.getVerdict());
+                virtualSubmission.setScore(submission.getScore());
 
-            // Calculate the offset from contest start
-            Duration offset = Duration.between(virtualContest.getActualStartTime(), submission.getJudged_on());
+                // Calculate the offset from contest start
+                Duration offset = Duration.between(virtualContest.getActualStartTime(), submission.getJudged_on());
 
-            // Schedule this submission at the appropriate virtual time
-            Instant virtualJudgeTime = virtualContest.getStartTime().plus(offset);
+                // Schedule this submission at the appropriate virtual time
+                Instant virtualJudgeTime = virtualContest.getStartTime().plus(offset);
 
-            virtualSubmission.setJudged_on(virtualJudgeTime);
+                virtualSubmission.setJudged_on(virtualJudgeTime);
 
-            // Calculate the offset from contest start
-            Duration offset1 = Duration.between(virtualContest.getActualStartTime(), submission.getSent_on());
+                // Calculate the offset from contest start
+                Duration offset1 = Duration.between(virtualContest.getActualStartTime(), submission.getSent_on());
 
-            // Schedule this submission at the appropriate virtual time
-            Instant virtualJudgeTime1 = virtualContest.getStartTime().plus(offset1);
+                // Schedule this submission at the appropriate virtual time
+                Instant virtualJudgeTime1 = virtualContest.getStartTime().plus(offset1);
 
-            virtualSubmission.setSent_on(virtualJudgeTime1);
+                virtualSubmission.setSent_on(virtualJudgeTime1);
 
-            // Schedule the event
-            long delayMillis = Duration.between(Instant.now(), virtualJudgeTime).toMillis();
-            if (delayMillis > 0) {
-                scheduler.schedule(() ->
-                                kafkaTemplate.send(KafkaTopicConstants.VIRTUAL_SUBMISSION_RESULT, virtualSubmission),
-                        delayMillis, TimeUnit.MILLISECONDS);
-            } else {
-                // If the time has already passed, send immediately
-                kafkaTemplate.send(KafkaTopicConstants.VIRTUAL_SUBMISSION_RESULT, virtualSubmission);
+                // Schedule the event
+                long delayMillis = Duration.between(Instant.now(), virtualJudgeTime).toMillis();
+                log.info("Delayed: " + delayMillis/1000);
+                if (delayMillis > 0) {
+                    scheduler.schedule(() ->
+                                    kafkaTemplate.send(KafkaTopicConstants.VIRTUAL_SUBMISSION_RESULT, virtualSubmission),
+                            delayMillis, TimeUnit.MILLISECONDS);
+                } else {
+                    // If the time has already passed, send immediately
+                    kafkaTemplate.send(KafkaTopicConstants.VIRTUAL_SUBMISSION_RESULT, virtualSubmission);
+                }
+            } catch (Exception e) {
+                log.warn("Skipping submission {} due to error: {}", submission.getId(), e.getMessage());
+                // Optionally log the stack trace for debugging:
+                // log.debug("Stack trace:", e);
             }
         }
     }

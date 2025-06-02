@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-05-18T23:38:11+0700",
+    date = "2025-06-03T04:14:50+0700",
     comments = "version: 1.6.3, compiler: javac, environment: Java 17.0.15 (Amazon.com Inc.)"
 )
 @Component
@@ -30,6 +30,7 @@ public class SubmissionResultConverterImpl implements SubmissionResultConverter 
         submissionResultEntity.setMemory_used_bytes( event.getMemory_used_bytes() );
         submissionResultEntity.setScore( event.getScore() );
         submissionResultEntity.setJudged_on( event.getJudged_on() );
+        submissionResultEntity.setSent_on( event.getSent_on() );
 
         return submissionResultEntity;
     }
@@ -50,6 +51,7 @@ public class SubmissionResultConverterImpl implements SubmissionResultConverter 
         submissionResultEvent.setExecution_time_ms( entity.getExecution_time_ms() );
         submissionResultEvent.setMemory_used_bytes( entity.getMemory_used_bytes() );
         submissionResultEvent.setScore( entity.getScore() );
+        submissionResultEvent.setSent_on( entity.getSent_on() );
         submissionResultEvent.setJudged_on( entity.getJudged_on() );
 
         return submissionResultEvent;

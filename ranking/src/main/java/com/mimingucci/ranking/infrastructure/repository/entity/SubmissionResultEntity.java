@@ -35,4 +35,6 @@ public class SubmissionResultEntity {
     private Integer score;
 
     private Instant judged_on;
+
+    private Instant sent_on;
 }

@@ -68,6 +68,7 @@ public class VirtualLeaderboardProcessFunction extends KeyedProcessFunction<Long
 
     @Override
     public void processElement(VirtualSubmissionResultEvent event, Context ctx, Collector<VirtualLeaderboardUpdateSerializable> out) throws Exception {
+        log.info("In contest: " + event.getEventType() + " - " + event.getVerdict() + " - " + event.getSent_on());
         if (event.getEventType().equals(SubmissionType.CONTEST_STARTED) || event.getEventType().equals(SubmissionType.CONTEST_ENDED)) {
             if (event.getEventType().equals(SubmissionType.CONTEST_STARTED)) {
                 log.info("Contest has started");
