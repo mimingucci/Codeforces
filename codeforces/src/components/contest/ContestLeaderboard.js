@@ -19,6 +19,7 @@ import {
 import { styled } from "@mui/material/styles";
 import ProblemApi from "../../getApi/ProblemApi";
 import LeaderboardApi from "../../getApi/LeaderboardApi";
+import UserApi from "../../getApi/UserApi";
 
 // Styled components for better visualization
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -88,6 +89,7 @@ const ContestLeaderboard = ({ contest, virtualContestId = null }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [error, setError] = useState(null);
+  const [userMap, setUserMap] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -103,6 +105,25 @@ const ContestLeaderboard = ({ contest, virtualContestId = null }) => {
 
         setProblems(problemsResponse.data.data);
         setLeaderboard(leaderboardResponse.data.data);
+
+        // Fetch user info for all unique userIds
+        const userIds = [
+          ...new Set(
+            leaderboardResponse.data.data.map((entry) => entry.userId)
+          ),
+        ];
+        const userInfoMap = {};
+        await Promise.all(
+          userIds.map(async (userId) => {
+            try {
+              const res = await UserApi.getUserById(userId);
+              userInfoMap[userId] = res.data.data;
+            } catch (e) {
+              userInfoMap[userId] = { username: userId }; // fallback
+            }
+          })
+        );
+        setUserMap(userInfoMap);
       } catch (error) {
         console.error("Failed to fetch contest data:", error);
         setError("Failed to load contest data");
@@ -173,7 +194,7 @@ const ContestLeaderboard = ({ contest, virtualContestId = null }) => {
                 <TableCell>{entry.rank}</TableCell>
                 <TableCell>
                   <Link href={`/profile/${entry.userId}`} color="primary">
-                    {entry.userId}
+                    {userMap[entry.userId]?.username || entry.userId}
                   </Link>
                 </TableCell>
                 <TableCell align="right">{entry.totalScore}</TableCell>
