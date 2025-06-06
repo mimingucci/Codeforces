@@ -13,35 +13,38 @@ import {
   Avatar,
   Divider,
   Link,
+  CircularProgress,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 const { FaArrowRightLong, FaStar, GoDotFill } = icons;
 
-let userId = HandleCookies.getCookie("id") || "";
 const NavbarPart1 = () => {
   const { t } = useTranslation();
-
   const [detain, setDetain] = useState();
+  const [loading, setLoading] = useState(true);
 
-  const checkLogin = () => {
-    if (HandleCookies.getCookie("id")?.length > 0) {
-      userId = HandleCookies.getCookie("id") || "";
-      return true;
-    }
-    return false;
-  };
-
-  const getDetainUser = () => {
-    UserApi.getUserById(userId).then((res) => setDetain(res?.data?.data));
-  };
+  // Check login status
+  const userId = HandleCookies.getCookie("id") || "";
 
   useEffect(() => {
-    if (checkLogin()) {
-      getDetainUser();
+    if (userId) {
+      setLoading(true);
+      UserApi.getUserById(userId)
+        .then((res) => setDetain(res?.data?.data))
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
-  }, []);
+  }, [userId]);
 
-  if (!checkLogin()) return null;
+  if (!userId) return null;
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" p={2}>
+        <CircularProgress size={32} />
+      </Box>
+    );
+  }
 
   return (
     <Paper
@@ -93,11 +96,11 @@ const NavbarPart1 = () => {
             {[
               {
                 text: t("navbar.settings"),
-                link: `/setting/${detain?.username}`,
+                link: `/setting/${detain?.id}`,
               },
               {
                 text: t("navbar.blogs"),
-                link: `/userblog/${detain?.username}`,
+                link: `/userblog/${detain?.id}`,
               },
               { text: t("navbar.talks"), link: "/chat" },
             ].map((item, index) => (

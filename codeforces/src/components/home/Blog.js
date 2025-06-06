@@ -271,7 +271,7 @@ const Blog = ({ blog }) => {
               variant="caption"
               color="text.secondary"
             >
-              {blog?.tags.join(", ")}
+              {blog?.tags?.join(", ")}
             </Typography>
           </Typography>
         </Box>

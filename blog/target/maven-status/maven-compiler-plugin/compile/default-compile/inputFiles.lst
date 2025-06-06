@@ -3,7 +3,6 @@
 /home/mimingucci/Work/Java/Codeforces/blog/src/main/java/com/mimingucci/blog/common/exception/ApiRequestException.java
 /home/mimingucci/Work/Java/Codeforces/blog/src/main/java/com/mimingucci/blog/common/util/JwtUtil.java
 /home/mimingucci/Work/Java/Codeforces/blog/src/main/java/com/mimingucci/blog/infrastructure/repository/entity/BlogEntity.java
-/home/mimingucci/Work/Java/Codeforces/blog/src/main/java/com/mimingucci/blog/infrastructure/repository/entity/TagEntity.java
 /home/mimingucci/Work/Java/Codeforces/blog/src/main/java/com/mimingucci/blog/presentation/api/impl/BlogControllerImpl.java
 /home/mimingucci/Work/Java/Codeforces/blog/src/main/java/com/mimingucci/blog/infrastructure/util/IdGenerator.java
 /home/mimingucci/Work/Java/Codeforces/blog/src/main/java/com/mimingucci/blog/infrastructure/repository/jpa/BlogJpaRepository.java
@@ -19,7 +18,6 @@
 /home/mimingucci/Work/Java/Codeforces/blog/src/main/java/com/mimingucci/blog/infrastructure/repository/converter/BlogConverter.java
 /home/mimingucci/Work/Java/Codeforces/blog/src/main/java/com/mimingucci/blog/presentation/dto/request/BlogUpdateRequest.java
 /home/mimingucci/Work/Java/Codeforces/blog/src/main/java/com/mimingucci/blog/common/exception/handler/ApiExceptionHandler.java
-/home/mimingucci/Work/Java/Codeforces/blog/src/main/java/com/mimingucci/blog/infrastructure/repository/jpa/TagJpaRepository.java
 /home/mimingucci/Work/Java/Codeforces/blog/src/main/java/com/mimingucci/blog/application/assembler/BlogAssembler.java
 /home/mimingucci/Work/Java/Codeforces/blog/src/main/java/com/mimingucci/blog/common/constant/KafkaTopicConstants.java
 /home/mimingucci/Work/Java/Codeforces/blog/src/main/java/com/mimingucci/blog/application/BlogApplicationService.java

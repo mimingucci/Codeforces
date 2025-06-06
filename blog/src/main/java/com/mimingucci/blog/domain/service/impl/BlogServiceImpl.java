@@ -37,7 +37,7 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public List<Blog> findByTag(String tagName) {
-        return this.blogRepository.findByTag(tagName);
+        return null;
     }
 
     @Override

@@ -222,9 +222,7 @@ const BlogDetail = () => {
         <div className="flex items-center text-[12px]">
           <RiAttachment2 size={15} />
           {t("blog.announcementOf")}{" "}
-          <span className="text-gray-500 mx-[5px]">
-            {p?.tags?.map((tag) => tag.name).join(", ")}
-          </span>
+          <span className="text-gray-500 mx-[5px]">{p?.tags?.join(", ")}</span>
         </div>
         {/* Stats */}
         <StatsContainer>

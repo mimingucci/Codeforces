@@ -127,7 +127,7 @@ export default function ImageUploader({ user, isHome = false }) {
         accessToken: HandleCookies.getCookie("token"),
       });
 
-      window.location.replace("/profile/" + user?.username);
+      window.location.replace("/profile/" + user?.id);
     } catch (err) {
       setError(t("imageUploader.uploadFailed"));
     } finally {

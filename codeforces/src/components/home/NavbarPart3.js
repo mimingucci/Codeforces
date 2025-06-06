@@ -88,7 +88,7 @@ const NavbarPart3 = () => {
                     </TableCell>
                   </TableRow>
                 ))
-              : users?.map((user, index) => (
+              : users?.slice(0, 10)?.map((user, index) => (
                   <TableRow
                     key={user._id}
                     sx={{ "&:nth-of-type(odd)": { bgcolor: "action.hover" } }}

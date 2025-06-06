@@ -6,9 +6,7 @@ import com.mimingucci.blog.domain.model.Blog;
 import com.mimingucci.blog.domain.repository.BlogRepository;
 import com.mimingucci.blog.infrastructure.repository.converter.BlogConverter;
 import com.mimingucci.blog.infrastructure.repository.entity.BlogEntity;
-import com.mimingucci.blog.infrastructure.repository.entity.TagEntity;
 import com.mimingucci.blog.infrastructure.repository.jpa.BlogJpaRepository;
-import com.mimingucci.blog.infrastructure.repository.jpa.TagJpaRepository;
 import com.mimingucci.blog.infrastructure.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,8 +26,6 @@ import java.util.stream.Collectors;
 public class BlogRepositoryImpl implements BlogRepository {
 
     private final BlogJpaRepository blogJpaRepository;
-
-    private final TagJpaRepository tagJpaRepository;
 
     @Override
     public Blog findById(Long id) {
@@ -46,14 +41,6 @@ public class BlogRepositoryImpl implements BlogRepository {
         BlogEntity entity = BlogConverter.INSTANCE.toEntity(blog);
         entity.setId(IdGenerator.INSTANCE.nextId());
 
-        // Process tags
-        if (blog.getTags() != null && !blog.getTags().isEmpty()) {
-            Set<TagEntity> tagEntities = blog.getTags().stream()
-                    .map(this::getOrCreateTag)
-                    .collect(Collectors.toSet());
-            entity.setTags(tagEntities);
-        }
-
         return BlogConverter.INSTANCE.toDomain(this.blogJpaRepository.save(entity));
 
     }
@@ -68,14 +55,6 @@ public class BlogRepositoryImpl implements BlogRepository {
         // Update basic fields
         existingEntity.setTitle(blog.getTitle());
         existingEntity.setContent(blog.getContent());
-
-        // Update tags
-        if (blog.getTags() != null) {
-            Set<TagEntity> tagEntities = blog.getTags().stream()
-                    .map(this::getOrCreateTag)
-                    .collect(Collectors.toSet());
-            existingEntity.setTags(tagEntities);
-        }
 
         return BlogConverter.INSTANCE.toDomain(this.blogJpaRepository.save(existingEntity));
     }
@@ -98,9 +77,6 @@ public class BlogRepositoryImpl implements BlogRepository {
         // Delete the blog
         this.blogJpaRepository.delete(blogEntity);
 
-        // Clean up unused tags (optional)
-        cleanupUnusedTags();
-
         return true;
     }
 
@@ -112,9 +88,7 @@ public class BlogRepositoryImpl implements BlogRepository {
 
     @Override
     public List<Blog> findByTag(String tagName) {
-        return this.blogJpaRepository.findByTagName(tagName).stream()
-                .map(BlogConverter.INSTANCE::toDomain)
-                .collect(Collectors.toList());
+        return null;
     }
 
     @Override
@@ -125,9 +99,7 @@ public class BlogRepositoryImpl implements BlogRepository {
 
     @Override
     public List<Blog> findRecentBlogsByTag(String tagName, Instant since) {
-        return this.blogJpaRepository.findRecentBlogsByTag(tagName, since).stream()
-                .map(BlogConverter.INSTANCE::toDomain)
-                .collect(Collectors.toList());
+        return null;
     }
 
     @Override
@@ -172,22 +144,5 @@ public class BlogRepositoryImpl implements BlogRepository {
         if (!blogEntity.getDislikes().contains(userId)) blogEntity.addDislike(userId);
         else blogEntity.getDislikes().remove(userId);
         return BlogConverter.INSTANCE.toDomain(this.blogJpaRepository.save(blogEntity));
-    }
-
-    private TagEntity getOrCreateTag(String tagName) {
-        return tagJpaRepository.findByNameIgnoreCase(tagName.toLowerCase().trim())
-                .orElseGet(() -> {
-                    TagEntity newTag = new TagEntity();
-                    newTag.setName(tagName.toLowerCase().trim());
-                    return tagJpaRepository.save(newTag);
-                });
-    }
-
-    // Helper method to clean up unused tags
-    private void cleanupUnusedTags() {
-        List<TagEntity> unusedTags = this.tagJpaRepository.findUnusedTags();
-        if (!unusedTags.isEmpty()) {
-            this.tagJpaRepository.deleteAll(unusedTags);
-        }
     }
 }
